@@ -17,7 +17,10 @@ onMounted(fetchUsers);
 </script>
 
 <template>
-  <div class="overflow-x-auto">
+ 
+ <h1>IT-Bangmod Kradan Kanban</h1>
+
+  <div class="overflow-x-auto w-6/12 " >
     <table class="table">
       <!-- head -->
       <thead>
@@ -28,7 +31,7 @@ onMounted(fetchUsers);
           <th>Status</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody >
         <!-- row 1 -->
         <tr class="">
           <th>1</th>
@@ -41,6 +44,7 @@ onMounted(fetchUsers);
             <div class="modal-box">
               <h3 class="font-bold text-lg">Design Backend API for PBI 1,2</h3>
               <p class="py-4">Design Backend API for PBI 1,2</p>
+              <textarea class="textarea textarea-bordered textarea-lg w-full max-w-xs" placeholder="Discripstion"></textarea>
               <div class="modal-action">
                 <label for="my_modal_6" class="btn">Close</label>
               </div>
