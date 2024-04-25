@@ -1,20 +1,20 @@
 <script setup>
-
-import { ref, onMounted } from 'vue'
-import { getItems } from '../libs/fetchUtils.js'
+import { ref, onMounted } from "vue"
+import { getItems } from "../libs/fetchUtils.js"
+import TaskDetail from '../views/TaskDetail.vue'
 
 const todoList = ref([])
-import TaskDetail from './TaskDetail.vue';
-
 
 onMounted(async () => {
   console.log(import.meta.env.VITE_BASE_URL)
-    const items = await getItems(import.meta.env.VITE_BASE_URL)
-    console.log(items)
-    todoList.value = items
-    console.log(todoList.value)
+  const items = await getItems(import.meta.env.VITE_BASE_URL)
+  console.log(items)
+  todoList.value = items
+  console.log(todoList.value)
+  console.log(items)
 })
 </script>
+
 <template>
 <div class="min-h-full">
   <nav class="bg-gray-800" style="background-color: #F785B1;">
@@ -63,6 +63,4 @@ onMounted(async () => {
     </table>
   </div>
  </div>
-</template>
-
 <style scoped></style>
