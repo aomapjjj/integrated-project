@@ -40,27 +40,42 @@ onMounted(async () => {
 <!-- header -->
 <div class="flex flex-col items-center mt-1">
   <div class="overflow-x-auto" >
-    <table class="table w-full bg-white rounded-xl overflow-hidden mt-10">
-      <!-- head -->
-      <thead>
-        <tr class="bg-base-200">
-          <th></th>
-          <th>Title</th>
-          <th>Assignees</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Iterate over todoList -->
-        <tr v-for="(item, index) in todoList" :key="index" class="">
-          <th >{{ index + 1 }}</th> 
-          <!-- <TaskDetail /> -->
-          <td >{{ item.title }}</td>
-          <td>{{ item.assignees }}</td>
-          <td>{{ item.status }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <table class="table mt-10">
+        <!-- head -->
+        <thead>
+          <tr class="bg-base-200">
+            <th></th>
+            <th>Title</th>
+            <th>Assignees</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Iterate over todoList -->
+          <tr v-for="(item, index) in todoList" :key="index" class="">
+            <th>{{ index + 1 }}</th>
+            <!-- <TaskDetail /> -->
+            <TaskDetail />
+            <td>{{ item.title }}</td>
+            <td>
+        <span :class="{'italic text-gray-500': item.assignees.length === 0 || item.assignees === null }">
+       {{item.assignees.length === 0 || item.assignees === null ? "Unassignees" : item.assignees  }}
+       </span>
+
+           </td>
+
+           <td :class="{
+         'bg-red-400': item.status === 'NO_STATUS',
+         'bg-orange-400': item.status === 'TO_DO',
+         'bg-yellow-400': item.status === 'DOING',
+         'bg-green-400': item.status === 'DONE'
+                      }">
+               {{ item.status }}
+          </td>
+          </tr>
+        </tbody>
+      </table>
   </div>
  </div>
+ </template>
 <style scoped></style>
