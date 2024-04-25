@@ -1,22 +1,22 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+
+import { ref, onMounted } from 'vue'
+import { getItems } from '../libs/fetchUtils.js'
+
+const todoList = ref([])
 import TaskDetail from './TaskDetail.vue';
-const TodoList = ref([]);
 
-const fetchUsers = async () => {
-  try {
-    const response = await fetch('/api/...');
-    const data = await response.json();
-    TodoList.value = data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
-};
 
-onMounted(fetchUsers);
+onMounted(async () => {
+  console.log(import.meta.env.VITE_BASE_URL)
+    const items = await getItems(import.meta.env.VITE_BASE_URL)
+    console.log(items)
+    todoList.value = items
+    console.log(todoList.value)
+})
 </script>
 <template>
-<!-- nev bar -->
+ <!-- nev bar -->
 <nav class="bg-gray-800" style="background-color: #F785B1;">
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
     <div class="relative flex h-16 items-center justify-between">
@@ -38,27 +38,19 @@ onMounted(fetchUsers);
           <th>Status</th>
         </tr>
       </thead>
-      <tbody >
-        <!-- row 1 -->
-        <tr class="">
-          <th>1</th>
-         <TaskDetail />
-          <td>Pang;Pong;</td>
-          <td>No Status</td>
+      <tbody>
+        <!-- Iterate over todoList -->
+        <tr v-for="(item, index) in todoList" :key="index" class="">
+          <th>{{ index + 1 }}</th> 
+          <!-- <TaskDetail /> -->
+          <td>{{ item.title }}</td>
+          <td>{{ item.assignees }}</td>
+          <td>{{ item.status }}</td>
         </tr>
-        <!-- row 2 -->
-        <tr class="">
-          <th>2</th>
-          <td>Design UI for PBI 1,2</td>
-          <td>Ping</td>
-          <td>To do</td>
-        </tr>
-
       </tbody>
     </table>
   </div>
-</div>
-
+ </div>
 </template>
 
 <style scoped></style>
