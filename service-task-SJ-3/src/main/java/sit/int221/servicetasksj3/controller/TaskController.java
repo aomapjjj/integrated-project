@@ -21,6 +21,12 @@ public class TaskController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @GetMapping("/v2/tasks")
+    public List<Task> getTasks(){
+        return  service.getTasks();
+    }
+
+
     @GetMapping("/v1/tasks")
     public List<TaskDTO> getAllTasks(){
         return service.getAllTasks();

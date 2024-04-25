@@ -24,6 +24,7 @@ public class TaskService {
     private ListMapper listMapper;
 
     public List<Task> getTasks(){
+
         return repository.findAll();
     }
 
