@@ -15,13 +15,20 @@ const fetchUsers = async () => {
 
 onMounted(fetchUsers);
 </script>
-
 <template>
- 
- <h1>IT-Bangmod Kradan Kanban</h1>
+<!-- nev bar -->
+<nav class="bg-gray-800" style="background-color: #F785B1;">
+  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden"></div>
+    </div>
+  </div>
+</nav>
 
+<div class="flex flex-col items-center mt-20">
+  <h1>IT-Bangmod Kradan Kanban</h1>
   <div class="overflow-x-auto w-6/12 " >
-    <table class="table">
+    <table class="table mt-10">
       <!-- head -->
       <thead>
         <tr class="bg-base-200">
@@ -64,6 +71,8 @@ onMounted(fetchUsers);
       </tbody>
     </table>
   </div>
+</div>
+
 </template>
 
 <style scoped></style>
