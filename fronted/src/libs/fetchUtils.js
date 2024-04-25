@@ -1,7 +1,7 @@
 async function getItems(url) {
   try {
-
-    const data = await fetch(url); //GET Method
+    console.log(import.meta.env.VITE_BASE_URL)
+    const data = await fetch(`${url}`); //GET Method
     const items = await data.json();
     return items;
   } catch (error) {

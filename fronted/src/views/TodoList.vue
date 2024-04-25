@@ -1,24 +1,32 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
+import { getItems } from '../libs/fetchUtils.js'
 
-const TodoList = ref([]);
+const todoList = ref([])
 
-const fetchUsers = async () => {
-  try {
-    const response = await fetch('/api/...');
-    const data = await response.json();
-    TodoList.value = data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
-};
-
-onMounted(fetchUsers);
+onMounted(async () => {
+  console.log(import.meta.env.VITE_BASE_URL)
+    const items = await getItems(import.meta.env.VITE_BASE_URL)
+    console.log(items)
+    todoList.value = items
+    console.log(todoList.value)
+})
 </script>
 
 <template>
-  <div class="overflow-x-auto">
-    <table class="table">
+ <!-- nev bar -->
+<nav class="bg-gray-800" style="background-color: #F785B1;">
+  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <div class="absolute inset-y-0 left-0 flex items-center sm:hidden"></div>
+    </div>
+  </div>
+</nav>
+ <h3 class="font-bold text-lg">IT-Bangmod Kradan Kanban</h3>
+<div class="flex flex-col items-center mt-20">
+  <h1>IT-Bangmod Kradan Kanban</h1>
+  <div class="overflow-x-auto w-6/12 " >
+    <table class="table mt-10">
       <!-- head -->
       <thead>
         <tr class="bg-base-200">
@@ -29,36 +37,17 @@ onMounted(fetchUsers);
         </tr>
       </thead>
       <tbody>
-        <!-- row 1 -->
-        <tr class="">
-          <th>1</th>
-          <!-- The button to open modal -->
-          <label for="my_modal_6" class="btn">
-            <td>Design Backend API for PBI 1,2</td>
-          </label>
-          <input type="checkbox" id="my_modal_6" class="modal-toggle" />
-          <div class="modal" role="dialog">
-            <div class="modal-box">
-              <h3 class="font-bold text-lg">Design Backend API for PBI 1,2</h3>
-              <p class="py-4">Design Backend API for PBI 1,2</p>
-              <div class="modal-action">
-                <label for="my_modal_6" class="btn">Close</label>
-              </div>
-            </div>
-          </div>
-          <td>Pang;Pong;</td>
-          <td>No Status</td>
+        <!-- Iterate over todoList -->
+        <tr v-for="(item, index) in todoList" :key="index" class="">
+          <th>{{ index + 1 }}</th> 
+          <!-- <TaskDetail /> -->
+          <td>{{ item.title }}</td>
+          <td>{{ item.assignees }}</td>
+          <td>{{ item.status }}</td>
         </tr>
-        <!-- row 2 -->
-        <tr class="">
-          <th>2</th>
-          <td>Design UI for PBI 1,2</td>
-          <td>Ping</td>
-          <td>To do</td>
-        </tr>
-
       </tbody>
     </table>
+  </div>
   </div>
 </template>
 
