@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-
+import TaskDetail from './TaskDetail.vue';
 const TodoList = ref([]);
 
 const fetchUsers = async () => {
@@ -24,7 +24,7 @@ onMounted(fetchUsers);
     </div>
   </div>
 </nav>
-
+ <h3 class="font-bold text-lg">IT-Bangmod Kradan Kanban</h3>
 <div class="flex flex-col items-center mt-20">
   <h1>IT-Bangmod Kradan Kanban</h1>
   <div class="overflow-x-auto w-6/12 " >
@@ -42,21 +42,7 @@ onMounted(fetchUsers);
         <!-- row 1 -->
         <tr class="">
           <th>1</th>
-          <!-- The button to open modal -->
-          <label for="my_modal_6" class="btn">
-            <td>Design Backend API for PBI 1,2</td>
-          </label>
-          <input type="checkbox" id="my_modal_6" class="modal-toggle" />
-          <div class="modal" role="dialog">
-            <div class="modal-box">
-              <h3 class="font-bold text-lg">Design Backend API for PBI 1,2</h3>
-              <p class="py-4">Design Backend API for PBI 1,2</p>
-              <textarea class="textarea textarea-bordered textarea-lg w-full max-w-xs" placeholder="Discripstion"></textarea>
-              <div class="modal-action">
-                <label for="my_modal_6" class="btn">Close</label>
-              </div>
-            </div>
-          </div>
+         <TaskDetail />
           <td>Pang;Pong;</td>
           <td>No Status</td>
         </tr>
