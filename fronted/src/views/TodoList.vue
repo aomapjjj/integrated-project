@@ -1,8 +1,11 @@
 <script setup>
+
 import { ref, onMounted } from 'vue'
 import { getItems } from '../libs/fetchUtils.js'
 
 const todoList = ref([])
+import TaskDetail from './TaskDetail.vue';
+
 
 onMounted(async () => {
   console.log(import.meta.env.VITE_BASE_URL)
@@ -12,7 +15,6 @@ onMounted(async () => {
     console.log(todoList.value)
 })
 </script>
-
 <template>
  <!-- nev bar -->
 <nav class="bg-gray-800" style="background-color: #F785B1;">
@@ -48,7 +50,7 @@ onMounted(async () => {
       </tbody>
     </table>
   </div>
-  </div>
+ </div>
 </template>
 
 <style scoped></style>
