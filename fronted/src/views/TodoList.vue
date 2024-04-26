@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { getItems } from "../libs/fetchUtils.js"
+import { getItems, getItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 
 const todoList = ref([])
+const selectedTodoId = ref(0)
 
 onMounted(async () => {
   console.log(import.meta.env.VITE_BASE_URL)
@@ -13,6 +14,10 @@ onMounted(async () => {
   console.log(todoList.value)
   console.log(items)
 })
+
+const selectTodo = (todoId) => {
+  selectedTodoId.value = todoId
+}
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -64,11 +69,14 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
         </thead>
         <tbody>
           <!-- Iterate over todoList -->
+          <TaskDetail :todo-id="selectedTodoId" />
           <tr v-for="(item, index) in todoList" :key="index">
             <th>{{ item.id }}</th>
-            <!-- <TaskDetail /> -->
-            <TaskDetail />
-            <label for="my_modal_6">
+            <label
+              for="my_modal_6"
+              class="btn"
+              @click="() => selectTodo(item.id)"
+            >
               <td>{{ item.title }}</td>
             </label>
             <td>
@@ -97,6 +105,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               {{ item.status }}
             </td>
           </tr>
+         
         </tbody>
         <tbody v-if="todoList.length === 0">
           <tr>
