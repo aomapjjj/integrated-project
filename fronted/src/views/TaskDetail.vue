@@ -2,10 +2,6 @@
 
 <template>
 
-  <label for="my_modal_6" class="btn">
-    <td>Design Backend API for PBI 1,2</td>
-  </label>
-
 
   <input type="checkbox" id="my_modal_6" class="modal-toggle" />
 
