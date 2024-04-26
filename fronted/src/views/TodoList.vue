@@ -20,6 +20,7 @@ const selectTodo = (todoId) => {
 }
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
 </script>
 <template>
   <div class="min-h-full">
@@ -42,28 +43,28 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       </div>
     </nav>
   </div>
+
   <!-- header -->
   <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6">
       <h1
-        class="text-3xl font-bold tracking-tight text-gray-900"
-        style="color: #9391e4"
-      >
+        class="text-3xl font-bold tracking-tight text-gray-900" style="color: #9391e4">
         IT-Bangmod Kradan Kanban TimeZone : {{ TimeZone }}
       </h1>
     </div>
   </header>
-  <!-- header -->
-  <div class="flex flex-col items-center mt-1">
+  <!-- header --> 
+
+  <div class="flex flex-col items-center mt-1" >
     <div class="overflow-x-auto">
-      <table class="table mt-10">
+      <table class="table mt-10 rounded-xl overflow-hidden">
         <!-- head -->
         <thead>
-          <tr class="bg-base-200">
-            <th></th>
-            <th>Title</th>
-            <th>Assignees</th>
-            <th>Status</th>
+          <tr class="bg-base-200 mt-4" style="background-color: #9FC3E9;">
+            <th class="hidden md:table-cell px-4 py-2 text-center text-sm font-semibold text-gray-700">No.</th>
+            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700">Title</th>
+            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700">Assignees</th>
+            <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -92,13 +93,13 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 }}
               </span>
             </td>
-
             <td
               :class="{
-                'bg-red-400': item.status === 'NO_STATUS',
-                'bg-orange-400': item.status === 'TO_DO',
-                'bg-yellow-400': item.status === 'DOING',
-                'bg-green-400': item.status === 'DONE'
+                  'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+                  'border-blue-500 text-blue-500': item.status === 'NO_STATUS',
+                  'border-red-500 text-red-500': item.status === 'TO_DO',
+                  'border-yellow-500 text-yellow-500': item.status === 'DOING',
+                  'border-green-500 text-green-500': item.status === 'DONE'
               }"
             >
               {{ item.status }}
@@ -110,7 +111,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <tr>
             <td
               colspan="4"
-              width="300px"
+              width="1000px"
               class="text-center py-4 text-gray-500"
             >
               No task
