@@ -1,34 +1,17 @@
-const items = [
+
+const items = 
     {
         "id": 5,
         "title": "TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0",
         "assignees": "Assignees1Assignees2Assignees3",
-        "status": "NO_STATUS"
-    },
-    {
-        "id": 6,
-        "title": "Repository",
-        "assignees": "",
         "status": "TO_DO"
-    },
-    {
-        "id": 7,
-        "title": "ดาต้าเบส",
-        "assignees": "あなた、彼、彼女(私では ありません)",
-        "status": "DOING"
-    },
-    {
-        "id": 8,
-        "title": "_Infrastructure_",
-        "assignees": "ไก่งวง กับ เพนกวิน",
-        "status": "DONE"
-    },
+    }
 
-
-]
-const checkEmpty = items.filter((item) => item === null || item === undefined)
-
-//console.log(checkEmpty)
+    function toCamelCase(str) {
+        return str.replace(/[-_]+([a-zA-Z])/g, function(match, letter) {
+          return letter.toUpperCase();
+        });
+      }
 
 
 const itemswithdes = [
@@ -72,5 +55,13 @@ const itemswithdes = [
 
 
 
-console.log(checkDes)
 
+
+
+
+
+
+
+function formatString(status){
+    status
+}
