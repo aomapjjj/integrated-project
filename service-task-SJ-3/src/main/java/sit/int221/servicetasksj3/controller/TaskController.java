@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/v1/tasks")
 @CrossOrigin(origins = "http://localhost:5173/")
 //@CrossOrigin(origins = "http://ip23sj3.sit.kmutt.ac.th")
 public class TaskController {
@@ -22,13 +22,13 @@ public class TaskController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping("/v1/tasks")
+    @GetMapping("")
     public List<TaskDTO> getAllTasks(){
         return service.getAllTasks();
     }
 
-    @GetMapping("/v1/tasks/{id}")
-    public ResponseEntity<Object> getTaskById(@PathVariable Integer id){
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskDTOTwo> getTaskById(@PathVariable Integer id){
         Task task = service.findByID(id);
         TaskDTOTwo taskDTOTwo = modelMapper.map(task, TaskDTOTwo.class);
         return ResponseEntity.ok(taskDTOTwo);

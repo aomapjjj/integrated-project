@@ -1,7 +1,6 @@
 package sit.int221.servicetasksj3.dtos;
 
 import lombok.*;
-import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 @Getter
