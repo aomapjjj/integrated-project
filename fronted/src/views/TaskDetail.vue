@@ -1,14 +1,9 @@
 <script></script>
 
 <template>
-
-
   <input type="checkbox" id="my_modal_6" class="modal-toggle" />
-
   <div class="modal" role="dialog">
-
     <div class="modal-box grid grid-rows-4 grid-flow-col gap-4" >
-        
       <h3 class="font-bold text-lg">Design Backend API for PBI 1,2</h3>
       <div class="label">
         <span class="label-text">Discripstion</span>
