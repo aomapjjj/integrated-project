@@ -64,7 +64,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             <th>Title</th>
             <th>Assignees</th>
             <th>Status</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -105,9 +104,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               {{ item.status }}
             </td>
           </tr>
-          <tr>
-            {{}}
-          </tr>
+         
         </tbody>
         <tbody v-if="todoList.length === 0">
           <tr>
