@@ -2,6 +2,7 @@ package sit.int221.servicetasksj3.dtos;
 
 import lombok.*;
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -13,6 +14,6 @@ public class TaskDTOTwo {
     private String description;
     private String assignees;
     private String status;
-    private Timestamp createdOn;
-    private Timestamp updatedOn;
+    private ZonedDateTime createdOn;
+    private ZonedDateTime updatedOn;
 }

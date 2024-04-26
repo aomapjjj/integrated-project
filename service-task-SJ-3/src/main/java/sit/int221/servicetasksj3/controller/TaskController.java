@@ -15,17 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("")
 @CrossOrigin(origins = "http://localhost:5173/")
+//@CrossOrigin(origins = "http://ip23sj3.sit.kmutt.ac.th")
 public class TaskController {
     @Autowired
     private TaskService service;
     @Autowired
     private ModelMapper modelMapper;
-
-    @GetMapping("/v2/tasks")
-    public List<Task> getTasks(){
-        return  service.getTasks();
-    }
-
 
     @GetMapping("/v1/tasks")
     public List<TaskDTO> getAllTasks(){
