@@ -66,9 +66,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       <thead>
         <tr class="bg-base-200 mt-4 md:mt-0" style="background-color: #9FC3E9;">
           <th class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">No.</th>
-          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">Title</th>
-          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">Assignees</th>
-          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">Status</th>
+          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700 itbkk-item">Title</th>
+          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700 itbkk-assignees">Assignees</th>
+          <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700 itbkk-status">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -76,17 +76,17 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
         <TaskDetail :todo-id="selectedTodoId" />
         <tr v-for="(item, index) in todoList" :key="index">
           <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">{{ item.id }}</td>
-          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-item">
             <label for="my_modal_6" @click="() => selectTodo(item.id)">
               {{ item.title }}
             </label>
           </td>
-          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-item">
             <span :class="{'italic text-gray-500': item.assignees.length === 0 || item.assignees === null}">
               {{ item.assignees.length === 0 || item.assignees === null ? "Unassignees" : item.assignees }}
             </span>
           </td>
-          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+          <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-item">
             <span :class="{
               'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
               'border-blue-500 text-blue-500': item.status === 'NO_STATUS',
