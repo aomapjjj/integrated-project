@@ -1,1 +1,1 @@
-select * from `SJ-3`.`TASKS`;
+select * from `kanbanIT`.`TASKS`;
