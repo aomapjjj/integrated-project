@@ -11,7 +11,7 @@ async function getItems(url) {
 async function getItemById(id) {
   try {
     console.log("id : ", id)
-    const data = await fetch(`http://localhost:8080/itb-kk/v1/tasks/${id}`)
+    const data = await fetch(`${import.meta.env.VITE_BASE_URL}/${id}`)
     const item = await data.json()
     return item
   } catch (error) {
