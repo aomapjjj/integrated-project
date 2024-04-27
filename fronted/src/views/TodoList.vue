@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue"
 import { getItems, getItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
-
+import {checkStatus} from "../libs/checkStatus"
 const todoList = ref([])
 const selectedTodoId = ref(0)
 
@@ -20,9 +20,7 @@ const selectTodo = (todoId) => {
 }
 
 
-function checkStatus(status){
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase().split('_').join(' ')
-}
+
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
