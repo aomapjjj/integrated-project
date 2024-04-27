@@ -14,7 +14,7 @@ const todo = ref({
   assignees: "",
   status: "",
   createdOn: "",
-  updatedOn: "",
+  updatedOn: ""
 })
 
 const todoList = ref([])
@@ -38,42 +38,58 @@ watch(
 )
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-function date(date) { }
-
 </script>
 
 <template>
   <input type="checkbox" id="my_modal_6" class="modal-toggle hidden" />
-  <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
-    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+  <div
+    class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
+  >
+    <div
+      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"
+    ></div>
 
     <div
-      class="modal-container bg-white w-full md:w-5/6 lg:w-2/3 xl:w-1/2 mx-auto rounded shadow-lg z-50 overflow-y-auto">
+      class="modal-container bg-white w-full md:w-5/6 lg:w-2/3 xl:w-1/2 mx-auto rounded shadow-lg z-50 overflow-y-auto"
+    >
       <div class="modal-content py-4 text-left px-6">
         <!-- Title -->
-        <h3 class="font-bold text-lg mb-4 ibkk-title">{{ todo.title }}</h3>
+        <h3 class="font-bold text-lg mb-4 itbkk-title">{{ todo.title }}</h3>
 
         <!-- Description -->
         <div class="mb-4">
           <label for="description" class="label">Description</label>
-          <textarea id="description" class="textarea textarea-bordered w-full itbkk-description" rows="4" :class="{
-          'italic text-gray-500':
-            todo.description.length === 0 ||
-            todo.description.trim() === '' ||
-            todo.description === null
-        }" placeholder="No description provided">{{ todo.description }}</textarea>
+          <textarea
+            id="description"
+            class="textarea textarea-bordered w-full itbkk-description"
+            rows="4"
+            :class="{
+              'italic text-gray-500':
+                todo.description.length === 0 ||
+                todo.description.trim() === '' ||
+                todo.description === null
+            }"
+            placeholder="No Description Provided"
+            >{{ todo.description || "No Description Provided" }}</textarea
+          >
         </div>
 
         <!-- Assignees -->
         <div class="mb-4">
           <label for="assignees" class="label">Assignees</label>
-          <textarea id="assignees" class="textarea textarea-bordered w-full itbkk-assignees" rows="4" :class="{
-          'italic text-gray-500':
-            todo.assignees.length === 0 ||
-            todo.assignees.trim() === '' ||
-            todo.assignees === null
-        }" placeholder="Unassigned">{{ todo.assignees }}</textarea>
+          <textarea
+            id="assignees"
+            class="textarea textarea-bordered w-full itbkk-assignees"
+            rows="4"
+            :class="{
+              'italic text-gray-500':
+                todo.assignees.length === 0 ||
+                todo.assignees.trim() === '' ||
+                todo.assignees === null
+            }"
+            placeholder="Unassigned"
+            >{{ todo.assignees }}</textarea
+          >
         </div>
 
         <!-- Status Dropdown -->
@@ -83,7 +99,10 @@ function date(date) { }
             <div tabindex="0" role="button" class="btn m-1">
               {{ checkStatus(todo.status) }}
             </div>
-            <ul tabindex="0" class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-52">
+            <ul
+              tabindex="0"
+              class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
               <li v-for="statusItem in todoList">
                 <a>{{ checkStatus(statusItem.status) }}</a>
               </li>
@@ -98,15 +117,15 @@ function date(date) { }
           </div>
 
           <!-- CreatedOn -->
-          <div class="mb-4 flex items-center">
+          <div class="mb-4 flex items-center itbkk-created-on">
             <label for="timezone" class="label mr-2">Created On : </label>
-            <h1>{{ todo.createdOn }}</h1>
+            <h1>{{ toDate(todo.createdOn) }}</h1>
           </div>
 
           <!-- UpdatedOn -->
-          <div class="mb-4 flex items-center">
+          <div class="mb-4 flex items-center itbkk-updated-on">
             <label for="timezone" class="label mr-2">Updated On : </label>
-            <h1>{{ todo.updatedOn }}</h1>
+            <h1>{{ toDate(todo.updatedOn) }}</h1>
           </div>
         </div>
         <!-- Close Button -->
