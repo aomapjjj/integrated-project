@@ -10,6 +10,10 @@ const selectedTodoId = ref(0);
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL);
   todoList.value = items;
+
+  if ("http://localhost:8080/itb-kk/v1/tasks/100") {
+    alert('ALERRRTTTTTTTTTSASSSSSS');
+  }
 });
 
 const selectTodo = (todoId) => {
