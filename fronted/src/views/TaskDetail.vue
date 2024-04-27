@@ -1,6 +1,7 @@
 <script setup>
 import { getItems, getItemById } from "@/libs/fetchUtils"
 import { ref, watch, onMounted } from "vue"
+import {checkStatus} from "../libs/checkStatus"
 const props = defineProps({
   todoId: Number
 })
@@ -100,14 +101,14 @@ function date(date) {}
           <label for="status" class="label">Status</label>
           <div class="dropdown">
             <div tabindex="0" role="button" class="btn m-1">
-              {{ todo.status }}
+              {{ checkStatus(todo.status)}}
             </div>
             <ul
               tabindex="0"
               class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li v-for="statusItem in todoList" >
-                <a>{{ statusItem.status }}</a>
+                <a>{{ checkStatus(statusItem.status) }}</a>
               </li>
             </ul>
           </div>

@@ -4,14 +4,17 @@ const items =
         "id": 5,
         "title": "TaskTitle1TaskTitle2TaskTitle3TaskTitle4TaskTitle5TaskTitle6TaskTitle7TaskTitle8TaskTitle9TaskTitle0",
         "assignees": "Assignees1Assignees2Assignees3",
-        "status": "TO_DO"
+        "status": "DOING"
     }
 
-    function toCamelCase(str) {
-        return str.replace(/[-_]+([a-zA-Z])/g, function(match, letter) {
-          return letter.toUpperCase();
-        });
-      }
+    function toPascalCase(str) {
+        return str.toLowerCase().split("_")
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+    }
+
+
+      console.log(toPascalCase(items.status))
 
 
 const itemswithdes = [
