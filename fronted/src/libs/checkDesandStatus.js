@@ -9,27 +9,26 @@ const items = {
   createdOn: "2024-04-25T21:03:44Z",
   updatedOn: "2024-04-26T19:03:56Z"
 }
-function formatDateTime(dateTimeString) {
-
-    // แยกวันที่และเวลา
-    const [datePart, timePart] = dateTimeString.split("T");
-    const date = datePart.split("-");
-    const time = timePart.replace("Z", "").split(":")
+function toDate(dateTimeString) {
+  const [datePart, timePart] = dateTimeString.split("T");
+  const [year, month, day] = datePart.split("-");
   
-    // แปลงแต่ละส่วนเป็นรูปแบบที่ต้องการโดยใช้ map()
-    const formattedDate = date.map(part => parseInt(part))
-    const formattedTime = time.map(part => parseInt(part))
-  
-    const mixed =  formattedDate.concat(formattedTime).join(", ")
-    const event = new Date(Date.UTC(mixed))
-
-    return event.toLocaleString('en-GB', { timeZone: 'UTC' })
-
+  let [hour, minute, second] = [0, 0, 0];
+  if (timePart) {
+      [hour, minute, second] = timePart.replace("Z", "").split(":");
   }
   
+  const event = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  
+  const formattedDate = event.toLocaleDateString('en-GB');
+  const formattedTime = event.toLocaleTimeString('en-GB');
+
+  return `${formattedDate} ${formattedTime}`;
+}
 
 
-  console.log(formatDateTime(items.createdOn));
+
+  console.log(toDate(items.createdOn));
   
 
 const itemswithdes = [

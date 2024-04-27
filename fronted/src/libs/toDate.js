@@ -1,18 +1,18 @@
-export function toDate(dateTimeString){
-    
-        // แยกวันที่และเวลา
-        const [datePart, timePart] = dateTimeString.split("T");
-        const date = datePart.split("-");
-        const time = timePart.replace("Z", "").split(":")
+export function toDate(dateTimeString) {
+      const [datePart, timePart] = dateTimeString.split("T");
+      const [year, month, day] = datePart.split("-");
       
-        // แปลงแต่ละส่วนเป็นรูปแบบที่ต้องการโดยใช้ map()
-        const formattedDate = date.map(part => parseInt(part))
-        const formattedTime = time.map(part => parseInt(part))
+      let [hour, minute, second] = [0, 0, 0];
+      if (timePart) {
+          [hour, minute, second] = timePart.replace("Z", "").split(":");
+      }
       
-        const mixed =  formattedDate.concat(formattedTime).join(", ")
-        const event = new Date(Date.UTC(mixed))
-    
-        return event.toLocaleString('en-GB', { timeZone: 'UTC' })
-    
+      const event = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
       
-}
+      const formattedDate = event.toLocaleDateString('en-GB');
+      const formattedTime = event.toLocaleTimeString('en-GB');
+  
+      return `${formattedDate} ${formattedTime}`;
+  }
+  
+      
