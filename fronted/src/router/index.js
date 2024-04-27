@@ -1,17 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router"
-import TodoList from "@/views/TodoList.vue"
+import TaskList from "@/views/TaskList.vue"
 
 export const routes = [
   {
     path: '/',
-    redirec: '/task',
-    name: 'TodoList',
-    component: TodoList,
+    redirect: { name: "TaskList" },
+  },
+  {
+    path: '/task',
+    name: 'TaskList',
+    component: TaskList,
+  },
+  {
+    path: '/:catchAll(.*)',
+    redirect: { name: "TaskList" },
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_BASE_URL),
+  history: createWebHistory(),
   routes,
 })
 

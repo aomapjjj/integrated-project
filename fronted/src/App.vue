@@ -1,14 +1,11 @@
 <script setup>
-import TodoList from './views/TodoList.vue';
 
 </script>
 
 <template>
   <div id="app">
-    <TodoList />
+    <router-view />
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

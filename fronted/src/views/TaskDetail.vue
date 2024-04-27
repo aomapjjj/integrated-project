@@ -13,14 +13,15 @@ const todo = ref({
   description: "",
   assignees: "",
   status: "",
-  createdOn: ""
+  createdOn: "",
+  updatedOn: "",
 })
 
 const todoList = ref([])
 
 onMounted(async () => {
-  console.log(import.meta.env.VITE_BASE_URL_2)
-  const items = await getItemsById(import.meta.env.VITE_BASE_URL_2, id)
+  console.log(import.meta.env.VITE_BASE_URL)
+  const items = await getItems(import.meta.env.VITE_BASE_URL)
   console.log(items)
   todoList.value = items
   console.log(todoList.value)
@@ -56,7 +57,7 @@ function date(date) { }
         <!-- Description -->
         <div class="mb-4">
           <label for="description" class="label">Description</label>
-          <textarea id="description" class="textarea textarea-bordered w-full ibkk-description" rows="4" :class="{
+          <textarea id="description" class="textarea textarea-bordered w-full itbkk-description" rows="4" :class="{
           'italic text-gray-500':
             todo.description.length === 0 ||
             todo.description.trim() === '' ||
@@ -67,7 +68,7 @@ function date(date) { }
         <!-- Assignees -->
         <div class="mb-4">
           <label for="assignees" class="label">Assignees</label>
-          <textarea id="assignees" class="textarea textarea-bordered w-full ibkk-assignees" rows="4" :class="{
+          <textarea id="assignees" class="textarea textarea-bordered w-full itbkk-assignees" rows="4" :class="{
           'italic text-gray-500':
             todo.assignees.length === 0 ||
             todo.assignees.trim() === '' ||
@@ -76,7 +77,7 @@ function date(date) { }
         </div>
 
         <!-- Status Dropdown -->
-        <div class="mb-4 ibkk-status">
+        <div class="mb-4 itbkk-status">
           <label for="status" class="label">Status</label>
           <div class="dropdown">
             <div tabindex="0" role="button" class="btn m-1">
@@ -90,7 +91,7 @@ function date(date) { }
           </div>
         </div>
         <!-- TimeZone -->
-        <div class="ibkk-timezone">
+        <div class="itbkk-timezone">
           <div class="mb-4 flex items-center">
             <label for="timezone" class="label mr-2">TimeZone : </label>
             <h1>{{ TimeZone }}</h1>
@@ -105,11 +106,11 @@ function date(date) { }
           <!-- UpdatedOn -->
           <div class="mb-4 flex items-center">
             <label for="timezone" class="label mr-2">Updated On : </label>
-            <h1>{{ todo.updateOn }}</h1>
+            <h1>{{ todo.updatedOn }}</h1>
           </div>
         </div>
         <!-- Close Button -->
-        <div class="modal-action h-300 ibkk-button">
+        <div class="modal-action h-300 itbkk-button">
           <label for="my_modal_6" class="btn">Close</label>
         </div>
       </div>
