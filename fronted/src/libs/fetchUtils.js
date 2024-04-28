@@ -12,8 +12,8 @@ async function getItemById(id) {
   try {
     console.log("id : ", id)
     const data = await fetch(`${import.meta.env.VITE_BASE_URL}/${id}`)
-    const item = await data.json()
-    return item
+    //const item = await data.json()
+    return data
   } catch (error) {
     console.log(`error: ${error}`)
   }
