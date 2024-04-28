@@ -1,1 +1,1 @@
-select * from `kanbanIT`.`tasks`;
+select * from `kanbanIT`.`TASKS`;
