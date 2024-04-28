@@ -43,45 +43,44 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 </script>
 
 <template>
-  <input type="checkbox" id="my_modal_6" class="modal-toggle hidden" />
-  <div
-    class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
-  >
-    <div
-      class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"
-    ></div>
+  <!-- Modal window -->
+  <input type="checkbox" id="my_modal_6" class="modal-toggle hidden"/>
+    <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
+      <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+      <div class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-5/6 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+            <div class="modal-content py-4 text-left px-6 flex-grow">
+            <!-- Title -->
+            <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold" style="background-color: #9fc3e9;">
+              <input type="text" class="grow" v-model="todo.title" placeholder="Enter Your Title" maxlength="100"/>
+            </label>
 
-    <div
-      class="modal-container bg-white w-full md:w-5/6 lg:w-2/3 xl:w-1/2 mx-auto rounded shadow-lg z-50 overflow-y-auto"
-    >
-      <div class="modal-content py-4 text-left px-6">
-        <!-- Title -->
-        <h3 class="font-bold text-lg mb-4 itbkk-title">{{ todo.title }}</h3>
-
-        <!-- Description -->
-        <div class="mb-4">
-          <label for="description" class="label">Description</label>
-          <textarea
-            id="description"
-            class="textarea textarea-bordered w-full itbkk-description"
-            rows="4"
-            :class="{
-              'italic text-gray-500':
-                todo.description.length === 0 ||
-                todo.description.trim() === '' ||
-                todo.description === null
-            }"
-            placeholder="No Description Provided"
-            >{{ todo.description || "No Description Provided" }}</textarea
-          >
-        </div>
-
+            <!-- Description -->
+            <label for="description" class="form-control">
+              <div class="label">
+                <span class="label-text font-bold input-md">Description</span>
+              </div>
+              <textarea
+                id="description"
+                class="itbkk-description textarea textarea-bordered h-3/4 w-11/12"
+                maxlength="500"
+                rows="4"
+                :class="{
+                'italic text-gray-500':
+                  todo.description.length === 0 ||
+                  todo.description.trim() === '' ||
+                  todo.description === null }" 
+                placeholder="No Description Provided" style="height:400px">{{ todo.description || "No Description Provided" }}
+              </textarea>
+            </label>
+      </div>
+      <div class="w-1/3 mr-6">
         <!-- Assignees -->
         <div class="mb-4">
           <label for="assignees" class="label">Assignees</label>
           <textarea
             id="assignees"
             class="textarea textarea-bordered w-full itbkk-assignees"
+            maxlength="30"
             rows="4"
             :class="{
               'italic text-gray-500':
@@ -94,23 +93,15 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           >
         </div>
 
-        <!-- Status Dropdown -->
-        <div class="mb-4 itbkk-status">
+        <!-- Status -->
+        <div class="itbkk-status mb-4">
           <label for="status" class="label">Status</label>
-          <div class="dropdown">
-            <div tabindex="0" role="button" class="btn m-1">
-              {{ checkStatus(todo.status) }}
-            </div>
-            <ul
-              tabindex="0"
-              class="dropdown-content z-10 menu p-2 shadow bg-base-100 rounded-box w-52"
-            >
-              <li v-for="statusItem in todoList">
-                <a>{{ checkStatus(statusItem.status) }}</a>
-              </li>
-            </ul>
-          </div>
+          <select class="select select-bordered w-full max-w-xs">
+            <!-- <option disabled selected>No Status</option> -->
+            <option v-for="statusItem in todoList">{{ checkStatus(statusItem.status) }}</option>
+          </select>
         </div>
+
         <!-- TimeZone -->
         <div class="itbkk-timezone">
           <div class="mb-4 flex items-center">
@@ -131,9 +122,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           </div>
         </div>
         <!-- Close Button -->
-        <div class="modal-action h-300 itbkk-button">
+        <div class="itbkk-button modal-action h-300">
+          <label for="my_modal_6" class="btn" style="background-color: #f785b1">Save</label>
           <label for="my_modal_6" class="btn">Close</label>
         </div>
+
       </div>
     </div>
   </div>
