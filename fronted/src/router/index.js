@@ -15,6 +15,11 @@ export const routes = [
     path: '/:catchAll(.*)',
     redirect: { name: "TaskList" },
   },
+  {
+    path: '/task/:id',
+    name: 'TaskDetail',
+    component: TaskList,
+  },
 ]
 
 const router = createRouter({

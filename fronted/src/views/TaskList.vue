@@ -1,18 +1,29 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getItems } from '../libs/fetchUtils.js';
+import { getItemById, getItems } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
 import { checkStatus } from '../libs/checkStatus';
+import { useRoute, useRouter } from 'vue-router';
 
+
+const route = useRoute()
+const router = useRouter()
 const todoList = ref([]);
 const selectedTodoId = ref(0);
+const notFound = ref(false)
 
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL);
   todoList.value = items;
 
-  if ("http://localhost:8080/itb-kk/v1/tasks/100") {
-    alert('ALERRRTTTTTTTTTSASSSSSS');
+  const taskId = route.params.id
+  if (taskId !== undefined) {
+    console.log(taskId)
+    const response = await getItemById(taskId)
+    if (response.status === 404 || response.status === 400) {
+      router.push('/task')
+      notFound.value = true
+    }
   }
 });
 
@@ -21,6 +32,7 @@ const selectTodo = (todoId) => {
 };
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
 </script>
 <template>
   <div class="min-h-full">
@@ -112,7 +124,17 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
               </td>
             </tr>
           </tbody>
-        </table>
+        </table><br>
+        <div role="alert" class="alert bg-red-400" v-show="notFound">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>The request task does not exit</span>
+          <div>
+            <button class="btn btn-sm" @click="notFound =false">Close</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

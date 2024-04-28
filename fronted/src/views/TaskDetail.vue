@@ -33,7 +33,9 @@ watch(
   () => props.todoId,
   async (newValue) => {
     const response = await getItemById(newValue)
-    todo.value = response
+    if (response.status === 200) {
+      todo.value = await response.json()
+    }
   }
 )
 
