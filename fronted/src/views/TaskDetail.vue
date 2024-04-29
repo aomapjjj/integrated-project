@@ -46,7 +46,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   <!-- Modal window -->
   <input type="checkbox" id="my_modal_6" class="modal-toggle hidden" />
   <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
-    <div class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-5/6 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+    <div class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
       <div class="flex justify-between w-full h-full" style="padding-top: 20px; padding-bottom: 20px; align-items: center">
         <div class="modal-content py-4 text-left px-6 flex-grow">
           <!-- Title -->
