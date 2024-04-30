@@ -142,7 +142,8 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           </div>
           <!-- Close Button -->
           <div class="itbkk-button modal-action">
-         
+           
+    
             <label for="my_modal_6" class="btn">Close</label>
           </div>
         </div>
