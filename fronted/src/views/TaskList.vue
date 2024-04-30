@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { getItemById, getItems } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
+import AddTask from '../views/AddTask.vue';
 import { checkStatus } from '../libs/checkStatus';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -25,6 +26,7 @@ onMounted(async () => {
       notFound.value = true
     }
   }
+
 });
 
 const selectTodo = (todoId) => {
@@ -48,7 +50,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         </div>
         <!-- ADD BUTTON -->
         <div class="flex items-center">
-          <button class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">+ Add</button>
+          <AddTask />
+
+           
           <!-- <button class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">- Delete</button> -->
         </div>
       </div>
