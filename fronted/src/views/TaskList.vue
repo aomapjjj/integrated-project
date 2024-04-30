@@ -22,7 +22,7 @@ onMounted(async () => {
     console.log(taskId)
     const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task')
+      router.push('/task/error')
       notFound.value = true
     }
   }
