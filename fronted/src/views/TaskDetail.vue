@@ -117,7 +117,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
               <option disabled selected>{{ checkStatus(todo.status) }}</option>
               <!-- <option v-for="statusItem in todoList" disabled>
                 {{ checkStatus(statusItem.status) }}
-              </option> -->
+              </option>  -->
             </select>
           </div>
 
