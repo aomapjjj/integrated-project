@@ -115,9 +115,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             >
             <select class="select select-bordered w-full max-w-xs mt-1">
               <option disabled selected>{{ checkStatus(todo.status) }}</option>
-              <option v-for="statusItem in todoList">
+              <!-- <option v-for="statusItem in todoList" disabled>
                 {{ checkStatus(statusItem.status) }}
-              </option>
+              </option> -->
             </select>
           </div>
 
