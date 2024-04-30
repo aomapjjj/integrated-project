@@ -1,11 +1,12 @@
 package sit.int221.servicetasksj3.controller;
 
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
-import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.services.TaskService;
 
@@ -28,9 +29,13 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDTOTwo> getTaskById(@PathVariable Integer id){
-        Task task = service.findByID(id);
-        TaskDTOTwo taskDTOTwo = modelMapper.map(task, TaskDTOTwo.class);
-        return ResponseEntity.ok(taskDTOTwo);
+    public Task getTaskById(@PathVariable Integer id){
+        return service.findByID(id);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<Task> createNewTasks(@Valid @RequestBody Task task){
+        Task createdTask = service.createNewTasks(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
 }

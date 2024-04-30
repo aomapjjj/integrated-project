@@ -1,9 +1,12 @@
 package sit.int221.servicetasksj3.services;
 
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.entities.Task;
@@ -30,6 +33,23 @@ public class TaskService {
                         "Task id "+ id + " does not exist !!!"));
     }
 
+    @Transactional
+    public Task createNewTasks(Task task) {
+        return repository.save(task);
+    }
+
+//    @Transactional
+//    public List<TaskDTO> removeTasks(Integer id){
+//        Task task = repository.findById(id).orElseThrow(
+//                () -> new HttpClientErrorException(HttpStatus.NOT_FOUND, )
+//        )
+//    }
+//    public void removeOffice(String officeCode) {
+//        Office office = repository.findById(officeCode).orElseThrow(
+//                () -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Office Id " + officeCode + " DOES NOT EXIST !!!")
+//        );
+//        repository.delete(office);
+//    }
 //    public TaskDTOTwo getTasks(int id){
 //        Task task = repository.findById(id).orElseThrow(() -> new ResponseStatusException(
 //                HttpStatus.NOT_FOUND, id + " does not exist"));

@@ -14,17 +14,17 @@ public class Task {
     @Id
     @Column(name = "taskId", updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer taskId;
+    private Integer id;
     @Column(name = "taskTitle", length = 100)
-    private String taskTitle;
+    private String title;
     @Column(name = "taskDescription", length = 500)
-    private String taskDescription;
+    private String description;
     @Column(name = "taskAssignees", length = 30)
-    private Object taskAssignees;
+    private Object assignees;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "taskStatus")
-    private TaskStatus taskStatus;
+    private TaskStatus status;
     @Column(name = "createdOn", updatable = false, insertable = false)
     private ZonedDateTime createdOn;
     @Column(name = "updatedOn", updatable = false, insertable = false)
