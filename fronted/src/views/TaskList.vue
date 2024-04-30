@@ -1,15 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getItemById, getItems } from '../libs/fetchUtils.js';
+import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
+import AddTask from '../views/AddTask.vue';
 import { checkStatus } from '../libs/checkStatus';
 import { useRoute, useRouter } from 'vue-router';
 
 
 const route = useRoute()
 const router = useRouter()
-const todoList = ref([]);
-const selectedTodoId = ref(0);
+const todoList = ref([])
+const selectedTodoId = ref(0)
 const notFound = ref(false)
 
 onMounted(async () => {
@@ -25,36 +26,52 @@ onMounted(async () => {
       notFound.value = true
     }
   }
+
 });
 
 const selectTodo = (todoId) => {
-  selectedTodoId.value = todoId;
+  selectedTodoId.value = todoId
 };
+
+const deleteTodo = async (todoId) => {
+  try {
+    const status = await deleteItemById(import.meta.env.VITE_BASE_URL, todoId);
+    if (status === 200) {
+      todoList.value = todoList.value.filter(todo => todo.id !== todoId);
+    } else {
+      console.error(`Failed to delete item with ID ${todoId}`);
+    }
+  } catch (error) {
+    console.error(`Error deleting item with ID ${todoId}:`, error);
+  }
+}
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 </script>
 <template>
-<div class="min-h-full">
-  <nav class="bg-gray-800" style="background-color: #f785b1">
-    <div class="mx-auto max-w-7xl px-1">
-      <div class="flex h-16 items-center justify-between">
-        <div class="flex items-center">
-          <div class="hidden md:block">
-            <div class="ml-2 flex items-baseline space-x-4">
-              <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">My Task</a>
+  <div class="min-h-full">
+    <nav class="bg-gray-800" style="background-color: #f785b1">
+      <div class="mx-auto max-w-7xl px-1">
+        <div class="flex h-16 items-center justify-between">
+          <div class="flex items-center">
+            <div class="hidden md:block">
+              <div class="ml-2 flex items-baseline space-x-4">
+                <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">My Task</a>
+              </div>
             </div>
           </div>
-        </div>
-        <!-- ADD BUTTON -->
-        <div class="flex items-center">
-          <button class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">+ Add</button>
-          <!-- <button class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">- Delete</button> -->
+          <!-- ADD BUTTON -->
+          <div class="flex items-center">
+            <AddTask />
+
+
+            <!-- <button class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">- Delete</button> -->
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
-</div>
+    </nav>
+  </div>
 
   <!-- header -->
   <header class="bg-white shadow">
@@ -85,6 +102,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
               <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 Status
               </th>
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
+                Edit Delete
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -101,18 +121,23 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
               </td>
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees"
                 :class="{ 'italic': item.assignees.length === 0 || item.assignees === null }">
-                {{ item.assignees.length === 0 || item.assignees === null ? 'Unassigned': item.assignees }}
+                {{ item.assignees.length === 0 || item.assignees === null ? 'Unassigned' : item.assignees }}
               </td>
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
                 <span :class="{
-                  'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                  'border-blue-500 text-blue-500':
-                    item.status === 'NO_STATUS',
-                  'border-red-500 text-red-500': item.status === 'TO_DO',
-                  'border-yellow-500 text-yellow-500':
-                    item.status === 'DOING',
-                  'border-green-500 text-green-500': item.status === 'DONE',}"> {{ checkStatus(item.status) }}
+          'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+          'border-blue-500 text-blue-500':
+            item.status === 'NO_STATUS',
+          'border-red-500 text-red-500': item.status === 'TO_DO',
+          'border-yellow-500 text-yellow-500':
+            item.status === 'DOING',
+          'border-green-500 text-green-500': item.status === 'DONE',
+        }"> {{ checkStatus(item.status) }}
                 </span>
+              </td>
+              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                <button class="btn btn-info">Edit</button>
+                <button class="btn btn-success" @click="() => deleteTodo(item.id)">Delete</button>
               </td>
             </tr>
             <!-- NO TASK -->
@@ -121,20 +146,23 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 No task
               </td>
             </tr>
+
           </tbody>
-        </table> 
-            <!-- alert 404 -->
-        <div role="alert" class="alert shadow-lg " v-show="notFound" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 500px; color: red; animation: fadeInOut 1.5s infinite;">
+        </table>
+        <!-- alert 404 -->
+        <div role="alert" class="alert shadow-lg " v-show="notFound"
+          style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 500px; color: red; animation: fadeInOut 1.5s infinite;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-              <div>
-                <h3 class="font-bold">The requested task does not exist</h3>
-                <div class="text-xs">Please check your ID again</div>
-              </div>
-              <div>
-                <button class="btn btn-sm" style="background-color: #9fc3e9;" @click="notFound =false">Close</button>
-              </div>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">The requested task does not exist</h3>
+            <div class="text-xs">Please check your ID again</div>
+          </div>
+          <div>
+            <button class="btn btn-sm" style="background-color: #9fc3e9;" @click="notFound = false">Close</button>
+          </div>
         </div>
 
       </div>

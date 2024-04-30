@@ -74,10 +74,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                   todo.description.trim() === '' ||
                   todo.description === null,
               }"
-              placeholder="No Description Provided"
-              style="height: 400px"
-              >{{ todo.description || 'No Description Provided' }}
-            </textarea>
+             placeholder="No Description Provided"
+             style="height: 400px"
+              >{{ todo.description }}</textarea
+            >
+           
           </label>
         </div>
 
@@ -114,9 +115,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             >
             <select class="select select-bordered w-full max-w-xs mt-1">
               <option disabled selected>{{ checkStatus(todo.status) }}</option>
-              <option v-for="statusItem in todoList">
+              <!-- <option v-for="statusItem in todoList" disabled>
                 {{ checkStatus(statusItem.status) }}
-              </option>
+              </option>  -->
             </select>
           </div>
 
@@ -141,12 +142,8 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           </div>
           <!-- Close Button -->
           <div class="itbkk-button modal-action">
-            <label
-              for="my_modal_6"
-              class="btn"
-              style="background-color: #f785b1"
-              >Save</label
-            >
+           
+    
             <label for="my_modal_6" class="btn">Close</label>
           </div>
         </div>

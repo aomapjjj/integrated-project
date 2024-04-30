@@ -1,6 +1,8 @@
+URL = import.meta.env.VITE_BASE_URL
+
 async function getItems(url) {
   try {
-    console.log(import.meta.env.VITE_BASE_URL)
+    console.log(URL)
     const data = await fetch(`${url}`) //GET Method
     const items = await data.json()
     return items
@@ -11,7 +13,7 @@ async function getItems(url) {
 async function getItemById(id) {
   try {
     console.log("id : ", id)
-    const data = await fetch(`${import.meta.env.VITE_BASE_URL}/${id}`)
+    const data = await fetch(`${URL}/${id}`)
     //const item = await data.json()
     return data
   } catch (error) {
@@ -21,7 +23,6 @@ async function getItemById(id) {
 
 async function deleteItemById(url, id) {
   console.log(`${url}/${id}`)
-
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE"
