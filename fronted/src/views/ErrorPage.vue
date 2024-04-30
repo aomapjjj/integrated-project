@@ -24,7 +24,7 @@ const startCountdown = () => {
 <template>
   <div class="error-page">
     <h1 class="error-title">404 Not Found</h1>
-    <p class="error-title" >Oops! Something went wrong.</p>
+    <p class="error-title" >Oops! Something went wrong</p>
     <p class="error-title" >{{ countdown }}</p>
     <span class="loading loading-spinner loading-lg"></span>
   </div>
