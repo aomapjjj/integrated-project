@@ -2,10 +2,10 @@
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
 import { ref, watch, onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
-import { useRouter } from "vue-router";
+
+import { useRouter } from "vue-router"
 
 const router = useRouter()
-
 
 const props = defineProps({
   todoId: Number
@@ -31,15 +31,14 @@ const submitForm = async () => {
     description: todo.value.description,
     assignees: todo.value.assignees,
     status: todo.value.status
-  });
-  console.log(add);
-  console.log(todo.value);
-  closeModal();
-  clearForm();
+  })
+  console.log(add)
+  console.log(todo.value)
+  closeModal()
+  clearForm()
 
-  router.go(); 
-};
-
+  router.go()
+}
 
 const closeModal = () => {
   my_modal_1.close()
@@ -51,7 +50,6 @@ const clearForm = () => {
   todo.value.assignees = ""
   todo.value.status = "NO_STATUS"
 }
-
 </script>
 <template>
   <button
@@ -138,10 +136,13 @@ const clearForm = () => {
                 class="select select-bordered w-full max-w-xs mt-1"
                 v-model="todo.status"
               >
-                <option selected disabled value="NO_STATUS">NO_STATUS</option>
-                <option value="TO_DO">TO_DO</option>
-                <option value="DOING">DOING</option>
-                <option value="DONE">DONE</option>
+                <option disabled value="NO_STATUS">No Status</option>
+                <option
+                  v-for="status in ['TO_DO', 'DOING', 'DONE']"
+                  :value="status"
+                >
+                  {{ checkStatus(status) }}
+                </option>
               </select>
             </div>
             <!-- Close Button -->
@@ -150,11 +151,11 @@ const clearForm = () => {
               style="display: flex; justify-content: space-around"
             >
               <form method="dialog" style="flex: 1">
-                <button 
+                <button
                   type="submit"
                   class="btn"
                   style="background-color: #f785b1; margin: 10px; width: 100%"
-                  :disabled="!todo.title.length" 
+                  :disabled="!todo.title.length"
                 >
                   Save
                 </button>
