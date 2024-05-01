@@ -26,13 +26,11 @@ public class TaskService {
     public List<TaskDTO> getAllTasks(){
         return listMapper.mapList(repository.findAll(), TaskDTO.class, modelMapper);
     }
-
     public Task findByID(Integer id) {
         return repository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Task id "+ id + " does not exist !!!"));
     }
-
     // ADD
     @Transactional
     public Task createNewTasks(Task task) {
@@ -55,12 +53,22 @@ public class TaskService {
     public Task updateTakes(Integer id, Task task) {
         // ค้นหา Task จาก repository ด้วย id
         Task existingTask = repository.findById(id).orElseThrow(
+<<<<<<< Updated upstream
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "NOT FOUND"));
         // เช็คว่า id ของ Task ที่พบเหมือนกับ id
         if (!existingTask.getId().equals(task.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MISMATCH");
         }
         return repository.save(task);
+=======
+                () -> new ItemNotFoundException("NOT FOUND"));
+        if (task.getTitle() == null || task.getTitle().isEmpty()) {
+            throw new ItemNotFoundException("Title is required");
+        } else {
+            task.setId(id);
+            return repository.save(task);
+        }
+>>>>>>> Stashed changes
     }
 }
 
