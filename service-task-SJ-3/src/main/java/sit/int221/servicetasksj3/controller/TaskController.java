@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
+import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.services.TaskService;
 
@@ -36,27 +37,21 @@ public class TaskController {
 
     // ADD
     @PostMapping("")
-    public ResponseEntity<Task> createNewTasks(@Valid @RequestBody Task task){
-        Task createdTask = service.createNewTasks(task);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+    public ResponseEntity<TaskDTOTwo> createNewTasks(@Valid @RequestBody Task task){
+        Task createTask = service.createNewTasks(task);
+        TaskDTOTwo createdTaskDTO = modelMapper.map(createTask, TaskDTOTwo.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskDTO);
     }
-
     // DELETE
     @DeleteMapping("/{id}")
     public List<TaskDTO> removeTasks(@PathVariable Integer id){
         return service.removeTasks(id);
     }
-
     // EDIT
     @PutMapping("/{id}")
-<<<<<<< Updated upstream
-    public Task updateTasks(@Valid @RequestBody Task task, @PathVariable Integer id) {
-        return service.updateTakes(id,task);
-=======
     public ResponseEntity<TaskDTOTwo> updateTasks(@Valid @RequestBody Task task, @PathVariable Integer id) {
         Task updatedTask = service.updateTakes(id, task);
         TaskDTOTwo updatedTaskDTO = modelMapper.map(updatedTask, TaskDTOTwo.class);
-        return ResponseEntity.ok(updatedTaskDTO);
->>>>>>> Stashed changes
+        return ResponseEntity.ok(updatedTaskDTO) ;
     }
 }
