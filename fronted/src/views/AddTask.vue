@@ -21,25 +21,15 @@ onMounted(async () => {
   todoList.value = items
 })
 
-watch(
-  () => props.todoId,
-  async (newValue) => {
-    const response = await getItemById(newValue)
-    if (response.status === 200) {
-      todo.value = await response.json()
-    }
-  }
-)
-
-const submitForm = () => {
-const add = addItem(import.meta.env.VITE_BASE_URL, {
-  title: todo.value.title,
-  description: todo.value.description,
-  assignees: todo.value.assignees,
-  status: todo.value.status
+const submitForm = async () => {
+  const add = await addItem(import.meta.env.VITE_BASE_URL, {
+    title: todo.value.title,
+    description: todo.value.description,
+    assignees: todo.value.assignees,
+    status: todo.value.status
   });
-
   console.log(add);
+  console.log(todo.value);
 };
 
 const closeModal = () => {
@@ -61,8 +51,7 @@ const closeModal = () => {
           <!-- Title -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
             <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-              <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
-                v-model="todo.title" />
+              <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="todo.title" />
             </label>
 
             <!-- Description -->
@@ -88,13 +77,13 @@ const closeModal = () => {
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
                 <option :disabled="!todo.status">
-                  {{ todo.status ? checkStatus(todo.status) : checkStatus(todo.status) === "No Status" }}
+                  {{ todo.status ? todo.status : todo.status === "No Status" }}
                 </option>
                 <option v-for="statusItem in todoList">
                   {{
           statusItem.status === "No Status"
             ? statusItem.status === "No Status"
-            : checkStatus(statusItem.status)
+            : (statusItem.status)
         }}
                 </option>
               </select>
