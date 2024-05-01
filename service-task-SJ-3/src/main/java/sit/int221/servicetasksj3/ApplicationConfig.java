@@ -15,4 +15,4 @@ public class ApplicationConfig {
     public ListMapper listMapper() {
         return ListMapper.getInstance();
     }
-}
+ }

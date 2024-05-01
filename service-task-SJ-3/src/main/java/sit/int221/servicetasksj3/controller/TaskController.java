@@ -52,6 +52,6 @@ public class TaskController {
     public ResponseEntity<TaskDTOTwo> updateTasks(@Valid @RequestBody Task task, @PathVariable Integer id) {
         Task updatedTask = service.updateTakes(id, task);
         TaskDTOTwo updatedTaskDTO = modelMapper.map(updatedTask, TaskDTOTwo.class);
-        return ResponseEntity.ok(updatedTaskDTO);
+        return ResponseEntity.ok(updatedTaskDTO) ;
     }
 }

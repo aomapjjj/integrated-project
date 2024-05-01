@@ -20,6 +20,6 @@ public class ListMapper {
     public static ListMapper getInstance() {
         return listMapper;
     }
-}
+ }
 
 

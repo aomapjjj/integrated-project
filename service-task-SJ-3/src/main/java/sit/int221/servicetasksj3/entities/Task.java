@@ -29,5 +29,5 @@ public class Task {
     @Column(name = "createdOn", updatable = false, insertable = false)
     private ZonedDateTime createdOn;
     @Column(name = "updatedOn", updatable = false, insertable = false)
-    private ZonedDateTime updatedOn;
+    private ZonedDateTime updatedOn ;
 }

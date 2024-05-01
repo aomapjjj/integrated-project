@@ -15,7 +15,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ItemNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleItemNotFoundException(RuntimeException exception, WebRequest request) {
-        return buildErrorResponse(exception, HttpStatus.NOT_FOUND, request);
+        return buildErrorResponse(exception, HttpStatus.NOT_FOUND, request) ;
     }
     private ResponseEntity<ErrorResponse> buildErrorResponse(Exception exception, HttpStatus httpStatus, WebRequest request) {
         return buildErrorResponse( exception, exception.getMessage(), httpStatus, request);
