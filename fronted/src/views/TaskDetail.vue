@@ -115,9 +115,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             >
             <select class="select select-bordered w-full max-w-xs mt-1">
               <option disabled selected>{{ checkStatus(todo.status) }}</option>
-              <!-- <option v-for="statusItem in todoList" disabled>
+              <option v-for="statusItem in todoList" disabled>
                 {{ checkStatus(statusItem.status) }}
-              </option>  -->
+              </option> 
             </select>
           </div>
 
@@ -142,8 +142,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           </div>
           <!-- Close Button -->
           <div class="itbkk-button modal-action">
-           
-    
+          
             <label for="my_modal_6" class="btn">Close</label>
           </div>
         </div>

@@ -11,7 +11,6 @@ const router = useRouter()
 const todoList = ref([])
 const selectedTodoId = ref(0)
 const notFound = ref(false)
-const modal = ref(null)
 
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL)
@@ -28,16 +27,12 @@ onMounted(async () => {
   }
 })
 
-const showModal = (todoId) => {
-  console.log(`Delete todo with ID: ${todoId}`)
-  if (modal.value) {
-    modal.value.showModal()
-  }
+const selectTodo = (todoId) => {
+  selectedTodoId.value = todoId
 }
 
 const deleteTodo = async (todoId) => {
   try {
-    showModal(todoId)
     const status = await deleteItemById(import.meta.env.VITE_BASE_URL, todoId)
     if (status === 200) {
       todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
@@ -48,6 +43,8 @@ const deleteTodo = async (todoId) => {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
 }
+
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const selectedItemIdToDelete = ref(null)
 
@@ -67,9 +64,7 @@ const confirmDelete = () => {
   closeModal()
 }
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 </script>
-
 <template>
   <div class="min-h-full">
     <nav class="bg-gray-800" style="background-color: #f785b1">
@@ -78,11 +73,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <div class="flex items-center">
             <div class="hidden md:block">
               <div class="ml-2 flex items-baseline space-x-4">
-                <a
-                  href="#"
-                  class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >My Task</a
-                >
+                <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">My Task</a>
               </div>
             </div>
           </div>
@@ -95,10 +86,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   <!-- header -->
   <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
-      <h1
-        class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900"
-        style="color: #9391e4"
-      >
+      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900" style="color: #9391e4">
         IT-Bangmod Kradan Kanban TimeZone : {{ TimeZone }}
       </h1>
     </div>
@@ -113,28 +101,17 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
         <table class="table-auto mt-10 rounded-xl overflow-hidden">
           <!-- table -->
           <thead>
-            <tr
-              class="bg-base-200 mt-4 md:mt-0"
-              style="background-color: #9fc3e9"
-            >
-              <th
-                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+            <tr class="bg-base-200 mt-4 md:mt-0" style="background-color: #9fc3e9">
+              <th class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 No.
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 Title
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 Assignees
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 Status
               </th>
               <th
@@ -148,53 +125,36 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <tbody>
             <!-- Iterate over todoList -->
             <TaskDetail :todo-id="selectedTodoId" />
-            <tr
-              class="itbkk-item"
-              v-for="(item, index) in todoList"
-              :key="index"
-            >
-              <td
-                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
-              >
+            <tr class="itbkk-item" v-for="(item, index) in todoList" :key="index">
+              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                 {{ item.id }}
               </td>
-              <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title"
-              >
+              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
                 <label for="my_modal_6" @click="() => selectTodo(item.id)">
                   {{ item.title }}
                 </label>
               </td>
-              <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees"
-                :class="{
-                  italic: item.assignees.length === 0 || item.assignees === null
-                }"
-              >
+              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees" :class="{
+          italic: item.assignees.length === 0 || item.assignees === null
+        }">
                 {{
-                  item.assignees.length === 0 || item.assignees === null
-                    ? "Unassigned"
-                    : item.assignees
-                }}
+          item.assignees.length === 0 || item.assignees === null
+            ? "Unassigned"
+            : item.assignees
+        }}
               </td>
-              <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
-              >
-                <span
-                  :class="{
-                    'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                    'border-blue-500 text-blue-500':
-                      item.status === 'NO_STATUS',
-                    'border-red-500 text-red-500': item.status === 'TO_DO',
-                    'border-yellow-500 text-yellow-500':
-                      item.status === 'DOING',
-                    'border-green-500 text-green-500': item.status === 'DONE'
-                  }"
-                >
+              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
+                <span :class="{
+            'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+            'border-blue-500 text-blue-500':
+              item.status === 'NO_STATUS',
+            'border-red-500 text-red-500': item.status === 'TO_DO',
+            'border-yellow-500 text-yellow-500':
+              item.status === 'DOING',
+            'border-green-500 text-green-500': item.status === 'DONE'
+          }">
                   {{ checkStatus(item.status) }}
                 </span>
-
-                <!-- EDIT -->
               </td>
               <td
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
@@ -236,6 +196,31 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             </tr>
           </tbody>
         </table>
+        <!-- alert 404 -->
+        <div role="alert" class="alert shadow-lg" v-show="notFound" style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            color: red;
+            animation: fadeInOut 1.5s infinite;
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">The requested task does not exist</h3>
+            <div class="text-xs">Please check your ID again</div>
+          </div>
+          <div>
+            <button class="btn btn-sm" style="background-color: #9fc3e9" @click="notFound = false">
+              Close
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

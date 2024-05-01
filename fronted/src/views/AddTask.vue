@@ -2,6 +2,9 @@
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
 import { ref, watch, onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   todoId: Number
@@ -30,10 +33,23 @@ const submitForm = async () => {
   })
   console.log(add)
   console.log(todo.value)
+  closeModal()
+  router.push('/task')
 }
 
 const closeModal = () => {
   my_modal_1.close()
+}
+
+const clearForm = () => {
+  formData.value.name = ""
+  formData.value.location = ""
+  formData.value.job = ""
+  formData.value.email = ""
+  formData.value.password = ""
+  formData.value.phone = ""
+  formData.value.bio = ""
+  formData.value.favorite = []
 }
 </script>
 <template>
