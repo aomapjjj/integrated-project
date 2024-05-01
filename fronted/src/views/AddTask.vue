@@ -2,10 +2,10 @@
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
 import { ref, watch, onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const router = useRouter()
-const route = useRoute()
+
 
 const props = defineProps({
   todoId: Number
