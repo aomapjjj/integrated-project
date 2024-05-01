@@ -33,26 +33,35 @@ public class TaskService {
                         "Task id "+ id + " does not exist !!!"));
     }
 
+    // ADD
     @Transactional
     public Task createNewTasks(Task task) {
         return repository.save(task);
     }
 
-//    @Transactional
-//    public List<TaskDTO> removeTasks(Integer id){
-//        Task task = repository.findById(id).orElseThrow(
-//                () -> new HttpClientErrorException(HttpStatus.NOT_FOUND, )
-//        )
-//    }
-//    public void removeOffice(String officeCode) {
-//        Office office = repository.findById(officeCode).orElseThrow(
-//                () -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Office Id " + officeCode + " DOES NOT EXIST !!!")
-//        );
-//        repository.delete(office);
-//    }
-//    public TaskDTOTwo getTasks(int id){
-//        Task task = repository.findById(id).orElseThrow(() -> new ResponseStatusException(
-//                HttpStatus.NOT_FOUND, id + " does not exist"));
-//        return modelMapper.map(task, TaskDTOTwo.class);
-//    }
+    // DELETE
+    @Transactional
+    public List<TaskDTO> removeTasks(Integer id){
+        Task task = repository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "NOT FOUND"));
+        repository.delete(task);
+
+        List<Task> remainingTasks = repository.findAll();
+        return listMapper.mapList(remainingTasks, TaskDTO.class, modelMapper);
+    }
+
+    // EDIT
+    @Transactional
+    public Task updateTakes(Integer id, Task task) {
+        // ค้นหา Task จาก repository ด้วย id
+        Task existingTask = repository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "NOT FOUND"));
+        // เช็คว่า id ของ Task ที่พบเหมือนกับ id
+        if (!existingTask.getId().equals(task.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "MISMATCH");
+        }
+        return repository.save(task);
+    }
 }
+
+

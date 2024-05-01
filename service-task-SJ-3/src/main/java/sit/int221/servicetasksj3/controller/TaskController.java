@@ -34,9 +34,22 @@ public class TaskController {
         return service.findByID(id);
     }
 
+    // ADD
     @PostMapping("")
     public ResponseEntity<Task> createNewTasks(@Valid @RequestBody Task task){
         Task createdTask = service.createNewTasks(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public List<TaskDTO> removeTasks(@PathVariable Integer id){
+        return service.removeTasks(id);
+    }
+
+    // EDIT
+    @PutMapping("/{id}")
+    public Task updateTasks(@Valid @RequestBody Task task, @PathVariable Integer id) {
+        return service.updateTakes(id,task);
     }
 }
