@@ -1,48 +1,62 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
-const countdown = ref(3)
-const router = useRouter()
+const countdown = ref(3);
+const router = useRouter();
 
 onMounted(() => {
-  startCountdown()
-})
+  startCountdown();
+});
 
 const startCountdown = () => {
   let interval = setInterval(() => {
-    countdown.value--
+    countdown.value--;
     if (countdown.value <= 0) {
-      clearInterval(interval)
-      router.push({ name: 'TaskList' })
+      clearInterval(interval);
+      router.push({ name: 'TaskList' });
     }
-  }, 1000)
-}
+  }, 1000);
+};
+
+const goBackHome = () => {
+  router.push({ name: 'TaskList' });
+};
 </script>
 
-
 <template>
-  <div class="error-page">
-    <h1 class="error-title">404 Not Found</h1>
-    <p class="error-title" >Oops! Something went wrong</p>
-    <p class="error-title" >{{ countdown }}</p>
-    <span class="loading loading-spinner loading-lg"></span>
+  <div class="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 text-center">
+    <h1 class="text-base font-semibold" style="color: #f785b1">404</h1>
+    <p class="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl error-title">Page not found</p>
+    <p class="mt-6 text-base leading-7 text-gray-600">The requested task does not exist</p>
+    <div class="mt-10 flex items-center justify-center gap-x-6">
+      <button @click="goBackHome" class="rounded-button rounded-md bg-error px-3.5 py-2.5 text-sm font-semibold text-white">Go back home</button>
+    </div>
+    <div class="mt-10 flex items-center justify-center gap-x-6">
+      <p class="error-title">{{ countdown }}</p>
+    </div>
+    <!-- <div class="mt-10 flex items-center justify-center gap-x-6">
+      <p class="loading loading-spinner loading-lg" style="color: #9391E4"></p>
+    </div> -->
   </div>
 </template>
 
 <style scoped>
-.error-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+.bg-error {
+  background-color: #f785b1;
+}
+
+.rounded-button {
+  border-radius: 9999px;
+}
+
+button:hover{
+  background-color: #9391E4
 }
 
 .error-title {
   font-size: 48px;
   font-weight: bold;
-  color: #d1310d ;
+  color: #eb4343;
 }
 </style>
-
