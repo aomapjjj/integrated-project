@@ -53,7 +53,6 @@ public class TaskService {
                 () -> new ItemNotFoundException("NOT FOUND"));
         repository.delete(task);
         return listMapper.mapList(repository.findAll(), TaskDTO.class, modelMapper);
-
     }
     // EDIT
     @Transactional
