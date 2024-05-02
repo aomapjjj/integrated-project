@@ -2,11 +2,9 @@
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
 import { ref, watch, onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
-
 import { useRouter } from "vue-router"
 
 const router = useRouter()
-
 const props = defineProps({
   todoId: Number
 })
@@ -32,12 +30,13 @@ const submitForm = async () => {
     assignees: todo.value.assignees,
     status: todo.value.status
   })
-  console.log(add)
-  console.log(todo.value)
+  // console.log(add)
+  // console.log(todo.value.title)
+  const addedTitle = todo.value.title
   closeModal()
   clearForm()
-  
   router.go()
+  alert(`Todo with title "${addedTitle}" added successfully!`)
 }
 
 const closeModal = () => {

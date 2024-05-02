@@ -1,5 +1,6 @@
 package sit.int221.servicetasksj3.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,13 +21,17 @@ public class Task {
     @Column(name = "taskDescription", length = 500)
     private String description;
     @Column(name = "taskAssignees", length = 30)
-    private Object assignees;
+    private String assignees;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "taskStatus")
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.NO_STATUS;
+
     @Column(name = "createdOn", updatable = false, insertable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime createdOn;
+
     @Column(name = "updatedOn", updatable = false, insertable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
 }
