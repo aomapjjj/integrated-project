@@ -40,6 +40,15 @@ public class TaskService {
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
             throw new ItemNotFoundException("Title is required");
         }
+        if (task.getTitle().length() > 100) {
+            throw new ItemNotFoundException("Title cannot exceed 100 characters");
+        }
+        if (task.getDescription().length() > 500) {
+            throw new ItemNotFoundException("Description cannot exceed 500 characters");
+        }
+        if (task.getAssignees().length() > 30) {
+            throw new ItemNotFoundException("Assignees cannot exceed 30 characters");
+        }
         try {
             return repository.save(task);
         } catch (Exception exception) {

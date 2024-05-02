@@ -21,7 +21,7 @@ public class Task {
     @Column(name = "taskDescription", length = 500)
     private String description;
     @Column(name = "taskAssignees", length = 30)
-    private Object assignees;
+    private String assignees;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "taskStatus")
