@@ -78,7 +78,7 @@ const confirmDelete = () => {
 
 
 
-  alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`)
+ // alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`)
   console.log(filterAndLogTitleById(selectedItemIdToDelete.value)) // เข้าถึง items จากตรงนี้ได้
 } 
 
