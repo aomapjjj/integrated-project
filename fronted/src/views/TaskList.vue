@@ -63,6 +63,8 @@ const closeModal = () => {
 const confirmDelete = () => {
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
+  window.alert(`Todo with title "" added successfully!`)
+  console.log(selectedItemIdToDelete.value)
 }
 
 </script>
@@ -160,7 +162,7 @@ const confirmDelete = () => {
               <td
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                <button class="btn btn-info">Edit</button>
+                <button class="itbkk-button-edit btn btn-info">Edit</button>
               </td>
 
               <!-- DELETE -->
@@ -168,7 +170,7 @@ const confirmDelete = () => {
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <button
-                  class="btn btn-success"
+                  class="itbkk-button-delete btn btn-success"
                   @click="openModalToDelete(item.id)"
                 >
                   Delete
