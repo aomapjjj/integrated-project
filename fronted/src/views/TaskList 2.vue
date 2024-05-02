@@ -3,7 +3,6 @@ import { ref, onMounted } from "vue"
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
-import EditTask from "../views/EditTask.vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
@@ -12,11 +11,11 @@ const router = useRouter()
 const todoList = ref([])
 const selectedTodoId = ref(0)
 const notFound = ref(false)
-let items = [] // ประกาศ items เป็นตัวแปร global
 
 onMounted(async () => {
-  items = await getItems(import.meta.env.VITE_BASE_URL)
+  const items = await getItems(import.meta.env.VITE_BASE_URL)
   todoList.value = items
+
   const taskId = route.params.id
   if (taskId !== undefined) {
     console.log(taskId)
@@ -44,22 +43,10 @@ const deleteTodo = async (todoId) => {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
 }
-const filterAndLogTitleById = (id) => {
-    const item = items.find(item => item.id === id);
-    if (item) {
-      console.log(item.title);
-      return item.title;
-    } else {
-      console.log(`No item found with id ${id}`);
-      return ""; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
-    }
-  }
-  
-
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-const selectedItemIdToDelete = ref(0)
+const selectedItemIdToDelete = ref(null)
 
 const openModalToDelete = (itemId) => {
   selectedItemIdToDelete.value = itemId
@@ -75,19 +62,9 @@ const closeModal = () => {
 const confirmDelete = () => {
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
-
-
-
-  alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`)
-  console.log(filterAndLogTitleById(selectedItemIdToDelete.value)) // เข้าถึง items จากตรงนี้ได้
-} 
-
-
+}
 
 </script>
-
-
-
 <template>
   <div class="min-h-full">
     <nav class="bg-gray-800" style="background-color: #f785b1">
@@ -179,14 +156,10 @@ const confirmDelete = () => {
                   {{ checkStatus(item.status) }}
                 </span>
               </td>
-
-              <!-- EDIT -->
               <td
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-
-                <button class="itbkk-button-edit btn btn-info">Edit</button>
-
+                <button class="btn btn-info">Edit</button>
               </td>
 
               <!-- DELETE -->
@@ -194,7 +167,7 @@ const confirmDelete = () => {
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <button
-                  class="itbkk-button-delete btn btn-success"
+                  class="btn btn-success"
                   @click="openModalToDelete(item.id)"
                 >
                   Delete
@@ -203,7 +176,7 @@ const confirmDelete = () => {
                   <div class="modal-box">
                     <h3 class="font-bold text-lg">Delete Confirmation</h3>
                     <p class="py-4">
-                      Are you sure you want to delete this item?  {{ filterAndLogTitleById(selectedItemIdToDelete) }}
+                      Are you sure you want to delete this item?
                     </p>
                     <div class="modal-action">
                       <button class="btn" @click="closeModal">Cancel</button>
