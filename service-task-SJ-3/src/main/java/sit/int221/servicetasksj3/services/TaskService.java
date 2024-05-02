@@ -43,10 +43,10 @@ public class TaskService {
         if (task.getTitle().length() > 100) {
             throw new ItemNotFoundException("Title cannot exceed 100 characters");
         }
-        if (task.getDescription().length() > 500) {
+        if (task.getDescription() != null && task.getDescription().length() > 500) {
             throw new ItemNotFoundException("Description cannot exceed 500 characters");
         }
-        if (task.getAssignees().length() > 30) {
+        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
             throw new ItemNotFoundException("Assignees cannot exceed 30 characters");
         }
         try {
@@ -57,11 +57,12 @@ public class TaskService {
     }
     // DELETE
     @Transactional
-    public List<TaskDTO> removeTasks(Integer id){
+    public TaskDTO removeTasks(Integer id){
         Task task = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
+        TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
         repository.delete(task);
-        return listMapper.mapList(repository.findAll(), TaskDTO.class, modelMapper);
+        return deletedTaskDTO;
     }
     // EDIT
     @Transactional

@@ -44,8 +44,12 @@ public class TaskController {
     }
     // DELETE
     @DeleteMapping("/{id}")
-    public List<TaskDTO> removeTasks(@PathVariable Integer id){
-        return service.removeTasks(id);
+//    public List<TaskDTO> removeTasks(@PathVariable Integer id){
+//        return service.removeTasks(id);
+//    }
+    public ResponseEntity<TaskDTO> removeTasks(@PathVariable Integer id){
+        TaskDTO deletedTaskDTO = service.removeTasks(id);
+        return ResponseEntity.ok().body(deletedTaskDTO);
     }
     // EDIT
     @PutMapping("/{id}")
