@@ -57,9 +57,7 @@ const closeModal = () => {
 
 <template>
   <!-- BUTTON -->
-
-
-    <button
+  <button
       @click="openModal"
       class="itbkk-button-edit btn btn-circle btn-outline btn-sm"
       style="color: currentColor"

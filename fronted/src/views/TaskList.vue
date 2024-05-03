@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue';
 import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
 import AddTask from '../views/AddTask.vue';
+import EditTask from '../views/EditTask.vue';
 import { checkStatus } from '../libs/checkStatus';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -243,8 +244,8 @@ const confirmDelete = () => {
               <!-- EDIT -->
 
               <td class="hidden md:table-cell text-sm pl-4">
+                
                 <EditTask />
-            
               </td>
 
               <!-- DELETE -->
@@ -306,7 +307,7 @@ const confirmDelete = () => {
               </td>
             </tr>
 
-            <!-- NO TASK -->
+            <!-- DELETE COMPLETE -->
             <tr v-if="todoList.length === 0">
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No task

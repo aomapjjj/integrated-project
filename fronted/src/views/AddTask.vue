@@ -6,6 +6,7 @@ import { useRouter } from "vue-router"
 
 const router = useRouter()
 const showAlertAdd = ref(false)
+const showAlertAfterClose = ref(false)
 
 const props = defineProps({
   todoId: Number
@@ -26,25 +27,24 @@ onMounted(async () => {
 })
 
 const submitForm = async () => {
-  const add = await addItem(import.meta.env.VITE_BASE_URL, {
+  await addItem(import.meta.env.VITE_BASE_URL, {
     title: todo.value.title,
     description: todo.value.description,
     assignees: todo.value.assignees,
     status: todo.value.status
   })
 
-  console.log(add)
-  console.log(todo.value.title)
-  const addedTitle = todo.value.title
-  closeModal()
+ 
   clearForm()
-  router.go()
-
+  showAlertAdd.value = true
+  showAlertAfterClose.value = true
+  setTimeout(() => {
+    showAlertAfterClose.value = false;
+  }, 2300);
 }
-
 const closeModal = () => {
   my_modal_1.close()
-  showAlertAdd.value= true
+  router.go()
 }
 
 const clearForm = () => {
@@ -57,16 +57,39 @@ const clearForm = () => {
 <template>
   <div class="flex justify-end mt-9">
     <!-- FILTERS -->
-    <button  class="btn bg-gray-900" style="color: white;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>
+    <button class="btn bg-gray-900" style="color: white">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="2"
+          d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"
+        />
       </svg>
       Filter
     </button>
     <!-- ADD -->
-    <button onclick="my_modal_1.showModal()" class="btn bg-green-400 ml-4" style="position:relative">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/>
+    <button
+      onclick="my_modal_1.showModal()"
+      class="btn bg-green-400 ml-4"
+      style="position: relative"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill="currentColor"
+          d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
+        />
       </svg>
       Add new task
     </button>
@@ -77,39 +100,84 @@ const clearForm = () => {
   >
     <dialog id="my_modal_1" class="modal">
       <div
-        class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
-        <div form @submit.prevent="submitForm" class="flex justify-between w-full h-full"
-          style="padding-top: 20px; padding-bottom: 20px; align-items: center">
+        class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
+      >
+        <div
+          form
+          @submit.prevent="submitForm"
+          class="flex justify-between w-full h-full"
+          style="padding-top: 20px; padding-bottom: 20px; align-items: center"
+        >
           <!-- Title -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
-            <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-              <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="todo.title" />
+            <label
+              class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
+            >
+              <input
+                type="text"
+                class="grow"
+                placeholder="Enter Your Title"
+                maxlength="100"
+                v-model="todo.title"
+              />
             </label>
 
             <!-- Description -->
             <label for="description" class="form-control flex-grow ml-4 mb-8">
               <div class="label">
-                <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                  style="color: #9391e4">Description</span>
+                <span
+                  class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                  style="color: #9391e4"
+                  >Description</span
+                >
               </div>
-              <textarea id="description" class="itbkk-description textarea textarea-bordered h-3/4 mb-8" maxlength="500"
-                rows="4" placeholder="No Description Provided" style="height: 400px"
-                v-model="todo.description"></textarea>
+              <textarea
+                id="description"
+                class="itbkk-description textarea textarea-bordered h-3/4 mb-8"
+                maxlength="500"
+                rows="4"
+                placeholder="No Description Provided"
+                style="height: 400px"
+                v-model="todo.description"
+              ></textarea>
             </label>
           </div>
-          <div class="modal-content py-4 text-left px-10 flex-grow w-1/3 max-w-sm" style="margin-top: 65px">
+          <div
+            class="modal-content py-4 text-left px-10 flex-grow w-1/3 max-w-sm"
+            style="margin-top: 65px"
+          >
             <!-- Assignees -->
             <div class="mt-10">
-              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Assignees</span>
-              <textarea id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" maxlength="30"
-                rows="4" placeholder="Unassigned" v-model="todo.assignees"></textarea>
+              <span
+                class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                style="color: #9391e4"
+                >Assignees</span
+              >
+              <textarea
+                id="assignees"
+                class="itbkk-assignees textarea textarea-bordered w-full mt-1"
+                maxlength="30"
+                rows="4"
+                placeholder="Unassigned"
+                v-model="todo.assignees"
+              ></textarea>
             </div>
             <!-- Status -->
             <div class="itbkk-status mb-4 mt-2">
-              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
-              <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
+              <span
+                class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                style="color: #9391e4"
+                >Status</span
+              >
+              <select
+                class="select select-bordered w-full max-w-xs mt-1"
+                v-model="todo.status"
+              >
                 <option disabled value="NO_STATUS">No Status</option>
-                <option v-for="status in ['TO_DO', 'DOING', 'DONE']" :value="status">
+                <option
+                  v-for="status in ['TO_DO', 'DOING', 'DONE']"
+                  :value="status"
+                >
                   {{ checkStatus(status) }}
                 </option>
               </select>
@@ -120,39 +188,72 @@ const clearForm = () => {
               class="modal-action"
               style="display: flex; justify-content: space-around"
             >
-
               <form method="dialog" style="flex: 1">
-                <button type="submit" class="btn" style="background-color: #f785b1; margin: 10px; width: 100%"
-                  :disabled="todo.title.length === 0 || todo.title === null">
+                <button
+                  type="submit"
+                  class="btn"
+                  style="background-color: #f785b1; margin: 10px; width: 100%"
+                  :disabled="todo.title.length === 0 || todo.title === null"
+                >
                   Save
                 </button>
               </form>
-              <button class="btn" style="flex: 1; margin: 10px" @click="closeModal">
+              <button
+                class="btn"
+                style="flex: 1; margin: 10px"
+                @click="closeModal"
+              >
                 Close
               </button>
             </div>
           </div>
         </div>
-        <div role="alert" class="alert shadow-lg " v-show="showAlertAdd" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 500px; color: red; animation: fadeInOut 1.5s infinite;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-              <div>
-                <h3 class="font-bold">Add</h3>
-              </div>
-              <div>
-                <button class="btn btn-sm" style="background-color: #9fc3e9;" @click="showAlertAdd = false">Close</button>
-              </div>
+
+
+         <!-- ALERT -->
+         <div
+          role="alert"
+          class="alert shadow-lg"
+          :class="{ hidden: !showAlertAfterClose }"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 300px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          "
+        >
+         
+          <h3 class="font-bold">Task Added Successfully! {{  }}</h3>
+         
         </div>
       </div>
     </dialog>
   </div>
 </template>
+
 <style>
-
-  .add-button:hover {
-    border-color: white;
-    color: white ;
-  }
-
+.add-button:hover {
+  border-color: white;
+  color: white;
+}
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 300px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 </style>
