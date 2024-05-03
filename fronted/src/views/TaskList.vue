@@ -1,4 +1,5 @@
 <script setup>
+
 import { ref, onMounted } from 'vue';
 import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
@@ -13,6 +14,7 @@ const todoList = ref([]);
 const selectedTodoId = ref(0);
 const notFound = ref(false);
 let items = []; // ประกาศ items เป็นตัวแปร global
+
 
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL);
@@ -45,15 +47,19 @@ const deleteTodo = async (todoId) => {
   }
 };
 const filterAndLogTitleById = (id) => {
+
   const item = items.find((item) => item.id === id);
+
   if (item) {
     console.log(item.title);
     return item.title;
   } else {
     console.log(`No item found with id ${id}`);
+
     return ''; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
   }
 };
+
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -71,8 +77,8 @@ const closeModal = () => {
 };
 
 const confirmDelete = () => {
-  deleteTodo(selectedItemIdToDelete.value);
-  closeModal();
+  deleteTodo(selectedItemIdToDelete.value)
+  closeModal()
 
   alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`);
   console.log(filterAndLogTitleById(selectedItemIdToDelete.value)); // เข้าถึง items จากตรงนี้ได้
@@ -166,6 +172,7 @@ const confirmDelete = () => {
               >
                 Status
               </th>
+
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
@@ -235,6 +242,14 @@ const confirmDelete = () => {
               </td>
 
               <!-- EDIT -->
+
+              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
+
+                <button class="itbkk-button-edit btn btn-info">Edit</button>
+
+              </td>
+
+
               <td class="hidden md:table-cell text-sm pl-4">
                 <EditTask :todo-id="selectedTodoId"/>
             
@@ -263,9 +278,11 @@ const confirmDelete = () => {
                       d="M6 18L18 6M6 6l12 12"
                     />
                   </svg>
+
                 </button>
 
                 <dialog id="my_modal_delete" class="modal">
+
                   <div class="modal-box" style="max-width: 1000px;">
                     <h3 class="itbkk-message font-bold text-lg">
                       Delete a Task
@@ -274,6 +291,7 @@ const confirmDelete = () => {
                       Do you want to delete the task "{{
                         filterAndLogTitleById(selectedItemIdToDelete)
                       }}"?
+
                     </p>
                     <div class="modal-action">
                       <button
@@ -305,8 +323,32 @@ const confirmDelete = () => {
           </tbody>
         </table>
       </div>
+      <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            color: red;
+            animation: fadeInOut 1.5s infinite;
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">The requested task does not exist</h3>
+            <div class="text-xs">qq</div>
+          </div>
+          <div>
+            <button class="btn btn-sm" style="background-color: #9fc3e9" @click="deleteComplete = false">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 </template>
 <style scoped>
 table {
