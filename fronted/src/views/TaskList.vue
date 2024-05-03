@@ -189,6 +189,7 @@ const confirmDelete = () => {
                   color: #fff;
                 "
               ></th>
+           
             </tr>
           </thead>
           <tbody>
@@ -243,15 +244,8 @@ const confirmDelete = () => {
 
               <!-- EDIT -->
 
-              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
-
-                <button class="itbkk-button-edit btn btn-info">Edit</button>
-
-              </td>
-
-
               <td class="hidden md:table-cell text-sm pl-4">
-                <EditTask :todo-id="selectedTodoId"/>
+                <EditTask />
             
               </td>
 
