@@ -4,7 +4,6 @@ import { ref, onMounted } from 'vue';
 import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
 import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
 import { checkStatus } from '../libs/checkStatus';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -13,6 +12,7 @@ const router = useRouter();
 const todoList = ref([]);
 const selectedTodoId = ref(0);
 const notFound = ref(false);
+const deleteComplete = ref(false)
 let items = []; // ประกาศ items เป็นตัวแปร global
 
 
@@ -79,9 +79,7 @@ const closeModal = () => {
 const confirmDelete = () => {
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
-
-  alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`);
-  console.log(filterAndLogTitleById(selectedItemIdToDelete.value)); // เข้าถึง items จากตรงนี้ได้
+  deleteComplete.value= true
 };
 </script>
 
@@ -338,8 +336,9 @@ const confirmDelete = () => {
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <div>
-            <h3 class="font-bold">The requested task does not exist</h3>
-            <div class="text-xs">qq</div>
+            <h2 class="font-bold">Delete Complete "{{
+                        filterAndLogTitleById(selectedItemIdToDelete)
+                      }}"</h2>
           </div>
           <div>
             <button class="btn btn-sm" style="background-color: #9fc3e9" @click="deleteComplete = false">
