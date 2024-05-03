@@ -12,6 +12,7 @@ const router = useRouter()
 const todoList = ref([])
 const selectedTodoId = ref(0)
 const notFound = ref(false)
+const deleteComplete = ref(false)
 let items = [] // ประกาศ items เป็นตัวแปร global
 
 onMounted(async () => {
@@ -45,16 +46,16 @@ const deleteTodo = async (todoId) => {
   }
 }
 const filterAndLogTitleById = (id) => {
-    const item = items.find(item => item.id === id);
-    if (item) {
-      console.log(item.title);
-      return item.title;
-    } else {
-      console.log(`No item found with id ${id}`);
-      return ""; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
-    }
+  const item = items.find(item => item.id === id);
+  if (item) {
+    console.log(item.title);
+    return item.title;
+  } else {
+    console.log(`No item found with id ${id}`);
+    return ""; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
   }
-  
+}
+
 
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -76,11 +77,9 @@ const confirmDelete = () => {
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
 
-
-
- // alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`)
-  console.log(filterAndLogTitleById(selectedItemIdToDelete.value)) // เข้าถึง items จากตรงนี้ได้
-} 
+  //  alert(`จะลบแล้วนร้า ${filterAndLogTitleById(selectedItemIdToDelete.value)}`)
+  deleteComplete.value = true
+}
 
 
 
@@ -137,12 +136,8 @@ const confirmDelete = () => {
               <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700">
                 Status
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              ></th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              ></th>
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"></th>
+              <th class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"></th>
             </tr>
           </thead>
           <tbody>
@@ -181,29 +176,22 @@ const confirmDelete = () => {
               </td>
 
               <!-- EDIT -->
-              <td
-                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
-              >
+              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
 
                 <button class="itbkk-button-edit btn btn-info">Edit</button>
 
               </td>
 
               <!-- DELETE -->
-              <td
-                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
-              >
-                <button
-                  class="itbkk-button-delete btn btn-success"
-                  @click="openModalToDelete(item.id)"
-                >
+              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                <button class="itbkk-button-delete btn btn-success" @click="openModalToDelete(item.id)">
                   Delete
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box">
                     <h3 class="font-bold text-lg">Delete Confirmation</h3>
                     <p class="py-4">
-                      Are you sure you want to delete this item?  {{ filterAndLogTitleById(selectedItemIdToDelete) }}
+                      Are you sure you want to delete this item? {{ filterAndLogTitleById(selectedItemIdToDelete) }}
                     </p>
                     <div class="modal-action">
                       <button class="btn" @click="closeModal">Cancel</button>
@@ -249,7 +237,31 @@ const confirmDelete = () => {
           </div>
         </div>
       </div>
+      <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            color: red;
+            animation: fadeInOut 1.5s infinite;
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">The requested task does not exist</h3>
+            <div class="text-xs">qq</div>
+          </div>
+          <div>
+            <button class="btn btn-sm" style="background-color: #9fc3e9" @click="deleteComplete = false">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 </template>
 <style scoped></style>
