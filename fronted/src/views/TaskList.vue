@@ -281,7 +281,7 @@ const confirmDelete = () => {
                       Delete a Task
                     </h3>
                     <p class="py-4 font-medium" style="word-wrap: break-word">
-                      Do you want to delete the task "{{
+                      Do you want to delete the task number {{ selectedItemIdToDelete }} - "{{
                         filterAndLogTitleById(selectedItemIdToDelete)
                       }}"?
 

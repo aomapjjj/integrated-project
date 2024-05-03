@@ -27,12 +27,17 @@ onMounted(async () => {
 })
 
 const submitForm = async () => {
+  const trimmedTitle = todo.value.title.trim();
+  const trimmedDescription = todo.value.description.trim();
+  const trimmedAssignees = todo.value.assignees.trim();
+
+  // เพิ่มรายการ
   await addItem(import.meta.env.VITE_BASE_URL, {
-    title: todo.value.title,
-    description: todo.value.description,
-    assignees: todo.value.assignees,
+    title: trimmedTitle,
+    description: trimmedDescription,
+    assignees: trimmedAssignees,
     status: todo.value.status
-  })
+  });
 
  
   clearForm()
