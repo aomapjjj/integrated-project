@@ -155,7 +155,7 @@ const clearForm = () => {
                 </option>
               </select>
             </div>
-            <!-- Close Button -->
+            <!-- Close & Save Button -->
             <div
               class="modal-action"
               style="display: flex; justify-content: space-around"
