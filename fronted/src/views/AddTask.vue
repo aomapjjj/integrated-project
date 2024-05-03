@@ -53,11 +53,26 @@ const clearForm = () => {
 }
 </script>
 <template>
-  <button onclick="my_modal_1.showModal()"
-    class="bg-white text-green-500 hover:bg-gray-900 rounded-md px-3 py-2 text-sm font-medium">
-    + Add
-  </button>
-  <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
+  <div class="flex justify-end mt-9">
+    <!-- FILTERS -->
+    <button  class="btn bg-gray-900" style="color: white;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"/>
+      </svg>
+      Filter
+    </button>
+    <!-- ADD -->
+    <button onclick="my_modal_1.showModal()" class="btn bg-green-400 ml-4" style="position:relative">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"/>
+      </svg>
+      Add new task
+    </button>
+  </div>
+
+  <div
+    class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
+  >
     <dialog id="my_modal_1" class="modal">
       <div
         class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
@@ -97,8 +112,13 @@ const clearForm = () => {
                 </option>
               </select>
             </div>
-            <!-- Close Button -->
-            <div class="modal-action" style="display: flex; justify-content: space-around">
+
+            <!-- Close & Save Button -->
+            <div
+              class="modal-action"
+              style="display: flex; justify-content: space-around"
+            >
+
               <form method="dialog" style="flex: 1">
                 <button type="submit" class="btn" style="background-color: #f785b1; margin: 10px; width: 100%"
                   :disabled="todo.title.length === 0 || todo.title === null">
@@ -127,4 +147,11 @@ const clearForm = () => {
     </dialog>
   </div>
 </template>
-<style></style>
+<style>
+
+  .add-button:hover {
+    border-color: white;
+    color: white ;
+  }
+
+</style>
