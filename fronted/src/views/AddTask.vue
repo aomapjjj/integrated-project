@@ -32,17 +32,19 @@ const submitForm = async () => {
     assignees: todo.value.assignees,
     status: todo.value.status
   })
+
   console.log(add)
   console.log(todo.value.title)
   const addedTitle = todo.value.title
   closeModal()
   clearForm()
   router.go()
-  alert(`Todo with title "${addedTitle}" added successfully!`)
+
 }
 
 const closeModal = () => {
   my_modal_1.close()
+  showAlertAdd.value= true
 }
 
 const clearForm = () => {
@@ -136,8 +138,7 @@ const clearForm = () => {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
               <div>
-                <h3 class="font-bold">The requested task does not exist</h3>
-                <div class="text-xs">Please check your ID again</div>
+                <h3 class="font-bold">Add</h3>
               </div>
               <div>
                 <button class="btn btn-sm" style="background-color: #9fc3e9;" @click="showAlertAdd = false">Close</button>
