@@ -3,6 +3,7 @@ import { getItems, getItemById } from "@/libs/fetchUtils"
 import { ref, watch, onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate"
+
 const props = defineProps({
   todoId: Number
 })
@@ -20,12 +21,8 @@ const todo = ref({
 const todoList = ref([])
 
 onMounted(async () => {
-  console.log(import.meta.env.VITE_BASE_URL)
   const items = await getItems(import.meta.env.VITE_BASE_URL)
-  console.log(items)
   todoList.value = items
-  console.log(todoList.value)
-  console.log(items)
 })
 
 // Watch for changes in the prop value
@@ -181,12 +178,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           </div>
           <!-- Close Button -->
           <div class="itbkk-button modal-action">
-            <form method="dialog" style="flex: 1">
-                <button type="submit" class="btn" style="background-color: #f785b1; margin: 10px; width: 100%"
-                  :disabled="todo.title.length === 0 || todo.title === null">
-                  Save
-                </button>
-              </form>
             <label for="my_modal_6" class="btn">Close</label>
           </div>
         </div>
