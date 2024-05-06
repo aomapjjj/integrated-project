@@ -70,7 +70,7 @@ const clearForm = () => {
       Filter
     </button>
     <!-- ADD -->
-    <button onclick="my_modal_1.showModal()" class="btn bg-green-400 ml-4" style="position: relative">
+    <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path fill="currentColor"
           d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
@@ -113,23 +113,23 @@ const clearForm = () => {
             <div class="itbkk-status mb-4 mt-2">
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-                <option disabled value="NO_STATUS">No Status</option>
+                <option value="NO_STATUS">No Status</option>
                 <option v-for="status in ['TO_DO', 'DOING', 'DONE']" :value="status">
                   {{ checkStatus(status) }}
                 </option>
               </select>
             </div>
 
-            <!-- Close & Save Button -->
+            <!-- Cancel & Save Button -->
             <div class="modal-action" style="display: flex; justify-content: space-around">
               <form method="dialog" style="flex: 1">
-                <button type="submit" class="btn" style="background-color: #f785b1; margin: 10px; width: 100%"
+                <button type="submit" class="itbkk-button-confirm btn" style="background-color: #f785b1; margin: 10px; width: 100%"
                   :disabled="todo.title.length === 0 || todo.title === null">
                   Save
                 </button>
               </form>
-              <button class="btn" style="flex: 1; margin: 10px" @click="closeModal">
-                Close
+              <button class="itbkk-button-cancel btn" style="flex: 1; margin: 10px" @click="closeModal">
+                Cancel
               </button>
             </div>
           </div>

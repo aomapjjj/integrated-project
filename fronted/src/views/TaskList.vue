@@ -202,13 +202,11 @@ const confirmDelete = () => {
                 </span>
               </td>
 
+            <div class="itbkk-button-action">
               <!-- EDIT -->
-
-              <td class="hidden md:table-cell text-sm pl-4">
-
+              <td class="itbkk-button-edithidden md:table-cell text-sm pl-4">
                 <EditTask :todo-id="item.id" />
               </td>
-
               <!-- DELETE -->
               <td class="hidden md:table-cell px-4 py-3 text-center md:text-left text-sm text-gray-700">
                 <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
@@ -217,8 +215,8 @@ const confirmDelete = () => {
                     stroke="currentColor" style="color: #eb4343">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
-
                 </button>
+                
 
                 <dialog id="my_modal_delete" class="modal">
 
@@ -243,6 +241,7 @@ const confirmDelete = () => {
                   </div>
                 </dialog>
               </td>
+            </div>
             </tr>
 
             <!-- DELETE COMPLETE -->
