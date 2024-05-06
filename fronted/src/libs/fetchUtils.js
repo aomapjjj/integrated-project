@@ -52,6 +52,8 @@ async function addItem(url, newItem) {
 }
 
 async function editItem(url, id, editItem) {
+  console.log(id)
+  console.log(editItem)
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
@@ -64,6 +66,7 @@ async function editItem(url, id, editItem) {
     })
     const editedItem = await res.json()
     return editedItem
+  
     // return res.status
   } catch (error) {
     console.log(`error: ${error}`)
