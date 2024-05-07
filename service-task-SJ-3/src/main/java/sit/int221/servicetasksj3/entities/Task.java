@@ -34,4 +34,32 @@ public class Task {
     @Column(name = "updatedOn", updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
+
+    public void setTitle(String title) {
+        if (title != null) {
+            title = title.trim();
+        }
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        if (description != null) {
+            description = description.trim();
+        }
+        this.description = description;
+    }
+
+    public void setAssignees(String assignees) {
+        if (assignees != null) {
+            assignees = assignees.trim();
+        }
+        this.assignees = assignees;
+    }
+
+    public void setStatus(TaskStatus status) {
+        if (status == null){
+            status = TaskStatus.NO_STATUS;
+        }
+        this.status = status;
+    }
 }
