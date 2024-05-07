@@ -16,14 +16,6 @@ const notFound = ref(false);
 const deleteComplete = ref(false)
 let items = []; // ประกาศ items เป็นตัวแปร global
 
-
-
-
-
-   
-  
-
-
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL);
   todoList.value = items;
@@ -209,46 +201,47 @@ const confirmDelete = () => {
                 </span>
               </td>
 
-            <div class="itbkk-button-action">
-              <!-- EDIT -->
-              <td class="itbkk-button-edithidden md:table-cell text-sm pl-4">
-                <EditTask :todo-id="item.id" />
-              </td>
-              <!-- DELETE -->
-              <td class="hidden md:table-cell px-4 py-3 text-center md:text-left text-sm text-gray-700">
-                <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
-                  @click="openModalToDelete(item.id)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" style="color: #eb4343">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                
+              <div class="itbkk-button-action">
+                <!-- EDIT -->
+                <td class="itbkk-button-edithidden md:table-cell text-sm pl-4">
+                  <EditTask :todo-id="item.id" />
+                </td>
+                <!-- DELETE -->
+                <td class="hidden md:table-cell px-4 py-3 text-center md:text-left text-sm text-gray-700">
+                  <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
+                    @click="openModalToDelete(item.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" style="color: #eb4343">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
 
-                <dialog id="my_modal_delete" class="modal">
 
-                  <div class="modal-box" style="max-width: 1000px;">
-                    <h3 class="itbkk-message font-bold text-lg">
-                      Delete a Task
-                    </h3>
-                    <p class="py-4 font-medium" style="word-wrap: break-word">
-                      Do you want to delete the task number {{ selectedItemIdToDelete }} - "{{
+                  <dialog id="my_modal_delete" class="modal">
+
+                    <div class="modal-box" style="max-width: 1000px;">
+                      <h3 class="itbkk-message font-bold text-lg">
+                        Delete a Task
+                      </h3>
+                      <p class="py-4 font-medium" style="word-wrap: break-word">
+                        Do you want to delete the task number {{ selectedItemIdToDelete }} - "{{
               filterAndLogTitleById(selectedItemIdToDelete)
             }}"?
 
-                    </p>
-                    <div class="modal-action">
-                      <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
-                        Cancel
-                      </button>
-                      <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff;" @click="confirmDelete">
-                        Confirm
-                      </button>
+                      </p>
+                      <div class="modal-action">
+                        <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
+                          Cancel
+                        </button>
+                        <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff;"
+                          @click="confirmDelete">
+                          Confirm
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </dialog>
-              </td>
-            </div>
+                  </dialog>
+                </td>
+              </div>
             </tr>
 
             <!-- DELETE COMPLETE -->
