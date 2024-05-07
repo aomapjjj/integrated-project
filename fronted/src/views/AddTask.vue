@@ -1,12 +1,13 @@
 <script setup>
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
-import { ref, watch, onMounted } from "vue"
+import { ref , onMounted } from "vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
 const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
+
 
 const props = defineProps({
   todoId: Number
@@ -26,26 +27,28 @@ onMounted(async () => {
   todoList.value = items
 })
 
+
+
 const submitForm = async () => {
   const trimmedTitle = todo.value.title.trim();
   const trimmedDescription = todo.value.description.trim();
   const trimmedAssignees = todo.value.assignees.trim();
 
-  // เพิ่มรายการ
   await addItem(import.meta.env.VITE_BASE_URL, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
     status: todo.value.status
   });
+
   clearForm()
   showAlertAdd.value = true
   showAlertAfterClose.value = true
   setTimeout(() => {
     showAlertAfterClose.value = false;
   }, 2300);
+ 
 }
-
 const closeModal = () => {
   my_modal_1.close()
   router.go()
@@ -57,6 +60,8 @@ const clearForm = () => {
   todo.value.assignees = ""
   todo.value.status = "NO_STATUS"
 }
+
+
 
 </script>
 <template>
@@ -151,7 +156,7 @@ const clearForm = () => {
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
           ">
 
-          <h3 class="font-bold">Task Added Successfully! {{ todo.title }}</h3>
+          <h3 class="font-bold">The task has been successfully added</h3>
 
         </div>
       </div>

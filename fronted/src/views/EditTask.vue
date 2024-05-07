@@ -49,10 +49,14 @@ const closeModal = () => {
 }
 
 const UpdateTask = async () => {
+  const trimmedTitle = todo.value.title.trim();
+  const trimmedDescription = todo.value.description.trim();
+  const trimmedAssignees = todo.value.assignees.trim();
+
   const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
-    title: todo.value.title,
-    description: todo.value.description,
-    assignees: todo.value.assignees,
+    title: trimmedTitle,
+    description: trimmedDescription,
+    assignees: trimmedAssignees,
     status: todo.value.status
   })
   console.log(edit)
@@ -154,9 +158,8 @@ console.log('tododmsv' , todo)
             v-model="todo.description"
             :class="{
               'italic text-gray-500':
-                todo.description.length === 0 ||
-                todo.description.trim() === '' ||
-                todo.description === null
+                !todo.description ||
+                todo.description.trim() === ''
             }"
             placeholder="No Description Provided"
             style="height: 400px"
@@ -183,9 +186,8 @@ console.log('tododmsv' , todo)
             v-model="todo.assignees"
             :class="{
               'italic text-gray-500':
-                todo.assignees.length === 0 ||
-                todo.assignees.trim() === '' ||
-                todo.assignees === null
+                !todo.assignees||
+                todo.assignees.trim() === ''
             }"
             placeholder="Unassigned"
             >{{ todo.assignees }}</textarea
