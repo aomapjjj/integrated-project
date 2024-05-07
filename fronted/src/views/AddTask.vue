@@ -38,8 +38,6 @@ const submitForm = async () => {
     assignees: trimmedAssignees,
     status: todo.value.status
   });
-
-
   clearForm()
   showAlertAdd.value = true
   showAlertAfterClose.value = true
@@ -47,6 +45,7 @@ const submitForm = async () => {
     showAlertAfterClose.value = false;
   }, 2300);
 }
+
 const closeModal = () => {
   my_modal_1.close()
   router.go()
@@ -58,6 +57,7 @@ const clearForm = () => {
   todo.value.assignees = ""
   todo.value.status = "NO_STATUS"
 }
+
 </script>
 <template>
   <div class="flex justify-end mt-9">
@@ -151,7 +151,7 @@ const clearForm = () => {
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
           ">
 
-          <h3 class="font-bold">Task Added Successfully! {{ }}</h3>
+          <h3 class="font-bold">Task Added Successfully! {{ todo.title }}</h3>
 
         </div>
       </div>
