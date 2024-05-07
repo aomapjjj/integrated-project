@@ -17,6 +17,13 @@ const deleteComplete = ref(false)
 let items = []; // ประกาศ items เป็นตัวแปร global
 
 
+
+
+
+   
+  
+
+
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL);
   todoList.value = items;
