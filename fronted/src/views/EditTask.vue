@@ -1,14 +1,14 @@
 <script setup>
 // Import ref from Vue
-import { ref, watch, onMounted } from "vue"
+import { ref, watch, computed } from "vue"
 import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate"
+import router from "@/router"
 
 const props = defineProps({
   todoId: Number
 })
-
 
 const todo = ref({
   id: "",
@@ -21,6 +21,7 @@ const todo = ref({
 })
 
 const todoList = ref([])
+const oldValue = ref({})
 
 watch(
   () => props.todoId,
@@ -28,6 +29,8 @@ watch(
     const response = await getItemById(newValue)
     if (response.status === 200) {
       todo.value = await response.json()
+      oldValue.value = { ...todo.value }
+      console.log(oldValue.value)
     }
   },
   { immediate: true }
@@ -49,9 +52,9 @@ const closeModal = () => {
 }
 
 const UpdateTask = async () => {
-  const trimmedTitle = todo.value.title.trim();
-  const trimmedDescription = todo.value.description.trim();
-  const trimmedAssignees = todo.value.assignees.trim();
+  const trimmedTitle = todo.value.title.trim()
+  const trimmedDescription = todo.value.description.trim()
+  const trimmedAssignees = todo.value.assignees.trim()
 
   const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
     title: trimmedTitle,
@@ -60,11 +63,15 @@ const UpdateTask = async () => {
     status: todo.value.status
   })
   console.log(edit)
-
- 
 }
 
+router.go()
 
+const checkEqual = computed(() => {
+  console.log(JSON.stringify(todo.value))
+  console.log(JSON.stringify(oldValue.value))
+  return JSON.stringify(todo.value) === JSON.stringify(oldValue.value)
+})
 </script>
 
 <template>
@@ -158,8 +165,7 @@ const UpdateTask = async () => {
             v-model="todo.description"
             :class="{
               'italic text-gray-500':
-                !todo.description ||
-                todo.description.trim() === ''
+                !todo.description || todo.description.trim() === ''
             }"
             placeholder="No Description Provided"
             style="height: 400px"
@@ -186,8 +192,7 @@ const UpdateTask = async () => {
             v-model="todo.assignees"
             :class="{
               'italic text-gray-500':
-                !todo.assignees||
-                todo.assignees.trim() === ''
+                !todo.assignees || todo.assignees.trim() === ''
             }"
             placeholder="Unassigned"
             >{{ todo.assignees }}</textarea
@@ -256,7 +261,11 @@ const UpdateTask = async () => {
               type="submit"
               class="btn"
               style="background-color: #f785b1; margin: 10px; width: 100%"
-              :disabled="todo.title.length === 0 || todo.title === null"
+              :disabled="
+                todo.title.length === 0 ||
+                todo.title === null ||
+                checkEqual === true
+              "
             >
               Save
             </button>

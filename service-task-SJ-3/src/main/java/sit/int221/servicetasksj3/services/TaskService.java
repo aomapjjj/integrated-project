@@ -76,6 +76,7 @@ public class TaskService {
         if (task.getStatus() != null) {
             task.setStatus(task.getStatus());
         }
+        task.setId(id);
         return repository.save(task);
     }
 }
