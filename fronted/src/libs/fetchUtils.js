@@ -35,6 +35,7 @@ async function deleteItemById(url, id) {
 
 async function addItem(url, newItem) {
   try {
+    console.log('POST')
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -54,6 +55,7 @@ async function addItem(url, newItem) {
 async function editItem(url, id, editItem) {
   console.log(id)
   console.log(editItem)
+  console.log('PUT')
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",

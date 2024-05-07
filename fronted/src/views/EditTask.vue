@@ -1,9 +1,10 @@
 <script setup>
 // Import ref from Vue
-import { ref, watch, onMounted } from "vue"
+import { ref, watch, computed } from "vue"
 import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate"
+import router from "@/router";
 
 const props = defineProps({
   todoId: Number
@@ -20,7 +21,10 @@ const todo = ref({
   updatedOn: ""
 })
 
+
+
 const todoList = ref([])
+const oldValue = ref({});
 
 watch(
   () => props.todoId,
@@ -28,10 +32,14 @@ watch(
     const response = await getItemById(newValue)
     if (response.status === 200) {
       todo.value = await response.json()
+      oldValue.value = {...todo.value}
+      console.log(oldValue.value)
     }
   },
   { immediate: true }
 )
+
+
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -48,6 +56,7 @@ const closeModal = () => {
   myModal.value.close()
 }
 
+
 const UpdateTask = async () => {
   const trimmedTitle = todo.value.title.trim();
   const trimmedDescription = todo.value.description.trim();
@@ -60,11 +69,17 @@ const UpdateTask = async () => {
     status: todo.value.status
   })
   console.log(edit)
-  console.log('tododmsv' , todo)
-  eventBus.emit('updateTodo', todo.value);
+  router.go()
 }
 
-console.log('tododmsv' , todo)
+const checkEqual = computed(() => {
+  console.log(JSON.stringify(todo.value))
+  console.log(JSON.stringify(oldValue.value))
+    return  JSON.stringify(todo.value) === JSON.stringify(oldValue.value)
+})
+
+
+
 </script>
 
 <template>
@@ -256,7 +271,7 @@ console.log('tododmsv' , todo)
               type="submit"
               class="btn"
               style="background-color: #f785b1; margin: 10px; width: 100%"
-              :disabled="todo.title.length === 0 || todo.title === null"
+              :disabled="todo.title.length === 0 || todo.title === null || checkEqual === true "
             >
               Save
             </button>
