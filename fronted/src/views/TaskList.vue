@@ -234,7 +234,7 @@ const confirmDelete = () => {
               <div class="itbkk-button-action">
                 <!-- EDIT -->
                 <td class="itbkk-button-edithidden md:table-cell text-sm pl-4">
-                  <EditTask :todo-id="item.id"/>
+                  <EditTask :todo-id="item.id" />
                 </td>
                 <!-- DELETE -->
                 <td
