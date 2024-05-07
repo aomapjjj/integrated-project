@@ -60,11 +60,11 @@ const UpdateTask = async () => {
     status: todo.value.status
   })
   console.log(edit)
-  console.log('tododmsv' , todo)
-  eventBus.emit('updateTodo', todo.value);
+
+ 
 }
 
-console.log('tododmsv' , todo)
+
 </script>
 
 <template>

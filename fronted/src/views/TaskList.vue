@@ -54,7 +54,7 @@ const filterAndLogTitleById = (id) => {
   } else {
     console.log(`No item found with id ${id}`)
 
-    return "" // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
+    return "" 
   }
 }
 
