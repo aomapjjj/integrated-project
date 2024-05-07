@@ -3,13 +3,8 @@ package sit.int221.servicetasksj3.services;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.server.ResponseStatusException;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
-import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
@@ -33,21 +28,20 @@ public class TaskService {
         return repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("Task id "+ id + " does not exist !!!"));
     }
-
     // ADD
     @Transactional
     public Task createNewTasks(Task task){
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
-            throw new ItemNotFoundException("Title is required");
+            throw new RuntimeException("NOT FOUND");
         }
         if (task.getTitle().length() > 100) {
-            throw new ItemNotFoundException("Title cannot exceed 100 characters");
+            throw new RuntimeException("Title cannot exceed 100 characters");
         }
         if (task.getDescription() != null && task.getDescription().length() > 500) {
-            throw new ItemNotFoundException("Description cannot exceed 500 characters");
+            throw new RuntimeException("Description cannot exceed 500 characters");
         }
         if (task.getAssignees() != null && task.getAssignees().length() > 30) {
-            throw new ItemNotFoundException("Assignees cannot exceed 30 characters");
+            throw new RuntimeException("Assignees cannot exceed 30 characters");
         }
         try {
             return repository.save(task);
@@ -66,14 +60,22 @@ public class TaskService {
     }
     // EDIT
     @Transactional
-    public Task updateTakes(Integer id, Task task) {
+    public Task updateTask(Integer id, Task task) {
         Task existingTask = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
-        if (task.getTitle() == null || task.getTitle().isEmpty()) {
-            throw new ItemNotFoundException("Title is required");
-        } else {
-            task.setId(id);
-            return repository.save(task);
-         }
+
+        if (task.getTitle() != null && !task.getTitle().isEmpty()) {
+            task.setTitle(task.getTitle().trim());
+        }
+        if (task.getDescription() != null) {
+            task.setDescription(task.getDescription().trim());
+        }
+        if (task.getAssignees() != null) {
+            task.setAssignees(task.getAssignees().trim());
+        }
+        if (task.getStatus() != null) {
+            task.setStatus(task.getStatus());
+        }
+        return repository.save(task);
     }
 }
