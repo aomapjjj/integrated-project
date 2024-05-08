@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue"
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import EditTask from "../views/EditTask.vue"
+import AddStatus from "../views/AddStatus.vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
@@ -65,16 +66,16 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const selectedItemIdToDelete = ref(0)
 
-const openModalToDelete = (itemId) => {
-  selectedItemIdToDelete.value = itemId
-  const modal = document.getElementById("my_modal_delete")
-  modal.showModal()
-}
+// const openModalToDelete = (itemId) => {
+//   selectedItemIdToDelete.value = itemId
+//   const modal = document.getElementById("my_modal_delete")
+//   modal.showModal()
+// }
 
-const closeModal = () => {
-  const modal = document.getElementById("my_modal_delete")
-  modal.close()
-}
+// const closeModal = () => {
+//   const modal = document.getElementById("my_modal_delete")
+//   modal.close()
+// }
 
 const confirmDelete = () => {
   deleteTodo(selectedItemIdToDelete.value)
@@ -84,6 +85,19 @@ const confirmDelete = () => {
     deleteComplete.value = false
   }, 2300)
 }
+
+
+
+const isModalOpen = ref(false);
+
+const openModalAdd = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
 </script>
 
 <template>
@@ -110,18 +124,62 @@ const confirmDelete = () => {
 
   <!-- header -->
   <header class="bg-white shadow">
-    <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
-      <h1
-        class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900"
-        style="color: #9391e4"
-      >
-        IT-Bangmod Kradan Kanban
-      </h1>
+  <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center">
+    <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900" style="color: #9391e4">
+      IT-Bangmod Kradan Kanban
+    </h1>
+
+
+
+     <!-- Add new status -->
+     
+     <button @click="openModalAdd" class="itbkk-button-add btn bg-green-400 ml-4">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
+    </svg>
+    Add new status
+  </button>
+
+  <!-- Modal -->
+  <div v-if="isModalOpen" id="default-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+      <!-- Modal content -->
+      <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+        <!-- Modal header -->
+        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          </h3>
+          <button @click="closeModal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            </svg>
+            <span class="sr-only">Close modal</span>
+          </button>
+        </div>
+        <!-- Modal body -->
+        <div class="p-4 md:p-5 space-y-4">
+          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+          </p>
+          <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+          </p>
+        </div>
+        <!-- Modal footer -->
+        <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+          <button @click="closeModal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
+          <button @click="closeModal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Decline</button>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <!-- header -->
+</div>
+</div>
+</header>
 
+
+
+
+
+  
   <div class="flex flex-col items-center mt-1">
     <div class="overflow-x-auto">
       <div class="min-w-full">
@@ -171,6 +229,7 @@ const confirmDelete = () => {
           class="table-auto mt-10 rounded-xl overflow-hidden"
           style="table-layout: fixed"
         >
+      
           <!-- table -->
           <thead>
             <tr class="bg-base-200 mt-4 md:mt-0">
@@ -392,4 +451,3 @@ tr:nth-child(odd) {
   background-color: #ffffff;
 }
 </style>
-../libs/checkStatus.js
