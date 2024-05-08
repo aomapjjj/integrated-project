@@ -195,9 +195,10 @@ const confirmDelete = () => {
                 {{ item.id}}
               </td>
               <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title"
+                class=" px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title"
               >
-                <label for="my_modal_6" @click="() => selectTodo(item.id)">
+                <label for="my_modal_6" @click="() => selectTodo(item.id)" 
+                  style="display: block; width: 100%; height: 100%;">
                   {{ item.title }}
                 </label>
               </td>
