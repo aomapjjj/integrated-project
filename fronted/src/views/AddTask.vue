@@ -66,14 +66,7 @@ const clearForm = () => {
 </script>
 <template>
   <div class="flex justify-end mt-9">
-    <!-- FILTERS -->
-    <button class="btn bg-gray-900" style="color: white">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"
-          d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4" />
-      </svg>
-      Filter
-    </button>
+   
     <!-- ADD -->
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

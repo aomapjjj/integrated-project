@@ -2,33 +2,34 @@
 import { ref, onMounted } from "vue"
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
-import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
-import StatusesList from "../views/StatusesList.vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
-const todoList = ref([])
+
+
 const selectedTodoId = ref(0)
 const notFound = ref(false)
 const deleteComplete = ref(false)
+
 let items = [] // ประกาศ items เป็นตัวแปร global
 
+
+const statusList = ref([])
+
+const status = ref({
+  statusid: "",
+  statusname: "",
+  statusdescription: "",
+})
+
+
 onMounted(async () => {
-  items = await getItems(import.meta.env.VITE_BASE_URL)
-  todoList.value = items
-  console.log('items' , items)
-  const taskId = route.params.id
-  if (taskId !== undefined) {
-    console.log(taskId)
-    const response = await getItemById(taskId)
-    if (response.status === 404 || response.status === 400) {
-      router.push("/task/error")
-      notFound.value = true
-    }
-  }
+  const lists = await getItems(import.meta.env.VITE_BASE_URL)
+  statusList.value = lists
+  console.log('list' , lists)
 })
 
 const selectTodo = (todoId) => {
@@ -83,10 +84,6 @@ const confirmDelete = () => {
     deleteComplete.value = false
   }, 2300)
 }
-
-const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
-}
 </script>
 
 <template>
@@ -122,57 +119,53 @@ const openNewStatus = () => {
       </h1>
     </div>
   </header>
+
   <!-- header -->
 
   <div class="flex flex-col items-center mt-1">
     <div class="overflow-x-auto">
       <div class="min-w-full">
-        <!-- FILTERS -->
-        <button class="btn bg-gray-900" style="color: white">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="2"
-              d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"
-            />
-          </svg>
-          Filter
-        </button>
-
-        <!-- ADD BUTTON -->
-
-        <AddTask />
-
-        <!-- MANAGE STATUS -->
-
-        <button
-          class="itbkk-manage-status btn bg-gray-200"
-          style="color: black"
-          @click="openNewStatus()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-width="2"
-              d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"
-            />
-          </svg>
-          Manage Status
-        </button>
+        <!-- HOME -->
+        <div class="text-sm breadcrumbs">
+          <ul>
+            <li>
+              <a @click="$router.go(-1)">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4 stroke-current"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  ></path>
+                </svg>
+                Home
+              </a>
+            </li>
+            <li>
+              <a>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4 stroke-current"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  ></path>
+                </svg>
+                Task Status
+              </a>
+            </li>
+          </ul>
+        </div>
 
         <table
           class="table-auto mt-10 rounded-xl overflow-hidden"
@@ -199,7 +192,7 @@ const openNewStatus = () => {
                   color: #fff;
                 "
               >
-                Title
+                Name
               </th>
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
@@ -209,7 +202,7 @@ const openNewStatus = () => {
                   color: #fff;
                 "
               >
-                Assignees
+                Descirption
               </th>
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
@@ -219,17 +212,10 @@ const openNewStatus = () => {
                   color: #fff;
                 "
               >
-                Status
+                Action
               </th>
 
-              <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
-                  color: #fff;
-                "
-              ></th>
+              
             </tr>
           </thead>
           <tbody>
@@ -237,7 +223,7 @@ const openNewStatus = () => {
             <TaskDetail :todo-id="selectedTodoId" />
             <tr
               class="itbkk-item"
-              v-for="(item, index) in todoList"
+              v-for="(item, index) in statusList"
               :key="index"
             >
               <td
@@ -268,24 +254,7 @@ const openNewStatus = () => {
                     : item.assignees
                 }}
               </td>
-              <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
-              >
-                <span
-                  :class="{
-                    'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                    'border-blue-500 text-blue-500':
-                      item.status === 'NO_STATUS',
-                    'border-red-500 text-red-500': item.status === 'TO_DO',
-                    'border-yellow-500 text-yellow-500':
-                      item.status === 'DOING',
-                    'border-green-500 text-green-500': item.status === 'DONE'
-                  }"
-                >
-                  {{ checkStatus(item.status) }}
-                </span>
-              </td>
-
+             
               <div class="itbkk-button-action">
                 <!-- EDIT -->
                 <td class="itbkk-button-edithidden md:table-cell text-sm pl-4">
@@ -349,7 +318,7 @@ const openNewStatus = () => {
             </tr>
 
             <!-- DELETE COMPLETE -->
-            <tr v-if="todoList.length === 0">
+            <tr >
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No task
               </td>
@@ -423,4 +392,4 @@ tr:nth-child(odd) {
   background-color: #ffffff;
 }
 </style>
-./StatusesList.vue/index.js
+../libs/checkStatus.js
