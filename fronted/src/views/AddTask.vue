@@ -61,12 +61,10 @@ const clearForm = () => {
   todo.value.status = "NO_STATUS"
 }
 
-
-
 </script>
+
 <template>
   <div class="flex justify-end mt-9">
-   
     <!-- ADD -->
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -88,7 +86,6 @@ const clearForm = () => {
             <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
               <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="todo.title" />
             </label>
-
             <!-- Description -->
             <label for="description" class="form-control flex-grow ml-4 mb-8">
               <div class="label">

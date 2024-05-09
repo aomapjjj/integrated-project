@@ -16,10 +16,10 @@ export const routes = [
     name: 'TaskList',
     component: TaskList,
   },
-  {
-    path: '/:catchAll(.*)',
-    redirect: { name: "TaskList" },
-  },
+  // {
+  //   path: '/:catchAll(.*)',
+  //   redirect: { name: "TaskList" },
+  // },
   {
     path: '/task/:id',
     name: 'TaskDetail',
@@ -39,11 +39,6 @@ export const routes = [
     path: '/task/status',
     name: 'StatusesList',
     component: StatusesList,
-  },
-  {
-    path: '/task/addstatus',
-    name: 'AddStatus',
-    component: AddStatus,
   },
 ]
 
