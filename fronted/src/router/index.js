@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from "vue-router"
 import TaskList from "@/views/TaskList.vue"
 import ErrorPage from "@/views/ErrorPage.vue"
 import AddTask from "@/views/AddTask.vue"
+import StatusesList from "@/views/StatusesList.vue"
+
 
 export const routes = [
   {
@@ -31,6 +33,11 @@ export const routes = [
     path: '/task',
     name: 'AddTask',
     component: AddTask,
+  },
+  {
+    path: '/task',
+    name: 'StatusesList',
+    component: StatusesList,
   },
   
 ]
