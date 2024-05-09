@@ -13,7 +13,7 @@ async function getItems(url) {
 async function getItemById(id) {
   try {
     console.log("id : ", id)
-    const data = await fetch(`${URL}/${id}`)
+    const data = await fetch(`${url}/${id}`)
     //const item = await data.json()
     return data
   } catch (error) {
