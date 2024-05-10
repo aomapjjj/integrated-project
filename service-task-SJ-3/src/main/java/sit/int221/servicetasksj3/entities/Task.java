@@ -1,14 +1,11 @@
 package sit.int221.servicetasksj3.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -58,10 +55,10 @@ public class Task {
         this.assignees = assignees;
     }
 
-//    public void setStatus(TaskStatus status) {
-//        if (status == null){
-//            status = TaskStatus.NO_STATUS;
-//        }
-//        this.status = status;
-//    }
+    public void setStatusTasks(TaskStatus statusTasks) {
+        if (statusTasks == null){
+            statusTasks = new TaskStatus();
+        }
+        this.statusTasks = statusTasks;
+    }
 }
