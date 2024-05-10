@@ -3,7 +3,6 @@ import TaskList from "@/views/TaskList.vue"
 import ErrorPage from "@/views/ErrorPage.vue"
 import AddTask from "@/views/AddTask.vue"
 import StatusesList from "@/views/StatusesList.vue"
-import AddStatus from "@/views/AddStatus.vue"
 
 
 export const routes = [
