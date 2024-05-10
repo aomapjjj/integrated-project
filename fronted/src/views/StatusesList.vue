@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { getItemById, getItems } from "../libs/fetchUtils.js"
+import { getItemById, getItems, addItem } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
@@ -10,7 +10,13 @@ const router = useRouter()
 const statusList = ref([])
 const selectedStatusId = ref(0)
 const notFound = ref(false)
-let items = []
+const myModal = ref(null)
+
+const status = ref({
+  id: "",
+  name: "",
+  description: "",
+})
 
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
@@ -41,24 +47,25 @@ const deleteStatus = async (statusId) => {
 }
 
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title.trim();
-  const trimmedDescription = todo.value.description.trim();
-  const trimmedAssignees = todo.value.assignees.trim();
+  const statusName = status.value.name
+  const statusDescription = status.value.description;
 
   await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
-    title: trimmedTitle,
-    description: trimmedDescription,
-    assignees: trimmedAssignees,
-    status: todo.value.status
+    name: statusName,
+    description: statusDescription,
   });
+}
 
-  clearForm()
-  showAlertAdd.value = true
-  showAlertAfterClose.value = true
-  setTimeout(() => {
-    showAlertAfterClose.value = false;
-  }, 2300);
- 
+const UpdateStatus = async () => {
+  const statusName = status.value.name
+  const statusDescription = status.value.description;
+
+  const edit = await editItem(import.meta.env.VITE_BASE_URL_STATUS, status.value.id, {
+    name: statusName,
+    description: statusDescription,
+  })
+  console.log(edit)
+  // router.go()
 }
 
 const openModalToDelete = (statusId) => {
@@ -84,17 +91,6 @@ const confirmDelete = () => {
 const selectStatusId = (statusId) => {
   selectedStatusId.value = statusId
 }
-
-// const openModalToDelete = (itemId) => {
-//   selectedItemIdToDelete.value = itemId
-//   const modal = document.getElementById("my_modal_delete")
-//   modal.showModal()
-// }
-
-// const closeModal = () => {
-//   const modal = document.getElementById("my_modal_delete")
-//   modal.close()
-// }
 
 </script>
 
@@ -131,12 +127,11 @@ const selectStatusId = (statusId) => {
 
           <!-- Modal content -->
           <div class="modal-action flex flex-col justify-between">
-            <form method="dialog">
-              <!-- Title -->
+            <form form @submit.prevent="submitForm" method="dialog">
+              <!-- name -->
               <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
-
                 <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-                  <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" />
+                  <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name"/>
                 </label>
                 <!-- Description -->
                 <label for="description" class="form-control flex-grow ml-4 mb-8">
@@ -144,14 +139,16 @@ const selectStatusId = (statusId) => {
                     <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
                   </div>
                   <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full"
-                    maxlength="500" rows="4" placeholder="No Description Provided"></textarea>
+                    maxlength="500" rows="4" placeholder="No Description Provided" v-model="status.description"></textarea>
                 </label>
               </div>
               <!-- Buttons -->
               <div class="flex justify-end">
-                <button class="btn mr-2" style="background-color: #f785b1;">Save</button>
-                <button class="btn">Close</button>
+                <button type="submit" class="btn mr-2" style="background-color: #f785b1;">Save</button>
               </div>
+              <button class="itbkk-button-cancel btn" style="flex: 1; margin: 10px" @click="closeModal">
+                Cancel
+              </button>
             </form>
           </div>
         </div>
