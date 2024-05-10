@@ -8,9 +8,7 @@ import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
-
 import java.util.List;
-
 
 @Service
 public class TaskService {
@@ -20,10 +18,12 @@ public class TaskService {
     private ModelMapper modelMapper;
     @Autowired
     private ListMapper listMapper;
+    //GET ALL TASKS
     public List<TaskDTO> getAllTasks(){
+
         return listMapper.mapList(repository.findAll(), TaskDTO.class, modelMapper);
     }
-
+    //GET ALL BY ID
     public Task findByID(Integer id) {
         return repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("Task id "+ id + " does not exist !!!"));
@@ -73,9 +73,9 @@ public class TaskService {
         if (task.getAssignees() != null) {
             task.setAssignees(task.getAssignees().trim());
         }
-        if (task.getStatus() != null) {
-            task.setStatus(task.getStatus());
-        }
+//        if (task.getStatus() != null) {
+//            task.setStatus(task.getStatus());
+//        }
         task.setId(id);
         return repository.save(task);
     }
