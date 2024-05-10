@@ -185,36 +185,45 @@ const closeModal = () => {
             </li>
           </ul>
         </div>
-        <table
-          class="table-auto mt-10 rounded-xl overflow-hidden"
-          style="table-layout: fixed"
-        >
+        <table class="table-auto mt-10 rounded-xl overflow-hidden" style="table-layout: fixed">
           <!-- table -->
           <thead>
-            <tr
-              class="bg-base-200 mt-4 md:mt-0"
-              style="background-color: #9fc3e9"
-            >
-              <th
-                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+            <tr class="bg-base-200 mt-4 md:mt-0">
+              <th class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
+                  background-color: #9fc3e9;
+                  border-bottom: 2px solid #9fc3e9;
+                  color: #fff;
+                ">
                 No.
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                  background-color: #9fc3e9;
+                  border-bottom: 2px solid #9fc3e9;
+                  color: #fff;
+                ">
                 Name
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                  background-color: #9fc3e9;
+                  border-bottom: 2px solid #9fc3e9;
+                  color: #fff;
+                ">
                 Description
               </th>
-              <th
-                class="px-4 py-2 text-center md:text-left text-sm font-semibold text-gray-700"
-              >
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                  background-color: #9fc3e9;
+                  border-bottom: 2px solid #9fc3e9;
+                  color: #fff;
+                ">
                 Action
               </th>
+
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                  background-color: #9fc3e9;
+                  border-bottom: 2px solid #9fc3e9;
+                  color: #fff;
+                "></th>
             </tr>
           </thead>
           <tbody>
@@ -254,6 +263,11 @@ const closeModal = () => {
               >
                 <button class="btn btn-outline">Edit</button>
                 <button class="btn btn-outline">Delete</button>
+              </td>
+            </tr>
+            <tr v-if="todoList.length === 0">
+              <td colspan="4" class="text-center py-4 text-gray-500">
+                No Status
               </td>
             </tr>
           </tbody>
