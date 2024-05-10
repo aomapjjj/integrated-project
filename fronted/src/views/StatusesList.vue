@@ -7,18 +7,19 @@ import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
-const todoList = ref([])
-const selectedTodoId = ref(0)
+const statusList = ref([])
+const selectedStatusId = ref(0)
 const notFound = ref(false)
+let items = []
 
 onMounted(async () => {
-  const items = await getItems(import.meta.env.VITE_BASE_URL)
-  todoList.value = items
+  const items = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  statusList.value = items
 
-  const taskId = route.params.id
-  if (taskId !== undefined) {
-    console.log(taskId)
-    const response = await getItemById(taskId)
+  const statusId = route.params.id
+  if (statusId !== undefined) {
+    console.log(statusId)
+    const response = await getItemById(statusId)
     if (response.status === 404 || response.status === 400) {
       router.push("/task")
       notFound.value = true
@@ -26,21 +27,42 @@ onMounted(async () => {
   }
 })
 
-const deleteTodo = async (todoId) => {
+const deleteStatus = async (statusId) => {
   try {
-    const status = await deleteItemById(import.meta.env.VITE_BASE_URL, todoId)
+    const status = await deleteItemById(import.meta.env.VITE_BASE_URL_STATUS, statusId)
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
+      statusList.value = statusList.value.filter((status) => status.id !== statusId)
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`)
+      console.error(`Failed to delete item with ID ${statusId}`)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error)
+    console.error(`Error deleting item with ID ${statusId}:`, error)
   }
 }
 
-const openModalToDelete = (itemId) => {
-  selectedItemIdToDelete.value = itemId
+const submitForm = async () => {
+  const trimmedTitle = todo.value.title.trim();
+  const trimmedDescription = todo.value.description.trim();
+  const trimmedAssignees = todo.value.assignees.trim();
+
+  await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
+    title: trimmedTitle,
+    description: trimmedDescription,
+    assignees: trimmedAssignees,
+    status: todo.value.status
+  });
+
+  clearForm()
+  showAlertAdd.value = true
+  showAlertAfterClose.value = true
+  setTimeout(() => {
+    showAlertAfterClose.value = false;
+  }, 2300);
+ 
+}
+
+const openModalToDelete = (statusId) => {
+  selectedItemIdToDelete.value = statusId
   const modal = document.getElementById("my_modal_delete")
   modal.showModal()
 }
@@ -59,8 +81,8 @@ const confirmDelete = () => {
   }, 2300)
 }
 
-const selectTodo = (todoId) => {
-  selectedTodoId.value = todoId
+const selectStatusId = (statusId) => {
+  selectedStatusId.value = statusId
 }
 
 // const openModalToDelete = (itemId) => {
@@ -205,24 +227,20 @@ const selectTodo = (todoId) => {
           </thead>
           <tbody>
             <!-- Iterate over todoList -->
-            <TaskDetail :todo-id="selectedTodoId" />
-            <tr class="itbkk-item" v-for="(item, index) in todoList" :key="index">
+            <!-- <TaskDetail :status-id="selectedstatusId" /> -->
+            <tr class="itbkk-item" v-for="(item, index) in statusList" :key="index">
               <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                 {{ item.id }}
               </td>
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
                 <label for="my_modal_6" @click="() => selectTodo(item.id)">
-                  {{ item.title }}
+                  {{ item.name }}
                 </label>
               </td>
-              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees" :class="{
-                italic: item.assignees.length === 0 || item.assignees === null
-              }">
-                {{
-                item.assignees.length === 0 || item.assignees === null
-                  ? "Unassigned"
-                  : item.assignees
-              }}
+              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees">
+                <label for="my_modal_6" @click="() => selectTodo(item.id)">
+                  {{ item.description }}
+                </label>
               </td>
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
                 <button class="btn btn-outline">Edit</button>
@@ -239,10 +257,7 @@ const selectTodo = (todoId) => {
                       Delete a Task
                     </h3>
                     <p class="py-4 font-medium" style="word-wrap: break-word">
-                      Do you want to delete the task number
-                      {{ selectedItemIdToDelete }} - "{{
-                filterAndLogTitleById(selectedItemIdToDelete)
-              }}"?
+                      Do you want to delete the task number ?
                     </p>
                     <div class="modal-action">
                       <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
@@ -256,7 +271,7 @@ const selectTodo = (todoId) => {
                 </dialog>
               </td>
             </tr>
-            <tr v-if="todoList.length === 0">
+            <tr v-if="statusList.length === 0">
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No Status
               </td>
