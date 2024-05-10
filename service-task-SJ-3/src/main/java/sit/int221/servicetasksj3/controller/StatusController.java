@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.StatusDTO;
+import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
+import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.services.StatusService;
 
@@ -31,13 +33,6 @@ public class StatusController {
         return service.findByID(id);
     }
 
-//    @PostMapping("")
-//    public ResponseEntity<Object> createNewTasks(@RequestBody TaskStatus status) {
-//        List<StatusDTO> createdStatus = service.createNewTasks(status);
-//            StatusDTO statusDTO = modelMapper.map(createdStatus, StatusDTO.class);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(statusDTO);
-//    }
-//
     @PostMapping("")
     public ResponseEntity<Object> createNewTasks(@RequestBody StatusDTO status) {
         List<StatusDTO> createdStatus = service.createNewTasks(status);

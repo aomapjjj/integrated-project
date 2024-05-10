@@ -73,9 +73,9 @@ public class TaskService {
         if (task.getAssignees() != null) {
             task.setAssignees(task.getAssignees().trim());
         }
-//        if (task.getStatus() != null) {
-//            task.setStatus(task.getStatus());
-//        }
+        if (task.getStatusTasks() != null) {
+            task.setStatusTasks(task.getStatusTasks());
+        }
         task.setId(id);
         return repository.save(task);
     }
