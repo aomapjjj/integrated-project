@@ -79,6 +79,7 @@ const UpdateStatus = async () => {
   console.log(edit);
   console.log(status.value)
   router.go()
+
 }
 
 const openModalToEdit = (statusId) => {
@@ -98,8 +99,9 @@ const closeModalEdit = () => {
 
 // ----------------------- Delete -----------------------
 
-const deleteStatus = async (statusId) => {
+const selectedItemIdToDelete = ref(0)
 
+const deleteStatus = async (statusId) => {
   try {
     const status = await deleteItemById(import.meta.env.VITE_BASE_URL_STATUS, statusId)
     if (status === 200) {
@@ -124,7 +126,7 @@ const closeModal = () => {
 }
 
 const confirmDelete = () => {
-  deleteTodo(selectedItemIdToDelete.value)
+  deleteStatus(selectedItemIdToDelete.value)
   closeModal()
   deleteComplete.value = true
   setTimeout(() => {
@@ -266,11 +268,7 @@ const confirmDelete = () => {
                 Action
               </th>
 
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
-                  color: #fff;
-                "></th>
+            
             </tr>
           </thead>
           <tbody>
@@ -330,24 +328,20 @@ const confirmDelete = () => {
                             Save
                           </button>
                         </form>
-                        <button class="itbkk-button-cancel btn" style="margin: 10px" @click="closeModalAdd()">
+                        <button class="itbkk-button-cancel btn"  @click="closeModalAdd()">
                           Cancel
                         </button>
                       </div>
+
                     </div>
                   </div>
                 </dialog>
 
 
-
-
                 <!-- Delete Modal -->
-                <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
+                <button class="itbkk-button-delete btn" style="margin-left: 10px;"
                   @click="openModalToDelete(item.id)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" style="color: #eb4343">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  Delete
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
