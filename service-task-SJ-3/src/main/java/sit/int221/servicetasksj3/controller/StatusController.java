@@ -1,5 +1,6 @@
 package sit.int221.servicetasksj3.controller;
 
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +35,14 @@ public class StatusController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> createNewTasks(@RequestBody StatusDTO status) {
-        List<StatusDTO> createdStatus = service.createNewTasks(status);
+    public ResponseEntity<Object> createNewStatuses(@RequestBody StatusDTO status) {
+        List<StatusDTO> createdStatus = service.createNewStatuses(status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateStatuses(@PathVariable Integer id, @RequestBody TaskStatus task) {
+        return ResponseEntity.ok(service.updateStatuses(id, task));
     }
 
 
