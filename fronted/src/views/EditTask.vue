@@ -119,8 +119,7 @@ const checkEqual = computed(() => {
     'italic text-gray-500':
       !todo.description ||
       todo.description.trim() === ''
-  }" placeholder="No Description Provided"
-            style="height: 400px">{{ todo.description }} {{ todoId }}</textarea>
+  }" placeholder="No Description Provided" style="height: 400px">{{ todo.description }} {{ todoId }}</textarea>
         </label>
       </div>
       <div class="modal-content py-4 text-left px-10 flex-grow w-2/3 max-w-2xl" style="margin-top: 65px">
@@ -169,7 +168,7 @@ const checkEqual = computed(() => {
           <form method="dialog" style="flex: 1">
             <button @click="UpdateTask" type="submit" class="btn"
               style="background-color: #f785b1; margin: 10px; width: 100%"
-              :disabled="todo.title.length === 0 || todo.title === null || checkEqual === true">
+              :disabled="todo.title?.length === 0 || todo.title === null || checkEqual === true">
               Save
             </button>
           </form>

@@ -13,7 +13,7 @@ async function getItems(url) {
 async function getItemById(id) {
   try {
     console.log("id : ", id)
-    const data = await fetch(`${url}/${id}`)
+    const data = await fetch(`${URL}/${id}`)
     //const item = await data.json()
     return data
   } catch (error) {
@@ -52,8 +52,6 @@ async function addItem(url, newItem) {
 }
 
 async function editItem(url, id, editItem) {
-  console.log(id)
-  console.log(editItem)
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
