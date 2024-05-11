@@ -4,7 +4,10 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import sit.int221.servicetasksj3.dtos.StatusDTO;
+import sit.int221.servicetasksj3.dtos.TaskDTO;
+import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
@@ -12,6 +15,7 @@ import sit.int221.servicetasksj3.repositories.TaskRepository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StatusService {
@@ -24,15 +28,16 @@ public class StatusService {
     @Autowired
     private ListMapper listMapper;
 
-    public List<StatusDTO> getAllTasks() {
+    public List<StatusDTO> getAllStatuses() {
         return listMapper.mapList(repository.findAll(), StatusDTO.class, modelMapper);
     }
 
-    public TaskStatus findByID(Integer id) {
+    public TaskStatus getStatusesById(Integer id) {
         return repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
     }
 
+    // ADD
     @Transactional
     public List<StatusDTO> createNewStatuses(StatusDTO statusDTO) {
         if (statusDTO.getName() == null || statusDTO.getName().trim().isEmpty()) {
@@ -47,7 +52,6 @@ public class StatusService {
         if (statusDTO.getDescription().trim().length() > 200) {
             throw new RuntimeException("Status description cannot exceed 200 characters");
         }
-
         // ตรวจสอบว่าสถานะที่กำลังสร้างนั้นมีชื่อซ้ำกับสถานะที่มีอยู่แล้วหรือไม่
         List<TaskStatus> existingStatuses = repository.findByName(statusDTO.getName().trim());
         if (!existingStatuses.isEmpty()) {
@@ -67,8 +71,9 @@ public class StatusService {
         }
     }
 
+    // EDIT
     @Transactional
-    public TaskStatus updateStatuses(Integer id, TaskStatus task) {
+    public TaskStatus updateStatuses(Integer id,TaskStatus task) {
         TaskStatus existingTask = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
 
@@ -86,7 +91,7 @@ public class StatusService {
         }
         try {
             Integer oldStatusId = existingTask.getId();
-            if (!task.getId().equals(oldStatusId)) {
+            if (task.getId() != null) {
                 taskRepository.updateStatusId(oldStatusId, task.getId());
             }
             task.setId(id);
@@ -96,4 +101,43 @@ public class StatusService {
         }
     }
 
+    // DELETE
+    // DELETE
+    @Transactional
+    public TaskStatus removeStatuses(Integer id) {
+        TaskStatus status = repository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("NOT FOUND"));
+        if ("NO_STATUS".equals(status.getName())) {
+            throw new RuntimeException("Cannot delete 'No Status'.");
+        }
+        try {
+            repository.delete(status);
+            return status;
+        } catch (Exception e) {
+            throw new ItemNotFoundException("Failed to delete status: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public TaskStatus transferStatuses(Integer id, Integer newId) {
+
+        TaskStatus existingStatus = repository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("Status not found"));
+
+        TaskStatus newStatus = repository.findById(newId).orElseThrow(
+                () -> new ItemNotFoundException("New status not found"));
+
+        if (existingStatus == null || newStatus == null) {
+            throw new ItemNotFoundException("Status not found");
+        }
+
+        List<Task> tasks = taskRepository.findByStatusTasksId(id);
+        for (Task task : tasks) {
+            task.setStatusTasks(newStatus);
+        }
+        // บันทึกการเปลี่ยนแปลงสถานะของงาน
+        taskRepository.saveAll(tasks);
+
+        return newStatus;
+    }
 }
