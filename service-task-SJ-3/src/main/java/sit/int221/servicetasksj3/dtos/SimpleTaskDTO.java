@@ -3,12 +3,14 @@ package sit.int221.servicetasksj3.dtos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 
 import java.time.ZonedDateTime;
 
 @Data
+@JsonPropertyOrder({"id", "title", "assignees", "status", "createdOn", "updatedOn"})
 public class SimpleTaskDTO {
     private Integer id;
     private String title;
