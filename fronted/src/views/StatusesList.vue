@@ -47,14 +47,30 @@ const deleteStatus = async (statusId) => {
 }
 
 const submitForm = async () => {
-  const statusName = status.value.name
-  const statusDescription = status.value.description;
+  const statusName = status.value.name.trim()
+  const statusDescription = status.value.description.trim()
 
   await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
     name: statusName,
     description: statusDescription,
   });
+
+  clearForm()
+
 }
+
+const clearForm = () => {
+  status.value.name = ""
+  status.value.description = ""
+
+}
+
+const closeModalAdd = () => {
+  const modal = document.getElementById("my_modal_4")
+  modal.close()
+  router.go()
+}
+
 
 const UpdateStatus = async () => {
   const statusName = status.value.name
@@ -101,16 +117,14 @@ const selectStatusId = (statusId) => {
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center">
             <div class="hidden md:block">
-              <div class="ml-2 flex items-baseline space-x-4">
-                <a href="#" class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium">My Task</a>
-              </div>
+        
             </div>
           </div>
-          <div class="flex items-center"></div>
         </div>
       </div>
     </nav>
   </div>
+  
   <!-- header -->
   <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center">
@@ -127,7 +141,7 @@ const selectStatusId = (statusId) => {
 
           <!-- Modal content -->
           <div class="modal-action flex flex-col justify-between">
-            <form form @submit.prevent="submitForm" method="dialog">
+           
               <!-- name -->
               <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
                 <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
@@ -144,12 +158,18 @@ const selectStatusId = (statusId) => {
               </div>
               <!-- Buttons -->
               <div class="flex justify-end">
-                <button type="submit" class="btn mr-2" style="background-color: #f785b1;">Save</button>
-              </div>
-              <button class="itbkk-button-cancel btn" style="flex: 1; margin: 10px" @click="closeModal">
-                Cancel
+              <form form @submit.prevent="submitForm" method="dialog">
+              
+                <button type="submit" class="itbkk-button-confirm btn mr-2" style="flex: 3; margin: 10px;background-color: #f785b1;"
+                :disabled="status.name.length === 0 || status.name === null">
+                Save
               </button>
             </form>
+              <button class="itbkk-button-cancel btn" style="margin: 10px" @click="closeModalAdd()">
+                Cancel
+              </button>
+            </div>
+      
           </div>
         </div>
       </dialog>
@@ -226,19 +246,24 @@ const selectStatusId = (statusId) => {
             <!-- Iterate over todoList -->
             <!-- <TaskDetail :status-id="selectedstatusId" /> -->
             <tr class="itbkk-item" v-for="(item, index) in statusList" :key="index">
+               <!-- ID -->
               <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                 {{ item.id }}
               </td>
+              <!-- NAME -->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
                 <label for="my_modal_6" @click="() => selectTodo(item.id)">
                   {{ item.name }}
                 </label>
               </td>
+              
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees">
                 <label for="my_modal_6" @click="() => selectTodo(item.id)">
                   {{ item.description }}
                 </label>
               </td>
+
+
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
                 <button class="btn btn-outline">Edit</button>
                 <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
