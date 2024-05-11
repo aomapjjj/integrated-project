@@ -287,7 +287,7 @@ const openNewStatus = () => {
           <h2 class="font-bold">
             Delete Complete "{{
           filterAndLogTitleById(selectedItemIdToDelete)
-        }}"
+            }}"
           </h2>
         </div>
         <div>

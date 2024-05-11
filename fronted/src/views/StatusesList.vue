@@ -104,7 +104,7 @@ const confirmDelete = () => {
   }, 2300)
 }
 
-const selectStatusId = (statusId) => {
+const selectStatus = (statusId) => {
   selectedStatusId.value = statusId
 }
 
@@ -117,14 +117,14 @@ const selectStatusId = (statusId) => {
         <div class="flex h-16 items-center justify-between">
           <div class="flex items-center">
             <div class="hidden md:block">
-        
+
             </div>
           </div>
         </div>
       </div>
     </nav>
   </div>
-  
+
   <!-- header -->
   <header class="bg-white shadow">
     <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center">
@@ -141,35 +141,37 @@ const selectStatusId = (statusId) => {
 
           <!-- Modal content -->
           <div class="modal-action flex flex-col justify-between">
-           
-              <!-- name -->
-              <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
-                <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-                  <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name"/>
-                </label>
-                <!-- Description -->
-                <label for="description" class="form-control flex-grow ml-4 mb-8">
-                  <div class="label">
-                    <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
-                  </div>
-                  <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full"
-                    maxlength="500" rows="4" placeholder="No Description Provided" v-model="status.description"></textarea>
-                </label>
-              </div>
-              <!-- Buttons -->
-              <div class="flex justify-end">
+
+            <!-- name -->
+            <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
+              <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
+                <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name" />
+              </label>
+              <!-- Description -->
+              <label for="description" class="form-control flex-grow ml-4 mb-8">
+                <div class="label">
+                  <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
+                </div>
+                <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                  maxlength="500" rows="4" placeholder="No Description Provided"
+                  v-model="status.description"></textarea>
+              </label>
+            </div>
+            <!-- Buttons -->
+            <div class="flex justify-end">
               <form form @submit.prevent="submitForm" method="dialog">
-              
-                <button type="submit" class="itbkk-button-confirm btn mr-2" style="flex: 3; margin: 10px;background-color: #f785b1;"
-                :disabled="status.name.length === 0 || status.name === null">
-                Save
-              </button>
-            </form>
+
+                <button type="submit" class="itbkk-button-confirm btn mr-2"
+                  style="flex: 3; margin: 10px;background-color: #f785b1;"
+                  :disabled="status.name.length === 0 || status.name === null">
+                  Save
+                </button>
+              </form>
               <button class="itbkk-button-cancel btn" style="margin: 10px" @click="closeModalAdd()">
                 Cancel
               </button>
             </div>
-      
+
           </div>
         </div>
       </dialog>
@@ -244,28 +246,77 @@ const selectStatusId = (statusId) => {
           </thead>
           <tbody>
             <!-- Iterate over todoList -->
-            <!-- <TaskDetail :status-id="selectedstatusId" /> -->
+            <!-- <StatusEdit :status-id="selectedStatusId" /> -->
             <tr class="itbkk-item" v-for="(item, index) in statusList" :key="index">
-               <!-- ID -->
+              <!-- ID -->
               <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                 {{ item.id }}
               </td>
               <!-- NAME -->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
-                <label for="my_modal_6" @click="() => selectTodo(item.id)">
+                <label for="my_modal_6" @click="() => selectStatus(item.id)">
                   {{ item.name }}
                 </label>
               </td>
-              
+
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees">
-                <label for="my_modal_6" @click="() => selectTodo(item.id)">
+                <label for="my_modal_6">
                   {{ item.description }}
                 </label>
               </td>
 
-
+              <!-- eidt -->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
-                <button class="btn btn-outline">Edit</button>
+
+                <button class="btn" onclick="my_modal_4.showModal()">edit</button>
+
+                <dialog id="my_modal_4" class="modal">
+                  <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
+                    <span class="block text-2xl font-bold leading-6 text-gray-900 mb-1" style="margin: 15px;">Edit
+                      Status</span>
+
+
+                    <!-- Modal content -->
+                    <div class="modal-action flex flex-col justify-between">
+
+                      <!-- name -->
+                      <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
+                        <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
+                          <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
+                            v-model="status.name" />
+                        </label>
+                        <!-- Description -->
+                        <label for="description" class="form-control flex-grow ml-4 mb-8">
+                          <div class="label">
+                            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
+                          </div>
+                          <textarea id="description"
+                            class="itbkk-description textarea textarea-bordered flex-grow w-full" maxlength="500"
+                            rows="4" placeholder="No Description Provided" v-model="status.description"> {{ status.description }}</textarea>
+                        </label>
+                      </div>
+                      <!-- Buttons -->
+                      <div class="flex justify-end">
+                        <form form @submit.prevent="UpdateStatus" method="dialog">
+
+                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2"
+                            style="flex: 3; margin: 10px;background-color: #f785b1;"
+                            :disabled="status.name.length === 0 || status.name === null">
+                            Save
+                          </button>
+                        </form>
+                        <button class="itbkk-button-cancel btn" style="margin: 10px" @click="closeModalAdd()">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </dialog>
+
+
+
+
+
                 <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
                   @click="openModalToDelete(item.id)">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
