@@ -25,6 +25,20 @@ public class TaskStatus {
     @JsonIgnore
     @OneToMany(mappedBy = "statusTasks", cascade = CascadeType.ALL)
     private Set<Task> tasks = new LinkedHashSet<>();
+
+    public void setName(String name) {
+        if (name != null) {
+            name = name.trim();
+        }
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        if (description != null) {
+            description = description.trim();
+        }
+        this.description = description;
+    }
 }
 
 
