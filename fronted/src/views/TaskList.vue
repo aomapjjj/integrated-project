@@ -15,6 +15,7 @@ const selectedTodoId = ref(0)
 const notFound = ref(false)
 const deleteComplete = ref(false)
 let items = [] // ประกาศ items เป็นตัวแปร global
+const showDetail = ref(false)
 
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL)
@@ -33,6 +34,7 @@ onMounted(async () => {
 
 const selectTodo = (todoId) => {
   selectedTodoId.value = todoId
+  showDetail.value = true
 }
 
 // ----------------------- Delete -----------------------
@@ -81,13 +83,11 @@ const confirmDelete = () => {
 
 const filterAndLogTitleById = (id) => {
   const item = items.find((item) => item.id === id)
-
   if (item) {
     console.log(item.title)
     return item.title
   } else {
     console.log(`No item found with id ${id}`)
-
     return ""
   }
 }
@@ -203,13 +203,13 @@ const openNewStatus = () => {
           </thead>
           <tbody>
             <!-- Iterate over todoList -->
-            <TaskDetail :todo-id="selectedTodoId" />
+            <TaskDetail :todo-id="selectedTodoId" v-if="showDetail"/>
             <tr class="itbkk-item" v-for="(item, index) in todoList" :key="index">
               <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                 {{ item.id }}
               </td>
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
-                <label for="my_modal_6" @click="() => selectTodo(item.id)"
+                <label for="my_modal_6" @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%">
                   {{ item.title }}
                 </label>

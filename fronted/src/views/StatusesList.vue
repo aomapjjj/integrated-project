@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { getItemById, getItems, addItem } from "../libs/fetchUtils.js"
+import { getItemById, getItems, addItem, editItem } from "../libs/fetchUtils.js"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
@@ -23,7 +23,6 @@ onMounted(async () => {
 
   const statusId = route.params.id
   if (statusId !== undefined) {
-    console.log(statusId)
     const response = await getItemById(statusId)
     if (response.status === 404 || response.status === 400) {
       router.push("/task")
@@ -39,12 +38,10 @@ onMounted(async () => {
 const submitForm = async () => {
   const statusName = status.value.name.trim()
   const statusDescription = status.value.description.trim()
-
   await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
     name: statusName,
     description: statusDescription,
   });
-
   clearForm()
 
 }
@@ -52,7 +49,6 @@ const submitForm = async () => {
 const clearForm = () => {
   status.value.name = ""
   status.value.description = ""
-
 }
 
 const closeModalAdd = () => {
@@ -71,24 +67,26 @@ const selectStatus = (statusId) => {
 
 // ----------------------- Edit -----------------------
 
-const selectedItemIdToEdit = ref(0)
-
 const UpdateStatus = async () => {
   const statusName = status.value.name
-  const statusDescription = status.value.description;
+  const statusDescription = status.value.description
+  const statusId = status.value.id
 
-  const edit = await editItem(import.meta.env.VITE_BASE_URL_STATUS, status.value.id, {
+  const edit = await editItem(import.meta.env.VITE_BASE_URL_STATUS, statusId, {
     name: statusName,
     description: statusDescription,
   })
-  console.log(edit)
-  // router.go()
+  console.log(edit);
+  console.log(status.value)
+  router.go()
 }
 
 const openModalToEdit = (statusId) => {
-  selectedItemIdToEdit.value = statusId
+  const statusToEdit = statusList.value.find(item => item.id === statusId)
+  status.value = { ...statusToEdit }
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
+  console.log(status.value)
 }
 
 const closeModalEdit = () => {
@@ -101,6 +99,7 @@ const closeModalEdit = () => {
 // ----------------------- Delete -----------------------
 
 const deleteStatus = async (statusId) => {
+
   try {
     const status = await deleteItemById(import.meta.env.VITE_BASE_URL_STATUS, statusId)
     if (status === 200) {
@@ -275,8 +274,7 @@ const confirmDelete = () => {
             </tr>
           </thead>
           <tbody>
-            <!-- Iterate over todoList -->
-            <!-- <StatusEdit :status-id="selectedStatusId" /> -->
+
             <tr class="itbkk-item" v-for="(item, index) in statusList" :key="index">
               <!-- ID -->
               <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
@@ -284,8 +282,8 @@ const confirmDelete = () => {
               </td>
               <!-- NAME -->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
-                <label for="my_modal_6" @click="() => selectStatus(item.id)">
-                  {{ checkStatus(item.name) }}
+                <label for="my_modal_6" @click="selectStatus(item.id)">
+                  {{ item.name }}
                 </label>
               </td>
 
@@ -298,21 +296,22 @@ const confirmDelete = () => {
               <!-- Edit modal-->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
 
-                <button class="btn" @click="openModalToEdit(status.id)">edit</button>
+                <button class="btn" @click="openModalToEdit(item.id)">edit</button>
 
                 <dialog id="my_modal_edit" class="modal">
+
                   <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
+
                     <span class="block text-2xl font-bold leading-6 text-gray-900 mb-1" style="margin: 15px;">Edit
                       Status</span>
 
                     <!-- Modal content -->
                     <div class="modal-action flex flex-col justify-between">
 
-                      <!-- name -->
                       <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
                         <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
                           <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
-                            v-model="item.name" />
+                            v-model="status.name" />
                         </label>
                         <!-- Description -->
                         <label for="description" class="form-control flex-grow ml-4 mb-8">
@@ -321,16 +320,13 @@ const confirmDelete = () => {
                           </div>
                           <textarea id="description"
                             class="itbkk-description textarea textarea-bordered flex-grow w-full" maxlength="500"
-                            rows="4" placeholder="No Description Provided" > {{  item.description }}</textarea>
+                            rows="4" placeholder="No Description Provided" v-model="status.description"></textarea>
                         </label>
                       </div>
                       <!-- Buttons -->
                       <div class="flex justify-end">
-                        <form form @submit.prevent="UpdateStatus" method="dialog">
-
-                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2"
-                            style="flex: 3; margin: 10px;background-color: #f785b1;"
-                            :disabled="item.name.length === 0 || item.name === null">
+                        <form method="dialog">
+                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2">
                             Save
                           </button>
                         </form>
