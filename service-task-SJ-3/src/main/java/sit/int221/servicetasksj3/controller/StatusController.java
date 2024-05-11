@@ -25,17 +25,17 @@ public class StatusController {
     private ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<StatusDTO> getAllTasks() {
-        return service.getAllTasks();
+    public List<StatusDTO> getAllStatuses() {
+        return service.getAllStatuses();
     }
 
     @GetMapping("/{id}")
-    public TaskStatus getTaskById(@PathVariable Integer id){
-        return service.findByID(id);
+    public TaskStatus getStatusesById(@PathVariable Integer id){
+        return service.getStatusesById(id);
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> createNewStatuses(@RequestBody StatusDTO status) {
+    public ResponseEntity<Object> createNewStatuses(@Valid @RequestBody StatusDTO status) {
         List<StatusDTO> createdStatus = service.createNewStatuses(status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
     }
@@ -43,6 +43,14 @@ public class StatusController {
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateStatuses(@PathVariable Integer id, @RequestBody TaskStatus task) {
         return ResponseEntity.ok(service.updateStatuses(id, task));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> removeStatuses(@Valid @PathVariable Integer id){
+        return ResponseEntity.ok(service.removeStatuses(id));
+    }
+    @DeleteMapping("/{id}/{newId}")
+    public ResponseEntity<Object> removeStatusAndReplace(@Valid @PathVariable Integer id , @PathVariable Integer newId){
+        return ResponseEntity.ok(service.transferStatuses(id,newId));
     }
 
 

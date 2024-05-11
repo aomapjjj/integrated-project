@@ -25,15 +25,8 @@ public class TaskStatus {
     private String description;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "statusTasks", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "statusTasks")
     private Set<Task> tasks = new LinkedHashSet<>();
-
-    @Column(name = "createdOn", updatable = false, insertable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
-    private ZonedDateTime createdOn;
-    @Column(name = "updatedOn", updatable = false, insertable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
-    private ZonedDateTime updatedOn;
 
     public void setName(String name) {
         if (name != null) {
