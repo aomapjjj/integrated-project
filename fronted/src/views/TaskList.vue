@@ -35,6 +35,11 @@ const selectTodo = (todoId) => {
   selectedTodoId.value = todoId
 }
 
+// ----------------------- Delete -----------------------
+
+const selectedItemIdToDelete = ref(0)
+
+
 const deleteTodo = async (todoId) => {
   try {
     const status = await deleteItemById(import.meta.env.VITE_BASE_URL, todoId)
@@ -47,22 +52,6 @@ const deleteTodo = async (todoId) => {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
 }
-const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id)
-
-  if (item) {
-    console.log(item.title)
-    return item.title
-  } else {
-    console.log(`No item found with id ${id}`)
-
-    return ""
-  }
-}
-
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-const selectedItemIdToDelete = ref(0)
 
 const openModalToDelete = (itemId) => {
   selectedItemIdToDelete.value = itemId
@@ -83,6 +72,34 @@ const confirmDelete = () => {
     deleteComplete.value = false
   }, 2300)
 }
+
+// ----------------------- Delete -----------------------
+
+
+// ----------------------- filterAndLogTitleById -----------------------
+
+
+const filterAndLogTitleById = (id) => {
+  const item = items.find((item) => item.id === id)
+
+  if (item) {
+    console.log(item.title)
+    return item.title
+  } else {
+    console.log(`No item found with id ${id}`)
+
+    return ""
+  }
+}
+
+// ----------------------- filterAndLogTitleById -----------------------
+
+
+
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+
+
 
 const openNewStatus = () => {
   router.push({ name: "StatusesList" })

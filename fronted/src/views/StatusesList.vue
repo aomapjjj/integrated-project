@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { getItemById, getItems, addItem } from "../libs/fetchUtils.js"
-import TaskDetail from "../views/TaskDetail.vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
@@ -33,18 +32,9 @@ onMounted(async () => {
   }
 })
 
-const deleteStatus = async (statusId) => {
-  try {
-    const status = await deleteItemById(import.meta.env.VITE_BASE_URL_STATUS, statusId)
-    if (status === 200) {
-      statusList.value = statusList.value.filter((status) => status.id !== statusId)
-    } else {
-      console.error(`Failed to delete item with ID ${statusId}`)
-    }
-  } catch (error) {
-    console.error(`Error deleting item with ID ${statusId}:`, error)
-  }
-}
+
+
+// ----------------------- Add -----------------------
 
 const submitForm = async () => {
   const statusName = status.value.name.trim()
@@ -72,6 +62,17 @@ const closeModalAdd = () => {
 }
 
 
+// ----------------------- Add -----------------------
+
+
+const selectStatus = (statusId) => {
+  selectedStatusId.value = statusId
+}
+
+// ----------------------- Edit -----------------------
+
+const selectedItemIdToEdit = ref(0)
+
 const UpdateStatus = async () => {
   const statusName = status.value.name
   const statusDescription = status.value.description;
@@ -82,6 +83,34 @@ const UpdateStatus = async () => {
   })
   console.log(edit)
   // router.go()
+}
+
+const openModalToEdit = (statusId) => {
+  selectedItemIdToEdit.value = statusId
+  const modal = document.getElementById("my_modal_edit")
+  modal.showModal()
+}
+
+const closeModalEdit = () => {
+  const modal = document.getElementById("my_modal_edit")
+  modal.close()
+}
+// ----------------------- Edit -----------------------
+
+
+// ----------------------- Delete -----------------------
+
+const deleteStatus = async (statusId) => {
+  try {
+    const status = await deleteItemById(import.meta.env.VITE_BASE_URL_STATUS, statusId)
+    if (status === 200) {
+      statusList.value = statusList.value.filter((status) => status.id !== statusId)
+    } else {
+      console.error(`Failed to delete item with ID ${statusId}`)
+    }
+  } catch (error) {
+    console.error(`Error deleting item with ID ${statusId}:`, error)
+  }
 }
 
 const openModalToDelete = (statusId) => {
@@ -103,10 +132,11 @@ const confirmDelete = () => {
     deleteComplete.value = false
   }, 2300)
 }
+// ----------------------- Delete -----------------------
 
-const selectStatus = (statusId) => {
-  selectedStatusId.value = statusId
-}
+
+
+
 
 </script>
 
@@ -255,7 +285,7 @@ const selectStatus = (statusId) => {
               <!-- NAME -->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title">
                 <label for="my_modal_6" @click="() => selectStatus(item.id)">
-                  {{ item.name }}
+                  {{ checkStatus(item.name) }}
                 </label>
               </td>
 
@@ -265,16 +295,15 @@ const selectStatus = (statusId) => {
                 </label>
               </td>
 
-              <!-- eidt -->
+              <!-- Edit modal-->
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
 
-                <button class="btn" onclick="my_modal_4.showModal()">edit</button>
+                <button class="btn" @click="openModalToEdit(status.id)">edit</button>
 
-                <dialog id="my_modal_4" class="modal">
+                <dialog id="my_modal_edit" class="modal">
                   <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
                     <span class="block text-2xl font-bold leading-6 text-gray-900 mb-1" style="margin: 15px;">Edit
                       Status</span>
-
 
                     <!-- Modal content -->
                     <div class="modal-action flex flex-col justify-between">
@@ -283,7 +312,7 @@ const selectStatus = (statusId) => {
                       <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
                         <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
                           <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
-                            v-model="status.name" />
+                            v-model="item.name" />
                         </label>
                         <!-- Description -->
                         <label for="description" class="form-control flex-grow ml-4 mb-8">
@@ -292,7 +321,7 @@ const selectStatus = (statusId) => {
                           </div>
                           <textarea id="description"
                             class="itbkk-description textarea textarea-bordered flex-grow w-full" maxlength="500"
-                            rows="4" placeholder="No Description Provided" v-model="status.description"> {{ status.description }}</textarea>
+                            rows="4" placeholder="No Description Provided" > {{  item.description }}</textarea>
                         </label>
                       </div>
                       <!-- Buttons -->
@@ -301,7 +330,7 @@ const selectStatus = (statusId) => {
 
                           <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2"
                             style="flex: 3; margin: 10px;background-color: #f785b1;"
-                            :disabled="status.name.length === 0 || status.name === null">
+                            :disabled="item.name.length === 0 || item.name === null">
                             Save
                           </button>
                         </form>
@@ -316,7 +345,7 @@ const selectStatus = (statusId) => {
 
 
 
-
+                <!-- Delete Modal -->
                 <button class="itbkk-button-delete btn btn-circle btn-outline btn-sm"
                   @click="openModalToDelete(item.id)">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
