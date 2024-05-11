@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sit.int221.servicetasksj3.dtos.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
 import sit.int221.servicetasksj3.entities.Task;
@@ -32,8 +33,10 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Integer id){
-        return service.findByID(id);
+    public SimpleTaskDTO getTaskById(@PathVariable Integer id){
+        Task task = service.findByID(id);
+        SimpleTaskDTO simpleTaskDTO = modelMapper.map(task, SimpleTaskDTO.class);
+        return simpleTaskDTO;
     }
 
     // ADD

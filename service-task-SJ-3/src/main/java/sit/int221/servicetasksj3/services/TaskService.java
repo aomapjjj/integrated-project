@@ -20,7 +20,6 @@ public class TaskService {
     private ListMapper listMapper;
     //GET ALL TASKS
     public List<TaskDTO> getAllTasks(){
-
         return listMapper.mapList(repository.findAll(), TaskDTO.class, modelMapper);
     }
     //GET ALL BY ID
