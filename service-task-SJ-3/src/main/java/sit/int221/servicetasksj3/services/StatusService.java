@@ -4,10 +4,8 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import sit.int221.servicetasksj3.dtos.StatusDTO;
-import sit.int221.servicetasksj3.dtos.TaskDTO;
-import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.dtos.StatusDTOTwo;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
@@ -28,8 +26,9 @@ public class StatusService {
     @Autowired
     private ListMapper listMapper;
 
-    public List<StatusDTO> getAllStatuses() {
-        return listMapper.mapList(repository.findAll(), StatusDTO.class, modelMapper);
+    //GET
+    public List<StatusDTOTwo> getAllStatuses() {
+        return listMapper.mapList(repository.findAll(), StatusDTOTwo.class, modelMapper);
     }
 
     public TaskStatus getStatusesById(Integer id) {
@@ -73,7 +72,7 @@ public class StatusService {
 
     // EDIT
     @Transactional
-    public TaskStatus updateStatuses(Integer id,TaskStatus task) {
+    public TaskStatus updateStatuses(Integer id , TaskStatus task) {
         TaskStatus existingTask = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
 
@@ -113,39 +112,30 @@ public class StatusService {
             repository.delete(status);
             return status;
         } catch (Exception e) {
-            throw new ItemNotFoundException("Failed to delete status: " + e.getMessage());
+            throw new ItemNotFoundException("Failed to delete status to the database" + e.getMessage());
         }
     }
-
+    // TRANSFER
     @Transactional
     public TaskStatus transferStatuses(Integer id, Integer newId) {
-        TaskStatus oldStatus = repository.findById(id).orElseThrow();
+        //เช็คว่า oldId และ newId ไม่เท่ากัน
+        if (id.equals(newId)) {
+            throw new RuntimeException("Cannot use old Status Id as New Status Id");
+        }
+        if (!repository.existsById(id)) {
+            throw new ItemNotFoundException("Status not found with id " + id);
+        }
+        if (!repository.existsById(newId)) {
+            throw new ItemNotFoundException("Status not found with id " + newId);
+        }
+        TaskStatus existingStatus  = repository.findById(id).orElseThrow();
         Integer newStatus = repository.findById(newId).orElseThrow().getId();
         try {
-            taskRepository.updateStatusId(oldStatus.getId() , newStatus);
-            repository.delete(oldStatus);
-            return oldStatus;
+            taskRepository.updateStatusId(existingStatus .getId() , newStatus);
+            repository.delete(existingStatus);
+            return existingStatus;
         }catch (Exception message){
-            throw new ItemNotFoundException(message.toString());
+            throw new ItemNotFoundException("NOT FOUND");
         }
-
-//        TaskStatus existingStatus = repository.findById(id).orElseThrow(
-//                () -> new ItemNotFoundException("Status not found"));
-//
-//        TaskStatus newStatus = repository.findById(newId).orElseThrow(
-//                () -> new ItemNotFoundException("New status not found"));
-//
-//        if (existingStatus == null || newStatus == null) {
-//            throw new ItemNotFoundException("Status not found");
-//        }
-//
-//        List<Task> tasks = taskRepository.findByStatusTasksId(id);
-//        for (Task task : tasks) {
-//            task.setStatusTasks(newStatus);
-//        }
-//        // บันทึกการเปลี่ยนแปลงสถานะของงาน
-//        taskRepository.saveAll(tasks);
-//
-//        return newStatus;
     }
 }

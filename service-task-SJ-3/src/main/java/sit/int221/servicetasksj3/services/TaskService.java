@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;

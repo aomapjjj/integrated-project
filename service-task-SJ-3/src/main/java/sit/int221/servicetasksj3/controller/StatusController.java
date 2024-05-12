@@ -7,8 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.StatusDTO;
-import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
-import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.dtos.StatusDTOTwo;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.services.StatusService;
 
@@ -21,11 +20,11 @@ import java.util.List;
 public class StatusController {
     @Autowired
     private StatusService service;
-    @Autowired
-    private ModelMapper modelMapper;
+//    @Autowired
+//    private ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<StatusDTO> getAllStatuses() {
+    public List<StatusDTOTwo> getAllStatuses() {
         return service.getAllStatuses();
     }
 
