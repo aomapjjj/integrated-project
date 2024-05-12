@@ -400,6 +400,7 @@ const checkEqual = computed(() => {
                     </div>
                   </div>
                 </dialog>
+                
               </td>
             </tr>
             <tr v-if="statusList.length === 0">
@@ -414,3 +415,6 @@ const checkEqual = computed(() => {
   </div>
 </template>
 <style scoped></style>
+
+
+
