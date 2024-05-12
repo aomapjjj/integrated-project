@@ -4,9 +4,13 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sit.int221.servicetasksj3.dtos.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
+import sit.int221.servicetasksj3.dtos.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 import java.util.List;
 
@@ -14,6 +18,8 @@ import java.util.List;
 public class TaskService {
     @Autowired
     private TaskRepository repository;
+    @Autowired
+    private StatusRepository statusRepository;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -29,7 +35,11 @@ public class TaskService {
     }
     // ADD
     @Transactional
-    public Task createNewTasks(Task task){
+    public Task createNewTasks(TaskNewDTO task){
+        Task task1 = modelMapper.map(task, Task.class);
+        TaskStatus status = statusRepository.findByName(task.getStatus());
+        task1.setStatusTasks(status);
+
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
             throw new RuntimeException("NOT FOUND");
         }
@@ -43,7 +53,7 @@ public class TaskService {
             throw new RuntimeException("Assignees cannot exceed 30 characters");
         }
         try {
-            return repository.save(task);
+            return repository.save(task1);
         } catch (Exception exception) {
             throw new ItemNotFoundException("Failed to save task");
         }
@@ -59,9 +69,13 @@ public class TaskService {
     }
     // EDIT
     @Transactional
-    public Task updateTask(Integer id, Task task) {
+    public Task updateTask(Integer id, TaskNewDTO task) {
         Task existingTask = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
+
+        Task task1 = modelMapper.map(task, Task.class);
+        TaskStatus status = statusRepository.findByName(task.getStatus());
+        task1.setStatusTasks(status);
 
         if (task.getTitle() != null && !task.getTitle().isEmpty()) {
             task.setTitle(task.getTitle().trim());
@@ -72,10 +86,10 @@ public class TaskService {
         if (task.getAssignees() != null) {
             task.setAssignees(task.getAssignees().trim());
         }
-        if (task.getStatusTasks() != null) {
-            task.setStatusTasks(task.getStatusTasks());
+        if (task.getStatus() != null) {
+            task.setStatus(task.getStatus());
         }
-        task.setId(id);
-        return repository.save(task);
+        task1.setId(id);
+        return repository.save(task1);
     }
 }

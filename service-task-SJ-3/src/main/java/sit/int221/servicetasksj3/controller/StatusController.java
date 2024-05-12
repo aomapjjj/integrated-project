@@ -53,5 +53,4 @@ public class StatusController {
         return ResponseEntity.ok(service.transferStatuses(id,newId));
     }
 
-
 }

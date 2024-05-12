@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
+import sit.int221.servicetasksj3.dtos.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.services.TaskService;
 
@@ -41,7 +42,7 @@ public class TaskController {
 
     // ADD
     @PostMapping("")
-    public ResponseEntity<TaskDTOTwo> createNewTasks(@Valid @RequestBody Task task){
+    public ResponseEntity<TaskDTOTwo> createNewTasks(@Valid @RequestBody TaskNewDTO task){
         Task createTask = service.createNewTasks(task);
         TaskDTOTwo createdTaskDTO = modelMapper.map(createTask, TaskDTOTwo.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskDTO);
@@ -54,7 +55,7 @@ public class TaskController {
     }
     // EDIT
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDTOTwo> updateTasks(@Valid @RequestBody Task task, @PathVariable Integer id) {
+    public ResponseEntity<TaskDTOTwo> updateTasks(@Valid @RequestBody TaskNewDTO task, @PathVariable Integer id) {
         Task updatedTask = service.updateTask(id, task);
         TaskDTOTwo updatedTaskDTO = modelMapper.map(updatedTask, TaskDTOTwo.class);
         return ResponseEntity.ok(updatedTaskDTO);

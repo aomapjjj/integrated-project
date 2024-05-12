@@ -10,10 +10,11 @@ import sit.int221.servicetasksj3.entities.TaskStatus;
 import java.time.ZonedDateTime;
 
 @Data
-@JsonPropertyOrder({"id", "title", "assignees", "status", "createdOn", "updatedOn"})
+@JsonPropertyOrder({"id", "title","description", "assignees", "status", "createdOn", "updatedOn"})
 public class SimpleTaskDTO {
     private Integer id;
     private String title;
+    private String  description;
     private String  assignees;
 
     @JsonIgnore
