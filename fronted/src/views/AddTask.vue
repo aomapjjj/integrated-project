@@ -30,9 +30,9 @@ onMounted(async () => {
 
 
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title.trim();
-  const trimmedDescription = todo.value.description.trim();
-  const trimmedAssignees = todo.value.assignees.trim();
+  const trimmedTitle = todo.value.title?.trim();
+  const trimmedDescription = todo.value?.description.trim();
+  const trimmedAssignees = todo.value?.assignees.trim();
 
   await addItem(import.meta.env.VITE_BASE_URL, {
     title: trimmedTitle,
