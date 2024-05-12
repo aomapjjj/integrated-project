@@ -18,19 +18,12 @@ const todo = ref({
   updatedOn: ""
 })
 
-const todoList = ref([])
 const isLoading = ref(true)
-
-onMounted(async () => {
-  const items = await getItems(import.meta.env.VITE_BASE_URL)
-  todoList.value = items
-})
 
 // Watch for changes in the prop value
 watch(
   () => props.todoId,
   async (newValue) => {
-    
       const response = await getItemById(newValue)
     console.log(newValue)
     if (response.status === 200) {

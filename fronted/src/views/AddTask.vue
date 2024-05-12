@@ -1,65 +1,59 @@
 <script setup>
 import { getItems, getItemById, addItem } from "../libs/fetchUtils.js"
-import { ref , onMounted } from "vue"
+import { ref, onMounted, watch } from "vue"
 import { checkStatus } from "../libs/checkStatus"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
 const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
-
+const statusList = ref([])
 
 const props = defineProps({
-  todoId: Number
+  todo: Object
 })
 
-const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "NO_STATUS"
-})
+watch(
+  () => props.todo,
+  async () => {
+    const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+    statusList.value = itemsStatus
 
-const todoList = ref([])
-
-onMounted(async () => {
-  const items = await getItems(import.meta.env.VITE_BASE_URL)
-  todoList.value = items
-})
-
-
+    console.log('itemStatuss', itemsStatus)
+  }, { immediate: true }
+)
 
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title?.trim();
-  const trimmedDescription = todo.value?.description.trim();
-  const trimmedAssignees = todo.value?.assignees.trim();
+  const trimmedTitle = props.todo.title?.trim();
+  const trimmedDescription = props.todo.description?.trim();
+  const trimmedAssignees = props.todo.assignees?.trim();
 
   await addItem(import.meta.env.VITE_BASE_URL, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: todo.value.status
+    status: props.todo.status
   });
 
-  clearForm()
+  // clearForm()
   showAlertAdd.value = true
   showAlertAfterClose.value = true
   setTimeout(() => {
     showAlertAfterClose.value = false;
   }, 2300);
- 
+
 }
 const closeModal = () => {
   my_modal_1.close()
   router.go()
 }
 
-const clearForm = () => {
-  todo.value.title = ""
-  todo.value.description = ""
-  todo.value.assignees = ""
-  todo.value.status = "NO_STATUS"
-}
+// const clearForm = () => {
+//   props.todo.value.title = ""
+//   props.todo.value.description = ""
+//   props.todo.value.assignees = ""
+//   props.todo.value.status = "NO_STATUS"
+// }
 
 </script>
 
@@ -109,8 +103,8 @@ const clearForm = () => {
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
                 <option value="NO_STATUS">No Status</option>
-                <option v-for="status in ['TO_DO', 'DOING', 'DONE']" :value="status">
-                  {{ checkStatus(status) }}
+                <option v-for="status in statusList" :value="status.name">
+                  {{ status.name }}
                 </option>
               </select>
             </div>
@@ -118,7 +112,8 @@ const clearForm = () => {
             <!-- Cancel & Save Button -->
             <div class="modal-action" style="display: flex; justify-content: space-around">
               <form method="dialog" style="flex: 1">
-                <button type="submit" class="itbkk-button-confirm btn" style="background-color: #f785b1; margin: 10px; width: 100%"
+                <button type="submit" class="itbkk-button-confirm btn"
+                  style="background-color: #f785b1; margin: 10px; width: 100%"
                   :disabled="todo.title.length === 0 || todo.title === null">
                   Save
                 </button>
