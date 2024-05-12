@@ -104,7 +104,7 @@ const closeModal = () => {
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
                 <option value="NO_STATUS">No Status</option>
                 <option v-for="status in statusList" :value="status.name">
-                  {{ status.name }}
+                  {{ checkStatus(status.name) }}
                 </option>
               </select>
             </div>
