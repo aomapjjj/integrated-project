@@ -10,6 +10,8 @@ import {
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate.js"
 import { useRoute, useRouter } from "vue-router"
+import {useTodo} from "../store/statusStore.js"
+
 
 const route = useRoute()
 const router = useRouter()
@@ -17,6 +19,9 @@ const statusList = ref([])
 const selectedStatusId = ref(0)
 const notFound = ref(false)
 const myModal = ref(null)
+
+
+
 
 const status = ref({
   id: "",
@@ -27,10 +32,11 @@ const status = ref({
 })
 
 
-
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  const itemsTask = await getItems(import.meta.env.VITE_BASE_URL)
   statusList.value = items
+
   console.log({...statusList.value})
   const statusId = route.params.id
   if (statusId !== undefined) {
@@ -459,14 +465,14 @@ const checkEqual = computed(() => {
                               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                               >Created On</span
                             >
-                            <label>{{ status.createdOn }}</label>
+                            <label>{{ toDate(status.createdOn) }}</label>
                           </div>
                           <div>
                             <span
                               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                               >Updated On</span
                             >
-                            <label>{{ status.updatedOn }}</label>
+                            <label>{{ toDate(status.updatedOn) }}</label>
                           </div>
                         </div>
                       </div>
