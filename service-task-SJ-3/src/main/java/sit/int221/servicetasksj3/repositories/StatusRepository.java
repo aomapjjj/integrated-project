@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface StatusRepository extends JpaRepository<TaskStatus, Integer> {
     TaskStatus findByName(String name);
-//    TaskStatus findByStatusName(String statusName);
-
 }

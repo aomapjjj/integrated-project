@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import sit.int221.servicetasksj3.controller.StatusController;
 import sit.int221.servicetasksj3.controller.TaskController;
 
-@RestControllerAdvice(assignableTypes = TaskController.class)
+@RestControllerAdvice(assignableTypes = {TaskController.class, StatusController.class})
+
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // 404 - ItemNotFoundException
     @ExceptionHandler(ItemNotFoundException.class)
