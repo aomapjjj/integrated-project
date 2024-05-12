@@ -33,6 +33,18 @@ async function deleteItemById(url, id) {
   }
 }
 
+async function deleteItemAndTransfer(url, id , newid) {
+  console.log(`${url}/${id}/${newid}`)
+  try {
+    const res = await fetch(`${url}/${id}/${newid}`, {
+      method: "DELETE"
+    })
+    return res.status
+  } catch (error) {
+    console.log(`error: ${error}`)
+  }
+}
+
 async function addItem(url, newItem) {
   try {
     const res = await fetch(url, {

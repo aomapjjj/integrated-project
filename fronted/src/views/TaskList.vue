@@ -17,6 +17,8 @@ const deleteComplete = ref(false)
 let items = [] // ประกาศ items เป็นตัวแปร global
 const showDetail = ref(false)
 
+
+
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL)
   todoList.value = items
@@ -36,6 +38,8 @@ const selectTodo = (todoId) => {
   selectedTodoId.value = todoId
   showDetail.value = true
 }
+
+
 
 // ----------------------- Delete -----------------------
 
@@ -76,7 +80,7 @@ const confirmDelete = () => {
 }
 
 // ----------------------- Delete -----------------------
-
+console.log('items' , items)
 
 // ----------------------- filterAndLogTitleById -----------------------
 
