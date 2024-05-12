@@ -58,9 +58,9 @@ const closeModal = () => {
 
 
 const UpdateTask = async () => {
-  const trimmedTitle = todo.value.title.trim();
-  const trimmedDescription = todo.value.description.trim();
-  const trimmedAssignees = todo.value.assignees.trim();
+  const trimmedTitle = todo.value.title?.trim();
+  const trimmedDescription = todo.value.description?.trim();
+  const trimmedAssignees = todo.value.assignees?.trim();
 
   const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
     title: trimmedTitle,
@@ -69,7 +69,7 @@ const UpdateTask = async () => {
     status: todo.value.status
   })
   console.log(edit)
-  router.go()
+
 }
 
 const checkEqual = computed(() => {
