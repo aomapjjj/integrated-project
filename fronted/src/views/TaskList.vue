@@ -21,6 +21,10 @@ const showDetail = ref(false)
 
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL)
+  const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  StatusesList.value = itemsStatus
+  
+  console.log('itemStatuss', itemsStatus)
   todoList.value = items
   console.log('items', items)
   const taskId = route.params.id
@@ -32,7 +36,11 @@ onMounted(async () => {
       notFound.value = true
     }
   }
+  return items
 })
+
+
+
 
 const selectTodo = (todoId) => {
   selectedTodoId.value = todoId
@@ -80,7 +88,7 @@ const confirmDelete = () => {
 }
 
 // ----------------------- Delete -----------------------
-console.log('items' , items)
+
 
 // ----------------------- filterAndLogTitleById -----------------------
 
