@@ -14,15 +14,21 @@ const todoList = ref([])
 const selectedTodoId = ref(0)
 const notFound = ref(false)
 const deleteComplete = ref(false)
-let items = [] // ประกาศ items เป็นตัวแปร global
 const showDetail = ref(false)
-
-
+const statusList = ref([])
+let items = [] // ประกาศ items เป็นตัวแปร global
+let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
+const todo = ref({
+  title: "",
+  description: "",
+  assignees: "",
+  status: "NO_STATUS"
+})
 
 onMounted(async () => {
   items = await getItems(import.meta.env.VITE_BASE_URL)
-  const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
-  StatusesList.value = itemsStatus
+  itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  statusList.value = itemsStatus
   
   console.log('itemStatuss', itemsStatus)
   todoList.value = items
@@ -38,9 +44,6 @@ onMounted(async () => {
   }
   return items
 })
-
-
-
 
 const selectTodo = (todoId) => {
   selectedTodoId.value = todoId
@@ -160,7 +163,7 @@ const openNewStatus = () => {
 
         <!-- ADD BUTTON -->
 
-        <AddTask />
+        <AddTask :todo="todo" />
 
         <!-- MANAGE STATUS -->
 

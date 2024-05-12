@@ -10,7 +10,6 @@ const props = defineProps({
   todoId: Number
 })
 
-
 const todo = ref({
   id: "",
   title: "",
@@ -20,10 +19,6 @@ const todo = ref({
   createdOn: "",
   updatedOn: ""
 })
-
-
-
-
 
 const todoList = ref([])
 const oldValue = ref({});
