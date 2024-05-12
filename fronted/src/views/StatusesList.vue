@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue"
-import { getItemById, getItems, addItem, editItem } from "../libs/fetchUtils.js"
+import { getItemById, getItems, addItem, editItem, deleteItemById } from "../libs/fetchUtils.js"
 import { checkStatus } from "../libs/checkStatus"
 import { useRoute, useRouter } from "vue-router"
 
@@ -116,22 +116,22 @@ const deleteStatus = async (statusId) => {
 
 const openModalToDelete = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal = document.getElementById("my_modal_delete")
-  modal.showModal()
+  const modal3 = document.getElementById("my_modal_delete")
+  modal3?.showModal()
 }
 
 const closeModal = () => {
-  const modal = document.getElementById("my_modal_delete")
-  modal.close()
+  const modal3 = document.getElementById("my_modal_delete")
+  modal3?.close()
 }
 
 const confirmDelete = () => {
   deleteStatus(selectedItemIdToDelete.value)
   closeModal()
-  deleteComplete.value = true
-  setTimeout(() => {
-    deleteComplete.value = false
-  }, 2300)
+  // deleteComplete.value = true
+  // setTimeout(() => {
+  //   deleteComplete.value = false
+  // }, 2300)
 }
 // ----------------------- Delete -----------------------
 
