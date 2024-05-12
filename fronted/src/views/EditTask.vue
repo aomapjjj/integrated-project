@@ -6,9 +6,10 @@ import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate"
 import router from "@/router";
 
+const statusList = ref([])
+
 const props = defineProps({
-  todoId: Number,
-  todo: Object
+  todoId: Number
 })
 
 const todo = ref({
@@ -21,7 +22,6 @@ const todo = ref({
   updatedOn: ""
 })
 
-const todoList = ref([])
 const oldValue = ref({});
 
 watch(
@@ -32,9 +32,12 @@ watch(
       todo.value = await response.json()
       oldValue.value = { ...todo.value }
     }
-  },
-  { immediate: true }
-  
+
+    const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+    statusList.value = itemsStatus
+    console.log('itemStatuss', itemsStatus)
+  }, { immediate: true }
+
 )
 
 
@@ -64,17 +67,15 @@ const UpdateTask = async () => {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: props.todo.status
+    status: todo.status
   })
   console.log(edit)
-
+  console.log(statusList.value)
 }
 
 const checkEqual = computed(() => {
   return JSON.stringify(todo.value) === JSON.stringify(oldValue.value)
 })
-
-
 
 </script>
 
@@ -133,11 +134,11 @@ const checkEqual = computed(() => {
         <div class="itbkk-status mb-4 mt-2">
           <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
           <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-                <option value="NO_STATUS">No Status</option>
-                <option v-for="status in statusList" :value="status.name">
-                  {{ checkStatus(status.name) }}
-                </option>
-              </select>
+            
+            <option v-for="status in statusList" :value="status.name">
+              {{ checkStatus(status.name) }}
+            </option>
+          </select>
         </div>
         <!-- TimeZone -->
         <div class="itbkk-timezone">
