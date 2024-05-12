@@ -53,8 +53,8 @@ public class StatusService {
             throw new RuntimeException("Status description cannot exceed 200 characters");
         }
         // ตรวจสอบว่าสถานะที่กำลังสร้างนั้นมีชื่อซ้ำกับสถานะที่มีอยู่แล้วหรือไม่
-        List<TaskStatus> existingStatuses = repository.findByName(statusDTO.getName().trim());
-        if (!existingStatuses.isEmpty()) {
+        TaskStatus existingStatuses = repository.findByName(statusDTO.getName().trim());
+        if (existingStatuses != null) {
             throw new RuntimeException("Status with name '" + statusDTO.getName().trim() + "' already exists");
         }
         try {
@@ -102,7 +102,6 @@ public class StatusService {
     }
 
     // DELETE
-    // DELETE
     @Transactional
     public TaskStatus removeStatuses(Integer id) {
         TaskStatus status = repository.findById(id).orElseThrow(
@@ -120,24 +119,33 @@ public class StatusService {
 
     @Transactional
     public TaskStatus transferStatuses(Integer id, Integer newId) {
-
-        TaskStatus existingStatus = repository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("Status not found"));
-
-        TaskStatus newStatus = repository.findById(newId).orElseThrow(
-                () -> new ItemNotFoundException("New status not found"));
-
-        if (existingStatus == null || newStatus == null) {
-            throw new ItemNotFoundException("Status not found");
+        TaskStatus oldStatus = repository.findById(id).orElseThrow();
+        Integer newStatus = repository.findById(newId).orElseThrow().getId();
+        try {
+            taskRepository.updateStatusId(oldStatus.getId() , newStatus);
+            repository.delete(oldStatus);
+            return oldStatus;
+        }catch (Exception message){
+            throw new ItemNotFoundException(message.toString());
         }
 
-        List<Task> tasks = taskRepository.findByStatusTasksId(id);
-        for (Task task : tasks) {
-            task.setStatusTasks(newStatus);
-        }
-        // บันทึกการเปลี่ยนแปลงสถานะของงาน
-        taskRepository.saveAll(tasks);
-
-        return newStatus;
+//        TaskStatus existingStatus = repository.findById(id).orElseThrow(
+//                () -> new ItemNotFoundException("Status not found"));
+//
+//        TaskStatus newStatus = repository.findById(newId).orElseThrow(
+//                () -> new ItemNotFoundException("New status not found"));
+//
+//        if (existingStatus == null || newStatus == null) {
+//            throw new ItemNotFoundException("Status not found");
+//        }
+//
+//        List<Task> tasks = taskRepository.findByStatusTasksId(id);
+//        for (Task task : tasks) {
+//            task.setStatusTasks(newStatus);
+//        }
+//        // บันทึกการเปลี่ยนแปลงสถานะของงาน
+//        taskRepository.saveAll(tasks);
+//
+//        return newStatus;
     }
 }
