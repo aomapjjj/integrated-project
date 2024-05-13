@@ -63,12 +63,14 @@ const UpdateTask = async () => {
   const trimmedDescription = todo.value.description?.trim();
   const trimmedAssignees = todo.value.assignees?.trim();
 
+
   const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: todo.status
+    status: todo.value.status
   })
+  router.go()
   console.log(edit)
   console.log(statusList.value)
 }
@@ -81,7 +83,7 @@ const checkEqual = computed(() => {
 
 <template>
   <!-- BUTTON -->
-  
+
   <label @click="openModal" class="itbkk-button-edit btn"  style="width: 150px;" >
     Edit
   </label>
