@@ -19,6 +19,8 @@ const selectedStatusId = ref(0)
 const notFound = ref(false)
 const myModal = ref(null)
 
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+
 const status = ref({
   id: "",
   name: "",
@@ -28,8 +30,7 @@ const status = ref({
 })
 
 onMounted(async () => {
-  const items = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
-  const itemsTask = await getItems(import.meta.env.VITE_BASE_URL)
+  const items = await getItems(baseUrlStatus)
   statusList.value = items
 
   console.log({ ...statusList.value })
