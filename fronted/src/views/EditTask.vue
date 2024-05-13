@@ -82,7 +82,8 @@ const checkEqual = computed(() => {
 
 <template>
   <!-- BUTTON -->
-  
+
+
   <label @click="openModal" class="itbkk-button-edit btn"  style="width: 150px;" >
     Edit
   </label>

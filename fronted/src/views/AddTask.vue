@@ -148,4 +148,6 @@ const closeModal = () => {
   color: white;
 }
 
+
 </style>
+
