@@ -103,7 +103,7 @@ public class StatusService {
         TaskStatus status = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
         if ("NO_STATUS".equals(status.getName())) {
-            throw new RuntimeException("Cannot delete 'No Status'.");
+            throw new RuntimeException("Cannot delete 'No Status'");
         }
         try {
             repository.delete(status);

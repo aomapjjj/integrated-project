@@ -33,7 +33,7 @@ async function deleteItemById(url, id) {
   }
 }
 
-async function deleteItemAndTransfer(url, id , newid) {
+async function deleteItemAndTransfer(url, id, newid) {
   console.log(`${url}/${id}/${newid}`)
   try {
     const res = await fetch(`${url}/${id}/${newid}`, {
@@ -76,7 +76,7 @@ async function editItem(url, id, editItem) {
     })
     const editedItem = await res.json()
     return editedItem
-  
+
     // return res.status
   } catch (error) {
     console.log(`error: ${error}`)
