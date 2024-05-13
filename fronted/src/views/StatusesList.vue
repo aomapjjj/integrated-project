@@ -6,6 +6,7 @@ import {
   addItem,
   editItem,
   deleteItemById,
+  deleteItemAndTransfer
 } from "../libs/fetchUtils.js"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate.js"
@@ -90,7 +91,6 @@ const UpdateStatus = async () => {
 const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
-  console.log("Hello", status.value)
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
   console.log(status.value)
@@ -116,10 +116,8 @@ const deleteStatus = async (statusId) => {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
       )
-     
     } else {
       console.error(`Failed to delete item with ID ${statusId}`)
-
     }
 
     if (status === 500) {
@@ -171,9 +169,6 @@ const deleteandtrans = async (statusId, newID) => {
     console.error(`Error deleting item with ID ${statusId}:`, error)
   }
 }
-
-
-
 
 // ----------------------- Delete -----------------------
 
@@ -407,7 +402,11 @@ const checkEqual = computed(() => {
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
               >
-                <button class="btn" @click="openModalToEdit(item.id)" v-if="item.name !== 'NO_STATUS'">
+                <button
+                  class="btn"
+                  @click="openModalToEdit(item.id)"
+                  v-if="item.name !== 'NO_STATUS'"
+                >
                   edit
                 </button>
 
@@ -508,14 +507,15 @@ const checkEqual = computed(() => {
                 </dialog>
 
                 <!-- Delete Modal -->
-                <button v-if="item.name !== 'NO_STATUS'"
+                <button
+                  v-if="item.name !== 'NO_STATUS'"
                   class="itbkk-button-delete btn"
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
                 >
                   Delete
                 </button>
-                <dialog id="my_modal_delete" class="modal">
+                <dialog id="" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
                     <h3 class="itbkk-message font-bold text-lg">
                       Delete a Task
@@ -541,6 +541,54 @@ const checkEqual = computed(() => {
                     </div>
                   </div>
                 </dialog>
+                <!-- my_modal_delete -->
+                <!-- my_modal_deleteAndTrans -->
+                <!-- Delete And Trans -->
+
+                <dialog id="my_modal_delete" class="modal">
+                  <div class="modal-box" style="max-width: 1000px">
+                    <h3 class="itbkk-message font-bold text-lg">
+                      Transfer a Status
+                    </h3>
+                    <p class="py-4 font-medium" style="word-wrap: break-word">
+                      There is some task associated with the ...
+                    </p>
+
+                    <div class="itbkk-status mb-4 mt-2">
+                      <span
+                        class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                        >Transfer To</span
+                      >
+                      <select
+                        class="select select-bordered w-full max-w-xs mt-1"
+                      >
+                        <option
+                        v-for="status in statusList" :value="status.name"
+                        >
+                          {{ checkStatus(status.name) }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="modal-action">
+                      <button
+                        class="itbkk-button-cancel btn"
+                        @click="closeModal"
+                        style="color: #eb4343"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        class="itbkk-button-confirm btn bg-green-400"
+                        style="color: #fff"
+                        @click="confirmDelete"
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  </div>
+                </dialog>
+                <!-- Delete And Trans -->
               </td>
             </tr>
             <tr v-if="statusList.length === 0">

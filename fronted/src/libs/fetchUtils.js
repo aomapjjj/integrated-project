@@ -108,5 +108,6 @@ export {
   deleteItemById,
   addItem,
   editItem,
-  editFavorite
+  editFavorite,
+  deleteItemAndTransfer
 }
