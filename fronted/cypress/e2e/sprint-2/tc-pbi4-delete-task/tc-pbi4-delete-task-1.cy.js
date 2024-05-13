@@ -39,7 +39,7 @@ describe(`TC-PBI4-DELETE-TASK-BASIC-1\n
     cy.get('@action').find('.itbkk-button-delete').click()
     cy.get('.itbkk-message').contains('Do you want to delete the task number')
     cy.get('.itbkk-message').contains('DevSecOps')
-    cy.get('.itbkk-button-cancel').contains("Cancel").click()
+    cy.get('.itbkk-button-cancel').contains("Cancel").click({force: true});
 
     cy.wait(100)
     cy.url().should('contain','/task')

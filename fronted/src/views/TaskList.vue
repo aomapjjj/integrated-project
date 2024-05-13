@@ -206,6 +206,7 @@ const openNewStatus = () => {
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- ADD BUTTON -->
+
         <AddTask :todo="todo" />
 
         <table
@@ -340,10 +341,10 @@ const openNewStatus = () => {
 
                   <dialog id="my_modal_delete" class="modal">
                     <div class="modal-box" style="max-width: 1000px">
-                      <h3 class="itbkk-message font-bold text-lg">
+                      <h3 class=" font-bold text-lg">
                         Delete a Task
                       </h3>
-                      <p class="py-4 font-medium" style="word-wrap: break-word">
+                      <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
                         Do you want to delete the task number
                         {{ selectedItemIdToDelete }} - "{{
                           filterAndLogTitleById(selectedItemIdToDelete)
@@ -351,9 +352,9 @@ const openNewStatus = () => {
                       </p>
                       <div class="modal-action">
                         <button
-                          class="itbkk-button-cancel btn"
+                          class="itbkk-button-cancel btn "
                           @click="closeModal"
-                          style="color: #eb4343"
+                          style="color: #eb4343; pointer-events: none"
                         >
                           Cancel
                         </button>
@@ -412,10 +413,8 @@ const openNewStatus = () => {
           ></path>
         </svg>
         <div>
-          <h2 class="font-bold">
-            Delete Complete "{{
-              filterAndLogTitleById(selectedItemIdToDelete)
-            }}"
+          <h2 class="itbkk-message font-bold">
+            The task has been deleted
           </h2>
         </div>
         <div>
