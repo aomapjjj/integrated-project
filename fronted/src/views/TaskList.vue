@@ -18,6 +18,10 @@ const showDetail = ref(false)
 const statusList = ref([])
 let items = [] // ประกาศ items เป็นตัวแปร global
 let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
+
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+
 const todo = ref({
   title: "",
   description: "",
@@ -26,8 +30,8 @@ const todo = ref({
 })
 
 onMounted(async () => {
-  items = await getItems(import.meta.env.VITE_BASE_URL)
-  itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  items = await getItems(baseUrlTask)
+  itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
   
   console.log('itemStatuss', itemsStatus)
@@ -60,7 +64,7 @@ const selectedItemIdToDelete = ref(0);
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(import.meta.env.VITE_BASE_URL, todoId);
+    const status = await deleteItemById(baseUrlTask, todoId);
     if (status === 200) {
       todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
     } else {

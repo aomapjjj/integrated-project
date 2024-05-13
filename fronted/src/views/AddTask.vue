@@ -9,6 +9,9 @@ const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
 const statusList = ref([])
 
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+
 const props = defineProps({
   todo: Object
 })
@@ -16,7 +19,7 @@ const props = defineProps({
 watch(
   () => props.todo,
   async () => {
-    const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+    const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
 
     console.log('itemStatuss', itemsStatus)
@@ -28,7 +31,7 @@ const submitForm = async () => {
   const trimmedDescription = props.todo.description?.trim();
   const trimmedAssignees = props.todo.assignees?.trim();
 
-  await addItem(import.meta.env.VITE_BASE_URL, {
+  await addItem(baseUrlTask, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
