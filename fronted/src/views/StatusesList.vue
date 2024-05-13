@@ -384,7 +384,7 @@ const checkEqual = computed(() => {
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title"
               >
                 <label for="my_modal_6" @click="selectStatus(item.id)">
-                  {{ item.name }}
+                  {{ checkStatus(item.name) }}
                 </label>
               </td>
 
@@ -400,7 +400,7 @@ const checkEqual = computed(() => {
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
               >
-                <button class="btn" @click="openModalToEdit(item.id)">
+                <button class="btn" @click="openModalToEdit(item.id)" v-if="item.name !== 'NO_STATUS'">
                   edit
                 </button>
 
@@ -501,7 +501,7 @@ const checkEqual = computed(() => {
                 </dialog>
 
                 <!-- Delete Modal -->
-                <button
+                <button v-if="item.name !== 'NO_STATUS'"
                   class="itbkk-button-delete btn"
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"

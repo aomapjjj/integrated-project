@@ -63,12 +63,14 @@ const UpdateTask = async () => {
   const trimmedDescription = todo.value.description?.trim();
   const trimmedAssignees = todo.value.assignees?.trim();
 
+
   const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: todo.status
+    status: todo.value.status
   })
+  router.go()
   console.log(edit)
   console.log(statusList.value)
 }
@@ -81,7 +83,7 @@ const checkEqual = computed(() => {
 
 <template>
   <!-- BUTTON -->
-  <button @click="openModal" class="itbkk-button-edit btn btn-circle btn-outline btn-sm" style="color: currentColor">
+  <button  @click="openModal" class="itbkk-button-edit btn btn-circle btn-outline btn-sm" style="color: currentColor">
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" style="color: #f785b1">
       <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
         <path stroke-dasharray="20" stroke-dashoffset="20" d="M3 21H21">
