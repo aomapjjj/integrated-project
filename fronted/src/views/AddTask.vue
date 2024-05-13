@@ -58,7 +58,6 @@ const closeModal = () => {
 </script>
 
 <template>
-  <div class="flex justify-end mt-9">
     <!-- ADD -->
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -67,7 +66,6 @@ const closeModal = () => {
       </svg>
       Add new task
     </button>
-  </div>
 
   <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
     <dialog id="my_modal_1" class="modal">
@@ -110,62 +108,45 @@ const closeModal = () => {
             </div>
 
             <!-- Cancel & Save Button -->
-            <div class="modal-action" style="display: flex; justify-content: space-around">
-              <form method="dialog" style="flex: 1">
-                <button type="submit" class="itbkk-button-confirm btn"
-                  style="background-color: #f785b1; margin: 10px; width: 100%"
+            <div class="modal-action">
+              <form method="dialog" style="display: flex; justify-content: flex-end;">
+                <button type="submit" class="itbkk-button-confirm btn disabled:{{ todo.title.length === 0 || todo.title === null }}" 
+                  style="background-color: #f785b1;"
                   :disabled="todo.title.length === 0 || todo.title === null">
                   Save
                 </button>
               </form>
-              <button class="itbkk-button-cancel btn" style="flex: 1; margin: 10px" @click="closeModal">
+              <button class="itbkk-button-cancel btn"  @click="closeModal">
                 Cancel
               </button>
             </div>
+
           </div>
         </div>
-
-
         <!-- ALERT -->
-        <div role="alert" class="alert shadow-lg" :class="{ hidden: !showAlertAfterClose }" style="
+        <div  role="alert" class="alert shadow-lg" :class="{ hidden: !showAlertAfterClose }" style="
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
-            width: 300px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            animation: fadeInOut 1.5s infinite;
           ">
-
-          <h3 class="font-bold">The task has been successfully added</h3>
-
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span class="font-bold text-green-400">The task has been successfully added</span>
         </div>
+
       </div>
     </dialog>
   </div>
 </template>
 
 <style>
+
 .add-button:hover {
   border-color: white;
   color: white;
 }
 
-.alert {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  width: 300px;
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
 </style>
