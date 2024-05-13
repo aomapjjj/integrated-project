@@ -9,6 +9,9 @@ import router from "@/router";
 
 const statusList = ref([])
 
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+
 const props = defineProps({
   todoId: Number
 })
@@ -34,7 +37,7 @@ watch(
       oldValue.value = { ...todo.value }
     }
 
-    const itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+    const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
     console.log('itemStatuss', itemsStatus)
   }, { immediate: true }
@@ -64,7 +67,7 @@ const UpdateTask = async () => {
   const trimmedDescription = todo.value.description?.trim();
   const trimmedAssignees = todo.value.assignees?.trim();
 
-  const edit = await editItem(import.meta.env.VITE_BASE_URL, props.todoId, {
+  const edit = await editItem(baseUrlTask, props.todoId, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
