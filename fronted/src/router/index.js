@@ -35,7 +35,7 @@ export const routes = [
     component: AddTask,
   },
   {
-    path: '/task',
+    path: '/task/status',
     name: 'StatusesList',
     component: StatusesList,
   },
