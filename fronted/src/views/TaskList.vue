@@ -1,27 +1,40 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
-import TaskDetail from '../views/TaskDetail.vue';
-import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
-import StatusesList from '../views/StatusesList.vue';
-import { checkStatus } from '../libs/checkStatus';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from "vue"
+import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import StatusesList from "../views/StatusesList.vue"
+import { checkStatus } from "../libs/checkStatus"
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const router = useRouter();
-const todoList = ref([]);
-const selectedTodoId = ref(0);
-const notFound = ref(false);
-const deleteComplete = ref(false);
-let items = []; // ประกาศ items เป็นตัวแปร global
-const showDetail = ref(false);
+const route = useRoute()
+const router = useRouter()
+const todoList = ref([])
+const selectedTodoId = ref(0)
+const notFound = ref(false)
+const deleteComplete = ref(false)
+const showDetail = ref(false)
+const statusList = ref([])
+let items = [] // ประกาศ items เป็นตัวแปร global
+let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
+const todo = ref({
+  title: "",
+  description: "",
+  assignees: "",
+  status: "NO_STATUS"
+})
 
 onMounted(async () => {
-  items = await getItems(import.meta.env.VITE_BASE_URL);
-  todoList.value = items;
-  console.log('items', items);
-  const taskId = route.params.id;
+  items = await getItems(import.meta.env.VITE_BASE_URL)
+  itemsStatus = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  statusList.value = itemsStatus
+  
+  console.log('itemStatuss', itemsStatus)
+  todoList.value = items
+  console.log('items', items)
+  const taskId = route.params.id
+
   if (taskId !== undefined) {
     console.log(taskId);
     const response = await getItemById(taskId);
@@ -30,12 +43,16 @@ onMounted(async () => {
       notFound.value = true;
     }
   }
-});
+  return items
+})
+
 
 const selectTodo = (todoId) => {
   selectedTodoId.value = todoId;
   showDetail.value = true;
 };
+
+
 
 // ----------------------- Delete -----------------------
 
@@ -185,7 +202,7 @@ const openNewStatus = () => {
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- ADD BUTTON -->
-        <AddTask />
+        <AddTask :todo="todo" />
 
         <table
           class="table-auto mt-10 rounded-xl overflow-hidden"

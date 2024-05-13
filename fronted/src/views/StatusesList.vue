@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import {
   getItemById,
   getItems,
   addItem,
   editItem,
-  deleteItemById
+  deleteItemById,
 } from "../libs/fetchUtils.js"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate.js"
@@ -28,8 +28,10 @@ const status = ref({
 
 onMounted(async () => {
   const items = await getItems(import.meta.env.VITE_BASE_URL_STATUS)
+  const itemsTask = await getItems(import.meta.env.VITE_BASE_URL)
   statusList.value = items
 
+  console.log({ ...statusList.value })
   const statusId = route.params.id
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
@@ -88,7 +90,7 @@ const UpdateStatus = async () => {
 const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
-  console.log("Hello", statusList.value)
+  console.log("Hello", status.value)
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
   console.log(status.value)
@@ -99,7 +101,7 @@ const closeModalEdit = () => {
   modal.close()
 }
 // ----------------------- Edit -----------------------
-
+const oldValue = ref({})
 // ----------------------- Delete -----------------------
 
 const selectedItemIdToDelete = ref(0)
@@ -114,8 +116,10 @@ const deleteStatus = async (statusId) => {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
       )
+     
     } else {
       console.error(`Failed to delete item with ID ${statusId}`)
+
     }
   } catch (error) {
     console.error(`Error deleting item with ID ${statusId}:`, error)
@@ -141,9 +145,38 @@ const confirmDelete = () => {
   //   deleteComplete.value = false
   // }, 2300)
 }
+
+const deleteandtrans = async (statusId, newID) => {
+  try {
+    const status = await deleteItemAndTransfer(
+      import.meta.env.VITE_BASE_URL_STATUS,
+      statusId,
+      newID
+    )
+    if (status === 200) {
+      statusList.value = statusList.value.filter(
+        (status) => status.id !== statusId
+      )
+    } else {
+      console.error(`Failed to delete item with ID ${statusId}`)
+    }
+  } catch (error) {
+    console.error(`Error deleting item with ID ${statusId}:`, error)
+  }
+}
+
+
+
+
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+const checkEqual = computed(() => {
+  console.log(JSON.stringify(status.value))
+  console.log(JSON.stringify(oldValue.value))
+  return JSON.stringify(status.value) === JSON.stringify(oldValue.value)
+})
 </script>
 
 <template>
@@ -223,7 +256,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                   type="submit"
                   class="itbkk-button-confirm btn mr-2"
                   style="flex: 3; margin: 10px; background-color: #f785b1"
-                  :disabled="status.name.length === 0 || status.name === null"
+                  :disabled="status.name?.length === 0 || status.name === null"
                 >
                   Save
                 </button>
@@ -428,7 +461,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                               >Created On</span
                             >
-                            <label>{{ toDate(status.updatedOn) }}</label>
+                            <label>{{ toDate(status.createdOn) }}</label>
                           </div>
                           <div>
                             <span
@@ -447,6 +480,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                             @click="UpdateStatus"
                             type="submit"
                             class="itbkk-button-confirm btn mr-2"
+                            :disabled="
+                              status.name?.length === 0 ||
+                              status.name === null ||
+                              checkEqual === true
+                            "
                           >
                             Save
                           </button>
