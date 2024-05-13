@@ -145,6 +145,7 @@ const closeModal = () => {
 const confirmDelete = () => {
   deleteStatus(selectedItemIdToDelete.value)
   closeModal()
+
   // deleteComplete.value = true
   // setTimeout(() => {
   //   deleteComplete.value = false
@@ -206,9 +207,10 @@ const checkEqual = computed(() => {
         IT-Bangmod Kradan Kanban
       </h1>
       <!-- Add new status -->
-      <button class="btn" onclick="my_modal_4.showModal()">Add status</button>
-
-      <dialog id="my_modal_4" class="modal">
+      <div class="itbkk-button-add">
+        <button class="btn" onclick="my_modal_4.showModal()">Add status</button>
+      </div>
+      <dialog id="my_modal_4" class="itbkk-modal-status modal">
         <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
           <span
             class="block text-2xl font-bold leading-6 text-gray-900 mb-1"
@@ -223,7 +225,7 @@ const checkEqual = computed(() => {
               class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
             >
               <label
-                class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
+                class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
               >
                 <input
                   type="text"
@@ -234,7 +236,7 @@ const checkEqual = computed(() => {
                 />
               </label>
               <!-- Description -->
-              <label for="description" class="form-control flex-grow ml-4 mb-8">
+              <label for="description" class="itbkk-status-description form-control flex-grow ml-4 mb-8">
                 <div class="label">
                   <span
                     class="block text-lg font-bold leading-6 text-gray-900 mb-1"
@@ -246,9 +248,9 @@ const checkEqual = computed(() => {
                   class="itbkk-description textarea textarea-bordered flex-grow w-full"
                   maxlength="500"
                   rows="4"
-                  placeholder="No Description Provided"
                   v-model="status.description"
-                ></textarea>
+                  >{{ status.description }}</textarea
+                >
               </label>
             </div>
             <!-- Buttons -->
@@ -321,7 +323,7 @@ const checkEqual = computed(() => {
           </ul>
         </div>
         <table
-          class="table-auto mt-10 rounded-xl overflow-hidden"
+          class="table-auto mt-10 rounded-xl "
           style="table-layout: fixed"
         >
           <!-- table -->
@@ -383,18 +385,29 @@ const checkEqual = computed(() => {
               </td>
               <!-- NAME -->
               <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-title"
+                class="itbkk-status-name px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                <label for="my_modal_6" @click="selectStatus(item.id)">
+                <label  class="itbkk-status-name" for="my_modal_6" @click="selectStatus(item.id)">
                   {{ checkStatus(item.name) }}
                 </label>
               </td>
 
               <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-assignees"
+                class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700" :class="{
+                  italic: !item.description || item.description?.length === 0,
+                }"
               >
-                <label for="my_modal_6">
-                  {{ item.description }}
+                <label
+                  for="my_modal_6"
+                  :class="{
+                  italic: !item.description || item.description?.length === 0,
+                }"
+                >
+                {{
+                  !item.description || item.description.length === 0
+                    ? 'No description is provided'
+                    : item.description
+                }}
                 </label>
               </td>
 
@@ -403,11 +416,11 @@ const checkEqual = computed(() => {
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
               >
                 <button
-                  class="btn"
+                  class="itbkk-button-edit btn"
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'NO_STATUS'"
                 >
-                  edit
+                  Edit
                 </button>
 
                 <dialog id="my_modal_edit" class="modal">
@@ -452,7 +465,10 @@ const checkEqual = computed(() => {
                             rows="4"
                             placeholder="No Description Provided"
                             v-model="status.description"
-                          ></textarea>
+                          >
+                            No description is provided
+                          </textarea
+                          >
                         </label>
                         <div style="display: flex; flex-direction: row">
                           <div style="margin-right: 30px">
@@ -515,7 +531,7 @@ const checkEqual = computed(() => {
                 >
                   Delete
                 </button>
-                <dialog id="" class="modal">
+                <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
                     <h3 class="itbkk-message font-bold text-lg">
                       Delete a Task
@@ -545,7 +561,7 @@ const checkEqual = computed(() => {
                 <!-- my_modal_deleteAndTrans -->
                 <!-- Delete And Trans -->
 
-                <dialog id="my_modal_delete" class="modal">
+                <dialog id="" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
                     <h3 class="itbkk-message font-bold text-lg">
                       Transfer a Status
@@ -563,7 +579,8 @@ const checkEqual = computed(() => {
                         class="select select-bordered w-full max-w-xs mt-1"
                       >
                         <option
-                        v-for="status in statusList" :value="status.name"
+                          v-for="status in statusList"
+                          :value="status.name"
                         >
                           {{ checkStatus(status.name) }}
                         </option>
@@ -602,4 +619,29 @@ const checkEqual = computed(() => {
     </div>
   </div>
 </template>
-<style scoped></style>
+<style>
+  /* เพิ่ม media query เพื่อปรับขนาดของตารางเมื่อจอมีขนาดเล็กกว่า 576px */
+  @media (max-width: 576px) {
+    .table-auto {
+      width: 100%;
+      overflow-x: auto; /* เพิ่ม overflow-x: auto; เพื่อให้เกิดการเลื่อนตารางแนวนอน */
+    }
+    .table-auto thead,
+    .table-auto tbody {
+      display: block;
+    }
+  
+    .table-auto thead th {
+      display: none;
+    }
+    .table-auto tbody td {
+      border-bottom: 1px solid #ccc;
+      display: block;
+      text-align: center;
+    }
+  }
+  /* ใช้ word-break เพื่อให้ข้อความยาว ๆ ขึ้นบรรทัดใหม่ */
+  .itbkk-status-description label {
+    word-break: break-word;
+  }
+</style>

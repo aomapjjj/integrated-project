@@ -45,7 +45,7 @@ const submitForm = async () => {
 }
 const closeModal = () => {
   my_modal_1.close()
-  router.go()
+ 
 }
 
 // const clearForm = () => {
@@ -67,7 +67,7 @@ const closeModal = () => {
       Add new task
     </button>
 
-  <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
+  <div class="itbkk-modal-task modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
     <dialog id="my_modal_1" class="modal">
       <div
         class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
@@ -111,7 +111,7 @@ const closeModal = () => {
               <form method="dialog" style="display: flex; justify-content: flex-end;">
                 <button type="submit" class="itbkk-button-confirm btn disabled:{{ todo.title.length === 0 || todo.title === null }}" 
                   style="background-color: #f785b1;"
-                  :disabled="todo.title.length === 0 || todo.title === null">
+                  :class="{ 'disabled': todo.title.length === 0 || !todo.title }">
                   Save
                 </button>
               </form>
