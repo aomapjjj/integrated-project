@@ -22,7 +22,7 @@ const todo = ref({
   title: "",
   description: "",
   assignees: "",
-  status: ""
+  status: "NO_STATUS"
 })
 
 onMounted(async () => {
@@ -205,8 +205,8 @@ const openNewStatus = () => {
         <AddTask :todo="todo" />
 
         <table
-          class="table-auto mt-10 rounded-xl overflow-hidden"
-          style="table-layout: fixed"
+          class="table-auto mt-10 rounded-xl"
+          style="table-layout: fixed;"
         >
           <!-- table -->
           <thead>
@@ -444,4 +444,5 @@ tr:nth-child(odd) {
 thead th {
   height: 3rem; /* Adjust the height as needed */
 }
+
 </style>

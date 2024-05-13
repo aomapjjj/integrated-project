@@ -100,7 +100,6 @@ const closeModal = () => {
             <div class="itbkk-status mb-4 mt-2">
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-                <option value="NO_STATUS">No Status</option>
                 <option v-for="status in statusList" :value="status.name">
                   {{ checkStatus(status.name) }}
                 </option>
@@ -149,4 +148,6 @@ const closeModal = () => {
   color: white;
 }
 
+
 </style>
+
