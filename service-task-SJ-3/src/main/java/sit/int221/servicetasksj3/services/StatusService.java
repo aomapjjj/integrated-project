@@ -45,9 +45,6 @@ public class StatusService {
         if (statusDTO.getName().trim().length() > 50) {
             throw new RuntimeException("Status name cannot exceed 50 characters");
         }
-//        if (statusDTO.getDescription().trim().isEmpty()) { // NOT EMPTY
-//            throw new RuntimeException("Status description is not empty");
-//        }
         if (statusDTO.getDescription().trim().length() > 200) {
             throw new RuntimeException("Status description cannot exceed 200 characters");
         }
@@ -103,7 +100,7 @@ public class StatusService {
         TaskStatus status = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
         if ("NO_STATUS".equals(status.getName())) {
-            throw new RuntimeException("Cannot delete 'No Status'.");
+            throw new RuntimeException("Cannot delete 'No Status'");
         }
         try {
             repository.delete(status);
