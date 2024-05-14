@@ -73,7 +73,7 @@ onMounted(async () => {
 const submitForm = async () => {
   const statusName = status.value.name.trim()
   const statusDescription = status.value.description.trim()
-  await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
+  await addItem(baseUrlStatus, {
     name: statusName,
     description: statusDescription
   })
@@ -105,7 +105,7 @@ const UpdateStatus = async () => {
   const statusDescription = status.value.description
   const statusId = status.value.id
 
-  const edit = await editItem(import.meta.env.VITE_BASE_URL_STATUS, statusId, {
+  const edit = await editItem(baseUrlStatus, statusId, {
     name: statusName,
     description: statusDescription
   })

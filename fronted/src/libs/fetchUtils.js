@@ -1,4 +1,4 @@
-URL = import.meta.env.VITE_BASE_URL
+let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
 
 async function getItems(url) {
   try {
@@ -13,7 +13,7 @@ async function getItems(url) {
 async function getItemById(id) {
   try {
     console.log("id : ", id)
-    const data = await fetch(`${URL}/${id}`)
+    const data = await fetch(`${baseUrlTask}/${id}`)
     //const item = await data.json()
     return data
   } catch (error) {
