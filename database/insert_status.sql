@@ -7,9 +7,9 @@
 -- (4, 'DONE', NULL);
 
 INSERT INTO kanbanIT.statustasks (statusid, statusname, statusdescription) VALUES
-(1, 'No Status', NULL),
+(1, 'No Status', 'The default status'),
 (2, 'To Do', NULL),
-(3, 'Doing', NULL),
-(4, 'Done', NULL);
+(3, 'Doing', 'Being worked on'),
+(4, 'Done', 'Finished');
 
 COMMIT;
