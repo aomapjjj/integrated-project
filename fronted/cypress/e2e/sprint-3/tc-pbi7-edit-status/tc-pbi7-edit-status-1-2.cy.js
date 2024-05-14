@@ -46,7 +46,7 @@ describe(`TC-PBI7-EDIT-STATUS-1-2\n
         cy.get('@modal').find('.itbkk-status-description','')
         cy.get('@modal').find('.itbkk-button-confirm').as('save')
 
-        cy.get('@save').should('be.disabled')
+        cy.get('@save').should('have.attr', 'disabled')
 
         cy.wait(100)
         cy.get('@modal').find('.itbkk-status-name').clear().type('To Do New')
