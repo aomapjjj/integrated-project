@@ -19,8 +19,8 @@ const statusList = ref([])
 let items = [] // ประกาศ items เป็นตัวแปร global
 let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const todo = ref({
   title: "",
@@ -376,7 +376,7 @@ const openNewStatus = () => {
             </tr>
 
             <!-- DELETE COMPLETE -->
-            <tr v-if="todoList.length === 0">
+            <tr v-if="todoList?.length === 0">
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No task
               </td>
