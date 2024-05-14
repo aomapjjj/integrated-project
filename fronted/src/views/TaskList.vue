@@ -178,25 +178,11 @@ const openNewStatus = () => {
   </header>
   <!-- header -->
 
-  <div class="flex justify-end mt-9 mr-9">
-    <!-- FILTERS -->
-    <button class="btn bg-gray-900" style="color: white; margin-right: 10px">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-      >
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-width="2"
-          d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4"
-        />
-      </svg>
-      Filter
-    </button>
+  <div class="flex justify-between mt-9 mx-20">
+    <div class="">
+      <!-- ADD BUTTON -->
+      <AddTask :todo="todo" />
+    </div>
     <!-- MANAGE STATUS -->
     <button
       class="itbkk-manage-status btn bg-gray-200"
@@ -226,14 +212,13 @@ const openNewStatus = () => {
     </button>
   </div>
 
-  <div class="flex flex-col items-center mt-5">
-    <div class="overflow-x-auto">
+  <div class="flex flex-col items-center mt-9">
+    <div class="overflow-x-auto max-h-96 w-min-full">
       <div class="min-w-full">
-        <!-- ADD BUTTON -->
-
-        <AddTask :todo="todo" />
-
-        <table class="table-auto mt-10 rounded-xl" style="table-layout: fixed">
+        <table
+          class="table-auto"
+          style="table-layout: fixed;"
+        >
           <!-- table -->
           <thead>
             <tr class="bg-base-200 mt-4 md:mt-0">
@@ -409,45 +394,27 @@ const openNewStatus = () => {
               </td>
 
               <div class="itbkk-button-action">
-                <td style="display: flex; justify-content: center">
-                  <div
-                    class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2"
-                  >
-                    <div class="dropdown dropdown-top dropdown-end">
-                      <div tabindex="0">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="28"
-                          height="28"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-width="3"
-                            d="M12 6h.01M12 12h.01M12 18h.01"
-                          />
-                        </svg>
-                      </div>
-                      <ul
-                        tabindex="0"
-                        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                      >
-                        <!-- EDIT -->
-                        <li>
-                          <a><EditTask :todo-id="item.id" /></a>
-                        </li>
-                        <!-- Delete -->
-                        <li>
-                          <a
-                            style="width: 150px; margin-left: 17px"
-                            class="itbkk-button-delete btn"
-                            @click="openModalToDelete(item.id)"
-                            >Delete</a
-                          >
-                        </li>
-                      </ul>
+                <td style="display: flex; justify-content: center;">
+                <div class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2">
+                  <div v-if="index !== 0 && index !== 1"class="dropdown dropdown-top dropdown-end">
+                    <div tabindex="0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                      </svg>
+                    </div>
+                    <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <!-- EDIT -->
+                      <li><a><EditTask :todo-id="item.id" /></a></li>
+                    <!-- Delete -->
+                      <li><a style="width: 150px; margin-left: 17px;" class="itbkk-button-delete btn" @click="openModalToDelete(item.id)">Delete</a></li>
+                    </ul>
+                  </div>
+
+                  <div  v-if="index === 0 || index === 1"  class="dropdown  dropdown-end">
+                    <div tabindex="0">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                      </svg>
                     </div>
 
                     <dialog id="my_modal_delete" class="modal">
@@ -538,10 +505,31 @@ const openNewStatus = () => {
       </div>
     </div>
   </div>
+
+<footer class="footer footer-center p-5 text-primary-content" style="background-color: #f785b1; margin-top: 37px;">
+  <aside class="flex items-center space-x-20">
+    <img src="/src/image/sit.png" alt="SIT logo" style="width: 180px; margin-right: 100px;">    
+    <p class="font-bold mb-2 text-gray-900">
+      IT-Bangmod Kradan Kanban was created by 2nd year undergraduate students
+      <br>( INT221 Integrated Information Technology Project I )
+    </p> 
+    <p class="text-white">Thank you for choosing Kradan Kanban!</p>
+  </aside> 
+</footer>
+
+
 </template>
 <style scoped>
+#tasktable {
+  width: 100%;
+  overflow: scroll;
+}
+
 table {
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px; 
+  overflow: hidden;
 }
 
 tr:nth-child(even) {
@@ -552,8 +540,7 @@ tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
-/* Set equal height for cells in thead */
 thead th {
-  height: 3rem; /* Adjust the height as needed */
+  height: 3rem;
 }
 </style>
