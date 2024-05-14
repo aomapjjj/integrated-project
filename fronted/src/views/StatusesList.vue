@@ -21,28 +21,6 @@ const myModal = ref(null)
 
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
-// const props = defineProps({
-//   statusId: Number
-// })
-
-// const oldValue = ref({})
-
-// watch(
-//   () => props.statusId,
-//   async (newValue) => {
-//     const response = await getItemById(newValue)
-//     if (response.status === 200) {
-//       statusList.value = await response.json()
-//       oldValue.value = { ...statusList.value }
-//     }
-
-//     const itemsStatus = await getItems(baseUrlStatus)
-//     statusList.value = itemsStatus
-//     console.log("itemStatuss", itemsStatus)
-//   },
-//   { immediate: true }
-// )
-
 // ------------------------------
 
 const status = ref({
@@ -99,6 +77,7 @@ const selectStatus = (statusId) => {
 }
 
 // ----------------------- Edit -----------------------
+const originalStatus = ref({})
 
 const UpdateStatus = async () => {
   const statusName = status.value.name
@@ -117,15 +96,24 @@ const UpdateStatus = async () => {
 const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
+  originalStatus.value = { ...statusToEdit }
+  console.log(status.value)
+  console.log(originalStatus.value)
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
-  console.log(status.value)
 }
 
 const closeModalEdit = () => {
   const modal = document.getElementById("my_modal_edit")
   modal.close()
 }
+
+const isEdited = computed(() => {
+  return (
+    (status.value.name !== originalStatus.value.name || status.value.description !== originalStatus.value.description) &&
+    (status.value.name.trim().length > 0 || status.value.description.trim().length > 0)
+  );
+});
 // ----------------------- Edit -----------------------
 
 // ----------------------- Delete -----------------------
@@ -184,10 +172,6 @@ const confirmDelete = () => {
   closeModal()
 
   console.log(selectedItemIdToDelete.value);
-  // deleteComplete.value = true
-  // setTimeout(() => {
-  //   deleteComplete.value = false
-  // }, 2300)
 }
 
 const openModalToDeleteTrans = (statusId) => {
@@ -205,10 +189,6 @@ const confirmDeleteTrans = (statusId) => {
   deleteandtrans(selectedItemIdToDelete.value, statusId)
   closeModalTrans()
   console.log(selectedItemIdToDelete.value);
-  // deleteComplete.value = true
-  // setTimeout(() => {
-  //   deleteComplete.value = false
-  // }, 2300)
 }
 
 const deleteandtrans = async (statusId, newID) => {
@@ -233,14 +213,6 @@ const deleteandtrans = async (statusId, newID) => {
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-// const checkEqual = computed(() => {
-//   console.log(JSON.stringify(status.value))
-//   console.log(JSON.stringify(oldValue.value))
-//   return JSON.stringify(status.value) === JSON.stringify(oldValue.value)
-// })
-
-
 
 </script>
 
@@ -475,10 +447,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                       <!-- Buttons -->
                       <div class="flex justify-end">
                         <form method="dialog">
-                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2" :disabled="status.name?.length === 0 ||
-                  status.name === null ||
-                  checkEqual === true
-                  ">
+                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2" :disabled="!isEdited">
                             Save
                           </button>
                         </form>
