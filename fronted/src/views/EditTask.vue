@@ -8,8 +8,8 @@ import router from "@/router"
 
 const statusList = ref([])
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const props = defineProps({
   todoId: Number
