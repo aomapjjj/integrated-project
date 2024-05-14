@@ -44,7 +44,7 @@ describe(`TC-PBI3-ADD-TASK-BASIC-2\n
 
     cy.wait(200)
     cy.get('.itbkk-title').contains("DevSecOps")
-    cy.get('.itbkk-description').contains('No Description Provided').as('description')
+    cy.get('.itbkk-description').contains('No Description Provided').as('description').click({force: true})
     cy.get('@description').should('have.css','font-style','italic') 
     cy.get('.itbkk-assignees').contains('Unassigned').as('assignees')
     cy.get('@assignees').should('have.css','font-style','italic') 
