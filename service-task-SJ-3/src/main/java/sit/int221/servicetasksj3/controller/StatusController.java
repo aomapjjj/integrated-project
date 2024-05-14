@@ -14,7 +14,7 @@ import sit.int221.servicetasksj3.services.StatusService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v2/statuses")
+@RequestMapping("/statuses")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
 
 public class StatusController {
