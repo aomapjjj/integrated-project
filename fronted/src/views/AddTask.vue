@@ -9,8 +9,8 @@ const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
 const statusList = ref([])
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/v1/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const props = defineProps({
   todo: Object
@@ -38,7 +38,7 @@ const submitForm = async () => {
     status: props.todo.status
   });
 
-  // clearForm()
+  clearForm()
   showAlertAdd.value = true
   showAlertAfterClose.value = true
   setTimeout(() => {
@@ -51,12 +51,12 @@ const closeModal = () => {
  
 }
 
-// const clearForm = () => {
-//   props.todo.value.title = ""
-//   props.todo.value.description = ""
-//   props.todo.value.assignees = ""
-//   props.todo.value.status = "NO_STATUS"
-// }
+const clearForm = () => {
+  props.todo.value.title = ""
+  props.todo.value.description = ""
+  props.todo.value.assignees = ""
+  props.todo.value.status = "NO_STATUS"
+}
 
 </script>
 

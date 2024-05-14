@@ -19,7 +19,7 @@ const selectedStatusId = ref(0)
 const notFound = ref(false)
 const myModal = ref(null)
 
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 // const props = defineProps({
 //   statusId: Number
