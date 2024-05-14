@@ -311,11 +311,11 @@ const openNewStatus = () => {
                   :class="{
                     'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
                     'border-blue-500 text-blue-500':
-                      item.status === 'NO_STATUS',
-                    'border-red-500 text-red-500': item.status === 'TO_DO',
+                      item.status === 'No status',
+                    'border-red-500 text-red-500': item.status === 'To do',
                     'border-yellow-500 text-yellow-500':
-                      item.status === 'DOING',
-                    'border-green-500 text-green-500': item.status === 'DONE',
+                      item.status === 'Doing',
+                    'border-green-500 text-green-500': item.status === 'Done',
                   }"
                 >
                   {{ checkStatus(item.status) }}

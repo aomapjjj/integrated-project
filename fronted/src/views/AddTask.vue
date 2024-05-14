@@ -78,7 +78,10 @@ const closeModal = () => {
           style="padding-top: 20px; padding-bottom: 20px; align-items: center">
           <!-- Title -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
+            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                  style="color:#9391e4; margin: 15px;">Title<span style="color: red;"> *</span> </span>
             <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
+              
               <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="todo.title" />
             </label>
             <!-- Description -->
@@ -114,7 +117,8 @@ const closeModal = () => {
               <form method="dialog" style="display: flex; justify-content: flex-end;">
                 <button type="submit" class="itbkk-button-confirm btn disabled:{{ todo.title.length === 0 || todo.title === null }}" 
                   style="background-color: #f785b1;"
-                  :class="{ 'disabled': todo.title.length === 0 || !todo.title }">
+                  :class="{ 'disabled': todo.title.length === 0 || !todo.title }"
+                  :disabled="todo.title?.length === 0 || todo.title === null">
                   Save
                 </button>
               </form>
