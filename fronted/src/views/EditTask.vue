@@ -38,7 +38,7 @@ watch(
 
     const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
-    console.log("itemStatuss", itemsStatus)
+    
   },
   { immediate: true }
 )
@@ -69,8 +69,7 @@ const UpdateTask = async () => {
     assignees: trimmedAssignees,
     status: todo.value.status
   })
-  console.log(edit)
-  console.log(statusList.value)
+ 
 }
 
 const checkEqual = computed(() => {
@@ -80,17 +79,12 @@ const checkEqual = computed(() => {
 
 <template>
   <!-- BUTTON -->
-
   <label @click="openModal" class="itbkk-button-edit btn" style="width: 150px">
     Edit
   </label>
-
   <!-- Modal window -->
-
-  <dialog ref="myModal" class="itbkk-modal-task w-full h-full" >
-    <div
-      class="modal-container bg-white w-full h-full top-0 left-0 flex items-center justify-center"
-    >
+  <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex" >
+    <div class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
       <div class="modal-content py-4 text-left px-6 flex-grow">
         <!-- Title -->
         <label
@@ -131,7 +125,7 @@ const checkEqual = computed(() => {
         </label>
       </div>
       <div
-        class="modal-content py-4 text-left px-10 flex-grow w-2/3 max-w-2xl"
+        class="modal-content py-4 text-left px-10"
         style="margin-top: 65px"
       >
         <!-- Assignees -->
@@ -143,7 +137,7 @@ const checkEqual = computed(() => {
           >
           <textarea
             id="assignees"
-            class="itbkk-assignees textarea textarea-bordered w-full mt-1"
+            class="itbkk-assignees textarea textarea-bordered  w-full mt-1"
             maxlength="30"
             rows="4"
             v-model="todo.assignees"
@@ -167,7 +161,7 @@ const checkEqual = computed(() => {
             v-model="todo.status"
           >
             <option v-for="status in statusList" :value="status.name">
-              {{ checkStatus(status.name) }}
+              {{ status.name }}
             </option>
           </select>
         </div>
@@ -203,13 +197,14 @@ const checkEqual = computed(() => {
             <h1>{{ toDate(todo.updatedOn) }}</h1>
           </div>
         </div>
-        <!-- Close Button -->
-        <div
-          class="modal-action"
-          style="display: flex; justify-content: space-around"
-        >
-          <form method="dialog" style="flex: 1">
-            <button
+        
+        <!-- Save & Close Button -->
+        <div class="modal-action flex justify-between">
+              <form
+                method="dialog"
+                style="display: flex; justify-content: flex-end"
+              >
+                <button
               @click="UpdateTask"
               type="submit"
               class="btn"
@@ -223,7 +218,7 @@ const checkEqual = computed(() => {
               Save
             </button>
           </form>
-          <button class="btn" style="flex: 1; margin: 10px" @click="closeModal">
+          <button class="btn" style="flex: 1;" @click="closeModal">
             Close
           </button>
         </div>
