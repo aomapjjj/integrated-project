@@ -19,7 +19,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return createErrorResponse(exception.getMessage(), HttpStatus.NOT_FOUND, request);
     }
     // 500 - Other Exceptions
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(InternalServerErrorException.class)
     public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception, WebRequest request) {
         return createErrorResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }

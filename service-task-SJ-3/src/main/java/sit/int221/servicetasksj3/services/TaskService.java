@@ -9,6 +9,7 @@ import sit.int221.servicetasksj3.dtos.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 import java.util.List;
@@ -39,20 +40,21 @@ public class TaskService {
         TaskStatus status = statusRepository.findByName(task.getStatus());
         task1.setStatusTasks(status);
 
-        if (task.getTitle() == null || task.getTitle().isEmpty()) {
-            throw new RuntimeException("NOT FOUND");
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            throw new InternalServerErrorException("NOT FOUND");
         }
-        if (task.getTitle().length() > 100) {
-            throw new RuntimeException("Title cannot exceed 100 characters");
+        if (task.getTitle().trim().length() > 100) {
+            throw new InternalServerErrorException("Title cannot exceed 100 characters");
         }
-        if (task.getDescription() != null && task.getDescription().length() > 500) {
-            throw new RuntimeException("Description cannot exceed 500 characters");
+        if (task.getDescription() != null && task.getDescription().trim().length() > 500) {
+            throw new InternalServerErrorException("Description cannot exceed 500 characters");
         }
-        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
-            throw new RuntimeException("Assignees cannot exceed 30 characters");
+        if (task.getAssignees() != null && task.getAssignees().trim().length() > 30) {
+            throw new InternalServerErrorException("Assignees cannot exceed 30 characters");
         }
         try {
-            return repository.save(task1);
+            Task savedTask = repository.save(task1);
+            return savedTask;
         } catch (Exception exception) {
             throw new ItemNotFoundException("Failed to save task");
         }

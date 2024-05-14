@@ -48,6 +48,14 @@ public class TaskStatus {
         }
         this.description = description;
     }
+
+
+//    public void setDescription(String description) {
+//        if (description != null) {
+//            description = description.trim();
+//        }
+//        this.description = description;
+//    }
 }
 
 

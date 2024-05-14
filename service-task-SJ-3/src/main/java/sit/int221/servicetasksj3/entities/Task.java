@@ -36,24 +36,27 @@ public class Task {
     private ZonedDateTime updatedOn;
 
     public void setTitle(String title) {
-        if (title != null) {
-            title = title.trim();
+        if (title == null || title.isEmpty()) {
+            this.title = null;
+        } else {
+            this.title = title.trim();
         }
-        this.title = title;
     }
 
     public void setDescription(String description) {
-        if (description != null) {
-            description = description.trim();
+        if (description == null || description.isEmpty()) {
+            this.description = null;
+        } else {
+            this.description = description.trim();
         }
-        this.description = description;
     }
 
     public void setAssignees(String assignees) {
-        if (assignees != null) {
-            assignees = assignees.trim();
+        if (assignees == null || assignees.isEmpty()) {
+            this.assignees = null;
+        } else {
+            this.assignees = assignees.trim();
         }
-        this.assignees = assignees;
     }
 
     public void setStatusTasks(TaskStatus statusTasks) {
