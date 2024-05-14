@@ -38,7 +38,7 @@ const submitForm = async () => {
     status: props.todo.status
   });
 
-  // clearForm()
+  clearForm()
   showAlertAdd.value = true
   showAlertAfterClose.value = true
   setTimeout(() => {
@@ -51,12 +51,12 @@ const closeModal = () => {
  
 }
 
-// const clearForm = () => {
-//   props.todo.value.title = ""
-//   props.todo.value.description = ""
-//   props.todo.value.assignees = ""
-//   props.todo.value.status = "NO_STATUS"
-// }
+const clearForm = () => {
+  props.todo.value.title = ""
+  props.todo.value.description = ""
+  props.todo.value.assignees = ""
+  props.todo.value.status = "NO_STATUS"
+}
 
 </script>
 

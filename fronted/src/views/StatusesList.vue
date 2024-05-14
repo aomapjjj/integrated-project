@@ -118,14 +118,12 @@ const isEdited = computed(() => {
 
 // ----------------------- Delete -----------------------
 
-const filterAndLogNameById = (id) => {
-  const item = statusList.find(item => item.id === id);
+const getNameById = (id) => {
+  const item = statusList.value.find(item => item.id === id);
   if (item) {
-    console.log(item.name);
     return item.name;
   } else {
-    console.log(`No item found with id ${id}`);
-    return ""; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
+    return null; // หรือให้คืนค่าที่เหมาะสมในกรณีที่ไม่พบ ID
   }
 }
 
@@ -261,7 +259,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full"
                   maxlength="500" rows="4" placeholder="No Description Provided"
                   v-model="status.description"></textarea>
-
               </label>
             </div>
             <!-- Buttons -->
@@ -405,10 +402,10 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                     <!-- Modal content -->
                     <div class="modal-action flex flex-col justify-between">
                       <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
-                        <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-                          <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
-                            v-model="status.name" />
-                        </label>
+                        <label class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
+                <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name" />
+
+              </label>
                         <!-- Description -->
                         <label for="description" class="form-control flex-grow ml-4 mb-8">
                           <div class="label">
@@ -470,7 +467,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                       Delete a Task
                     </h3>
                     <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
-                      Do you want to delete {{ selectedItemIdToDelete }}
+                      Do you want to delete {{ getNameById(selectedItemIdToDelete) }}
                     </p>
                     <div class="modal-action">
                       <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
