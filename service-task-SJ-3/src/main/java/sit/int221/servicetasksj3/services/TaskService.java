@@ -37,7 +37,13 @@ public class TaskService {
     @Transactional
     public Task createNewTasks(TaskNewDTO task){
         Task task1 = modelMapper.map(task, Task.class);
-        TaskStatus status = statusRepository.findByName(task.getStatus());
+        TaskStatus status;
+        try {
+             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow();
+
+        } catch (Exception exception) {
+             status = statusRepository.findByName(task.getStatus());
+        }
         task1.setStatusTasks(status);
 
         if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
