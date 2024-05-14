@@ -39,7 +39,8 @@ public class TaskService {
         Task task1 = modelMapper.map(task, Task.class);
         TaskStatus status;
         try {
-             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow();
+             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
+                     () -> new InternalServerErrorException("Invalid status ID"));
 
         } catch (Exception exception) {
              status = statusRepository.findByName(task.getStatus());
