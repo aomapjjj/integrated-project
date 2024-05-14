@@ -85,12 +85,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <!-- Status -->
           <div class="itbkk-status mb-4 mt-2">
             <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
-            <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-              <option disabled value="NO_STATUS">No Status</option>
-              <option disabled v-for="status in ['TO_DO', 'DOING', 'DONE']" :value="status">
-                {{ checkStatus(status) }}
-              </option>
-            </select>
+            {{ todo.status }}
           </div>
 
           <!-- TimeZone -->
