@@ -8,12 +8,11 @@ import sit.int221.servicetasksj3.dtos.StatusDTO;
 import sit.int221.servicetasksj3.dtos.StatusDTOTwo;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StatusService {
@@ -38,50 +37,57 @@ public class StatusService {
 
     // ADD
     @Transactional
-    public List<StatusDTO> createNewStatuses(StatusDTO statusDTO) {
-        if (statusDTO.getName() == null || statusDTO.getName().trim().isEmpty()) {
-            throw new RuntimeException("Status name is required");
+    public StatusDTO createNewStatuses(StatusDTO statusDTO) {
+        // Trim leading and trailing whitespace
+        statusDTO.setName(statusDTO.getName().trim());
+        statusDTO.setDescription(statusDTO.getDescription() != null ? statusDTO.getDescription().trim() : null);
+
+        if (statusDTO.getName() == null || statusDTO.getName().isEmpty()) {
+            throw new InternalServerErrorException("Status name is required");
         }
-        if (statusDTO.getName().trim().length() > 50) {
-            throw new RuntimeException("Status name cannot exceed 50 characters");
+        if (statusDTO.getName().length() > 50) {
+            throw new InternalServerErrorException("Status name cannot exceed 50 characters");
         }
-        if (statusDTO.getDescription().trim().length() > 200) {
-            throw new RuntimeException("Status description cannot exceed 200 characters");
+        if (statusDTO.getDescription() != null && statusDTO.getDescription().length() > 200) {
+            throw new InternalServerErrorException("Status description cannot exceed 200 characters");
         }
-        // ตรวจสอบว่าสถานะที่กำลังสร้างนั้นมีชื่อซ้ำกับสถานะที่มีอยู่แล้วหรือไม่
-        TaskStatus existingStatuses = repository.findByName(statusDTO.getName().trim());
-        if (existingStatuses != null) {
-            throw new RuntimeException("Status with name '" + statusDTO.getName().trim() + "' already exists");
+        // Check if status with the same name already exists
+        TaskStatus existingStatus = repository.findByName(statusDTO.getName());
+        if (existingStatus != null) {
+            throw new InternalServerErrorException("Status with name '" + statusDTO.getName() + "' already exists");
         }
         try {
-            // Create TaskStatus entity
-            TaskStatus status = new TaskStatus();
-                status.setName(statusDTO.getName().trim());
-                status.setDescription(statusDTO.getDescription().trim());
-            // Save TaskStatus entity
-            TaskStatus savedStatus = repository.save(status);
-            // Map the saved TaskStatus entity to StatusDTO
-            return Collections.singletonList(modelMapper.map(savedStatus, StatusDTO.class));
+            TaskStatus savedStatus = repository.save(modelMapper.map(statusDTO, TaskStatus.class));
+            return modelMapper.map(savedStatus, StatusDTO.class);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save task status to the database", e);
+            throw new InternalServerErrorException("Failed to save task status to the database");
         }
     }
 
+
     // EDIT
     @Transactional
-    public TaskStatus updateStatuses(Integer id , TaskStatus task) {
+    public TaskStatus updateStatuses(Integer id, TaskStatus task) {
         TaskStatus existingTask = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
-
+        // Check if the status ID is for "No Status"
+        if (existingTask.getId() == 1) {
+            throw new InternalServerErrorException("The status 'No Status' cannot be changed");
+        }
+        // Check if the task name is "No Status" and not changed
+        if ("No Status".equalsIgnoreCase(existingTask.getName()) && !task.getName().equalsIgnoreCase("No Status")) {
+            throw new InternalServerErrorException("The status name 'No Status' should not be changed");
+        }
         if (task.getName() == null || task.getName().trim().isEmpty()) {
-            throw new RuntimeException("Status name is required");
+            throw new InternalServerErrorException("Status name is required");
         }
         if (task.getName().trim().length() > 50) {
-            throw new RuntimeException("Status name cannot exceed 50 characters");
+            throw new InternalServerErrorException("Status name cannot exceed 50 characters");
         }
-        if (task.getDescription().trim().length() > 200) {
-            throw new RuntimeException("Status description cannot exceed 200 characters");
+        if (task.getDescription() != null && task.getDescription().trim().length() > 200) {
+            throw new InternalServerErrorException("Status description cannot exceed 200 characters");
         }
+
         try {
             Integer oldStatusId = existingTask.getId();
             if (task.getId() != null) {
@@ -90,17 +96,18 @@ public class StatusService {
             task.setId(id);
             return repository.save(task);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save task status to the database", e);
+            throw new InternalServerErrorException("Failed to save task status to the database");
         }
     }
+
 
     // DELETE
     @Transactional
     public TaskStatus removeStatuses(Integer id) {
         TaskStatus status = repository.findById(id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
-        if ("NO_STATUS".equals(status.getName())) {
-            throw new RuntimeException("Cannot delete 'No Status'");
+        if ("No Status".equals(status.getName())) {
+            throw new InternalServerErrorException("Cannot delete 'No Status'");
         }
         try {
             repository.delete(status);
@@ -114,7 +121,7 @@ public class StatusService {
     public TaskStatus transferStatuses(Integer id, Integer newId) {
         //เช็คว่า oldId และ newId ไม่เท่ากัน
         if (id.equals(newId)) {
-            throw new RuntimeException("Cannot use old Status Id as New Status Id");
+            throw new InternalServerErrorException("Cannot use old Status Id as New Status Id");
         }
         if (!repository.existsById(id)) {
             throw new ItemNotFoundException("Status not found with id " + id);
