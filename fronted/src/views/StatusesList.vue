@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed , watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -20,6 +20,30 @@ const notFound = ref(false)
 const myModal = ref(null)
 
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/v2/statuses`;
+
+// const props = defineProps({
+//   statusId: Number
+// })
+
+// const oldValue = ref({})
+
+// watch(
+//   () => props.statusId,
+//   async (newValue) => {
+//     const response = await getItemById(newValue)
+//     if (response.status === 200) {
+//       statusList.value = await response.json()
+//       oldValue.value = { ...statusList.value }
+//     }
+
+//     const itemsStatus = await getItems(baseUrlStatus)
+//     statusList.value = itemsStatus
+//     console.log("itemStatuss", itemsStatus)
+//   },
+//   { immediate: true }
+// )
+
+// ------------------------------
 
 const status = ref({
   id: "",
@@ -49,12 +73,12 @@ onMounted(async () => {
 const submitForm = async () => {
   const statusName = status.value.name.trim()
   const statusDescription = status.value.description.trim()
-  await addItem(import.meta.env.VITE_BASE_URL_STATUS, {
+  await addItem(baseUrlStatus, {
     name: statusName,
     description: statusDescription
   })
   clearForm()
-  router.go()
+
 }
 
 const clearForm = () => {
@@ -81,7 +105,7 @@ const UpdateStatus = async () => {
   const statusDescription = status.value.description
   const statusId = status.value.id
 
-  const edit = await editItem(import.meta.env.VITE_BASE_URL_STATUS, statusId, {
+  const edit = await editItem(baseUrlStatus, statusId, {
     name: statusName,
     description: statusDescription
   })
@@ -103,8 +127,19 @@ const closeModalEdit = () => {
   modal.close()
 }
 // ----------------------- Edit -----------------------
-const oldValue = ref({})
+
 // ----------------------- Delete -----------------------
+
+const filterAndLogNameById = (id) => {
+  const item = statusList.find(item => item.id === id);
+  if (item) {
+    console.log(item.name);
+    return item.name;
+  } else {
+    console.log(`No item found with id ${id}`);
+    return ""; // หรือให้คืนค่า null หรือ undefined ตามที่คุณต้องการ
+  }
+}
 
 const selectedItemIdToDelete = ref(0)
 
@@ -199,11 +234,14 @@ const deleteandtrans = async (statusId, newID) => {
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-const checkEqual = computed(() => {
-  console.log(JSON.stringify(status.value))
-  console.log(JSON.stringify(oldValue.value))
-  return JSON.stringify(status.value) === JSON.stringify(oldValue.value)
-})
+// const checkEqual = computed(() => {
+//   console.log(JSON.stringify(status.value))
+//   console.log(JSON.stringify(oldValue.value))
+//   return JSON.stringify(status.value) === JSON.stringify(oldValue.value)
+// })
+
+
+
 </script>
 
 <template>
@@ -238,7 +276,7 @@ const checkEqual = computed(() => {
             <!-- name -->
 
             <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
-              <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
+              <label class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
                 <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name" />
 
               </label>
@@ -345,11 +383,10 @@ const checkEqual = computed(() => {
               <!-- NAME -->
 
               <td
-                class="itbkk-status-name px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                class=""
               >
                 <label  class="itbkk-status-name" for="my_modal_6" @click="selectStatus(item.id)">
-
-                  {{ checkStatus(item.name) }}
+                  {{item.name}}
                 </label>
               </td>
 
@@ -460,11 +497,11 @@ const checkEqual = computed(() => {
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
-                    <h3 class="itbkk-message font-bold text-lg">
+                    <h3 class="font-bold text-lg">
                       Delete a Task
                     </h3>
-                    <p class="py-4 font-medium" style="word-wrap: break-word">
-                      Do you want to delete the task number ?
+                    <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
+                      Do you want to delete {{ selectedItemIdToDelete }}
                     </p>
                     <div class="modal-action">
                       <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
@@ -496,8 +533,7 @@ const checkEqual = computed(() => {
                       <span class="block text-lg font-bold leading-6 text-gray-900 mb-2">Transfer To</span>
                       <select v-model="status.id" class="select select-bordered w-full max-w-xs mt-1">
                         <option v-for="status in statusList" :value="status.id">
-
-                          {{ checkStatus(status.name) }}
+                          {{ status.name }}
                         </option>
                       </select>
                       <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff" @click="confirmDeleteTrans(status.id)">
