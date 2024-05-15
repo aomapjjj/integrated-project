@@ -22,6 +22,7 @@ const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const todo = ref({
+
   title: "",
   description: "",
   assignees: "",

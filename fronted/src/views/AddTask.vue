@@ -46,8 +46,9 @@ const submitForm = async () => {
   }, 2300)
 }
 const closeModal = () => {
-  my_modal_1.close()
-}
+  my_modal_1.close();
+  router.go(-1)
+};
 
 // const clearForm = () => {
 //   props.todo.value.title = ""
@@ -58,25 +59,16 @@ const closeModal = () => {
 </script>
 
 <template>
-  <!-- ADD -->
-  <button
-    onclick="my_modal_1.showModal()"
-    class="itbkk-button-add btn bg-green-400 ml-4"
-    style="position: relative"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-    >
-      <path
-        fill="currentColor"
-        d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
-      />
+<!-- ADD -->
+  <RouterLink :to=" {name: 'AddTask'}">
+  <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+      <path fill="currentColor"
+        d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
     </svg>
     Add new task
   </button>
+</RouterLink>
 
   <div
     class="itbkk-modal-task modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
@@ -168,7 +160,6 @@ const closeModal = () => {
                 >Status</span
               >
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-                <option disabled value="NO_STATUS">No status(default)</option>
                 <option v-for="status in statusList" :value="status.name">
                   {{ status.name }}
                 </option>
