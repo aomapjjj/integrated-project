@@ -260,6 +260,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                   maxlength="100"
                   v-model="status.name"
                 />
+                <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
+              {{ status.name?.length }}/100
+            </p>
               </label>
               <!-- Description -->
               <label
@@ -269,8 +272,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <div class="label">
                   <span
                     class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                    >Description</span
+                    >Description <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
+              {{ status.description?.length }}/500
+            </p> </span
                   >
+                  
                 </div>
 
                 <textarea
@@ -482,7 +488,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                             maxlength="100"
                             v-model="status.name"
                           />
+                          <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
+              {{ status.name?.length }}/100
+            </p>
                         </label>
+
                         <!-- Description -->
                         <label
                           for="description"
@@ -491,8 +501,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                           <div class="label">
                             <span
                               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                              >Description</span
+                              >Description <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
+              {{ status.description?.length }}/500
+            </p></span
                             >
+                            
                           </div>
 
                           <textarea
@@ -636,7 +649,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <!-- Delete And Trans -->
               </td>
             </tr>
-            <tr v-if="statusList.length === 0">
+            <tr v-if="statusList?.length === 0">
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No Status
               </td>
