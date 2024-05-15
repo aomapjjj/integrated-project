@@ -3,6 +3,7 @@ import TaskList from "@/views/TaskList.vue"
 import ErrorPage from "@/views/ErrorPage.vue"
 import AddTask from "@/views/AddTask.vue"
 import StatusesList from "@/views/StatusesList.vue"
+import TaskDetail from "@/views/TaskDetail.vue"
 
 
 export const routes = [
@@ -25,14 +26,14 @@ export const routes = [
     component: TaskList,
   },
   {
+    path: '/task/:id/add',
+    name: 'AddTask',
+    component: AddTask,
+  },
+  {
     path: '/task/error',
     name: 'ErrorPage',
     component: ErrorPage,
-  },
-  {
-    path: '/task',
-    name: 'AddTask',
-    component: AddTask,
   },
   {
     path: '/v2/status',
