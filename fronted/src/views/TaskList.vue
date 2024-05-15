@@ -26,7 +26,7 @@ const todo = ref({
   title: '',
   description: '',
   assignees: '',
-  status: 'NO_STATUS',
+  status: 'No Status',
 });
 
 onMounted(async () => {

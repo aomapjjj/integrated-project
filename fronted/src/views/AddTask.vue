@@ -47,7 +47,7 @@ const submitForm = async () => {
 };
 const closeModal = () => {
   my_modal_1.close();
-  
+  router.go(-1)
 };
 
 const clearForm = () => {
@@ -60,6 +60,7 @@ const clearForm = () => {
 
 <template>
   <!-- ADD -->
+  <RouterLink :to=" {name: 'AddTask'}">
   <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn bg-green-400 ml-4" style="position: relative">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
       <path fill="currentColor"
@@ -67,6 +68,7 @@ const clearForm = () => {
     </svg>
     Add new task
   </button>
+</RouterLink>
 
   <div class="itbkk-modal-task modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
     <dialog id="my_modal_1" class="modal">
@@ -104,7 +106,6 @@ const clearForm = () => {
             <div class="itbkk-status mb-4 mt-2">
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
               <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
-                <option disabled value="NO_STATUS">No status(default)</option>
                 <option v-for="status in statusList" :value="status.name">
                   {{ status.name }}
                 </option>
