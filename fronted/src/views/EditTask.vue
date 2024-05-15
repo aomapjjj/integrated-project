@@ -99,6 +99,9 @@ const checkEqual = computed(() => {
             placeholder="Enter Your Title"
             maxlength="100"
           />
+          <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.title?.length }}/100
+              </p>
         </label>
         <!-- Description -->
         <label for="description" class="form-control flex-grow ml-4 mb-8">
@@ -106,7 +109,9 @@ const checkEqual = computed(() => {
             <span
               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
               style="color: #9391e4"
-              >Description</span
+              >Description  <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.description?.length }}/500
+              </p></span
             >
           </div>
           <textarea
@@ -123,6 +128,7 @@ const checkEqual = computed(() => {
             style="height: 400px"
             >{{ todo.description }}</textarea
           >
+         
         </label>
       </div>
       <div
@@ -134,7 +140,9 @@ const checkEqual = computed(() => {
           <span
             class="block text-lg font-bold leading-6 text-gray-900 mb-2"
             style="color: #9391e4"
-            >Assignees</span
+            >Assignees <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.assignees?.length }}/30
+              </p></span
           >
           <textarea
             id="assignees"

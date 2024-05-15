@@ -36,7 +36,7 @@ export const routes = [
     component: ErrorPage,
   },
   {
-    path: '/v2/status',
+    path: '/status',
     name: 'StatusesList',
     component: StatusesList,
   },
