@@ -636,7 +636,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <!-- Delete And Trans -->
               </td>
             </tr>
-            <tr v-if="statusList.length === 0">
+            <tr v-if="statusList?.length === 0">
               <td colspan="4" class="text-center py-4 text-gray-500">
                 No Status
               </td>
