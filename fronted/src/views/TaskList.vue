@@ -518,7 +518,7 @@ const openNewStatus = () => {
                         <button
                           class="itbkk-button-cancel btn"
                           @click="closeModal"
-                          style="color: #eb4343; pointer-events: none"
+                          style="color: #eb4343;"
                         >
                           Cancel
                         </button>

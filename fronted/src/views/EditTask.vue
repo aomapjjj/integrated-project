@@ -4,9 +4,10 @@ import { ref, watch, computed } from "vue"
 import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
 import { checkStatus } from "../libs/checkStatus"
 import { toDate } from "../libs/toDate"
-import router from "@/router"
+import { useRouter } from 'vue-router';
 
 const statusList = ref([])
+const router = useRouter();
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
@@ -35,7 +36,6 @@ watch(
       todo.value = await response.json()
       oldValue.value = { ...todo.value }
     }
-
     const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
     
@@ -69,7 +69,8 @@ const UpdateTask = async () => {
     assignees: trimmedAssignees,
     status: todo.value.status
   })
- 
+  console.log(edit)
+  router.push({ name: "TaskList" })
 }
 
 const checkEqual = computed(() => {
@@ -120,7 +121,7 @@ const checkEqual = computed(() => {
             }"
             placeholder="No Description Provided"
             style="height: 400px"
-            >{{ todo.description }} {{ todoId }}</textarea
+            >{{ todo.description }}</textarea
           >
         </label>
       </div>
