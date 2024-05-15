@@ -4,8 +4,7 @@ import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
 import AddTask from '../views/AddTask.vue';
 import EditTask from '../views/EditTask.vue';
-import StatusesList from '../views/StatusesList.vue';
-import { checkStatus } from '../libs/checkStatus';
+
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();

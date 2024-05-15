@@ -8,7 +8,7 @@ import {
   deleteItemById,
   deleteItemAndTransfer
 } from "../libs/fetchUtils.js"
-import { checkStatus } from "../libs/checkStatus"
+
 import { toDate } from "../libs/toDate.js"
 import { useRoute, useRouter } from "vue-router"
 
