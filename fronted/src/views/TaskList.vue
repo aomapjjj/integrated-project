@@ -179,37 +179,55 @@ const openNewStatus = () => {
   <!-- header -->
 
   <div class="flex justify-between mt-9 mx-20">
-    <div class="">
-      <!-- ADD BUTTON -->
-      <AddTask :todo="todo" />
-    </div>
-    <!-- MANAGE STATUS -->
-    <button
-      class="itbkk-manage-status btn bg-gray-200"
-      style="color: black"
-      @click="openNewStatus()"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-      >
-        <g
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
+    <!-- SEARCH INPUT -->
+    <div class="mr-auto">
+      <label class="input input-bordered flex items-center gap-2">
+        <input type="text" class="grow" placeholder="Search" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          class="w-4 h-4 opacity-70"
         >
           <path
-            d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+            fill-rule="evenodd"
+            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+            clip-rule="evenodd"
           />
-          <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
-        </g>
-      </svg>
-      Manage Status
-    </button>
+        </svg>
+      </label>
+    </div>
+    <div class="flex space-x-4">
+      <!-- ADD BUTTON -->
+      <AddTask :todo="todo" />
+      <!-- MANAGE STATUS -->
+      <button
+        class="itbkk-manage-status btn bg-gray-200"
+        style="color: black"
+        @click="openNewStatus()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+        >
+          <g
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+          >
+            <path
+              d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+            />
+            <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
+          </g>
+        </svg>
+        Manage Status
+      </button>
+    </div>
   </div>
 
   <div class="flex flex-col items-center mt-9">
@@ -264,7 +282,7 @@ const openNewStatus = () => {
                   style="display: flex; align-items: center"
                   @click="sortByStatus(), toggleIcon()"
                 >
-                  Status
+                  <div class="mr-2">Status</div>
                   <!-- Default -->
                   <svg
                     v-if="showIcon === 'default'"
@@ -331,6 +349,8 @@ const openNewStatus = () => {
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
+                  text-align: center;
+                  vertical-align: middle;
                 "
               >
                 Action
@@ -437,58 +457,82 @@ const openNewStatus = () => {
                       </ul>
                     </div>
                   </div>
+
+                  <!-- Dropdown  -->
                   <div
                     v-if="index === 0 || index === 1"
-                    class="dropdown dropdown-end"
+                    class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8"
                   >
-                    <div tabindex="0">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="28"
-                        height="28"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-linecap="round"
-                          stroke-width="3"
-                          d="M12 6h.01M12 12h.01M12 18h.01"
-                        />
-                      </svg>
-                    </div>
-
-                    <dialog id="my_modal_delete" class="modal">
-                      <div class="modal-box" style="max-width: 1000px">
-                        <h3 class="font-bold text-lg">Delete a Task</h3>
-                        <p
-                          class="itbkk-message py-4 font-medium"
-                          style="word-wrap: break-word"
+                    <div class="dropdown dropdown-end">
+                      <div tabindex="0">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="28"
+                          height="28"
+                          viewBox="0 0 24 24"
                         >
-                          Do you want to delete the task number
-                          {{ selectedItemIdToDelete }} - "{{
-                            filterAndLogTitleById(selectedItemIdToDelete)
-                          }}"?
-                        </p>
-                        <div class="modal-action">
-                          <button
-                            class="itbkk-button-cancel btn"
-                            @click="closeModal"
-                            style="color: #eb4343; pointer-events: none"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            class="itbkk-button-confirm btn bg-green-400"
-                            style="color: #fff"
-                            @click="confirmDelete"
-                          >
-                            Confirm
-                          </button>
-                        </div>
+                          <path
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-width="3"
+                            d="M12 6h.01M12 12h.01M12 18h.01"
+                          />
+                        </svg>
                       </div>
-                    </dialog>
+                      <ul
+                        tabindex="0"
+                        class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                      >
+                        <!-- EDIT -->
+                        <li>
+                          <a><EditTask :todo-id="item.id" /></a>
+                        </li>
+
+                        <!-- Delete -->
+                        <li>
+                          <a
+                            style="width: 150px; margin-left: 17px"
+                            class="itbkk-button-delete btn"
+                            @click="openModalToDelete(item.id)"
+                            >Delete</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
                   </div>
+
+                  <dialog id="my_modal_delete" class="modal">
+                    <div class="modal-box" style="max-width: 1000px">
+                      <h3 class="font-bold text-lg">Delete a Task</h3>
+                      <p
+                        class="itbkk-message py-4 font-medium"
+                        style="word-wrap: break-word"
+                      >
+                        Do you want to delete the task number
+                        {{ selectedItemIdToDelete }} - "{{
+                          filterAndLogTitleById(selectedItemIdToDelete)
+                        }}"?
+                      </p>
+                      <div class="modal-action">
+                        <button
+                          class="itbkk-button-cancel btn"
+                          @click="closeModal"
+                          style="color: #eb4343; pointer-events: none"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          class="itbkk-button-confirm btn bg-green-400"
+                          style="color: #fff"
+                          @click="confirmDelete"
+                        >
+                          Confirm
+                        </button>
+                      </div>
+                    </div>
+                  </dialog>
+
                   <!-- DELETE -->
                 </td>
               </div>
