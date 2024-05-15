@@ -618,7 +618,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                         @click="confirmDeleteTrans(status.id)"
                       >
                         Confirm
-                        {{ status.id }}
+                        
                       </button>
                     </div>
 
