@@ -1,7 +1,7 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
 import { ref, watch } from "vue"
-import { checkStatus } from "../libs/checkStatus"
+
 import { useRouter } from "vue-router"
 
 const router = useRouter()

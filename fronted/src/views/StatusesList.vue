@@ -8,7 +8,7 @@ import {
   deleteItemById,
   deleteItemAndTransfer
 } from "../libs/fetchUtils.js"
-import { checkStatus } from "../libs/checkStatus"
+
 import { toDate } from "../libs/toDate.js"
 import { useRoute, useRouter } from "vue-router"
 
@@ -460,7 +460,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <button
                   class="itbkk-button-edit btn"
                   @click="openModalToEdit(item.id)"
-                  v-if="item.name !== 'No TATUS'"
+                  v-if="item.name !== 'No Status'"
                 >
                   Edit
                 </button>
@@ -564,7 +564,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
                 <!-- Delete Modal -->
                 <button
-                  v-if="item.name !== 'NO_STATUS'"
+                  v-if="item.name !== 'No Status'"
                   class="itbkk-button-delete btn"
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
@@ -599,8 +599,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                     </div>
                   </div>
                 </dialog>
-                <!-- my_modal_delete -->
-                <!-- my_modal_deleteAndTrans -->
+            
                 <!-- Delete And Trans -->
 
                 <dialog id="my_modal_deleteTrans" class="modal">
