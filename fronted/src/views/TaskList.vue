@@ -1,145 +1,186 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
-import TaskDetail from '../views/TaskDetail.vue';
-import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
+import { ref, onMounted } from "vue"
+import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
 
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const router = useRouter();
-const todoList = ref([]);
-const selectedTodoId = ref(0);
-const notFound = ref(false);
-const deleteComplete = ref(false);
-const showDetail = ref(false);
-const statusList = ref([]);
-let items = []; // ประกาศ items เป็นตัวแปร global
-let itemsStatus = []; // ประกาศ items เป็นตัวแปร global
+const route = useRoute()
+const router = useRouter()
+const todoList = ref([])
+const selectedTodoId = ref(0)
+const notFound = ref(false)
+const deleteComplete = ref(false)
+const showDetail = ref(false)
+const statusList = ref([])
+let items = [] // ประกาศ items เป็นตัวแปร global
+let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: '',
-});
+  title: "",
+  description: "",
+  assignees: "",
+  status: ""
+})
+
 
 onMounted(async () => {
-  items = await getItems(baseUrlTask);
-  itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
+  items = await getItems(baseUrlTask)
+  itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
 
-  console.log('itemStatuss', itemsStatus);
-  todoList.value = items;
-  console.log('items', items);
-  const taskId = route.params.id;
+  console.log("itemStatuss", itemsStatus)
+  todoList.value = items
+  console.log("items", items)
+  const taskId = route.params.id
 
   if (taskId !== undefined) {
-    console.log(taskId);
-    const response = await getItemById(taskId);
+    console.log(taskId)
+    const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task/error');
-      notFound.value = true;
+      router.push("/task/error")
+      notFound.value = true
     }
   }
-  return items;
-});
+  return items
+})
 
 const selectTodo = (todoId) => {
-  selectedTodoId.value = todoId;
-  showDetail.value = true;
-};
+  selectedTodoId.value = todoId
+  showDetail.value = true
+}
 
 // ----------------------- Delete -----------------------
 
-const selectedItemIdToDelete = ref(0);
+const selectedItemIdToDelete = ref(0)
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(baseUrlTask, todoId);
+    const status = await deleteItemById(baseUrlTask, todoId)
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
+      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`);
+      console.error(`Failed to delete item with ID ${todoId}`)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error);
+    console.error(`Error deleting item with ID ${todoId}:`, error)
   }
-};
+}
 
 const openModalToDelete = (itemId) => {
-  selectedItemIdToDelete.value = itemId;
-  const modal = document.getElementById('my_modal_delete');
-  modal.showModal();
-};
+  selectedItemIdToDelete.value = itemId
+  const modal = document.getElementById("my_modal_delete")
+  modal.showModal()
+}
 
 const closeModal = () => {
-  const modal = document.getElementById('my_modal_delete');
-  modal.close();
-};
+  const modal = document.getElementById("my_modal_delete")
+  modal.close()
+}
 
 const confirmDelete = () => {
-  deleteTodo(selectedItemIdToDelete.value);
-  closeModal();
-  deleteComplete.value = true;
+  deleteTodo(selectedItemIdToDelete.value)
+  closeModal()
+  deleteComplete.value = true
   setTimeout(() => {
-    deleteComplete.value = false;
-  }, 2300);
-};
+    deleteComplete.value = false
+  }, 2300)
+}
 
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id);
+  const item = items.find((item) => item.id === id)
   if (item) {
-    console.log(item.title);
-    return item.title;
+    console.log(item.title)
+    return item.title
   } else {
-    console.log(`No item found with id ${id}`);
-    return '';
+    console.log(`No item found with id ${id}`)
+    return ""
   }
-};
+}
 
 // ----------------------- filterAndLogTitleById -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default');
+const showIcon = ref("default")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc';
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc';
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
   } else {
-    showIcon.value = 'asc';
+    showIcon.value = "asc"
   }
-};
-const statusSortOrder = ref('asc');
+}
+const statusSortOrder = ref("asc")
 
 const sortByStatus = () => {
-  const currentSortOrder = statusSortOrder.value;
-  if (currentSortOrder === 'asc') {
-    todoList.value.sort((a, b) => a.status.localeCompare(b.status));
-    statusSortOrder.value = 'desc';
+  const currentSortOrder = statusSortOrder.value
+  if (currentSortOrder === "asc") {
+    todoList.value.sort((a, b) => a.status.localeCompare(b.status))
+    statusSortOrder.value = "desc"
   } else {
-    todoList.value.sort((a, b) => b.status.localeCompare(a.status));
-    statusSortOrder.value = 'asc';
+    todoList.value.sort((a, b) => b.status.localeCompare(a.status))
+    statusSortOrder.value = "asc"
   }
-};
+}
 
 // ----------------------- STATUS SORT -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' });
-};
+  router.push({ name: "StatusesList" })
+}
+
+// ------------------------- Limit --------------------------
+const openModalToLimit = () => {
+  const modal3 = document.getElementById("my_modal_limit")
+  modal3?.showModal()
+}
+
+const closeModalToLimit = () => {
+  const modal3 = document.getElementById("my_modal_limit")
+  modal3?.close()
+}
+
+const confirmToLimit = () => {
+  const selectedStatus = document.querySelector("#my_modal_limit select").value;
+  const tasksInSelectedStatus = itemsStatus.find(item => item.name === selectedStatus).tasks?.length;
+
+  
+  if (selectedStatus === "No Status" ) {
+    alert("Cannot set limit for 'No Status' status.");
+    return;
+  }
+  if (selectedStatus === "Done") {
+    alert("Cannot set limit for 'Done' status.");
+    return;
+  }
+
+ t
+  if (selectedStatus !== "No Status" && selectedStatus !== "Done") {
+ 
+    
+    if (tasksInSelectedStatus > limit) {
+      alert(`Status '${selectedStatus}' exceeds the limit of ${limit} tasks. Please update task status or complete existing tasks before setting the limit.`);
+      return;
+    }
+  }
+
+  // Handle confirming the limit setting here
+  // Add your logic to set the limit for the selected status
+  closeModalToLimit();
+}
 </script>
 
 <template>
@@ -178,6 +219,51 @@ const openNewStatus = () => {
   <!-- header -->
 
   <div class="flex justify-between mt-9 mx-20">
+    <!----------------- Limit ---------------->
+    <button
+      class="itbkk-button-delete btn"
+      style="margin-left: 10px"
+      @click="openModalToLimit()"
+    >
+      LIMIT-TASKS-IN STATUS
+    </button>
+    <dialog id="my_modal_limit" class="modal">
+      <div class="modal-box" style="max-width: 1000px">
+        <h3 class="font-bold text-lg">Limit Task</h3>
+        <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
+          What the Task do you want to Limit ?
+        </p>
+
+        <select class="select select-bordered w-full max-w-xs mt-1" >
+          <option v-for="(item, index) in itemsStatus"
+              :key="index">
+            {{ item.name }}
+          </option>
+        </select>
+
+
+        <input type="number" placeholder="Your Limit" class="input input-bordered max-w-xs ml-4 " min="1"/>
+
+        <div class="modal-action">
+          <button
+            class="itbkk-button-cancel btn"
+            @click="closeModalToLimit()"
+            style="color: #eb4343"
+          >
+            Cancel
+          </button>
+          <button
+            class="itbkk-button-confirm btn bg-green-400"
+            style="color: #fff"
+            @click="confirmToLimit()"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+
     <!-- SEARCH INPUT -->
     <div class="mr-auto">
       <label class="input input-bordered flex items-center gap-2">
@@ -383,12 +469,12 @@ const openNewStatus = () => {
               <td
                 class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.assignees || item.assignees.length === 0,
+                  italic: !item.assignees || item.assignees.length === 0
                 }"
               >
                 {{
                   !item.assignees || item.assignees.length === 0
-                    ? 'Unassigned'
+                    ? "Unassigned"
                     : item.assignees
                 }}
               </td>
@@ -403,7 +489,7 @@ const openNewStatus = () => {
                     'border-red-500 text-red-500': item.status === 'To Do',
                     'border-yellow-500 text-yellow-500':
                       item.status === 'Doing',
-                    'border-green-500 text-green-500': item.status === 'Done',
+                    'border-green-500 text-green-500': item.status === 'Done'
                   }"
                 >
                   {{ item.status }}
@@ -517,7 +603,7 @@ const openNewStatus = () => {
                         <button
                           class="itbkk-button-cancel btn"
                           @click="closeModal"
-                          style="color: #eb4343;"
+                          style="color: #eb4343"
                         >
                           Cancel
                         </button>
@@ -621,7 +707,7 @@ table {
   overflow: hidden;
 }
 
-td  {
+td {
   border-bottom: 1px solid #ababab;
 }
 
