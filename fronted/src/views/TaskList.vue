@@ -22,13 +22,11 @@ const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const todo = ref({
-
   title: "",
   description: "",
   assignees: "",
   status: ""
 })
-
 
 onMounted(async () => {
   items = await getItems(baseUrlTask)
@@ -155,32 +153,33 @@ const closeModalToLimit = () => {
 }
 
 const confirmToLimit = () => {
-  const selectedStatus = document.querySelector("#my_modal_limit select").value;
-  const tasksInSelectedStatus = itemsStatus.find(item => item.name === selectedStatus).tasks?.length;
+  const selectedStatus = document.querySelector("#my_modal_limit select").value
+  const tasksInSelectedStatus = itemsStatus.find(
+    (item) => item.name === selectedStatus
+  ).tasks?.length
 
-  
-  if (selectedStatus === "No Status" ) {
-    alert("Cannot set limit for 'No Status' status.");
-    return;
+  if (selectedStatus === "No Status") {
+    alert("Cannot set limit for 'No Status' status.")
+    return
   }
   if (selectedStatus === "Done") {
-    alert("Cannot set limit for 'Done' status.");
-    return;
+    alert("Cannot set limit for 'Done' status.")
+    return
   }
 
- t
+  
   if (selectedStatus !== "No Status" && selectedStatus !== "Done") {
- 
-    
     if (tasksInSelectedStatus > limit) {
-      alert(`Status '${selectedStatus}' exceeds the limit of ${limit} tasks. Please update task status or complete existing tasks before setting the limit.`);
-      return;
+      alert(
+        `Status '${selectedStatus}' exceeds the limit of ${limit} tasks. Please update task status or complete existing tasks before setting the limit.`
+      )
+      return
     }
   }
 
   // Handle confirming the limit setting here
   // Add your logic to set the limit for the selected status
-  closeModalToLimit();
+  closeModalToLimit()
 }
 </script>
 
@@ -235,15 +234,18 @@ const confirmToLimit = () => {
           What the Task do you want to Limit ?
         </p>
 
-        <select class="select select-bordered w-full max-w-xs mt-1" >
-          <option v-for="(item, index) in itemsStatus"
-              :key="index">
+        <select class="select select-bordered w-full max-w-xs mt-1">
+          <option v-for="(item, index) in itemsStatus" :key="index">
             {{ item.name }}
           </option>
         </select>
 
-
-        <input type="number" placeholder="Your Limit" class="input input-bordered max-w-xs ml-4 " min="1"/>
+        <input
+          type="number"
+          placeholder="Your Limit"
+          class="input input-bordered max-w-xs ml-4"
+          min="1"
+        />
 
         <div class="modal-action">
           <button
@@ -263,7 +265,6 @@ const confirmToLimit = () => {
         </div>
       </div>
     </dialog>
-
 
     <!-- SEARCH INPUT -->
     <div class="mr-auto">
