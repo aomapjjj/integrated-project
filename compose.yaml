@@ -15,21 +15,21 @@ services:
     restart: unless-stopped
 
   fe:
-    image: ghcr.io/olarnr/studentproj/fe
+    image: ghcr.io/aomapjjj/integrated-project/fe
     build: 
-      context: studentproj-fe
+      context: fronted
       dockerfile: multi.Dockerfile
     networks:
       front-tier:
         ipv4_address: 172.15.0.3
         aliases:
-          - studentproj-fe
+          - fronted
     restart: unless-stopped
 
   api:
-    image: ghcr.io/olarnr/studentproj/api
+    image: ghcr.io/aomapjjj/integrated-project/api
     build: 
-      context: studentproj-api
+      context: service-task-SJ-3
       dockerfile: multi.Dockerfile
     environment:
       - mysql_url=studentproj-db
@@ -41,7 +41,7 @@ services:
       front-tier:
         ipv4_address: 172.15.0.4
         aliases:
-          - studentproj-api
+          - service-task-SJ-3
       back-tier:
         ipv4_address: 172.15.1.4
     restart: unless-stopped
