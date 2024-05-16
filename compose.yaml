@@ -1,5 +1,5 @@
  services:
-  proxy:
+ proxy:
     image: nginx:alpine
     configs:
       - source: proxy_config
@@ -8,20 +8,11 @@
       - fe
       - api
     networks:
-      - front-tier:
-          ipv4_address: 172.15.0.2
+      front-tier:
+        ipv4_address: 172.15.0.2
     ports:
       - "80:80"
     restart: unless-stopped
-
-networks:
-  front-tier:
-    driver: bridge
-
-
-   configs:
-  proxy_config:
-  file: sj3-proxy/proxy.conf
 
   fe:
     image: ghcr.io/aomapjjj/integrated-project/fe
