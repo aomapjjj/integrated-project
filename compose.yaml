@@ -13,7 +13,6 @@
     ports:
       - "80:80"
     restart: unless-stopped
-
   fe:
     image: ghcr.io/aomapjjj/integrated-project/fe
     build: 
@@ -63,8 +62,6 @@
         aliases:
           - database
     restart: unless-stopped
-
-
 configs:
   proxy_config:
     file:sj3-proxy/proxy.conf
