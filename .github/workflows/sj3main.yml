@@ -25,7 +25,7 @@ jobs:
         with:
           context: service-task-SJ-3
           file: service-task-SJ-3/gha.Dockerfile
-          tags: ghcr.io/AomAPJJJ/integrated-project/api
+          tags: ghcr.io/aomapjjj/integrated-project/api
           push: true
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
@@ -35,7 +35,7 @@ jobs:
         with:
           context: fronted
           file: fronted/gha.Dockerfile
-          tags: ghcr.io/AomAPJJJ/integrated-project/fe
+          tags: ghcr.io/aomapjjj/integrated-project/fe
           push: true
 #          cache-from: type=gha
 #          cache-to: type=gha,mode=max
