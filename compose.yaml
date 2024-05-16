@@ -1,4 +1,4 @@
-services:
+ services:
   proxy:
     image: nginx:alpine
     configs:
@@ -8,11 +8,16 @@ services:
       - fe
       - api
     networks:
-      front-tier:
-        ipv4_address: 172.15.0.2
+      - front-tier:
+          ipv4_address: 172.15.0.2
     ports:
       - "80:80"
     restart: unless-stopped
+
+networks:
+  front-tier:
+    driver: bridge
+
 
    configs:
   proxy_config:
