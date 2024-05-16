@@ -67,7 +67,7 @@ services:
 
 configs:
   proxy_config:
-    file: studentproj-proxy/proxy.conf
+    file: sj3-proxy/proxy.conf
 
 volumes:
   db-datadir:
