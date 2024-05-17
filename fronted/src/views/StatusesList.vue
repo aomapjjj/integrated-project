@@ -427,7 +427,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               <td
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                {{ item.id }}
+                {{ index+1 }}
               </td>
               <!-- NAME -->
 
