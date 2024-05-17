@@ -8,7 +8,7 @@ import {
   deleteItemById,
   deleteItemAndTransfer
 } from "../libs/fetchUtils.js"
-
+import { useStatuses } from "../stores/storeStatus"
 import { toDate } from "../libs/toDate.js"
 import { useRoute, useRouter } from "vue-router"
 
@@ -18,9 +18,11 @@ const statusList = ref([])
 const selectedStatusId = ref(0)
 const notFound = ref(false)
 const myModal = ref(null)
+let items = []
 
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
+const myStatuses= useStatuses()
 // ------------------------------
 
 const status = ref({
@@ -32,9 +34,15 @@ const status = ref({
 })
 
 onMounted(async () => {
-  const items = await getItems(baseUrlStatus)
-  statusList.value = items
 
+  if (myStatuses.getStatuses().length === 0) {
+    items = await getItems(baseUrlStatus)
+    myStatuses.addStatuses(await items)
+  }
+
+  console.log(myStatuses.getStatuses())
+
+  statusList.value = items
   console.log({ ...statusList.value })
   const statusId = route.params.id
   if (statusId !== undefined) {
@@ -51,10 +59,11 @@ onMounted(async () => {
 const submitForm = async () => {
   const statusName = status.value.name.trim()
   const statusDescription = status.value.description.trim()
-  await addItem(baseUrlStatus, {
+  const itemAdd = await addItem(baseUrlStatus, {
     name: statusName,
     description: statusDescription
   })
+  myStatuses.addStatus(itemAdd.id, itemAdd.name, itemAdd.description, itemAdd.createdOn, itemAdd.updateOn)
   clearForm()
 }
 
