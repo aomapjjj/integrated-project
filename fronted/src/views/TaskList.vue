@@ -458,7 +458,7 @@ const confirmToLimit = () => {
             <TaskDetail :todo-id="selectedTodoId" v-if="showDetail" />
             <tr
               class="itbkk-item"
-              v-for="(item, index) in todoList"
+              v-for="(item, index) in myTasks.getTasks()"
               :key="index"
             >
               <td
