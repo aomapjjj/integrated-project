@@ -77,6 +77,7 @@ const deleteTodo = async (todoId) => {
   } catch (error) {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
+  
 }
 
 const openModalToDelete = (itemId, index) => {
@@ -91,7 +92,7 @@ const closeModal = () => {
   modal.close()
 }
 
-const confirmDelete = () => {
+const confirmDelete = (items) => {
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
   deleteComplete.value = true
