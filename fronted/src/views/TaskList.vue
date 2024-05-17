@@ -4,7 +4,7 @@ import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
-
+import { useTasks } from "../stores/store"
 import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
@@ -17,6 +17,7 @@ const showDetail = ref(false)
 const statusList = ref([])
 let items = [] // ประกาศ items เป็นตัวแปร global
 let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
+const indexDelete = ref(0)
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -25,19 +26,26 @@ const todo = ref({
   title: "",
   description: "",
   assignees: "",
-  status: ""
+  status: "No Status"
 })
 
+const myTasks= useTasks()
 onMounted(async () => {
-  items = await getItems(baseUrlTask)
+
+
+  if (myTasks.getTasks().length === 0) {
+    items = await getItems(baseUrlTask)
+    myTasks.addTasks(await items)
+  }
+
+  console.log(myTasks.getTasks())
+
   itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
-
   console.log("itemStatuss", itemsStatus)
   todoList.value = items
   console.log("items", items)
   const taskId = route.params.id
-
   if (taskId !== undefined) {
     console.log(taskId)
     const response = await getItemById(taskId)
@@ -71,8 +79,9 @@ const deleteTodo = async (todoId) => {
   }
 }
 
-const openModalToDelete = (itemId) => {
+const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
+  indexDelete.value = index
   const modal = document.getElementById("my_modal_delete")
   modal.showModal()
 }
@@ -449,13 +458,13 @@ const confirmToLimit = () => {
             <TaskDetail :todo-id="selectedTodoId" v-if="showDetail" />
             <tr
               class="itbkk-item"
-              v-for="(item, index) in todoList"
+              v-for="(item, index) in myTasks.getTasks()"
               :key="index"
             >
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                {{ item.id }}
+                {{ index+1}}
               </td>
               <td
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
@@ -537,7 +546,7 @@ const confirmToLimit = () => {
                           <a
                             style="width: 150px; margin-left: 17px"
                             class="itbkk-button-delete btn"
-                            @click="openModalToDelete(item.id)"
+                            @click="openModalToDelete(item.id, index)"
                             >Delete</a
                           >
                         </li>
@@ -597,7 +606,7 @@ const confirmToLimit = () => {
                         style="word-wrap: break-word"
                       >
                         Do you want to delete the task number
-                        {{ selectedItemIdToDelete }} - "{{
+                        {{ indexDelete + 1 }} - "{{
                           filterAndLogTitleById(selectedItemIdToDelete)
                         }}"?
                       </p>
