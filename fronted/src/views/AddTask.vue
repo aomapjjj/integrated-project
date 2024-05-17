@@ -1,7 +1,7 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
 import { ref, watch } from "vue"
-
+import { useTasks } from "../stores/store"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
@@ -12,6 +12,7 @@ const statusList = ref([])
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
+const myTasks= useTasks()
 const props = defineProps({
   todo: Object
 })
@@ -32,13 +33,14 @@ const submitForm = async () => {
   const trimmedDescription = props.todo.description?.trim()
   const trimmedAssignees = props.todo.assignees?.trim()
 
-  await addItem(baseUrlTask, {
+  const itemAdd = await addItem(baseUrlTask, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
     status: props.todo.status
-  })
-
+  }) 
+  
+  myTasks.addTask(itemAdd.id, itemAdd.title, itemAdd.description, itemAdd.assignees, itemAdd.status, itemAdd.createdOn, itemAdd.updateOn)
   showAlertAdd.value = true
   showAlertAfterClose.value = true
   setTimeout(() => {
