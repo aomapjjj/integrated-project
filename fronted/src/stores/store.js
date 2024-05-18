@@ -32,11 +32,16 @@ const useTasks = defineStore('tasks', () => {
       updateOn: updateOn,
     })
   }
-  const updateTask = (id, category, description) => {
-    todos.value = todos.value.map((todo) => {
-      return todo.id === id
-        ? { ...todo, category: category, description: description }
-        : todo
+  const updateTask = (id, title, description, assignees, status, createdOn, updateOn) => {
+    tasks.value = tasks.value.map((task) => {
+      return task.id === id
+        ? { ...task, title: title,
+          description: description,
+          assignees: assignees,
+          status: status,
+          createdOn: createdOn,
+          updateOn: updateOn }
+        : task
     })
   }
   const findTodo = (searchId) => {

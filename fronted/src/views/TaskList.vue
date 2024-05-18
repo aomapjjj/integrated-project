@@ -92,7 +92,7 @@ const closeModal = () => {
   modal.close()
 }
 
-const confirmDelete = (items) => {
+const confirmDelete = () => {
   myTasks.removeTask(selectTodo.id)
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
@@ -637,11 +637,6 @@ const confirmToLimit = () => {
             </tr>
 
             <!-- DELETE COMPLETE -->
-            <tr v-if="todoList?.length === 0">
-              <td colspan="4" class="text-center py-4 text-gray-500">
-                No task
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>

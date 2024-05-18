@@ -2,12 +2,13 @@
 // Import ref from Vue
 import { ref, watch, computed } from "vue"
 import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
-
+import { useTasks } from "../stores/store"
 import { toDate } from "../libs/toDate"
 import { useRouter } from 'vue-router';
 
 const statusList = ref([])
 const router = useRouter();
+const myTasks= useTasks()
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
@@ -38,7 +39,6 @@ watch(
     }
     const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
-    
   },
   { immediate: true }
 )
@@ -69,6 +69,7 @@ const UpdateTask = async () => {
     assignees: trimmedAssignees,
     status: todo.value.status
   })
+  myTasks.updateTask(edit.id, edit.title, edit.description, edit.assignees, edit.status, edit.createdOn, edit.updateOn)
   console.log(edit)
   router.push({ name: "TaskList" })
 }
