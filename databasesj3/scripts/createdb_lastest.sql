@@ -78,5 +78,3 @@ INSERT INTO `kanbanIT`.`tasks` (`taskTitle`, `taskDescription`, `taskAssignees`,
 
 COMMIT;
 
-select * from `kanbanIT`.`tasks`;
-SELECT * FROM `kanbanIT`.`statustasks`;
