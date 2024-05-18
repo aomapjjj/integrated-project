@@ -17,7 +17,7 @@ services:
   fe:
     image: ghcr.io/aomapjjj/integrated-project/fe
     build: 
-      context: fronted
+      context: https://github.com/aomapjjj/integrated-project.git#main:fronted
       dockerfile: multi.Dockerfile
     networks:
       front-tier:
@@ -29,7 +29,7 @@ services:
   api:
     image: ghcr.io/aomapjjj/integrated-project/api
     build: 
-      context: service-task-SJ-3
+      context:  https://github.com/aomapjjj/integrated-project.git#main:service-task-SJ-3
       dockerfile: multi.Dockerfile
     environment:
       - mysql_url=database
