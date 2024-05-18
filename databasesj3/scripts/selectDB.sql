@@ -1,2 +1,2 @@
-select * from `kanbanIT`.`TASKS`;
-SELECT * FROM kanbanIT.statustasks;
+select * from `kanbanIT`.`tasks`;
+SELECT * FROM `kanbanIT`.`statustasks`;
