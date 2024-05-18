@@ -32,7 +32,7 @@ services:
       context:  https://github.com/aomapjjj/integrated-project.git#main:service-task-SJ-3
       dockerfile: multi.Dockerfile
     environment:
-      - mysql_url=database
+      - mysql_url=databasesj3
     depends_on:
       db:
         condition: service_healthy
@@ -48,9 +48,9 @@ services:
 
   db:
     image: mysql/mysql-server
-    env_file: database/env.list
+    env_file: databasesj3/env.list
     volumes: 
-      - ./database/scripts:/docker-entrypoint-initdb.d
+      - ./databasesj3/scripts:/docker-entrypoint-initdb.d
       - db-datadir:/var/lib/mysql
     healthcheck:
       test: ["CMD", "/healthcheck.sh"]
@@ -61,7 +61,7 @@ services:
       back-tier:
         ipv4_address: 172.15.1.5
         aliases:
-          - database
+          - databasesj3
     restart: unless-stopped
 
 
