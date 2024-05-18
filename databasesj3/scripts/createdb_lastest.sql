@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS `kanbanIT`.`statustasks` (
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `kanbanIT`.`TASKS`
+-- Table `kanbanIT`.`tasks`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `kanbanIT`.`TASKS` (
+CREATE TABLE IF NOT EXISTS `kanbanIT`.`tasks` (
   `taskId` INT NOT NULL AUTO_INCREMENT,
   `taskTitle` TEXT(100) NOT NULL,
   `taskDescription` TEXT(500) NULL DEFAULT NULL,
@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS `kanbanIT`.`TASKS` (
   `statusId` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`taskId`),
   UNIQUE INDEX `taskId_UNIQUE` (`taskId` ASC) VISIBLE,
-  INDEX `fk_TASKS_statustasks_idx` (`statusId` ASC) VISIBLE,
-  CONSTRAINT `fk_TASKS_statustasks`
+  INDEX `fk_tasks_statustasks_idx` (`statusId` ASC) VISIBLE,
+  CONSTRAINT `fk_tasks_statustasks`
     FOREIGN KEY (`statusId`)
     REFERENCES `kanbanIT`.`statustasks` (`statusId`)
     ON DELETE NO ACTION
