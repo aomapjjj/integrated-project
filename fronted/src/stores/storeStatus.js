@@ -28,11 +28,14 @@ const useStatuses = defineStore('statuses', () => {
         updateOn: updateOn,
       })
     }
-    const updateTask = (id, category, description) => {
-      todos.value = todos.value.map((todo) => {
-        return todo.id === id
-          ? { ...todo, category: category, description: description }
-          : todo
+    const updateStatus = (id, name, description, createdOn, updateOn) => {
+      statuses.value = statuses.value.map((status) => {
+        return status.id === id
+          ? { ...status, name: name,
+            description: description,
+            createdOn: createdOn,
+            updateOn: updateOn, }
+          : status
       })
     }
     const findTodo = (searchId) => {
@@ -51,7 +54,7 @@ const useStatuses = defineStore('statuses', () => {
       getStatuses,
       addStatuses,
       addStatus,
-      updateTask,
+      updateStatus,
       findIndexTodo,
       findTodo,
       removeStatus
