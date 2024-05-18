@@ -152,46 +152,9 @@ const openNewStatus = () => {
   router.push({ name: "StatusesList" })
 }
 
-// ------------------------- Limit --------------------------
-const openModalToLimit = () => {
-  const modal3 = document.getElementById("my_modal_limit")
-  modal3?.showModal()
-}
 
-const closeModalToLimit = () => {
-  const modal3 = document.getElementById("my_modal_limit")
-  modal3?.close()
-}
 
-const confirmToLimit = () => {
-  const selectedStatus = document.querySelector("#my_modal_limit select").value
-  const tasksInSelectedStatus = itemsStatus.find(
-    (item) => item.name === selectedStatus
-  ).tasks?.length
 
-  if (selectedStatus === "No Status") {
-    alert("Cannot set limit for 'No Status' status.")
-    return
-  }
-  if (selectedStatus === "Done") {
-    alert("Cannot set limit for 'Done' status.")
-    return
-  }
-
-  
-  if (selectedStatus !== "No Status" && selectedStatus !== "Done") {
-    if (tasksInSelectedStatus > limit) {
-      alert(
-        `Status '${selectedStatus}' exceeds the limit of ${limit} tasks. Please update task status or complete existing tasks before setting the limit.`
-      )
-      return
-    }
-  }
-
-  // Handle confirming the limit setting here
-  // Add your logic to set the limit for the selected status
-  closeModalToLimit()
-}
 </script>
 
 <template>
@@ -230,52 +193,7 @@ const confirmToLimit = () => {
   <!-- header -->
 
   <div class="flex justify-between mt-9 mx-20">
-    <!----------------- Limit ---------------->
-    <button
-      class="itbkk-button-delete btn"
-      style="margin-left: 10px"
-      @click="openModalToLimit()"
-    >
-      LIMIT-TASKS-IN STATUS
-    </button>
-    <dialog id="my_modal_limit" class="modal">
-      <div class="modal-box" style="max-width: 1000px">
-        <h3 class="font-bold text-lg">Limit Task</h3>
-        <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
-          What the Task do you want to Limit ?
-        </p>
-
-        <select class="select select-bordered w-full max-w-xs mt-1">
-          <option v-for="(item, index) in itemsStatus" :key="index">
-            {{ item.name }}
-          </option>
-        </select>
-
-        <input
-          type="number"
-          placeholder="Your Limit"
-          class="input input-bordered max-w-xs ml-4"
-          min="1"
-        />
-
-        <div class="modal-action">
-          <button
-            class="itbkk-button-cancel btn"
-            @click="closeModalToLimit()"
-            style="color: #eb4343"
-          >
-            Cancel
-          </button>
-          <button
-            class="itbkk-button-confirm btn bg-green-400"
-            style="color: #fff"
-            @click="confirmToLimit()"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    </dialog>
+   
 
     <!-- SEARCH INPUT -->
     <div class="mr-auto">
