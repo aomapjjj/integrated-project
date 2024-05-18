@@ -93,6 +93,7 @@ const closeModal = () => {
 }
 
 const confirmDelete = (items) => {
+  myTasks.removeTask(selectTodo.id)
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
   deleteComplete.value = true

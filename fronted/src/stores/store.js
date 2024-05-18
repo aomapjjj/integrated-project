@@ -45,9 +45,9 @@ const useTasks = defineStore('tasks', () => {
   const findIndexTodo = (searchId) => {
     return todos.value.findIndex((todo) => todo.id === searchId)
   }
-  const removeTodo = (removeId) => {
-    todos.value.splice(
-      todos.value.findIndex((todo) => todo.id === removeId),
+  const removeTask = (removeId) => {
+    tasks.value.splice(
+      tasks.value.findIndex((Task) => Task.id === removeId),
       1
     )
   }
@@ -58,7 +58,7 @@ const useTasks = defineStore('tasks', () => {
     updateTask,
     findIndexTodo,
     findTodo,
-    removeTodo
+    removeTask
   }
 })
 
