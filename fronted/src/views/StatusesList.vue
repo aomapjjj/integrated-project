@@ -173,6 +173,7 @@ const closeModal = () => {
 }
 
 const confirmDelete = () => {
+  myStatuses.removeStatus(selectedItemIdToDelete.value)
   deleteStatus(selectedItemIdToDelete.value)
   closeModal()
 
