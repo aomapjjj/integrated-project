@@ -22,10 +22,10 @@ export const routes = [
       },
     ],
   },
-  // {
-  //   path: '/:catchAll(.*)',
-  //   redirect: { name: "TaskList" },
-  // },
+  {
+    path: '/:catchAll(.*)',
+    redirect: { name: "TaskList" },
+  },
   {
     path: "/task/:id",
     name: "TaskDetail",
