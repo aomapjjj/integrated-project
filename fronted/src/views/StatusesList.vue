@@ -38,11 +38,13 @@ onMounted(async () => {
   if (myStatuses.getStatuses().length === 0) {
     items = await getItems(baseUrlStatus)
     myStatuses.addStatuses(await items)
-  }
-  console.log(myStatuses.getStatuses())
+    console.table(items)
 
-  statusList.value = items
+  }
+  statusList.value = myStatuses.getStatuses()
+  console.log(myStatuses.getStatuses())
   console.log({ ...statusList.value })
+
   const statusId = route.params.id
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
@@ -106,11 +108,11 @@ const UpdateStatus = async () => {
 
 const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
+  console.table(statusList.value)
   console.log(statusToEdit)
+  console.log(statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
-  console.log(status.value)
-  console.log(originalStatus.value)
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
 }

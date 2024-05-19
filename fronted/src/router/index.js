@@ -20,17 +20,22 @@ export const routes = [
         name: 'AddTask',
         component: AddTask,
       },
+      {
+        path: "/task/:id",
+        name: "TaskDetail",
+        component: TaskDetail,
+      },
     ],
   },
   // {
   //   path: '/:catchAll(.*)',
   //   redirect: { name: "TaskList" },
   // },
-  {
-    path: "/task/:id",
-    name: "TaskDetail",
-    component: TaskList,
-  },
+  // {
+  //   path: "/task/:id",
+  //   name: "TaskDetail",
+  //   component: TaskDetail,
+  // },
 
   {
     path: "/task/error",
