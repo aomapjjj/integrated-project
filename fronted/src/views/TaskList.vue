@@ -38,7 +38,7 @@ onMounted(async () => {
     taskStore.addTasks(await items)
   }
 
-  console.log(taskStore.getTasks())
+  console.log('sedsss' , taskStore.getTasks())
 
   itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
@@ -124,30 +124,38 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- STATUS SORT -----------------------
 const showIcon = ref("default")
+const statusSortOrder = ref("asc")
 
 const toggleIcon = () => {
   if (showIcon.value === "default") {
     showIcon.value = "asc"
+    statusSortOrder.value = "asc"
   } else if (showIcon.value === "asc") {
     showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = "asc"
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
+
+  sortByStatus()
 }
-const statusSortOrder = ref("asc")
 
 const sortByStatus = () => {
+  
   const currentSortOrder = statusSortOrder.value
   
   if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-    statusSortOrder.value = "desc"
-    
-  } else {
+  } else if (currentSortOrder === "desc") {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
-    statusSortOrder.value = "asc"
-  }
+  } else { 
+    taskStore.getTasks().sort((a, b) => a.id - b.id) 
 }
+
+}
+
+
 
 // ----------------------- STATUS SORT -----------------------
 
