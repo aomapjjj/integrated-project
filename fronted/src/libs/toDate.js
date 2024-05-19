@@ -1,5 +1,8 @@
 export function toDate(dateTimeString) {
-      const [datePart, timePart] = dateTimeString?.split("T")
+    if(dateTimeString === null){
+        return null
+    }
+      const [datePart, timePart] = dateTimeString.split("T")
       const [year, month, day] = datePart?.split("-")
       
       let [hour, minute, second] = [0, 0, 0]
