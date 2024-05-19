@@ -3,6 +3,7 @@ import { getItems, getItemById } from "@/libs/fetchUtils"
 import { ref, watch, onMounted } from "vue"
 
 import { toDate } from "../libs/toDate"
+import router from "@/router";
 
 const props = defineProps({
   todoId: Number
@@ -34,6 +35,10 @@ watch(
     }
   }, { immediate: true }
 )
+
+const closeModal = () => {
+  router.go(-1)
+}
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 </script>
@@ -112,7 +117,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           </div>
           <!-- Close Button -->
           <div class="itbkk-button modal-action">
-            <label for="my_modal_6" class="btn">Close</label>
+            <label for="my_modal_6" class="btn" @click="closeModal()">Close</label>
           </div>
         </div>
       </div>

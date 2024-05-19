@@ -31,11 +31,11 @@ export const routes = [
     path: '/:catchAll(.*)',
     redirect: { name: "TaskList" },
   },
-  {
-    path: "/task/:id",
-    name: "TaskDetail",
-    component: TaskList,
-  },
+  // {
+  //   path: "/task/:id",
+  //   name: "TaskDetail",
+  //   component: TaskList,
+  // },
   {
     path: "/task/error",
     name: "ErrorPage",
