@@ -9,7 +9,6 @@ import {
   deleteItemAndTransfer
 } from "../libs/fetchUtils.js"
 import { useStatuses } from "../stores/storeStatus"
-import { toDate } from "../libs/toDate.js"
 import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
@@ -432,11 +431,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                           </div>
                           <div style="margin-right: 30px">
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Created On</span>
-                            <label>{{ toDate(status.createdOn) }}</label>
+                            <label>{{ status.createdOn }}</label>
                           </div>
                           <div>
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Updated On</span>
-                            <label>{{ toDate(status.updatedOn) }}</label>
+                            <label>{{ status.updatedOn }}</label>
                           </div>
                         </div>
                       </div>
