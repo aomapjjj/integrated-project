@@ -98,10 +98,10 @@ const UpdateStatus = async () => {
   })
   console.log(edit)
   myStatuses.updateStatus(edit.id, edit.name, edit.description, edit.createdOn, edit.updateOn)
-  
+
   const statusIndex = statusList.value.findIndex((status) => status.id === statusId);
   if (statusIndex !== -1) {
-    statusList.value[statusIndex] = {...edit}
+    statusList.value[statusIndex] = { ...edit }
   }
 }
 
@@ -424,20 +424,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                             No description is provided
                           </textarea>
                         </label>
-                        <div style="display: flex; flex-direction: row">
-                          <div style="margin-right: 30px">
-                            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Time Zone</span>
-                            <label>{{ TimeZone }}</label>
-                          </div>
-                          <div style="margin-right: 30px">
-                            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Created On</span>
-                            <label>{{ status.createdOn }}</label>
-                          </div>
-                          <div>
-                            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Updated On</span>
-                            <label>{{ status.updatedOn }}</label>
-                          </div>
-                        </div>
+                        
                       </div>
 
                       <!-- Buttons -->
