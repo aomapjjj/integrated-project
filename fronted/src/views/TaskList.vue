@@ -29,16 +29,16 @@ const todo = ref({
   status: "No Status"
 })
 
-const myTasks= useTasks()
+const taskStore= useTasks()
 onMounted(async () => {
 
 
-  if (myTasks.getTasks().length === 0) {
+  if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
-    myTasks.addTasks(await items)
+    taskStore.addTasks(await items)
   }
 
-  console.log(myTasks.getTasks())
+  console.log(taskStore.getTasks())
 
   itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
@@ -93,7 +93,7 @@ const closeModal = () => {
 }
 
 const confirmDelete = () => {
-  myTasks.removeTask(selectTodo.id)
+  taskStore.removeTask(selectTodo.id)
   deleteTodo(selectedItemIdToDelete.value)
   closeModal()
   deleteComplete.value = true
@@ -137,11 +137,13 @@ const statusSortOrder = ref("asc")
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
+  
   if (currentSortOrder === "asc") {
-    todoList.value.sort((a, b) => a.status.localeCompare(b.status))
+    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
     statusSortOrder.value = "desc"
+    
   } else {
-    todoList.value.sort((a, b) => b.status.localeCompare(a.status))
+    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
     statusSortOrder.value = "asc"
   }
 }
@@ -215,7 +217,7 @@ const openNewStatus = () => {
     </div>
     <div class="flex space-x-4">
       <!-- ADD BUTTON -->
-      <AddTask :todo="todo" />
+      <AddTask />
       <!-- MANAGE STATUS -->
       <button
         class="itbkk-manage-status btn bg-gray-200"
@@ -378,7 +380,7 @@ const openNewStatus = () => {
             <TaskDetail :todo-id="selectedTodoId" v-if="showDetail" />
             <tr
               class="itbkk-item"
-              v-for="(item, index) in myTasks.getTasks()"
+              v-for="(item, index) in taskStore.getTasks()"
               :key="index"
             >
               <td
@@ -393,7 +395,7 @@ const openNewStatus = () => {
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
-                >
+                  >
                   {{ item.title }}
                 </label>
               </td>

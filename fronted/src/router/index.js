@@ -20,6 +20,11 @@ export const routes = [
         name: 'AddTask',
         component: AddTask,
       },
+      {
+        path: "/task/:id",
+        name: "TaskDetail",
+        component: TaskDetail,
+      },
     ],
   },
   {
@@ -31,7 +36,6 @@ export const routes = [
     name: "TaskDetail",
     component: TaskList,
   },
-
   {
     path: "/task/error",
     name: "ErrorPage",
