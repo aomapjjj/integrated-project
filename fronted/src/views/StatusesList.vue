@@ -432,11 +432,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                           </div>
                           <div style="margin-right: 30px">
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Created On</span>
-                            <label>{{ status.createdOn }}</label>
+                            <label>{{ toDate(status.createdOn) }}</label>
                           </div>
                           <div>
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Updated On</span>
-                            <label>{{ status.updatedOn }}</label>
+                            <label>{{ toDate(status.updatedOn) }}</label>
                           </div>
                         </div>
                       </div>

@@ -27,23 +27,22 @@ export const routes = [
       },
     ],
   },
-  // {
-  //   path: '/:catchAll(.*)',
-  //   redirect: { name: "TaskList" },
-  // },
-  // {
-  //   path: "/task/:id",
-  //   name: "TaskDetail",
-  //   component: TaskDetail,
-  // },
-
+  {
+    path: '/:catchAll(.*)',
+    redirect: { name: "TaskList" },
+  },
+  {
+    path: "/task/:id",
+    name: "TaskDetail",
+    component: TaskList,
+  },
   {
     path: "/task/error",
     name: "ErrorPage",
     component: ErrorPage,
   },
   {
-    path: "/v2/status",
+    path: "/status",
     name: "StatusesList",
     component: StatusesList,
   },
