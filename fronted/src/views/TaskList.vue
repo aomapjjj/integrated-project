@@ -58,6 +58,7 @@ onMounted(async () => {
 })
 
 const selectTodo = (todoId) => {
+  router.push({ name: 'TaskDetail', params: { id: todoId } })
   selectedTodoId.value = todoId
   showDetail.value = true
 }
@@ -377,7 +378,7 @@ const openNewStatus = () => {
           </thead>
           <tbody>
             <!-- Iterate over todoList -->
-            <TaskDetail :todo-id="selectedTodoId" v-if="showDetail" />
+            <TaskDetail :todo-id="selectedTodoId" />
             <tr
               class="itbkk-item"
               v-for="(item, index) in taskStore.getTasks()"
