@@ -1,211 +1,222 @@
 <script setup>
-import { ref, onMounted } from "vue"
-import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
-import TaskDetail from "../views/TaskDetail.vue"
-import AddTask from "../views/AddTask.vue"
-import EditTask from "../views/EditTask.vue"
-import { useTasks } from "../stores/store"
-import { useRoute, useRouter } from "vue-router"
+import { ref, onMounted } from 'vue';
+import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
+import TaskDetail from '../views/TaskDetail.vue';
+import AddTask from '../views/AddTask.vue';
+import EditTask from '../views/EditTask.vue';
+import { useTasks } from '../stores/store';
+import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
-const todoList = ref([])
-const selectedTodoId = ref(0)
-const notFound = ref(false)
-const deleteComplete = ref(false)
-const showDetail = ref(false)
-const statusList = ref([])
-let items = [] // ประกาศ items เป็นตัวแปร global
-let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
-const indexDelete = ref(0)
+const route = useRoute();
+const router = useRouter();
+const todoList = ref([]);
+const selectedTodoId = ref(0);
+const notFound = ref(false);
+const deleteComplete = ref(false);
+const showDetail = ref(false);
+const statusList = ref([]);
+let items = []; // ประกาศ items เป็นตัวแปร global
+let itemsStatus = []; // ประกาศ items เป็นตัวแปร global
+const indexDelete = ref(0);
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
-})
+  title: '',
+  description: '',
+  assignees: '',
+  status: 'No Status',
+});
 
-const taskStore= useTasks()
+const taskStore = useTasks();
 onMounted(async () => {
-
-
   if (taskStore.getTasks().length === 0) {
-    items = await getItems(baseUrlTask)
-    taskStore.addTasks(await items)
+    items = await getItems(baseUrlTask);
+    taskStore.addTasks(await items);
   }
 
-  console.log('sedsss' , taskStore.getTasks())
+  console.log('sedsss', taskStore.getTasks());
 
-  itemsStatus = await getItems(baseUrlStatus)
-  statusList.value = itemsStatus
-  console.log("itemStatuss", itemsStatus)
-  todoList.value = items
-  console.log("items", items)
-  const taskId = route.params.id
+  itemsStatus = await getItems(baseUrlStatus);
+  statusList.value = itemsStatus;
+  console.log('itemStatuss', itemsStatus);
+  todoList.value = items;
+  console.log('items', items);
+  const taskId = route.params.id;
   if (taskId !== undefined) {
-    console.log(taskId)
-    const response = await getItemById(taskId)
+    console.log(taskId);
+    const response = await getItemById(taskId);
     if (response.status === 404 || response.status === 400) {
-      router.push("/task/error")
-      notFound.value = true
+      router.push('/task/error');
+      notFound.value = true;
     }
   }
-  return items
-})
+  return items;
+});
 
 const selectTodo = (todoId) => {
-  router.push({ name: 'TaskDetail', params: { id: todoId } })
-  selectedTodoId.value = todoId
-  showDetail.value = true
-}
+  router.push({ name: 'TaskDetail', params: { id: todoId } });
+  selectedTodoId.value = todoId;
+  showDetail.value = true;
+};
 
 // ----------------------- Delete -----------------------
 
-const selectedItemIdToDelete = ref(0)
+const selectedItemIdToDelete = ref(0);
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(baseUrlTask, todoId)
+    const status = await deleteItemById(baseUrlTask, todoId);
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
+      todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`)
+      console.error(`Failed to delete item with ID ${todoId}`);
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error)
+    console.error(`Error deleting item with ID ${todoId}:`, error);
   }
-  
-}
+};
 
 const openModalToDelete = (itemId, index) => {
-  selectedItemIdToDelete.value = itemId
-  indexDelete.value = index
-  const modal = document.getElementById("my_modal_delete")
-  modal.showModal()
-}
+  selectedItemIdToDelete.value = itemId;
+  indexDelete.value = index;
+  const modal = document.getElementById('my_modal_delete');
+  modal.showModal();
+};
 
 const closeModal = () => {
-  const modal = document.getElementById("my_modal_delete")
-  modal.close()
-}
+  const modal = document.getElementById('my_modal_delete');
+  modal.close();
+};
 
 const confirmDelete = () => {
-  taskStore.removeTask(selectTodo.id)
-  deleteTodo(selectedItemIdToDelete.value)
-  closeModal()
-  deleteComplete.value = true
+  taskStore.removeTask(selectTodo.id);
+  deleteTodo(selectedItemIdToDelete.value);
+  closeModal();
+  deleteComplete.value = true;
   setTimeout(() => {
-    deleteComplete.value = false
-  }, 2300)
-}
+    deleteComplete.value = false;
+  }, 2300);
+};
 
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id)
+  const item = items.find((item) => item.id === id);
   if (item) {
-    console.log(item.title)
-    return item.title
+    console.log(item.title);
+    return item.title;
   } else {
-    console.log(`No item found with id ${id}`)
-    return ""
+    console.log(`No item found with id ${id}`);
+    return '';
   }
-}
+};
 
 // ----------------------- filterAndLogTitleById -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref("default")
-const statusSortOrder = ref("asc")
+const showIcon = ref('default');
+const statusSortOrder = ref('asc');
 
 const toggleIcon = () => {
-  if (showIcon.value === "default") {
-    showIcon.value = "asc"
-    statusSortOrder.value = "asc"
-  } else if (showIcon.value === "asc") {
-    showIcon.value = "desc"
-    statusSortOrder.value = "desc"
+  if (showIcon.value === 'default') {
+    showIcon.value = 'asc';
+    statusSortOrder.value = 'asc';
+  } else if (showIcon.value === 'asc') {
+    showIcon.value = 'desc';
+    statusSortOrder.value = 'desc';
   } else {
-    showIcon.value = "default"
-    statusSortOrder.value = "default"
+    showIcon.value = 'default';
+    statusSortOrder.value = 'default';
   }
 
-  sortByStatus()
-}
+  sortByStatus();
+};
 
 const sortByStatus = () => {
-  
-  const currentSortOrder = statusSortOrder.value
-  
-  if (currentSortOrder === "asc") {
-    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === "desc") {
-    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
-  } else { 
-    taskStore.getTasks().sort((a, b) => a.id - b.id) 
-}
+  const currentSortOrder = statusSortOrder.value;
 
-}
-
-
+  if (currentSortOrder === 'asc') {
+    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status));
+  } else if (currentSortOrder === 'desc') {
+    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status));
+  } else {
+    taskStore.getTasks().sort((a, b) => a.id - b.id);
+  }
+};
 
 // ----------------------- STATUS SORT -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
-}
-
-
-
-
+  router.push({ name: 'StatusesList' });
+};
 </script>
 
 <template>
-  <div class="min-h-full">
-    <nav class="bg-gray-800" style="background-color: #f785b1">
-      <div class="mx-auto max-w-7xl px-1">
-        <div class="flex h-16 items-center justify-between">
-          <div class="flex items-center">
-            <div class="hidden md:block">
-              <div class="ml-2 flex items-baseline space-x-4">
-                <a
-                  href="#"
-                  class="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                  >My Task</a
+  <div class="min-h-full max-h-fit">
+    <nav class="bg-white shadow" style="margin-top: 10px">
+      <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-4">
+          <img
+            src="/src/image/logo.png"
+            alt="LOGO"
+            class="w-[100px] h-[100px]"
+          />
+          <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
+            <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
+            <h1
+              class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight"
+              style="color: #9391e4; text-align: center"
+            >
+              IT-Bangmod Kradan Kanban
+            </h1>
+          </div>
+        </a>
+        <div class="flex items-center">
+          <div class="hidden md:block">
+            <div class="flex space-x-4">
+              <!-- ADD BUTTON -->
+              <AddTask />
+              <!-- MANAGE STATUS -->
+              <button
+                class="itbkk-manage-status btn bg-gray-200"
+                style="color: white; background-color: #f785b1; border-radius: 30px;"
+                @click="openNewStatus()"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
                 >
-              </div>
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+                    />
+                    <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
+                  </g>
+                </svg>
+                Manage Status
+              </button>
             </div>
           </div>
-          <div class="flex items-center"></div>
         </div>
       </div>
     </nav>
   </div>
 
-  <!-- header -->
-  <header class="bg-white shadow">
-    <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
-      <h1
-        class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900"
-        style="color: #9391e4; text-align: center"
-      >
-        IT-Bangmod Kradan Kanban
-      </h1>
-    </div>
-  </header>
-  <!-- header -->
-
   <div class="flex justify-between mt-9 mx-20">
-   
-
     <!-- SEARCH INPUT -->
     <div class="mr-auto">
       <label class="input input-bordered flex items-center gap-2">
@@ -223,37 +234,6 @@ const openNewStatus = () => {
           />
         </svg>
       </label>
-    </div>
-    <div class="flex space-x-4">
-      <!-- ADD BUTTON -->
-      <AddTask />
-      <!-- MANAGE STATUS -->
-      <button
-        class="itbkk-manage-status btn bg-gray-200"
-        style="color: black"
-        @click="openNewStatus()"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-        >
-          <g
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-          >
-            <path
-              d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
-            />
-            <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
-          </g>
-        </svg>
-        Manage Status
-      </button>
     </div>
   </div>
 
@@ -395,7 +375,7 @@ const openNewStatus = () => {
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                {{ index+1}}
+                {{ index + 1 }}
               </td>
               <td
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
@@ -404,19 +384,19 @@ const openNewStatus = () => {
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
-                  >
+                >
                   {{ item.title }}
                 </label>
               </td>
               <td
                 class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.assignees || item.assignees.length === 0
+                  italic: !item.assignees || item.assignees.length === 0,
                 }"
               >
                 {{
                   !item.assignees || item.assignees.length === 0
-                    ? "Unassigned"
+                    ? 'Unassigned'
                     : item.assignees
                 }}
               </td>
@@ -431,7 +411,7 @@ const openNewStatus = () => {
                     'border-red-500 text-red-500': item.status === 'To Do',
                     'border-yellow-500 text-yellow-500':
                       item.status === 'Doing',
-                    'border-green-500 text-green-500': item.status === 'Done'
+                    'border-green-500 text-green-500': item.status === 'Done',
                   }"
                 >
                   {{ item.status }}
@@ -613,24 +593,22 @@ const openNewStatus = () => {
     </div>
   </div>
 
-  <footer
-    class="footer footer-center p-5 text-primary-content"
-    style="background-color: #f785b1; margin-top: 37px"
-  >
+  <footer class="footer footer-center p-5 text-primary-content">
     <aside class="flex items-center space-x-20">
-      <img
+      <!-- <img
         src="/src/image/sit.png"
         alt="SIT logo"
         style="width: 180px; margin-right: 100px"
-      />
-      <p class="font-bold mb-2 text-gray-900">
+      /> -->
+      <!-- <p class="font-bold mb-2 text-gray-900">
         IT-Bangmod Kradan Kanban was created by 2nd year undergraduate students
         <br />( INT221 Integrated Information Technology Project I )
-      </p>
-      <p class="text-white">Thank you for choosing Kradan Kanban!</p>
+      </p> -->
+      <p style="color: #f785b1">Thank you for choosing Kradan Kanban!</p>
     </aside>
   </footer>
 </template>
+
 <style scoped>
 #tasktable {
   width: 100%;
