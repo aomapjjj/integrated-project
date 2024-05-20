@@ -49,6 +49,7 @@ const myModal = ref(null);
 
 // Function to open the modal
 const openModal = () => {
+  router.push({ name: 'TaskDetail', params: { id: props.todoId } });
   myModal.value.showModal();
   console.log([props.todoId]);
 };
@@ -56,6 +57,7 @@ const openModal = () => {
 // Function to close the modal
 const closeModal = () => {
   myModal.value.close();
+  router.go(-1);
 };
 
 const UpdateTask = async () => {

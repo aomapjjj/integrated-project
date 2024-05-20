@@ -387,7 +387,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
               <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
                 <button class="itbkk-button-edit btn" @click="openModalToEdit(item.id)"
-                  v-if="item.name !== 'No Status'">
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'">
                   Edit
                 </button>
 
@@ -444,7 +444,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 </dialog>
 
                 <!-- Delete Modal -->
-                <button v-if="item.name !== 'No Status'" class="itbkk-button-delete btn" style="margin-left: 10px"
+                <button v-if="item.name !== 'No Status' && item.name !== 'Done'" class="itbkk-button-delete btn" style="margin-left: 10px"
                   @click="openModalToDelete(item.id)">
                   Delete
                 </button>
