@@ -166,7 +166,7 @@ const openNewStatus = () => {
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
           <img
-            src="/src/image/logo.png"
+            src="/src/image/sj3.png"
             alt="LOGO"
             class="w-[100px] h-[100px]"
           />
