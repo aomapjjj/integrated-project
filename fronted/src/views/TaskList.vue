@@ -179,13 +179,17 @@ const openNewStatus = () => {
         </a>
         <div class="flex items-center">
           <div class="hidden md:block">
-            <div class="flex space-x-4">
+            <div class="flex space-x-1.5">
               <!-- ADD BUTTON -->
               <AddTask />
               <!-- MANAGE STATUS -->
               <button
                 class="itbkk-manage-status btn bg-gray-200"
-                style="color: white; background-color: #f785b1; border-radius: 30px;"
+                style="
+                  color: white;
+                  background-color: #f785b1;
+                  border-radius: 30px;
+                "
                 @click="openNewStatus()"
               >
                 <svg
@@ -216,25 +220,47 @@ const openNewStatus = () => {
     </nav>
   </div>
 
-  <div class="flex justify-between mt-9 mx-20">
-    <!-- SEARCH INPUT -->
-    <div class="mr-auto">
-      <label class="input input-bordered flex items-center gap-2">
-        <input type="text" class="grow" placeholder="Search" />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          class="w-4 h-4 opacity-70"
+  <div class="flex justify-end mt-9 mx-20">
+    <!-- LIMIT -->
+    <button class="btn btn-circle btn-outline mr-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4"
+        fill="none"
+        viewBox="0 0 14 14"
+      >
+        <path
+          fill="#9FC3E9"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z"
+        />
+      </svg>
+    </button>
+    <!-- FILTER -->
+    <button class="btn btn-circle btn-outline">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4"
+        fill="none"
+        viewBox="0 0 14 14"
+      >
+        <g
+          fill="#9FC3E9"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-          <path
-            fill-rule="evenodd"
-            d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </label>
-    </div>
+          <circle cx="2" cy="2" r="1.5" />
+          <path d="M3.5 2h10" />
+          <circle cx="7" cy="7" r="1.5" />
+          <path d="M.5 7h5m3 0h5" />
+          <circle cx="12" cy="12" r="1.5" />
+          <path d="M10.5 12H.5" />
+        </g>
+      </svg>
+    </button>
   </div>
 
   <div class="flex flex-col items-center mt-9">
@@ -610,6 +636,39 @@ const openNewStatus = () => {
 </template>
 
 <style scoped>
+/* Responsive table styles */
+@media screen and (max-width: 640px) {
+  /* Hide the table header */
+  thead {
+    display: none;
+  }
+
+  /* Make table rows display as blocks for better stacking on small screens */
+  tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #ababab; /* Add border to separate rows */
+    border-radius: 10px; /* Add border radius for rounded corners */
+  }
+
+  /* Make table cells display as block elements */
+  td {
+    display: block;
+    text-align: left;
+    border: none; /* Remove border to separate cells */
+  }
+
+  /* Hide the table cell labels */
+  td:before {
+    display: none;
+  }
+
+  /* Hide the "Action" column labels */
+  .itbkk-button-action td:before {
+    display: none;
+  }
+}
+
 #tasktable {
   width: 100%;
   overflow: scroll;
