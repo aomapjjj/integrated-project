@@ -2,11 +2,13 @@
 // Import ref from Vue
 import { ref, watch, computed } from "vue"
 import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
-import { checkStatus } from "../libs/checkStatus"
+import { useTasks } from "../stores/store"
 import { toDate } from "../libs/toDate"
-import router from "@/router"
+import { useRouter } from 'vue-router';
 
 const statusList = ref([])
+const router = useRouter();
+const myTasks= useTasks()
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
@@ -35,10 +37,8 @@ watch(
       todo.value = await response.json()
       oldValue.value = { ...todo.value }
     }
-
     const itemsStatus = await getItems(baseUrlStatus)
     statusList.value = itemsStatus
-    
   },
   { immediate: true }
 )
@@ -69,7 +69,9 @@ const UpdateTask = async () => {
     assignees: trimmedAssignees,
     status: todo.value.status
   })
- 
+  myTasks.updateTask(edit.id, edit.title, edit.description, edit.assignees, edit.status, edit.createdOn, edit.updateOn)
+  console.log(edit)
+  router.push({ name: "TaskList" })
 }
 
 const checkEqual = computed(() => {
@@ -98,6 +100,9 @@ const checkEqual = computed(() => {
             placeholder="Enter Your Title"
             maxlength="100"
           />
+          <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.title?.length }}/100
+              </p>
         </label>
         <!-- Description -->
         <label for="description" class="form-control flex-grow ml-4 mb-8">
@@ -105,7 +110,9 @@ const checkEqual = computed(() => {
             <span
               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
               style="color: #9391e4"
-              >Description</span
+              >Description  <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.description?.length }}/500
+              </p></span
             >
           </div>
           <textarea
@@ -120,8 +127,9 @@ const checkEqual = computed(() => {
             }"
             placeholder="No Description Provided"
             style="height: 400px"
-            >{{ todo.description }} {{ todoId }}</textarea
+            >{{ todo.description }}</textarea
           >
+         
         </label>
       </div>
       <div
@@ -133,7 +141,9 @@ const checkEqual = computed(() => {
           <span
             class="block text-lg font-bold leading-6 text-gray-900 mb-2"
             style="color: #9391e4"
-            >Assignees</span
+            >Assignees <p class="text-sm text-red-400 mb-2 mt-2">
+                {{ todo.assignees?.length }}/30
+              </p></span
           >
           <textarea
             id="assignees"

@@ -1,0 +1,10 @@
+FROM mysql/mysql-server
+
+ENV MYSQL_RANDOM_ROOT_PASSWORD=true
+ENV MYSQL_USER=dev
+ENV MYSQL_PASSWORD=mysql
+ENV MYSQL_DATABASE=kanbanIT
+
+COPY scripts/ /docker-entrypoint-initdb.d/
+
+HEALTHCHECK --interval=2s --timeout=3s --retries=20 CMD /healthcheck.sh

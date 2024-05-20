@@ -1,146 +1,171 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
-import TaskDetail from '../views/TaskDetail.vue';
-import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
-import StatusesList from '../views/StatusesList.vue';
-import { checkStatus } from '../libs/checkStatus';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from "vue"
+import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const router = useRouter();
-const todoList = ref([]);
-const selectedTodoId = ref(0);
-const notFound = ref(false);
-const deleteComplete = ref(false);
-const showDetail = ref(false);
-const statusList = ref([]);
-let items = []; // ประกาศ items เป็นตัวแปร global
-let itemsStatus = []; // ประกาศ items เป็นตัวแปร global
+const route = useRoute()
+const router = useRouter()
+const todoList = ref([])
+const selectedTodoId = ref(0)
+const notFound = ref(false)
+const deleteComplete = ref(false)
+const showDetail = ref(false)
+const statusList = ref([])
+let items = [] // ประกาศ items เป็นตัวแปร global
+let itemsStatus = [] // ประกาศ items เป็นตัวแปร global
+const indexDelete = ref(0)
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'NO_STATUS',
-});
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
 
+const taskStore= useTasks()
 onMounted(async () => {
-  items = await getItems(baseUrlTask);
-  itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
 
-  console.log('itemStatuss', itemsStatus);
-  todoList.value = items;
-  console.log('items', items);
-  const taskId = route.params.id;
 
+  if (taskStore.getTasks().length === 0) {
+    items = await getItems(baseUrlTask)
+    taskStore.addTasks(await items)
+  }
+
+  console.log('sedsss' , taskStore.getTasks())
+
+  itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
+  console.log("itemStatuss", itemsStatus)
+  todoList.value = items
+  console.log("items", items)
+  const taskId = route.params.id
   if (taskId !== undefined) {
-    console.log(taskId);
-    const response = await getItemById(taskId);
+    console.log(taskId)
+    const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task/error');
-      notFound.value = true;
+      router.push("/task/error")
+      notFound.value = true
     }
   }
-  return items;
-});
+  return items
+})
 
 const selectTodo = (todoId) => {
-  selectedTodoId.value = todoId;
-  showDetail.value = true;
-};
+  router.push({ name: 'TaskDetail', params: { id: todoId } })
+  selectedTodoId.value = todoId
+  showDetail.value = true
+}
 
 // ----------------------- Delete -----------------------
 
-const selectedItemIdToDelete = ref(0);
+const selectedItemIdToDelete = ref(0)
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(baseUrlTask, todoId);
+    const status = await deleteItemById(baseUrlTask, todoId)
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
+      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`);
+      console.error(`Failed to delete item with ID ${todoId}`)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error);
+    console.error(`Error deleting item with ID ${todoId}:`, error)
   }
-};
+  
+}
 
-const openModalToDelete = (itemId) => {
-  selectedItemIdToDelete.value = itemId;
-  const modal = document.getElementById('my_modal_delete');
-  modal.showModal();
-};
+const openModalToDelete = (itemId, index) => {
+  selectedItemIdToDelete.value = itemId
+  indexDelete.value = index
+  const modal = document.getElementById("my_modal_delete")
+  modal.showModal()
+}
 
 const closeModal = () => {
-  const modal = document.getElementById('my_modal_delete');
-  modal.close();
-};
+  const modal = document.getElementById("my_modal_delete")
+  modal.close()
+}
 
 const confirmDelete = () => {
-  deleteTodo(selectedItemIdToDelete.value);
-  closeModal();
-  deleteComplete.value = true;
+  taskStore.removeTask(selectTodo.id)
+  deleteTodo(selectedItemIdToDelete.value)
+  closeModal()
+  deleteComplete.value = true
   setTimeout(() => {
-    deleteComplete.value = false;
-  }, 2300);
-};
+    deleteComplete.value = false
+  }, 2300)
+}
 
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id);
+  const item = items.find((item) => item.id === id)
   if (item) {
-    console.log(item.title);
-    return item.title;
+    console.log(item.title)
+    return item.title
   } else {
-    console.log(`No item found with id ${id}`);
-    return '';
+    console.log(`No item found with id ${id}`)
+    return ""
   }
-};
+}
 
 // ----------------------- filterAndLogTitleById -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default');
+const showIcon = ref("default")
+const statusSortOrder = ref("asc")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc';
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc';
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'asc';
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
-};
-const statusSortOrder = ref('asc');
+
+  sortByStatus()
+}
 
 const sortByStatus = () => {
-  const currentSortOrder = statusSortOrder.value;
-  if (currentSortOrder === 'asc') {
-    todoList.value.sort((a, b) => a.status.localeCompare(b.status));
-    statusSortOrder.value = 'desc';
-  } else {
-    todoList.value.sort((a, b) => b.status.localeCompare(a.status));
-    statusSortOrder.value = 'asc';
-  }
-};
+  
+  const currentSortOrder = statusSortOrder.value
+  
+  if (currentSortOrder === "asc") {
+    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
+  } else if (currentSortOrder === "desc") {
+    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
+  } else { 
+    taskStore.getTasks().sort((a, b) => a.id - b.id) 
+}
+
+}
+
+
 
 // ----------------------- STATUS SORT -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' });
-};
+  router.push({ name: "StatusesList" })
+}
+
+
+
+
 </script>
 
 <template>
@@ -179,6 +204,8 @@ const openNewStatus = () => {
   <!-- header -->
 
   <div class="flex justify-between mt-9 mx-20">
+   
+
     <!-- SEARCH INPUT -->
     <div class="mr-auto">
       <label class="input input-bordered flex items-center gap-2">
@@ -199,7 +226,7 @@ const openNewStatus = () => {
     </div>
     <div class="flex space-x-4">
       <!-- ADD BUTTON -->
-      <AddTask :todo="todo" />
+      <AddTask />
       <!-- MANAGE STATUS -->
       <button
         class="itbkk-manage-status btn bg-gray-200"
@@ -359,16 +386,16 @@ const openNewStatus = () => {
           </thead>
           <tbody>
             <!-- Iterate over todoList -->
-            <TaskDetail :todo-id="selectedTodoId" v-if="showDetail" />
+            <TaskDetail :todo-id="selectedTodoId" />
             <tr
               class="itbkk-item"
-              v-for="(item, index) in todoList"
+              v-for="(item, index) in taskStore.getTasks()"
               :key="index"
             >
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
-                {{ item.id }}
+                {{ index+1}}
               </td>
               <td
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
@@ -377,19 +404,19 @@ const openNewStatus = () => {
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
-                >
+                  >
                   {{ item.title }}
                 </label>
               </td>
               <td
                 class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.assignees || item.assignees.length === 0,
+                  italic: !item.assignees || item.assignees.length === 0
                 }"
               >
                 {{
                   !item.assignees || item.assignees.length === 0
-                    ? 'Unassigned'
+                    ? "Unassigned"
                     : item.assignees
                 }}
               </td>
@@ -404,7 +431,7 @@ const openNewStatus = () => {
                     'border-red-500 text-red-500': item.status === 'To Do',
                     'border-yellow-500 text-yellow-500':
                       item.status === 'Doing',
-                    'border-green-500 text-green-500': item.status === 'Done',
+                    'border-green-500 text-green-500': item.status === 'Done'
                   }"
                 >
                   {{ item.status }}
@@ -450,7 +477,7 @@ const openNewStatus = () => {
                           <a
                             style="width: 150px; margin-left: 17px"
                             class="itbkk-button-delete btn"
-                            @click="openModalToDelete(item.id)"
+                            @click="openModalToDelete(item.id, index)"
                             >Delete</a
                           >
                         </li>
@@ -510,7 +537,7 @@ const openNewStatus = () => {
                         style="word-wrap: break-word"
                       >
                         Do you want to delete the task number
-                        {{ selectedItemIdToDelete }} - "{{
+                        {{ indexDelete + 1 }} - "{{
                           filterAndLogTitleById(selectedItemIdToDelete)
                         }}"?
                       </p>
@@ -518,7 +545,7 @@ const openNewStatus = () => {
                         <button
                           class="itbkk-button-cancel btn"
                           @click="closeModal"
-                          style="color: #eb4343; pointer-events: none"
+                          style="color: #eb4343"
                         >
                           Cancel
                         </button>
@@ -539,11 +566,6 @@ const openNewStatus = () => {
             </tr>
 
             <!-- DELETE COMPLETE -->
-            <tr v-if="todoList?.length === 0">
-              <td colspan="4" class="text-center py-4 text-gray-500">
-                No task
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -622,7 +644,7 @@ table {
   overflow: hidden;
 }
 
-td  {
+td {
   border-bottom: 1px solid #ababab;
 }
 
