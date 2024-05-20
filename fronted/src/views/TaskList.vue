@@ -164,7 +164,7 @@ const openNewStatus = () => {
 
 <template>
   <div class="min-h-full max-h-fit">
-    <nav class="bg-white shadow" style="margin-top: 10px">
+    <nav class="bg-white shadow" style="margin-top: 10px; background-color: #d8f1f1 ;">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
           <img
@@ -176,7 +176,7 @@ const openNewStatus = () => {
             <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
             <h1
               class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight"
-              style="color: #9391e4; text-align: center"
+              style="color: #9391e4; text-align: center; text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;"
             >
               IT-Bangmod Kradan Kanban
             </h1>
@@ -225,7 +225,7 @@ const openNewStatus = () => {
     </nav>
   </div>
 
-  <div class="flex justify-end mt-9 mx-20">
+  <div class="flex justify-end mt-9 mx-auto" style="margin-right: 100px;">
     <!-- LIMIT -->
     <button
       class="btn btn-circle btn-outline mr-2"

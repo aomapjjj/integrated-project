@@ -1,6 +1,6 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 import { useTasks } from "../stores/store"
 import { useRouter } from "vue-router"
 
@@ -72,9 +72,19 @@ const clearForm = () => {
   todo.value.status = "No Status"
 }
 
+// ----------------------- Validate -----------------------
+
 const isValidTitle = (title) => {
-  return title && title?.trim().length > 0;
-};
+  return title && title?.trim().length > 0 && title?.trim().length <= 100
+}
+
+const isFormValid = computed(() => {
+  return (
+    isValidTitle(todo.value.title) &&
+    todo.value.description.trim().length <= 500 &&
+    todo.value.assignees.trim().length <= 30
+  )
+})
 
 </script>
 
@@ -131,7 +141,6 @@ const isValidTitle = (title) => {
                 type="text"
                 class="grow"
                 placeholder="Enter Your Title"
-                maxlength="100"
                 v-model="todo.title"
               />
             </label>
@@ -153,7 +162,6 @@ const isValidTitle = (title) => {
               <textarea
                 id="description"
                 class="itbkk-description textarea textarea-bordered h-3/4"
-                maxlength="500"
                 rows="4"
                 placeholder="No Description Provided"
                 style="height: 200px"
@@ -177,7 +185,6 @@ const isValidTitle = (title) => {
             <textarea
               id="assignees"
               class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-              maxlength="30"
               rows="4"
               placeholder="Unassigned"
               v-model="todo.assignees"
@@ -212,8 +219,8 @@ const isValidTitle = (title) => {
                   type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
                   style="background-color: #f785b1"
-                  :class="{ disabled: !isValidTitle(todo.title) }"
-                  :disabled="!isValidTitle(todo.title)"
+                  :class="{ disabled: !isFormValid }"
+                  :disabled="!isFormValid"
                 >
                   Save
                 </button>
@@ -226,7 +233,7 @@ const isValidTitle = (title) => {
         </div>
 
         <!-- ALERT -->
-        <div 
+        <div
           role="alert"
           class="alert shadow-lg"
           :class="{ hidden: !showAlertAfterClose }"

@@ -85,9 +85,6 @@ const closeModalAdd = () => {
   modal.close()
 }
 
-const isValidName = (name) => {
-  return name && name?.trim().length > 0
-}
 
 // logic for submitting the form
 
@@ -160,6 +157,8 @@ const statusExists = (name) => {
     (status) => status.name?.trim().toLowerCase() === name?.trim().toLowerCase()
   )
 }
+
+//ติดตรงเวลาจะแก้ description มันก็ขึ้นด้วย
 
 // ----------------------- Edit -----------------------
 
@@ -252,6 +251,18 @@ const deleteandtrans = async (statusId, newID) => {
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+// ----------------------- Validate -----------------------
+
+// const isValidName = (name) => {
+//   return name && name?.trim().length > 0 && name?.trim().length <= 50
+// }
+
+// const isFormValid = computed(() => {
+//   return (isValidName(status.name) &&
+//    status.description.trim().length <= 200 
+//   )
+// })
+
 </script>
 
 <template>
@@ -305,11 +316,10 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                   type="text"
                   class="grow"
                   placeholder="Enter Your Title"
-                  maxlength="100"
                   v-model="status.name"
                 />
                 <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                  {{ status.name?.length }}/100
+                  {{ status.name?.length }}/50
                 </p>
               </label>
               <!-- Description -->
@@ -322,7 +332,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                     class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                     >Description
                     <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                      {{ status.description?.length }}/500
+                      {{ status.description?.length }}/200
                     </p>
                   </span>
                 </div>
@@ -330,7 +340,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 <textarea
                   id="description"
                   class="itbkk-description textarea textarea-bordered flex-grow w-full"
-                  maxlength="500"
                   rows="4"
                   placeholder="No Description Provided"
                   v-model="status.description"
@@ -344,10 +353,9 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                   type="submit"
                   class="itbkk-button-confirm btn mr-2"
                   style="flex: 3; margin: 10px; background-color: #f785b1"
-                  :class="{ disabled: !isValidName(status.name) }"
-                  :disabled="
-                    !isValidName(status.name) && statusExists(status.name)
-                  "
+
+                 
+                  :disabled="statusExists()"
                 >
                   Save
                 </button>
@@ -543,7 +551,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                             v-model="status.name"
                           />
                           <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                            {{ status.name?.length }}/100
+                            {{ status.name?.length }}/50
                           </p>
                         </label>
 
@@ -557,7 +565,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                               class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                               >Description
                               <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                                {{ status.description?.length }}/500
+                                {{ status.description?.length }}/200
                               </p></span
                             >
                           </div>

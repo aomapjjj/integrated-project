@@ -22,6 +22,8 @@ const startCountdown = () => {
 const goBackHome = () => {
   router.push({ name: 'TaskList' });
 };
+
+
 </script>
 
 <template>
