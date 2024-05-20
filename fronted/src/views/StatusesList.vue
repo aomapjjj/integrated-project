@@ -33,12 +33,10 @@ const status = ref({
 })
 
 onMounted(async () => {
-
   if (myStatuses.getStatuses().length === 0) {
     items = await getItems(baseUrlStatus)
     myStatuses.addStatuses(await items)
     console.table(items)
-
   }
   statusList.value = myStatuses.getStatuses()
   console.log(myStatuses.getStatuses())
@@ -63,7 +61,17 @@ const submitForm = async () => {
     name: statusName,
     description: statusDescription
   })
-  myStatuses.addStatus(itemAdd.id, itemAdd.name, itemAdd.description, itemAdd.createdOn, itemAdd.updateOn)
+  if (statusExists(statusName)) {
+    alert("Status name already exists")
+    return
+  }
+  myStatuses.addStatus(
+    itemAdd.id,
+    itemAdd.name,
+    itemAdd.description,
+    itemAdd.createdOn,
+    itemAdd.updateOn
+  )
   clearForm()
 }
 
@@ -75,12 +83,13 @@ const clearForm = () => {
 const closeModalAdd = () => {
   const modal = document.getElementById("my_modal_4")
   modal.close()
-
 }
 
 const isValidName = (name) => {
-  return name && name?.trim().length > 0;
-};
+  return name && name?.trim().length > 0
+}
+
+// logic for submitting the form
 
 // ----------------------- Add -----------------------
 
@@ -100,10 +109,22 @@ const UpdateStatus = async () => {
     name: statusName,
     description: statusDescription
   })
+  if (statusExists(statusName)) {
+    alert("Status name already exists")
+    return
+  }
   console.log(edit)
-  myStatuses.updateStatus(edit.id, edit.name, edit.description, edit.createdOn, edit.updateOn)
+  myStatuses.updateStatus(
+    edit.id,
+    edit.name,
+    edit.description,
+    edit.createdOn,
+    edit.updateOn
+  )
 
-  const statusIndex = statusList.value.findIndex((status) => status.id === statusId);
+  const statusIndex = statusList.value.findIndex(
+    (status) => status.id === statusId
+  )
   if (statusIndex !== -1) {
     statusList.value[statusIndex] = { ...edit }
   }
@@ -133,6 +154,13 @@ const isEdited = computed(() => {
       status.value.description.trim().length > 0)
   )
 })
+
+const statusExists = (name) => {
+  return statusList.value.some(
+    (status) => status.name?.trim().toLowerCase() === name?.trim().toLowerCase()
+  )
+}
+
 // ----------------------- Edit -----------------------
 
 // ----------------------- Delete -----------------------
@@ -240,9 +268,15 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   </div>
 
   <!-- header -->
+
   <header class="bg-white shadow">
-    <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center">
-      <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900" style="color: #9391e4">
+    <div
+      class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center"
+    >
+      <h1
+        class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900"
+        style="color: #9391e4"
+      >
         IT-Bangmod Kradan Kanban
       </h1>
       <!-- Add new status -->
@@ -251,45 +285,78 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
       </div>
       <dialog id="my_modal_4" class="itbkk-modal-status modal">
         <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
-          <span class="block text-2xl font-bold leading-6 text-gray-900 mb-1" style="margin: 15px">Add Status</span>
+          <span
+            class="block text-2xl font-bold leading-6 text-gray-900 mb-1"
+            style="margin: 15px"
+            >Add Status</span
+          >
 
           <!-- Modal content -->
           <div class="modal-action flex flex-col justify-between">
             <!-- name -->
 
-            <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
-              <label class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-                <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100" v-model="status.name" />
+            <div
+              class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
+            >
+              <label
+                class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
+              >
+                <input
+                  type="text"
+                  class="grow"
+                  placeholder="Enter Your Title"
+                  maxlength="100"
+                  v-model="status.name"
+                />
                 <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
                   {{ status.name?.length }}/100
                 </p>
               </label>
               <!-- Description -->
-              <label for="description" class="itbkk-status-description form-control flex-grow ml-4 mb-8">
+              <label
+                for="description"
+                class="itbkk-status-description form-control flex-grow ml-4 mb-8"
+              >
                 <div class="label">
-                  <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description <p
-                      class="text-sm text-red-400 ml-4 mb-2 mt-2">
+                  <span
+                    class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                    >Description
+                    <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
                       {{ status.description?.length }}/500
-                    </p> </span>
-
+                    </p>
+                  </span>
                 </div>
 
-                <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full"
-                  maxlength="500" rows="4" placeholder="No Description Provided"
-                  v-model="status.description"></textarea>
+                <textarea
+                  id="description"
+                  class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                  maxlength="500"
+                  rows="4"
+                  placeholder="No Description Provided"
+                  v-model="status.description"
+                ></textarea>
               </label>
             </div>
             <!-- Buttons -->
             <div class="flex justify-end">
               <form form @submit.prevent="submitForm" method="dialog">
-                <button type="submit" class="itbkk-button-confirm btn mr-2"
+                <button
+                  type="submit"
+                  class="itbkk-button-confirm btn mr-2"
                   style="flex: 3; margin: 10px; background-color: #f785b1"
                   :class="{ disabled: !isValidName(status.name) }"
-                  :disabled="!isValidName(status.name)">
+                  :disabled="
+                    !isValidName(status.name) && statusExists(status.name)
+                  "
+                >
                   Save
                 </button>
               </form>
-              <button class="itbkk-button-cancel btn" style="margin: 10px" @click="closeModalAdd()">
+              <button
+                class="itbkk-button-cancel btn"
+                style="margin: 10px"
+                @click="closeModalAdd()"
+              >
                 Cancel
               </button>
             </div>
@@ -306,18 +373,36 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <ul>
             <li>
               <a @click="$router.go(-1)">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4 stroke-current">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4 stroke-current"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  ></path>
                 </svg>
                 Home
               </a>
             </li>
             <li>
               <a>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-4 h-4 stroke-current">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="w-4 h-4 stroke-current"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                  ></path>
                 </svg>
                 Task Status
               </a>
@@ -325,122 +410,188 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           </ul>
         </div>
 
-        <table class="table-auto mt-10 rounded-xl overflow-hidden" style="table-layout: fixed">
+        <table
+          class="table-auto mt-10 rounded-xl overflow-hidden"
+          style="table-layout: fixed"
+        >
           <!-- table -->
           <thead>
             <tr class="bg-base-200 mt-4 md:mt-0">
-              <th class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+              <th
+                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
+                "
+              >
                 No.
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
+                "
+              >
                 Name
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
+                "
+              >
                 Description
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
+                "
+              >
                 Action
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr class="itbkk-item" v-for="(item, index) in myStatuses.getStatuses()" :key="index">
+            <tr
+              class="itbkk-item"
+              v-for="(item, index) in myStatuses.getStatuses()"
+              :key="index"
+            >
               <!-- ID -->
-              <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
+              <td
+                class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
+              >
                 {{ index + 1 }}
               </td>
               <!-- NAME -->
 
               <td class="">
-                <label class="itbkk-status-name" for="my_modal_6" @click="selectStatus(item.id)">
+                <label
+                  class="itbkk-status-name"
+                  for="my_modal_6"
+                  @click="selectStatus(item.id)"
+                >
                   {{ item.name }}
                 </label>
               </td>
 
-              <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700" :class="{
+              <td
+                class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                :class="{
                   italic: !item.description || item.description?.length === 0
-                }">
-                <label for="my_modal_6" :class="{
-                  italic: !item.description || item.description?.length === 0
-                }">
+                }"
+              >
+                <label
+                  for="my_modal_6"
+                  :class="{
+                    italic: !item.description || item.description?.length === 0
+                  }"
+                >
                   {{
-                  !item.description || item.description.length === 0
-                    ? "No description is provided"
-                    : item.description
-                }}
+                    !item.description || item.description.length === 0
+                      ? "No description is provided"
+                      : item.description
+                  }}
                 </label>
               </td>
 
               <!-- Edit modal-->
 
-              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
-                <button class="itbkk-button-edit btn" @click="openModalToEdit(item.id)"
-                  v-if="item.name !== 'No Status' && item.name !== 'Done'">
+              <td
+                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
+              >
+                <button
+                  class="itbkk-button-edit btn"
+                  @click="openModalToEdit(item.id)"
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
+                >
                   Edit
                 </button>
 
                 <dialog id="my_modal_edit" class="modal">
-                  <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto" :key="index">
-                    <span class="block text-2xl font-bold leading-6 text-gray-900 mb-1" style="margin: 15px">Edit
-                      Status</span>
+                  <div
+                    class="modal-box w-full md:w-11/12 max-w-5xl mx-auto"
+                    :key="index"
+                  >
+                    <span
+                      class="block text-2xl font-bold leading-6 text-gray-900 mb-1"
+                      style="margin: 15px"
+                      >Edit Status</span
+                    >
 
                     <!-- Modal content -->
                     <div class="modal-action flex flex-col justify-between">
-                      <div class="modal-content py-4 text-left px-6 flex-grow flex flex-col">
+                      <div
+                        class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
+                      >
                         <label
-                          class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8">
-                          <input type="text" class="grow" placeholder="Enter Your Title" maxlength="100"
-                            v-model="status.name" />
+                          class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
+                        >
+                          <input
+                            type="text"
+                            class="grow"
+                            placeholder="Enter Your Title"
+                            maxlength="100"
+                            v-model="status.name"
+                          />
                           <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
                             {{ status.name?.length }}/100
                           </p>
                         </label>
 
                         <!-- Description -->
-                        <label for="description" class="form-control flex-grow ml-4 mb-8">
+                        <label
+                          for="description"
+                          class="form-control flex-grow ml-4 mb-8"
+                        >
                           <div class="label">
-                            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description <p
-                                class="text-sm text-red-400 ml-4 mb-2 mt-2">
+                            <span
+                              class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                              >Description
+                              <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
                                 {{ status.description?.length }}/500
-                              </p></span>
-
+                              </p></span
+                            >
                           </div>
 
-                          <textarea id="description"
-                            class="itbkk-description textarea textarea-bordered flex-grow w-full" maxlength="500"
-                            rows="4" placeholder="No Description Provided" v-model="status.description">
+                          <textarea
+                            id="description"
+                            class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                            maxlength="500"
+                            rows="4"
+                            placeholder="No Description Provided"
+                            v-model="status.description"
+                          >
                             No description is provided
                           </textarea>
                         </label>
-                        
                       </div>
 
                       <!-- Buttons -->
                       <div class="flex justify-end">
                         <form method="dialog">
-                          <button @click="UpdateStatus" type="submit" class="itbkk-button-confirm btn mr-2"
-                            :class="{ 'disabled': !isEdited }" :disabled="!isEdited">
+                          <button
+                            @click="UpdateStatus"
+                            type="submit"
+                            class="itbkk-button-confirm btn mr-2"
+                            :class="{ disabled: !isEdited }"
+                            :disabled="!isEdited"
+                          >
                             Save
                           </button>
                         </form>
-                        <button class="itbkk-button-cancel btn" @click="closeModalEdit()">
+                        <button
+                          class="itbkk-button-cancel btn"
+                          @click="closeModalEdit()"
+                        >
                           Cancel
                         </button>
                       </div>
@@ -449,22 +600,37 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                 </dialog>
 
                 <!-- Delete Modal -->
-                <button v-if="item.name !== 'No Status' && item.name !== 'Done'" class="itbkk-button-delete btn" style="margin-left: 10px"
-                  @click="openModalToDelete(item.id)">
+                <button
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
+                  class="itbkk-button-delete btn"
+                  style="margin-left: 10px"
+                  @click="openModalToDelete(item.id)"
+                >
                   Delete
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 1000px">
                     <h3 class="font-bold text-lg">Delete a Task</h3>
-                    <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
+                    <p
+                      class="itbkk-message py-4 font-medium"
+                      style="word-wrap: break-word"
+                    >
                       Do you want to delete
                       {{ getNameById(selectedItemIdToDelete) }}
                     </p>
                     <div class="modal-action">
-                      <button class="itbkk-button-cancel btn" @click="closeModal" style="color: #eb4343">
+                      <button
+                        class="itbkk-button-cancel btn"
+                        @click="closeModal"
+                        style="color: #eb4343"
+                      >
                         Cancel
                       </button>
-                      <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff" @click="confirmDelete">
+                      <button
+                        class="itbkk-button-confirm btn bg-green-400"
+                        style="color: #fff"
+                        @click="confirmDelete"
+                      >
                         Confirm
                       </button>
                     </div>
@@ -483,31 +649,43 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                     </p>
 
                     <div class="itbkk-status mb-4 mt-2">
-                      <span class="block text-lg font-bold leading-6 text-gray-900 mb-2">Transfer To</span>
-                      <select v-model="status.id" class="select select-bordered w-full max-w-xs mt-1">
+                      <span
+                        class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                        >Transfer To</span
+                      >
+                      <select
+                        v-model="status.id"
+                        class="select select-bordered w-full max-w-xs mt-1"
+                      >
                         <option v-for="status in statusList" :value="status.id">
                           {{ status.name }}
                         </option>
                       </select>
-                      <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff"
-                        @click="confirmDeleteTrans(status.id)">
+                      <button
+                        class="itbkk-button-confirm btn bg-green-400"
+                        style="color: #fff"
+                        @click="confirmDeleteTrans(status.id)"
+                      >
                         Confirm
-
                       </button>
                     </div>
 
                     <div class="modal-action">
-                      <button class="itbkk-button-cancel btn" @click="closeModalTrans" style="color: #eb4343">
+                      <button
+                        class="itbkk-button-cancel btn"
+                        @click="closeModalTrans"
+                        style="color: #eb4343"
+                      >
                         Cancel
                       </button>
                     </div>
                   </div>
                 </dialog>
-                <!-- Delete And Trans -->
               </td>
             </tr>
           </tbody>
         </table>
+        
       </div>
     </div>
   </div>
