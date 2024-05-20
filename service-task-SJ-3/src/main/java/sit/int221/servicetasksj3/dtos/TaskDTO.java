@@ -13,10 +13,10 @@ public class TaskDTO {
     private Integer id;
     private String title;
     private String assignees;
-    @JsonIgnore
-    private TaskStatus statusTasks;
+    private TaskStatus status;
 
     public String getStatus(){
-        return statusTasks.getName();
+        return status.getName();
     }
 }
+

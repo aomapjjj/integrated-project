@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.StatusDTO;
 import sit.int221.servicetasksj3.dtos.StatusDTOTwo;
+import sit.int221.servicetasksj3.dtos.StatusLimitTaskDTO;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
+import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
 import java.util.List;
-
 @Service
 public class StatusService {
     @Autowired
@@ -68,8 +69,7 @@ public class StatusService {
     // EDIT
     @Transactional
     public TaskStatus updateStatuses(Integer id, TaskStatus task) {
-        TaskStatus existingTask = repository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("NOT FOUND"));
+        TaskStatus existingTask = repository.findById(id).orElseThrow(() -> new ItemNotFoundException("NOT FOUND"));
         // Check if the status ID is for "No Status"
         if (existingTask.getId() == 1) {
             throw new InternalServerErrorException("The status 'No Status' cannot be changed");
@@ -82,12 +82,16 @@ public class StatusService {
             throw new InternalServerErrorException("Status name is required");
         }
         if (task.getName().trim().length() > 50) {
-            throw new InternalServerErrorException("Status name cannot exceed 50 characters");
+            throw new InternalServerErrorException("Name must be between 0 and 50");
         }
         if (task.getDescription() != null && task.getDescription().trim().length() > 200) {
-            throw new InternalServerErrorException("Status description cannot exceed 200 characters");
+            throw new InternalServerErrorException("Description must be between 0 and 200");
         }
-
+        // Check if the status is unique
+        TaskStatus existingStatus = repository.findByName(task.getName().trim());
+        if (existingStatus != null) {
+            throw new ValidationException("Status name must be unique");
+        }
         try {
             Integer oldStatusId = existingTask.getId();
             if (task.getId() != null) {
@@ -99,7 +103,6 @@ public class StatusService {
             throw new InternalServerErrorException("Failed to save task status to the database");
         }
     }
-
 
     // DELETE
     @Transactional
@@ -116,6 +119,7 @@ public class StatusService {
             throw new ItemNotFoundException("Failed to delete status to the database" + e.getMessage());
         }
     }
+
     // TRANSFER
     @Transactional
     public TaskStatus transferStatuses(Integer id, Integer newId) {
@@ -139,4 +143,11 @@ public class StatusService {
             throw new ItemNotFoundException("NOT FOUND");
         }
     }
+    // LIMIT
+//    @Transactional
+//    public StatusLimitTaskDTO updateStatusLimit(Integer id, StatusLimitTaskDTO statusLimitTaskDTO){
+//        TaskStatus existingStatus = repository.findById(id).orElseThrow(
+//                () -> new ItemNotFoundException("NOT FOUND"));
+//
+//    }
 }

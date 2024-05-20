@@ -34,7 +34,7 @@ public class StatusController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> createNewStatuses(@Valid @RequestBody StatusDTO status) {
+    public ResponseEntity<StatusDTO> createNewStatuses(@Valid @RequestBody StatusDTO status) {
         StatusDTO createdStatus = service.createNewStatuses(status);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
     }
@@ -51,5 +51,7 @@ public class StatusController {
     public ResponseEntity<Object> removeStatusAndReplace(@Valid @PathVariable Integer id , @PathVariable Integer newId){
         return ResponseEntity.ok(service.transferStatuses(id,newId));
     }
+
+//    @PatchMapping("/{id}/maximum-task")
 
 }
