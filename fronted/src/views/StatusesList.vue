@@ -78,6 +78,10 @@ const closeModalAdd = () => {
 
 }
 
+const isValidName = (name) => {
+  return name && name?.trim().length > 0;
+};
+
 // ----------------------- Add -----------------------
 
 const selectStatus = (statusId) => {
@@ -280,7 +284,8 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               <form form @submit.prevent="submitForm" method="dialog">
                 <button type="submit" class="itbkk-button-confirm btn mr-2"
                   style="flex: 3; margin: 10px; background-color: #f785b1"
-                  :disabled="status.name?.length === 0 || status.name === null">
+                  :class="{ disabled: !isValidName(status.name) }"
+                  :disabled="!isValidName(status.name)">
                   Save
                 </button>
               </form>
