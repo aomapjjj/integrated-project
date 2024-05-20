@@ -1,160 +1,163 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
-import TaskDetail from '../views/TaskDetail.vue';
-import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
-import { useTasks } from '../stores/store';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from "vue"
+import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const router = useRouter();
-const todoList = ref([]);
-const selectedTodoId = ref(0);
-const notFound = ref(false);
-const deleteComplete = ref(false);
-const showDetail = ref(false);
-const statusList = ref([]);
-let items = []; // ประกาศ items เป็นตัวแปร global
-let itemsStatus = []; // ประกาศ items เป็นตัวแปร global
-const indexDelete = ref(0);
+const route = useRoute()
+const router = useRouter()
+const todoList = ref([])
+const selectedTodoId = ref(0)
+const notFound = ref(false)
+const deleteComplete = ref(false)
+const showDetail = ref(false)
+const statusList = ref([])
+let items = [] 
+let itemsStatus = [] 
+const indexDelete = ref(0)
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const isLimitEnabled = ref(false) // เปิด input limitๆ
+const maxTasks = ref(10) 
+
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status',
-});
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
 
-const taskStore = useTasks();
+const taskStore = useTasks()
 onMounted(async () => {
   if (taskStore.getTasks().length === 0) {
-    items = await getItems(baseUrlTask);
-    taskStore.addTasks(await items);
+    items = await getItems(baseUrlTask)
+    taskStore.addTasks(await items)
   }
 
-  console.log('sedsss', taskStore.getTasks());
+  console.log("sedsss", taskStore.getTasks())
 
-  itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
-  console.log('itemStatuss', itemsStatus);
-  todoList.value = items;
-  console.log('items', items);
-  const taskId = route.params.id;
+  itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
+  console.log("itemStatuss", itemsStatus)
+  todoList.value = items
+  console.log("items", items)
+  const taskId = route.params.id
   if (taskId !== undefined) {
-    console.log(taskId);
-    const response = await getItemById(taskId);
+    console.log(taskId)
+    const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task/error');
-      notFound.value = true;
+      router.push("/task/error")
+      notFound.value = true
     }
   }
-  return items;
-});
+  return items
+})
 
 const selectTodo = (todoId) => {
-  router.push({ name: 'TaskDetail', params: { id: todoId } });
-  selectedTodoId.value = todoId;
-  showDetail.value = true;
-};
+  router.push({ name: "TaskDetail", params: { id: todoId } })
+  selectedTodoId.value = todoId
+  showDetail.value = true
+}
 
 // ----------------------- Delete -----------------------
 
-const selectedItemIdToDelete = ref(0);
+const selectedItemIdToDelete = ref(0)
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(baseUrlTask, todoId);
+    const status = await deleteItemById(baseUrlTask, todoId)
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
+      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`);
+      console.error(`Failed to delete item with ID ${todoId}`)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error);
+    console.error(`Error deleting item with ID ${todoId}:`, error)
   }
-};
+}
 
 const openModalToDelete = (itemId, index) => {
-  selectedItemIdToDelete.value = itemId;
-  indexDelete.value = index;
-  const modal = document.getElementById('my_modal_delete');
-  modal.showModal();
-};
+  selectedItemIdToDelete.value = itemId
+  indexDelete.value = index
+  const modal = document.getElementById("my_modal_delete")
+  modal.showModal()
+}
 
 const closeModal = () => {
-  const modal = document.getElementById('my_modal_delete');
-  modal.close();
-};
+  const modal = document.getElementById("my_modal_delete")
+  modal.close()
+}
 
 const confirmDelete = () => {
-  taskStore.removeTask(selectTodo.id);
-  deleteTodo(selectedItemIdToDelete.value);
-  closeModal();
-  deleteComplete.value = true;
+  taskStore.removeTask(selectTodo.id)
+  deleteTodo(selectedItemIdToDelete.value)
+  closeModal()
+  deleteComplete.value = true
   setTimeout(() => {
-    deleteComplete.value = false;
-  }, 2300);
-};
+    deleteComplete.value = false
+  }, 2300)
+}
 
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id);
+  const item = items.find((item) => item.id === id)
   if (item) {
-    console.log(item.title);
-    return item.title;
+    console.log(item.title)
+    return item.title
   } else {
-    console.log(`No item found with id ${id}`);
-    return '';
+    console.log(`No item found with id ${id}`)
+    return ""
   }
-};
+}
 
 // ----------------------- filterAndLogTitleById -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default');
-const statusSortOrder = ref('asc');
+const showIcon = ref("default")
+const statusSortOrder = ref("asc")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc';
-    statusSortOrder.value = 'asc';
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc';
-    statusSortOrder.value = 'desc';
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'default';
-    statusSortOrder.value = 'default';
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
 
-  sortByStatus();
-};
+  sortByStatus()
+}
 
 const sortByStatus = () => {
-  const currentSortOrder = statusSortOrder.value;
+  const currentSortOrder = statusSortOrder.value
 
-  if (currentSortOrder === 'asc') {
-    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status));
-  } else if (currentSortOrder === 'desc') {
-    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status));
+  if (currentSortOrder === "asc") {
+    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
+  } else if (currentSortOrder === "desc") {
+    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
-    taskStore.getTasks().sort((a, b) => a.id - b.id);
+    taskStore.getTasks().sort((a, b) => a.id - b.id)
   }
-};
+}
 
 // ----------------------- STATUS SORT -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' });
-};
+  router.push({ name: "StatusesList" })
+}
 </script>
 
 <template>
@@ -222,7 +225,10 @@ const openNewStatus = () => {
 
   <div class="flex justify-end mt-9 mx-20">
     <!-- LIMIT -->
-    <button class="btn btn-circle btn-outline mr-2">
+    <button
+      class="btn btn-circle btn-outline mr-2"
+      onclick="my_modal_limit.showModal()"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-4 w-4"
@@ -238,6 +244,35 @@ const openNewStatus = () => {
         />
       </svg>
     </button>
+    <dialog id="my_modal_limit" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Status Settings</h3>
+        <p class="py-4">
+          User can limit the number of task in status by setting the Maximum
+          task in each status
+        </p>
+        <span style="color: red"
+          >( except "No Status" and "Done" statuses )</span
+        >
+
+        <div class="flex items-center mt-4">
+          <span class="mr-2">Enable Status Limit</span>
+          <input type="checkbox" class="toggle" v-model="isLimitEnabled"  />
+        </div>
+
+        <div v-if="isLimitEnabled" class="mt-4">
+        <label for="status-limit" class="mr-2">Set Maximum Tasks:</label>
+        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" />
+      </div>
+
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn mr-2 bg-green-400">Confirm</button>
+            <button class="btn">Close</button>
+          </form>
+        </div>
+      </div>
+    </dialog>
     <!-- FILTER -->
     <button class="btn btn-circle btn-outline">
       <svg
@@ -417,12 +452,12 @@ const openNewStatus = () => {
               <td
                 class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.assignees || item.assignees.length === 0,
+                  italic: !item.assignees || item.assignees.length === 0
                 }"
               >
                 {{
                   !item.assignees || item.assignees.length === 0
-                    ? 'Unassigned'
+                    ? "Unassigned"
                     : item.assignees
                 }}
               </td>
@@ -437,7 +472,7 @@ const openNewStatus = () => {
                     'border-red-500 text-red-500': item.status === 'To Do',
                     'border-yellow-500 text-yellow-500':
                       item.status === 'Doing',
-                    'border-green-500 text-green-500': item.status === 'Done',
+                    'border-green-500 text-green-500': item.status === 'Done'
                   }"
                 >
                   {{ item.status }}

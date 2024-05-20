@@ -1,47 +1,47 @@
 <script setup>
-import { getItems, addItem } from '../libs/fetchUtils.js';
-import { ref, onMounted } from 'vue';
-import { useTasks } from '../stores/store';
-import { useRouter } from 'vue-router';
+import { getItems, addItem } from "../libs/fetchUtils.js"
+import { ref, onMounted } from "vue"
+import { useTasks } from "../stores/store"
+import { useRouter } from "vue-router"
 
-const router = useRouter();
-const showAlertAdd = ref(false);
-const showAlertAfterClose = ref(false);
-const statusList = ref([]);
+const router = useRouter()
+const showAlertAdd = ref(false)
+const showAlertAfterClose = ref(false)
+const statusList = ref([])
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
-const myTasks = useTasks();
+const myTasks = useTasks()
 
 // const props = defineProps({
 //   todo: Object
 // })
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status',
-});
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
 
 onMounted(async () => {
-  const itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
-  console.log('itemStatuss', itemsStatus);
-});
+  const itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
+  console.log("itemStatuss", itemsStatus)
+})
 
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title?.trim();
-  const trimmedDescription = todo.value.description?.trim();
-  const trimmedAssignees = todo.value.assignees?.trim();
+  const trimmedTitle = todo.value.title?.trim()
+  const trimmedDescription = todo.value.description?.trim()
+  const trimmedAssignees = todo.value.assignees?.trim()
 
   const itemAdd = await addItem(baseUrlTask, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: todo.value.status,
-  });
+    status: todo.value.status
+  })
 
   myTasks.addTask(
     itemAdd.id,
@@ -51,25 +51,31 @@ const submitForm = async () => {
     itemAdd.status,
     itemAdd.createdOn,
     itemAdd.updateOn
-  );
-  showAlertAdd.value = true;
-  showAlertAfterClose.value = true;
+  )
+  showAlertAdd.value = true
+  showAlertAfterClose.value = true
   setTimeout(() => {
-    showAlertAfterClose.value = false;
-  }, 2300);
-};
+    showAlertAfterClose.value = false
+  }, 2300)
+}
+
 const closeModal = () => {
-  my_modal_1.close();
-  router.go(-1);
-  clearForm();
-};
+  my_modal_1.close()
+  router.go(-1)
+  clearForm()
+}
 
 const clearForm = () => {
-  todo.value.title = '';
-  todo.value.description = '';
-  todo.value.assignees = '';
-  todo.value.status = 'No Status';
+  todo.value.title = ""
+  todo.value.description = ""
+  todo.value.assignees = ""
+  todo.value.status = "No Status"
+}
+
+const isValidTitle = (title) => {
+  return title && title?.trim().length > 0;
 };
+
 </script>
 
 <template>
@@ -163,22 +169,25 @@ const clearForm = () => {
           </div>
           <div class="modal-content py-4 text-left px-10 mb-2">
             <!-- Assignees -->
-              <span
-                class="block text-lg font-bold leading-6 text-gray-900"
-                style="color: #9391e4"
-                >Assignees</span>
-              <textarea
-                id="assignees"
-                class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-                maxlength="30"
-                rows="4"
-                placeholder="Unassigned"
-                v-model="todo.assignees"
-              ></textarea>
-              <p class="text-sm text-gray-400 mb-2 mt-2" 
-                style="text-align: right">
-                  {{ todo.assignees?.length }}/30
-                </p>
+            <span
+              class="block text-lg font-bold leading-6 text-gray-900"
+              style="color: #9391e4"
+              >Assignees</span
+            >
+            <textarea
+              id="assignees"
+              class="itbkk-assignees textarea textarea-bordered w-full mt-1"
+              maxlength="30"
+              rows="4"
+              placeholder="Unassigned"
+              v-model="todo.assignees"
+            ></textarea>
+            <p
+              class="text-sm text-gray-400 mb-2 mt-2"
+              style="text-align: right"
+            >
+              {{ todo.assignees?.length }}/30
+            </p>
             <!-- Status -->
             <div class="itbkk-status mb-4 mt-2">
               <span
@@ -198,14 +207,13 @@ const clearForm = () => {
 
             <!-- Cancel & Save Button -->
             <div class="modal-action">
-              <form
-                method="dialog">
+              <form method="dialog">
                 <button
                   type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
                   style="background-color: #f785b1"
-                  :class="{ disabled: todo.title?.length === 0 || !todo.title }"
-                  :disabled="todo.title?.length === 0 || todo.title === null"
+                  :class="{ disabled: !isValidTitle(todo.title) }"
+                  :disabled="!isValidTitle(todo.title)"
                 >
                   Save
                 </button>
@@ -214,7 +222,6 @@ const clearForm = () => {
                 Cancel
               </button>
             </div>
-
           </div>
         </div>
 
