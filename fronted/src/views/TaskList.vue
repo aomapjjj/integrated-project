@@ -39,7 +39,7 @@ onMounted(async () => {
     taskStore.addTasks(await items)
   }
 
-  console.log("sedsss", taskStore.getTasks())
+  
 
   itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
@@ -59,7 +59,9 @@ onMounted(async () => {
 })
 
 const selectTodo = (todoId) => {
-  router.push({ name: "TaskDetail", params: { id: todoId } })
+  if (todoId !== 0) {
+  router.push({ name: "TaskDetail", params: { id: todoId } });
+}
   selectedTodoId.value = todoId
   showDetail.value = true
 }

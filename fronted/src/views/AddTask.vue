@@ -226,7 +226,7 @@ const isValidTitle = (title) => {
         </div>
 
         <!-- ALERT -->
-        <div
+        <div 
           role="alert"
           class="alert shadow-lg"
           :class="{ hidden: !showAlertAfterClose }"
