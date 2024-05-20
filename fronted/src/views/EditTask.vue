@@ -1,82 +1,90 @@
 <script setup>
 // Import ref from Vue
-import { ref, watch, computed } from "vue"
-import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
-import { useTasks } from "../stores/store"
-import { toDate } from "../libs/toDate"
+import { ref, watch, computed } from 'vue';
+import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
+import { useTasks } from '../stores/store';
+import { toDate } from '../libs/toDate';
 import { useRouter } from 'vue-router';
 
-const statusList = ref([])
+const statusList = ref([]);
 const router = useRouter();
-const myTasks= useTasks()
+const myTasks = useTasks();
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const props = defineProps({
-  todoId: Number
-})
+  todoId: Number,
+});
 
 const todo = ref({
-  id: "",
-  title: "",
-  description: "",
-  assignees: "",
-  status: "",
-  createdOn: "",
-  updatedOn: ""
-})
+  id: '',
+  title: '',
+  description: '',
+  assignees: '',
+  status: '',
+  createdOn: '',
+  updatedOn: '',
+});
 
-const oldValue = ref({})
+const oldValue = ref({});
 
 watch(
   () => props.todoId,
   async (newValue) => {
-    const response = await getItemById(newValue)
+    const response = await getItemById(newValue);
     if (response.status === 200) {
-      todo.value = await response.json()
-      oldValue.value = { ...todo.value }
+      todo.value = await response.json();
+      oldValue.value = { ...todo.value };
     }
-    const itemsStatus = await getItems(baseUrlStatus)
-    statusList.value = itemsStatus
+    const itemsStatus = await getItems(baseUrlStatus);
+    statusList.value = itemsStatus;
   },
   { immediate: true }
-)
+);
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-const myModal = ref(null)
+const myModal = ref(null);
 
 // Function to open the modal
 const openModal = () => {
-  myModal.value.showModal()
-  console.log([props.todoId])
-}
+  myModal.value.showModal();
+  console.log([props.todoId]);
+};
 
 // Function to close the modal
 const closeModal = () => {
-  myModal.value.close()
-}
+  myModal.value.close();
+};
 
 const UpdateTask = async () => {
-  const trimmedTitle = todo.value.title?.trim()
-  const trimmedDescription = todo.value.description?.trim()
-  const trimmedAssignees = todo.value.assignees?.trim()
+  const trimmedTitle = todo.value.title?.trim();
+  const trimmedDescription = todo.value.description?.trim();
+  const trimmedAssignees = todo.value.assignees?.trim();
 
   const edit = await editItem(baseUrlTask, props.todoId, {
     title: trimmedTitle,
     description: trimmedDescription,
     assignees: trimmedAssignees,
-    status: todo.value.status
-  })
-  myTasks.updateTask(edit.id, edit.title, edit.description, edit.assignees, edit.status, edit.createdOn, edit.updateOn)
-  console.log(edit)
-  router.push({ name: "TaskList" })
-}
+    status: todo.value.status,
+  });
+  myTasks.updateTask(
+    edit.id,
+    edit.title,
+    edit.description,
+    edit.assignees,
+    edit.status,
+    edit.createdOn,
+    edit.updateOn
+  );
+  console.log(edit);
+  router.push({ name: 'TaskList' });
+};
 
 const checkEqual = computed(() => {
-  return JSON.stringify(todo.value) === JSON.stringify(oldValue.value)
-})
+  return JSON.stringify(todo.value) === JSON.stringify(oldValue.value);
+});
 </script>
 
 <template>
@@ -85,79 +93,89 @@ const checkEqual = computed(() => {
     Edit
   </label>
   <!-- Modal window -->
-  <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex" >
-    <div class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+  <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex">
+    <div
+      class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
       <div class="modal-content py-4 text-left px-6 flex-grow">
         <!-- Title -->
-        <label
-          class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
-          style="background-color: #9fc3e9"
-        >
-          <input
-            type="text"
-            class="grow"
-            v-model="todo.title"
-            placeholder="Enter Your Title"
-            maxlength="100"
-          />
-          <p class="text-sm text-red-400 mb-2 mt-2">
-                {{ todo.title?.length }}/100
-              </p>
-        </label>
-        <!-- Description -->
-        <label for="description" class="form-control flex-grow ml-4 mb-8">
-          <div class="label">
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-              style="color: #9391e4"
-              >Description  <p class="text-sm text-red-400 mb-2 mt-2">
-                {{ todo.description?.length }}/500
-              </p></span
-            >
-          </div>
-          <textarea
-            id="description"
-            class="itbkk-description textarea textarea-bordered h-3/4 mb-8"
-            maxlength="500"
-            rows="4"
-            v-model="todo.description"
-            :class="{
-              'italic text-gray-500':
-                !todo.description || todo.description.trim() === ''
-            }"
-            placeholder="No Description Provided"
-            style="height: 400px"
-            >{{ todo.description }}</textarea
+        <div class="relative">
+          <label
+            class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mt-1"
+            style="background-color: #9fc3e9"
           >
-         
-        </label>
+            <input
+              type="text"
+              class="grow"
+              v-model="todo.title"
+              placeholder="Enter Your Title"
+              maxlength="100"
+            />
+          </label>
+          <p
+            class="text-sm text-gray-400 mb-2 mt-2 ml-4"
+            style="text-align: right"
+          >
+            {{ todo.title?.length }}/100
+          </p>
+        </div>
+        <!-- Description -->
+        <div class="relative">
+          <label for="description" class="form-control flex-grow ml-4 mb-8">
+            <div class="label">
+              <span
+                class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                style="color: #9391e4"
+                >Description
+              </span>
+            </div>
+            <textarea
+              id="description"
+              class="itbkk-description textarea textarea-bordered h-3/4"
+              maxlength="500"
+              rows="4"
+              v-model="todo.description"
+              :class="{
+                'italic text-gray-500':
+                  !todo.description || todo.description.trim() === '',
+              }"
+              placeholder="No Description Provided"
+              style="height: 400px"
+              >{{ todo.description }}</textarea
+            >
+            <p
+              class="text-sm text-gray-400 mb-2 mt-2"
+              style="text-align: right"
+            >
+              {{ todo.description?.length }}/500
+            </p>
+          </label>
+        </div>
       </div>
-      <div
-        class="modal-content py-4 text-left px-10"
-        style="margin-top: 65px"
-      >
+      <div class="modal-content py-4 text-left px-10" style="margin-top: 65px">
         <!-- Assignees -->
         <div class="mt-10">
           <span
-            class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+            class="block text-lg font-bold leading-6 text-gray-900"
             style="color: #9391e4"
-            >Assignees <p class="text-sm text-red-400 mb-2 mt-2">
-                {{ todo.assignees?.length }}/30
-              </p></span
+            >Assignees</span
           >
           <textarea
             id="assignees"
-            class="itbkk-assignees textarea textarea-bordered  w-full mt-1"
+            class="itbkk-assignees textarea textarea-bordered w-full mt-1"
             maxlength="30"
             rows="4"
             v-model="todo.assignees"
             :class="{
               'italic text-gray-500':
-                !todo.assignees || todo.assignees.trim() === ''
+                !todo.assignees || todo.assignees.trim() === '',
             }"
             placeholder="Unassigned"
-            >{{ todo.assignees }}</textarea
+            >{{ todo.assignees }}
+            </textarea
           >
+          <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
+            {{ todo.assignees?.length }}/30
+          </p>
         </div>
         <!-- Status -->
         <div class="itbkk-status mb-4 mt-2">
@@ -207,18 +225,18 @@ const checkEqual = computed(() => {
             <h1>{{ toDate(todo.updatedOn) }}</h1>
           </div>
         </div>
-        
+
         <!-- Save & Close Button -->
-        <div class="modal-action flex justify-between">
-              <form
-                method="dialog"
-                style="display: flex; justify-content: flex-end"
-              >
-                <button
+        <div class="modal-action flex justify-between ml-20">
+          <form
+            method="dialog"
+            style="display: flex; justify-content: flex-end; margin-top: -10px; flex: 1;"
+          >
+            <button
               @click="UpdateTask"
               type="submit"
               class="btn"
-              style="background-color: #f785b1; margin: 10px; width: 100%"
+              style="background-color: #f785b1; "
               :disabled="
                 todo.title?.length === 0 ||
                 todo.title === null ||
@@ -228,12 +246,11 @@ const checkEqual = computed(() => {
               Save
             </button>
           </form>
-          <button class="btn" style="flex: 1;" @click="closeModal">
-            Close
-          </button>
+          <button class="btn" style="margin-top: -10px;" @click="closeModal">Close</button>
         </div>
       </div>
     </div>
   </dialog>
 </template>
-<style></style>
+<style>
+</style>
