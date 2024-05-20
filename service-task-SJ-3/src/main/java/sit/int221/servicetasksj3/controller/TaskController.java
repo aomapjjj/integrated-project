@@ -7,21 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import sit.int221.servicetasksj3.dtos.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTO;
 import sit.int221.servicetasksj3.dtos.TaskDTOTwo;
 import sit.int221.servicetasksj3.dtos.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.exceptions.ErrorDetails;
+import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.services.TaskService;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/tasks")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
-//@CrossOrigin(origins = "http://localhost:5173/")
-//@CrossOrigin(origins = "http://ip23sj3.sit.kmutt.ac.th")
+
 public class TaskController {
     @Autowired
     private TaskService service;
@@ -29,12 +30,15 @@ public class TaskController {
     private ModelMapper modelMapper;
 
     @GetMapping("")
-    public List<TaskDTO> getAllTasks(){
-        return service.getAllTasks();
+    public List<TaskNewDTO> getAllTasksFiltered(
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
+            @RequestParam(required = false) String[] filterStatuses
+    ) {
+        return service.getAllTasksFiltered(sortBy, filterStatuses);
     }
 
     @GetMapping("/{id}")
-    public SimpleTaskDTO getTaskById(@PathVariable Integer id){
+    public SimpleTaskDTO getTaskById(@PathVariable Integer id) {
         Task task = service.findByID(id);
         SimpleTaskDTO simpleTaskDTO = modelMapper.map(task, SimpleTaskDTO.class);
         return simpleTaskDTO;
@@ -42,17 +46,19 @@ public class TaskController {
 
     // ADD
     @PostMapping("")
-    public ResponseEntity<TaskDTOTwo> createNewTasks(@Valid @RequestBody TaskNewDTO task){
+    public ResponseEntity<TaskDTOTwo> createNewTasks(@Valid @RequestBody TaskNewDTO task) {
         Task createTask = service.createNewTasks(task);
         TaskDTOTwo createdTaskDTO = modelMapper.map(createTask, TaskDTOTwo.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskDTO);
     }
+
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<TaskDTO> removeTasks(@PathVariable Integer id){
+    public ResponseEntity<TaskDTO> removeTasks(@PathVariable Integer id) {
         TaskDTO deletedTaskDTO = service.removeTasks(id);
         return ResponseEntity.ok().body(deletedTaskDTO);
     }
+
     // EDIT
     @PutMapping("/{id}")
     public ResponseEntity<TaskDTOTwo> updateTasks(@Valid @RequestBody TaskNewDTO task, @PathVariable Integer id) {

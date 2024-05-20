@@ -1,8 +1,8 @@
 package sit.int221.servicetasksj3.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +26,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "statusId")
-    private TaskStatus statusTasks;
+    private TaskStatus status;
 
     @Column(name = "createdOn", updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
@@ -59,10 +59,10 @@ public class Task {
         }
     }
 
-    public void setStatusTasks(TaskStatus statusTasks) {
-        if (statusTasks == null){
-            statusTasks = new TaskStatus();
+    public void setStatus(TaskStatus status) {
+        if (status == null){
+            status = new TaskStatus();
         }
-        this.statusTasks = statusTasks;
+        this.status = status;
     }
 }

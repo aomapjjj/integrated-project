@@ -1,14 +1,21 @@
 package sit.int221.servicetasksj3.dtos;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class TaskNewDTO {
     private Integer id;
     private String title;
     private String description;
     private String assignees;
-    private String status = "NO_STATUS";
+    private String status = "No Status";
 
     public void setTitle(String title) {
         if (title != null) {
@@ -33,7 +40,7 @@ public class TaskNewDTO {
 
     public void setStatus(String status) {
         if (status == null || status.isEmpty()) {
-            this.status = "NO_STATUS";
+            this.status = "No Status";
         } else {
             this.status = status;
         }

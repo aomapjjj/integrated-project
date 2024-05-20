@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,8 +27,8 @@ public class TaskStatus {
     private String description;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "statusTasks")
-    private Set<Task> tasks = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "status")
+    private List<Task> tasks = new ArrayList<>();
 
     @Column(name = "createdOn", updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
@@ -48,14 +50,6 @@ public class TaskStatus {
         }
         this.description = description;
     }
-
-
-//    public void setDescription(String description) {
-//        if (description != null) {
-//            description = description.trim();
-//        }
-//        this.description = description;
-//    }
 }
 
 
