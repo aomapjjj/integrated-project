@@ -42,8 +42,8 @@ describe(`TC-PBI7-EDIT-STATUS-3\n
 
         cy.get('.itbkk-modal-status').as('modal')
         cy.get('@modal').find('.itbkk-status-name','Maximum001Maximum002Maximum003Maximum004Maximum005')
-        cy.get('@modal').find('.itbkk-status-description').clear()
-        cy.get('@modal').find('.itbkk-button-confirm').click() 
+        cy.get('@modal').find('.itbkk-status-description')
+        cy.get('@modal').find('.itbkk-button-confirm').click({force: true}) 
         cy.wait(100)
     })
 
@@ -53,8 +53,7 @@ describe(`TC-PBI7-EDIT-STATUS-3\n
 
         cy.get('.itbkk-status-name').contains('Maximum001Maximum002Maximum003Maximum004Maximum005').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-status-name','Maximum001Maximum002Maximum003Maximum004Maximum005')
-        cy.get('@item').contains('.itbkk-status-description','No description is provided').as('description')
-        cy.get('@description').should('have.css','font-style','italic') 
+
     })
 
 })

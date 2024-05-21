@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed } from "vue"
 import {
   getItemById,
   getItems,
@@ -290,7 +290,7 @@ const isFormValid = computed(() => {
             </h1>
           </div>
         </a>
-        <div class="itbkk-button-add">
+        <div>
           <button onclick="my_modal_4.showModal()" class="itbkk-button-add btn ml-4" style="
         position: relative;
         border-radius: 30px;
@@ -316,7 +316,7 @@ const isFormValid = computed(() => {
   <div>
     <!-- Add new status -->
 
-    <dialog id="my_modal_4" class="itbkk-modal-status modal">
+    <dialog id="my_modal_4" class="itbkk-modal-status ">
       <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
         <span class="block text-2xl font-bold leading-6 mb-1"
           style="margin: 15px; color: #9391e4; text-align: center;">Add Status</span>
@@ -330,20 +330,20 @@ const isFormValid = computed(() => {
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4">Name
               </span>
             </div>
-            <label class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4">
-              <input type="text" class="grow" placeholder="Enter Your Title" v-model="status.name" />
+            <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
+              <input type="text" class="grow itbkk-status-name" placeholder="Enter Your Title" v-model="status.name" />
             </label>
-            <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
+            <p class=" text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ status.name?.length }}/50
             </p>
             <!-- Description -->
-            <label for="description" class="itbkk-status-description form-control flex-grow ml-4">
+            <label for="description" class=" form-control flex-grow ml-4">
               <div class="label">
                 <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description
                 </span>
               </div>
 
-              <textarea id="description" class="itbkk-description textarea textarea-bordered flex-grow w-full" rows="4"
+              <textarea id="description" class="itbkk-status-description textarea textarea-bordered flex-grow w-full" rows="4"
                 placeholder="No Description Provided" v-model="status.description"></textarea>
             </label>
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
@@ -368,12 +368,12 @@ const isFormValid = computed(() => {
   </div>
 
   <div class="flex flex-col items-center mt-1">
-    <div role="alert" class="alert alert-error" v-show="notFound">
+    <div role="alert" class="alert alert-error" v-show="notFound" >
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>Error! Task failed successfully.</span>
+      <p class="itbkk-message">An error has occurred, the status does not exist</p>
     </div>
     <div class="overflow-x-auto">
       <div class="min-w-full">

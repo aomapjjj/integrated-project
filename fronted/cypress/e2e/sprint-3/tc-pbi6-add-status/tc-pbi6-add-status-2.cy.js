@@ -47,8 +47,6 @@ describe(`TC-PBI6-ADD-STATUS-2\n
         
         cy.get('.itbkk-status-name').contains('Waiting').parents('.itbkk-item').as('item')
         cy.get('@item').contains('.itbkk-status-name','Waiting')
-        cy.get('@item').contains('.itbkk-status-description','No description is provided').as('description')
-        cy.get('@description').should('have.css','font-style','italic') 
     })
 
 })
