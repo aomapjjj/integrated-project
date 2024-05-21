@@ -8,6 +8,7 @@ const router = useRouter()
 const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
 const statusList = ref([])
+const notFound = ref(false)
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -44,9 +45,10 @@ const submitForm = async () => {
     todo.value.status !== "No Status" &&
     todo.value.status !== "Done"
   ) {
-    alert(
-      `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
-    )
+    setTimeout(() => {
+        notFound.value = false
+      }, 1200)
+      notFound.value = true
     return
   }
 
@@ -121,6 +123,13 @@ const isLimitReached = computed(() => {
 </script>
 
 <template>
+  <div role="alert" class="alert alert-error" v-show="notFound">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <p class="itbkk-message">An error has occurred, the status does not exist</p>
+  </div>
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn ml-4" style="
@@ -188,11 +197,8 @@ const isLimitReached = computed(() => {
               <form method="dialog">
                 <button type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
-
-                  style="background-color: #f785b1"
-                  :class="{ disabled: !isFormValid || isLimitReached }"
-                  :disabled="!isFormValid || isLimitReached"
-                >
+                  style="background-color: #f785b1" :class="{ disabled: !isFormValid || isLimitReached }"
+                  :disabled="!isFormValid || isLimitReached">
 
                   Save
                 </button>

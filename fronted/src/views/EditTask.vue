@@ -9,7 +9,7 @@ import { useRouter } from "vue-router"
 const statusList = ref([])
 const router = useRouter()
 const myTasks = useTasks()
-
+const error = ref('')
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
@@ -76,12 +76,8 @@ const UpdateTask = async () => {
     todo.value.status !== "No Status" &&
     todo.value.status !== "Done"
   ) {
-    alert(
-      `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
-    )
-    return
+    return error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
   }
-
   try {
 
     const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
@@ -292,6 +288,7 @@ const isFormValid = computed(() => {
             >
               Save
             </button>
+            
           </form>
           <button class="btn" style="margin-top: -10px" @click="closeModal">
             Close
