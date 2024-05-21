@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted , computed } from "vue"
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
@@ -18,19 +18,11 @@ const statusList = ref([])
 let items = [] 
 let itemsStatus = [] 
 const indexDelete = ref(0)
-
-const isLimitEnabled = ref(false) // เปิด input limitๆ
+const isLimitEnabled = ref(false)
 const maxTasks = ref(10) 
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-
-const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
-})
 
 const taskStore = useTasks()
 onMounted(async () => {
@@ -39,7 +31,7 @@ onMounted(async () => {
     taskStore.addTasks(await items)
   }
 
-  console.log("sedsss", taskStore.getTasks())
+  
 
   itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
@@ -59,7 +51,9 @@ onMounted(async () => {
 })
 
 const selectTodo = (todoId) => {
-  router.push({ name: "TaskDetail", params: { id: todoId } })
+  if (todoId !== 0) {
+  router.push({ name: "TaskDetail", params: { id: todoId } });
+}
   selectedTodoId.value = todoId
   showDetail.value = true
 }
@@ -143,7 +137,6 @@ const toggleIcon = () => {
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-
   if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
   } else if (currentSortOrder === "desc") {
@@ -153,16 +146,43 @@ const sortByStatus = () => {
   }
 }
 
-// ----------------------- STATUS SORT -----------------------
+
+// ----------------------- Filter -----------------------
+
+const searchQuery = ref([])
+
+const filteredTasks = computed(() => {
+  if (searchQuery.value.length === 0) {
+    return taskStore.getTasks()
+    
+  }
+  return taskStore.getTasks().filter(task => searchQuery.value.includes(task.status))
+})
+
+const removeStatus = (status) => {
+  const index = searchQuery.value.indexOf(status)
+  if (index > -1) {
+    searchQuery.value.splice(index, 1)
+  }
+}
+
+// ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
   router.push({ name: "StatusesList" })
 }
+
+// ----------------------- Limit ---------------------------
+const toggleLimit = () => {
+  taskStore.setLimitEnabled(isLimitEnabled.value)
+}
+
+
 </script>
 
 <template>
   <div class="min-h-full max-h-fit">
-    <nav class="bg-white shadow" style="margin-top: 10px">
+    <nav class="bg-white shadow" style=" background-color: #d8f1f1 ;">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
           <img
@@ -174,7 +194,7 @@ const openNewStatus = () => {
             <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
             <h1
               class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight"
-              style="color: #9391e4; text-align: center"
+              style="color: #9391e4; text-align: center; text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;"
             >
               IT-Bangmod Kradan Kanban
             </h1>
@@ -223,7 +243,7 @@ const openNewStatus = () => {
     </nav>
   </div>
 
-  <div class="flex justify-end mt-9 mx-20">
+  <div class="flex justify-start mt-9 mx-auto ml-[100px]">
     <!-- LIMIT -->
     <button
       class="btn btn-circle btn-outline mr-2"
@@ -257,12 +277,12 @@ const openNewStatus = () => {
 
         <div class="flex items-center mt-4">
           <span class="mr-2">Enable Status Limit</span>
-          <input type="checkbox" class="toggle" v-model="isLimitEnabled"  />
+          <input type="checkbox" class="toggle" v-model="isLimitEnabled" @change="toggleLimit"/>
         </div>
 
         <div v-if="isLimitEnabled" class="mt-4">
         <label for="status-limit" class="mr-2">Set Maximum Tasks:</label>
-        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" />
+        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" @input="taskStore.setMaxTasks(maxTasks)" max="30" />
       </div>
 
         <div class="modal-action">
@@ -274,28 +294,51 @@ const openNewStatus = () => {
       </div>
     </dialog>
     <!-- FILTER -->
-    <button class="btn btn-circle btn-outline">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        fill="none"
-        viewBox="0 0 14 14"
-      >
-        <g
-          fill="#9FC3E9"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+     
+    <details class="dropdown">
+    <summary class="m-1 btn">
+      <button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 14 14"
         >
-          <circle cx="2" cy="2" r="1.5" />
-          <path d="M3.5 2h10" />
-          <circle cx="7" cy="7" r="1.5" />
-          <path d="M.5 7h5m3 0h5" />
-          <circle cx="12" cy="12" r="1.5" />
-          <path d="M10.5 12H.5" />
-        </g>
-      </svg>
-    </button>
+          <g
+            fill="#9FC3E9"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="2" cy="2" r="1.5" />
+            <path d="M3.5 2h10" />
+            <circle cx="7" cy="7" r="1.5" />
+            <path d="M.5 7h5m3 0h5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <path d="M10.5 12H.5" />
+          </g>
+        </svg>
+      </button>
+      filter
+    </summary>
+    <ul class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+      <li v-for="status in statusList" :key="status.name" class="flex items-center">
+        <label class="flex items-center space-x-2 w-full">
+          <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
+          <span>{{ status.name }}</span>
+        </label>
+      </li>
+    </ul>
+  </details>
+
+  <div class="selected-filters flex flex-wrap mt-2">
+    <div v-for="status in searchQuery" :key="status" class="selected-filter bg-blue-200 text-blue-800 rounded-full px-4 py-2 mr-2 mt-2 flex items-center">
+      <span>{{ status }}</span>
+      <button @click="removeStatus(status)" class="ml-2 text-blue-600 hover:text-blue-800">
+        &times;
+      </button>
+    </div>
+  </div>
   </div>
 
   <div class="flex flex-col items-center mt-9">
@@ -428,11 +471,7 @@ const openNewStatus = () => {
           <tbody>
             <!-- Iterate over todoList -->
             <TaskDetail :todo-id="selectedTodoId" />
-            <tr
-              class="itbkk-item"
-              v-for="(item, index) in taskStore.getTasks()"
-              :key="index"
-            >
+            <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
@@ -442,6 +481,7 @@ const openNewStatus = () => {
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <label
+                
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
@@ -604,7 +644,15 @@ const openNewStatus = () => {
                   <!-- DELETE -->
                 </td>
               </div>
+              
             </tr>
+            <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0" >
+              <td colspan="5" class="text-center py-4 text-gray-400">
+                No task
+              </td>
+              </tr>
+           
+
 
             <!-- DELETE COMPLETE -->
           </tbody>
@@ -621,34 +669,28 @@ const openNewStatus = () => {
           transform: translateX(-50%);
           z-index: 9999;
           width: 500px;
-          color: red;
+          color: rgb(74 222 128 / var(--tw-text-opacity));
           animation: fadeInOut 1.5s infinite;
         "
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          class="stroke-info shrink-0 w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
-        </svg>
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
         <div>
-          <h2 class="itbkk-message font-bold">The task has been deleted</h2>
+          <h2 class="itbkk-message font-bold text-green-400">The task has been deleted</h2>
         </div>
         <div>
-          <button
-            class="btn btn-sm"
-            style="background-color: #9fc3e9"
-            @click="deleteComplete = false"
-          >
-            Close
-          </button>
+  
         </div>
       </div>
     </div>
@@ -730,5 +772,32 @@ tr:nth-child(odd) {
 
 thead th {
   height: 3rem;
+}
+.selected-filters {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.selected-filter {
+  display: flex;
+  align-items: center;
+  background-color: #cce5ff;
+  color: #004085;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.selected-filter button {
+  margin-left: 0.5rem;
+  background: none;
+  border: none;
+  color: #004085;
+  cursor: pointer;
+}
+
+.selected-filter button:hover {
+  color: #002752;
 }
 </style>

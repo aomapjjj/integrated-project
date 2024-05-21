@@ -221,7 +221,6 @@ public class TaskService {
                     validationError.addValidationError("status", "the status has reached the limit");                }
             }
         }
-
         task1.setId(id);
         return repository.save(task1);
     }

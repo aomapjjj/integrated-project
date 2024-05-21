@@ -1,92 +1,134 @@
 <script setup>
 // Import ref from Vue
-import { ref, watch, computed } from 'vue';
-import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
-import { useTasks } from '../stores/store';
-import { toDate } from '../libs/toDate';
-import { useRouter } from 'vue-router';
+import { ref, watch, computed } from "vue"
+import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
+import { useTasks } from "../stores/store"
+import { toDate } from "../libs/toDate"
+import { useRouter } from "vue-router"
 
-const statusList = ref([]);
-const router = useRouter();
-const myTasks = useTasks();
-
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
-
+const statusList = ref([])
+const router = useRouter()
+const myTasks = useTasks()
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const notFound = ref(false)
+const error = ref("")
 const props = defineProps({
-  todoId: Number,
-});
+  todoId: Number
+})
 
 const todo = ref({
-  id: '',
-  title: '',
-  description: '',
-  assignees: '',
-  status: '',
-  createdOn: '',
-  updatedOn: '',
-});
+  id: "",
+  title: "",
+  description: "",
+  assignees: "",
+  status: "",
+  createdOn: "",
+  updatedOn: ""
+})
 
-const oldValue = ref({});
+const oldValue = ref({})
 
 watch(
   () => props.todoId,
   async (newValue) => {
-    const response = await getItemById(newValue);
+    const response = await getItemById(newValue)
     if (response.status === 200) {
-      todo.value = await response.json();
-      oldValue.value = { ...todo.value };
+      todo.value = await response.json()
+      oldValue.value = { ...todo.value }
     }
-    const itemsStatus = await getItems(baseUrlStatus);
-    statusList.value = itemsStatus;
+    const itemsStatus = await getItems(baseUrlStatus)
+    statusList.value = itemsStatus
   },
   { immediate: true }
-);
+)
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-const myModal = ref(null);
+const myModal = ref(null)
 
-// Function to open the modal
 const openModal = () => {
-  router.push({ name: 'TaskDetail', params: { id: props.todoId } });
-  myModal.value.showModal();
-  console.log([props.todoId]);
-};
+  router.push({ name: "TaskDetail", params: { id: props.todoId } })
+  myModal.value.showModal()
+  console.log([props.todoId])
+}
 
-// Function to close the modal
 const closeModal = () => {
-  myModal.value.close();
-  router.go(-1);
-};
+  myModal.value.close()
+  router.go(-1)
+}
 
 const UpdateTask = async () => {
-  const trimmedTitle = todo.value.title?.trim();
-  const trimmedDescription = todo.value.description?.trim();
-  const trimmedAssignees = todo.value.assignees?.trim();
+  const trimmedTodo = {
+    title: todo.value.title?.trim(),
+    description: todo.value.description?.trim(),
+    assignees: todo.value.assignees?.trim(),
+    status: todo.value.status
+  }
 
-  const edit = await editItem(baseUrlTask, props.todoId, {
-    title: trimmedTitle,
-    description: trimmedDescription,
-    assignees: trimmedAssignees,
-    status: todo.value.status,
-  });
-  myTasks.updateTask(
-    edit.id,
-    edit.title,
-    edit.description,
-    edit.assignees,
-    edit.status,
-    edit.createdOn,
-    edit.updateOn
-  );
-  console.log(edit);
-  router.push({ name: 'TaskList' });
-};
+  const tasksInStatus = myTasks
+    .getTasks()
+    .filter((task) => task.status === todo.value.status)
+
+  if (
+    myTasks.getIsLimitEnabled &&
+    tasksInStatus.length >= myTasks.getMaxTasks &&
+    todo.value.status !== "No Status" &&
+    todo.value.status !== "Done"
+  ) {
+    setTimeout(() => {
+      notFound.value = false
+    }, 1800)
+    notFound.value = true
+    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`)
+  }
+  try {
+    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
+    myTasks.updateTask(
+      edit.id,
+      edit.title,
+      edit.description,
+      edit.assignees,
+      edit.status,
+      edit.createdOn,
+      edit.updateOn
+    )
+    console.log(edit)
+    router.push({ name: "TaskList" })
+  } catch (error) {
+    console.error("Error updating task:", error)
+  }
+}
 
 const checkEqual = computed(() => {
-  return JSON.stringify(todo.value) === JSON.stringify(oldValue.value);
-});
+  const trimmedTodo = {
+    ...todo.value,
+    title: todo.value.title?.trim(),
+    description: todo.value.description?.trim(),
+    assignees: todo.value.assignees?.trim()
+  }
+  const trimmedOldValue = {
+    ...oldValue.value,
+    title: oldValue.value.title?.trim(),
+    description: oldValue.value.description?.trim(),
+    assignees: oldValue.value.assignees?.trim()
+  }
+  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue)
+})
+
+// ----------------------- Validate -----------------------
+
+const isValidTitle = (title) => {
+  return title && title.trim().length > 0 && title.trim().length <= 100
+}
+
+const isFormValid = computed(() => {
+  return (
+    isValidTitle(todo.value.title) &&
+    (!todo.value.description || todo.value.description.trim().length <= 500) &&
+    (!todo.value.assignees || todo.value.assignees.trim().length <= 30)
+  )
+})
 </script>
 
 <template>
@@ -97,7 +139,8 @@ const checkEqual = computed(() => {
   <!-- Modal window -->
   <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex">
     <div
-      class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+      class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
+    >
       <div class="modal-content py-4 text-left px-6 flex-grow">
         <!-- Title -->
         <div class="relative">
@@ -110,7 +153,6 @@ const checkEqual = computed(() => {
               class="grow"
               v-model="todo.title"
               placeholder="Enter Your Title"
-              maxlength="100"
             />
           </label>
           <p
@@ -133,12 +175,11 @@ const checkEqual = computed(() => {
             <textarea
               id="description"
               class="itbkk-description textarea textarea-bordered h-3/4"
-              maxlength="500"
               rows="4"
               v-model="todo.description"
               :class="{
                 'italic text-gray-500':
-                  !todo.description || todo.description.trim() === '',
+                  !todo.description || todo.description.trim() === ''
               }"
               placeholder="No Description Provided"
               style="height: 400px"
@@ -164,12 +205,11 @@ const checkEqual = computed(() => {
           <textarea
             id="assignees"
             class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-            maxlength="30"
             rows="4"
             v-model="todo.assignees"
             :class="{
               'italic text-gray-500':
-                !todo.assignees || todo.assignees.trim() === '',
+                !todo.assignees || todo.assignees.trim() === ''
             }"
             placeholder="Unassigned"
             >{{ todo.assignees }}
@@ -230,29 +270,38 @@ const checkEqual = computed(() => {
 
         <!-- Save & Close Button -->
         <div class="modal-action flex justify-between ml-20">
-          <form
-            method="dialog"
-            style="display: flex; justify-content: flex-end; margin-top: -10px; flex: 1;"
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              margin-left: 10px;
+              flex: 1;
+            "
           >
             <button
               @click="UpdateTask"
               type="submit"
-              class="btn"
-              style="background-color: #f785b1; "
-              :disabled="
-                todo.title?.length === 0 ||
-                todo.title === null ||
-                checkEqual === true
-              "
+              class="btn "
+              style="background-color: #f785b1"
+              :disabled="!isFormValid || checkEqual"
+              :class="{ disabled: !isFormValid || checkEqual }"
             >
               Save
             </button>
-          </form>
-          <button class="btn" style="margin-top: -10px;" @click="closeModal">Close</button>
+            <button class="btn ml-2" @click="closeModal">
+              Close
+            </button>
+          </div>
+        </div>
+        <div role="alert" v-show="notFound">
+          <div
+            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"
+          >
+            {{ error }}
+          </div>
         </div>
       </div>
     </div>
   </dialog>
 </template>
-<style>
-</style>
+<style></style>
