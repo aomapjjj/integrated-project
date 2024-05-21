@@ -9,7 +9,7 @@ const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
 const statusList = ref([])
 const notFound = ref(false)
-
+const error = ref('')
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
@@ -47,9 +47,10 @@ const submitForm = async () => {
   ) {
     setTimeout(() => {
         notFound.value = false
-      }, 1200)
+      }, 1800)
       notFound.value = true
-    return
+    return error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
+    
   }
 
   try {
@@ -123,13 +124,7 @@ const isLimitReached = computed(() => {
 </script>
 
 <template>
-  <div role="alert" class="alert alert-error" v-show="notFound">
-    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    <p class="itbkk-message">An error has occurred, the status does not exist</p>
-  </div>
+  
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn ml-4" style="
@@ -207,6 +202,11 @@ const isLimitReached = computed(() => {
                 Cancel
               </button>
             </div>
+            <div role="alert" v-show="notFound">
+          <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+            {{ error }}
+          </div>
+        </div>
           </div>
         </div>
 
