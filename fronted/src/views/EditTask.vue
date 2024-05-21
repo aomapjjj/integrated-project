@@ -87,6 +87,21 @@ const UpdateTask = async () => {
 const checkEqual = computed(() => {
   return JSON.stringify(todo.value) === JSON.stringify(oldValue.value);
 });
+
+
+// ----------------------- Validate -----------------------
+
+const isValidTitle = (title) => {
+  return title && title.trim().length > 0 && title.trim().length <= 100
+}
+
+const isFormValid = computed(() => {
+  return (
+    isValidTitle(todo.value.title) &&
+    todo.value.description?.trim().length <= 500 &&
+    todo.value.assignees?.trim().length <= 30
+  )
+})
 </script>
 
 <template>
@@ -110,7 +125,6 @@ const checkEqual = computed(() => {
               class="grow"
               v-model="todo.title"
               placeholder="Enter Your Title"
-              maxlength="100"
             />
           </label>
           <p
@@ -133,7 +147,6 @@ const checkEqual = computed(() => {
             <textarea
               id="description"
               class="itbkk-description textarea textarea-bordered h-3/4"
-              maxlength="500"
               rows="4"
               v-model="todo.description"
               :class="{
@@ -164,7 +177,6 @@ const checkEqual = computed(() => {
           <textarea
             id="assignees"
             class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-            maxlength="30"
             rows="4"
             v-model="todo.assignees"
             :class="{
@@ -240,10 +252,10 @@ const checkEqual = computed(() => {
               class="btn"
               style="background-color: #f785b1; "
               :disabled="
-                todo.title?.length === 0 ||
-                todo.title === null ||
+                !isFormValid ||
                 checkEqual === true
               "
+              :class="{ disabled: !isFormValid }"
             >
               Save
             </button>
