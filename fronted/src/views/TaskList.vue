@@ -455,7 +455,7 @@ const toggleLimit = () => {
               <!-- STATUS SORT -->
 
               <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                class="itbkk-status-sort px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
