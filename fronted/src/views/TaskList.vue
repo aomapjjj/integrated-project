@@ -476,6 +476,7 @@ const openNewStatus = () => {
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <label
+                
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"

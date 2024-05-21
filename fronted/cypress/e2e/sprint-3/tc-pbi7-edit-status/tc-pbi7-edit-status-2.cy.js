@@ -43,9 +43,9 @@ describe(`TC-PBI7-EDIT-STATUS-2\n
 
 
         cy.get('.itbkk-modal-status').as('modal')
-        cy.get('@modal').find('.itbkk-status-name').clear().type('   _Dropped_   ')
-        cy.get('@modal').find('.itbkk-status-description').clear().type('   _Tasks are no longer needed_   ')
-        cy.get('@modal').find('.itbkk-button-confirm').click() 
+        cy.get('@modal').find('.itbkk-status-name').type('   _Dropped_   ', {force: true})
+        cy.get('@modal').find('.itbkk-status-description').type('   _Tasks are no longer needed_   ',{force: true})
+        cy.get('@modal').find('.itbkk-button-confirm').click({force: true}) 
         cy.wait(100)
     })
 

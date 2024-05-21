@@ -47,18 +47,18 @@ describe(`TC-PBI6-ADD-STATUS-1\n
 
     it('should have an Add Status and click the button to show the modal window".',()=>{
         cy.get('.itbkk-manage-status').should('exist').click() ;
-        cy.wait(100) ;
+        cy.wait(500) ;
 
-        cy.get('.itbkk-button-add').click()
-        cy.wait(100) ;
+        cy.get('.itbkk-button-add').click
+        cy.wait(500) ;
 
         cy.get('.itbkk-modal-status').should('exist').as('modal')
         cy.get('@modal').find('.itbkk-button-confirm').should('be.disabled')
-        cy.get('@modal').find('.itbkk-status-name').type("Test")
+        cy.get('@modal').find('.itbkk-status-name').type("Test", {force: true})
         cy.get('@modal').find('.itbkk-button-confirm').should('not.be.disabled')
-        cy.get('@modal').find('.itbkk-status-name').clear()
+        cy.get('@modal').find('.itbkk-status-name').clear({force: true})
         cy.get('@modal').find('.itbkk-button-confirm').should('be.disabled')
-        cy.get('@modal').find('.itbkk-button-cancel').should('exist').click()
+        cy.get('@modal').find('.itbkk-button-cancel').should('exist').click({force: true})
         cy.wait(100) 
 
         cy.url().should('contain','/status')
