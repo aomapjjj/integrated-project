@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted , computed } from "vue"
 import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
@@ -145,7 +145,6 @@ const toggleIcon = () => {
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-
   if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
   } else if (currentSortOrder === "desc") {
@@ -155,11 +154,33 @@ const sortByStatus = () => {
   }
 }
 
-// ----------------------- STATUS SORT -----------------------
+
+// ----------------------- Filter -----------------------
+
+const searchQuery = ref([])
+
+const filteredTasks = computed(() => {
+  if (searchQuery.value.length === 0) {
+    return taskStore.getTasks()
+    
+  }
+  return taskStore.getTasks().filter(task => searchQuery.value.includes(task.status))
+})
+
+const removeStatus = (status) => {
+  const index = searchQuery.value.indexOf(status)
+  if (index > -1) {
+    searchQuery.value.splice(index, 1)
+  }
+}
+
+// ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
   router.push({ name: "StatusesList" })
 }
+
+
 </script>
 
 <template>
@@ -225,7 +246,7 @@ const openNewStatus = () => {
     </nav>
   </div>
 
-  <div class="flex justify-end mt-9 mx-auto" style="margin-right: 100px;">
+  <div class="flex justify-start mt-9 mx-auto ml-[100px]">
     <!-- LIMIT -->
     <button
       class="btn btn-circle btn-outline mr-2"
@@ -276,28 +297,51 @@ const openNewStatus = () => {
       </div>
     </dialog>
     <!-- FILTER -->
-    <button class="btn btn-circle btn-outline">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        fill="none"
-        viewBox="0 0 14 14"
-      >
-        <g
-          fill="#9FC3E9"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+     
+    <details class="dropdown">
+    <summary class="m-1 btn">
+      <button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 14 14"
         >
-          <circle cx="2" cy="2" r="1.5" />
-          <path d="M3.5 2h10" />
-          <circle cx="7" cy="7" r="1.5" />
-          <path d="M.5 7h5m3 0h5" />
-          <circle cx="12" cy="12" r="1.5" />
-          <path d="M10.5 12H.5" />
-        </g>
-      </svg>
-    </button>
+          <g
+            fill="#9FC3E9"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="2" cy="2" r="1.5" />
+            <path d="M3.5 2h10" />
+            <circle cx="7" cy="7" r="1.5" />
+            <path d="M.5 7h5m3 0h5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <path d="M10.5 12H.5" />
+          </g>
+        </svg>
+      </button>
+      filter
+    </summary>
+    <ul class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+      <li v-for="status in statusList" :key="status.name" class="flex items-center">
+        <label class="flex items-center space-x-2 w-full">
+          <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
+          <span>{{ status.name }}</span>
+        </label>
+      </li>
+    </ul>
+  </details>
+
+  <div class="selected-filters flex flex-wrap mt-2">
+    <div v-for="status in searchQuery" :key="status" class="selected-filter bg-blue-200 text-blue-800 rounded-full px-4 py-2 mr-2 mt-2 flex items-center">
+      <span>{{ status }}</span>
+      <button @click="removeStatus(status)" class="ml-2 text-blue-600 hover:text-blue-800">
+        &times;
+      </button>
+    </div>
+  </div>
   </div>
 
   <div class="flex flex-col items-center mt-9">
@@ -430,11 +474,7 @@ const openNewStatus = () => {
           <tbody>
             <!-- Iterate over todoList -->
             <TaskDetail :todo-id="selectedTodoId" />
-            <tr
-              class="itbkk-item"
-              v-for="(item, index) in taskStore.getTasks()"
-              :key="index"
-            >
+            <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
@@ -606,7 +646,15 @@ const openNewStatus = () => {
                   <!-- DELETE -->
                 </td>
               </div>
+              
             </tr>
+            <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0" >
+              <td colspan="5" class="text-center py-4 text-gray-400">
+                No task
+              </td>
+              </tr>
+           
+
 
             <!-- DELETE COMPLETE -->
           </tbody>
@@ -732,5 +780,32 @@ tr:nth-child(odd) {
 
 thead th {
   height: 3rem;
+}
+.selected-filters {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.selected-filter {
+  display: flex;
+  align-items: center;
+  background-color: #cce5ff;
+  color: #004085;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.selected-filter button {
+  margin-left: 0.5rem;
+  background: none;
+  border: none;
+  color: #004085;
+  cursor: pointer;
+}
+
+.selected-filter button:hover {
+  color: #002752;
 }
 </style>
