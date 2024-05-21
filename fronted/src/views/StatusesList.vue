@@ -106,7 +106,7 @@ const UpdateStatus = async () => {
     name: statusName,
     description: statusDescription
   })
-  if (statusExists(statusName)) {
+  if (statusExists(statusName,statusId)) {
     alert("Status name already exists")
     return
   }
@@ -152,11 +152,14 @@ const isEdited = computed(() => {
   )
 })
 
-const statusExists = (name) => {
+const statusExists = (name, id) => {
   return statusList.value.some(
-    (status) => status.name?.trim().toLowerCase() === name?.trim().toLowerCase()
+    (status) => 
+      status.name?.trim().toLowerCase() === name?.trim().toLowerCase() && 
+      status.id !== id
   )
 }
+
 
 //ติดตรงเวลาจะแก้ description มันก็ขึ้นด้วย
 
@@ -251,17 +254,23 @@ const deleteandtrans = async (statusId, newID) => {
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
 // ----------------------- Validate -----------------------
+const isValidName = (name) => {
+  return name && name.trim().length > 0 && name.trim().length <= 50
+}
 
-// const isValidName = (name) => {
-//   return name && name?.trim().length > 0 && name?.trim().length <= 50
-// }
+const isValidDescription = (description) => {
+  return !description || description.trim().length <= 200
+}
 
-// const isFormValid = computed(() => {
-//   return (isValidName(status.name) &&
-//    status.description.trim().length <= 200 
-//   )
-// })
+const isFormValid = computed(() => {
+  return (
+    isValidName(status.value.name) &&
+    isValidDescription(status.value.description)
+  )
+})
+
 
 </script>
 
@@ -353,9 +362,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                   type="submit"
                   class="itbkk-button-confirm btn mr-2"
                   style="flex: 3; margin: 10px; background-color: #f785b1"
-
-                 
-                  :disabled="statusExists()"
+                  :disabled="!isFormValid"
                 >
                   Save
                 </button>
@@ -591,7 +598,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
                             type="submit"
                             class="itbkk-button-confirm btn mr-2"
                             :class="{ disabled: !isEdited }"
-                            :disabled="!isEdited"
+                            :disabled="!isFormValid || !isEdited"
                           >
                             Save
                           </button>
