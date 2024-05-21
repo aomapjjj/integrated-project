@@ -89,7 +89,7 @@ public class StatusService {
         }
         // Check if the status is unique
         TaskStatus existingStatus = repository.findByName(task.getName().trim());
-        if (existingStatus != null) {
+        if (existingStatus != null && !existingStatus.getId().equals(id)) {
             throw new ValidationException("Status name must be unique");
         }
         try {
