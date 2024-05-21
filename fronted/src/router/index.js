@@ -45,6 +45,13 @@ export const routes = [
     path: "/status",
     name: "StatusesList",
     component: StatusesList,
+    children: [
+      {
+        path: "/status/:id/edit",
+        name: 'EditStatus',
+        component: StatusesList,
+      },
+    ],
   },
 ];
 

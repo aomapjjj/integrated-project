@@ -130,18 +130,17 @@ const UpdateStatus = async () => {
 
 const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
-  console.table(statusList.value)
-  console.log(statusToEdit)
-  console.log(statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
+  router.push({ name: "EditStatus", params: { id: statusId } });
 }
 
 const closeModalEdit = () => {
   const modal = document.getElementById("my_modal_edit")
   modal.close()
+  router.go(-1)
 }
 
 const isEdited = computed(() => {
