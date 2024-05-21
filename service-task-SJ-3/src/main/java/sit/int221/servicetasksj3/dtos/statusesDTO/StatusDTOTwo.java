@@ -1,7 +1,6 @@
-package sit.int221.servicetasksj3.dtos;
+package sit.int221.servicetasksj3.dtos.statusesDTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
