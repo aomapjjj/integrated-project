@@ -18,19 +18,11 @@ const statusList = ref([])
 let items = [] 
 let itemsStatus = [] 
 const indexDelete = ref(0)
-
-const isLimitEnabled = ref(false) // เปิด input limitๆ
+const isLimitEnabled = ref(false)
 const maxTasks = ref(10) 
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-
-const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
-})
 
 const taskStore = useTasks()
 onMounted(async () => {
@@ -489,6 +481,7 @@ const toggleLimit = () => {
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <label
+                
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
