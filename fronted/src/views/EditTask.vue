@@ -47,14 +47,12 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 const myModal = ref(null)
 
-// Function to open the modal
 const openModal = () => {
   router.push({ name: "TaskDetail", params: { id: props.todoId } })
   myModal.value.showModal()
   console.log([props.todoId])
 }
 
-// Function to close the modal
 const closeModal = () => {
   myModal.value.close()
   router.go(-1)
@@ -68,18 +66,39 @@ const UpdateTask = async () => {
     status: todo.value.status
   }
 
-  const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
-  myTasks.updateTask(
-    edit.id,
-    edit.title,
-    edit.description,
-    edit.assignees,
-    edit.status,
-    edit.createdOn,
-    edit.updateOn
-  )
-  console.log(edit)
-  router.push({ name: "TaskList" })
+  const tasksInStatus = myTasks
+    .getTasks()
+    .filter((task) => task.status === todo.value.status)
+    
+  if (
+    myTasks.getIsLimitEnabled &&
+    tasksInStatus.length >= myTasks.getMaxTasks &&
+    todo.value.status !== "No Status" &&
+    todo.value.status !== "Done"
+  ) {
+    alert(
+      `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
+    )
+    return
+  }
+
+  try {
+
+    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
+    myTasks.updateTask(
+      edit.id,
+      edit.title,
+      edit.description,
+      edit.assignees,
+      edit.status,
+      edit.createdOn,
+      edit.updateOn
+    )
+    console.log(edit)
+    router.push({ name: "TaskList" })
+  } catch (error) {
+    console.error("Error updating task:", error)
+  }
 }
 
 const checkEqual = computed(() => {
@@ -87,30 +106,32 @@ const checkEqual = computed(() => {
     ...todo.value,
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
-    assignees: todo.value.assignees?.trim(),
-  };
+    assignees: todo.value.assignees?.trim()
+  }
   const trimmedOldValue = {
     ...oldValue.value,
     title: oldValue.value.title?.trim(),
     description: oldValue.value.description?.trim(),
-    assignees: oldValue.value.assignees?.trim(),
-  };
-  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue);
-});
+    assignees: oldValue.value.assignees?.trim()
+  }
+  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue)
+})
 
 // ----------------------- Validate -----------------------
 
 const isValidTitle = (title) => {
-  return title && title.trim().length > 0 && title.trim().length <= 100;
-};
+  return title && title.trim().length > 0 && title.trim().length <= 100
+}
 
 const isFormValid = computed(() => {
   return (
     isValidTitle(todo.value.title) &&
     (!todo.value.description || todo.value.description.trim().length <= 500) &&
     (!todo.value.assignees || todo.value.assignees.trim().length <= 30)
-  );
-});
+  )
+})
+
+
 </script>
 
 <template>

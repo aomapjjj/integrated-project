@@ -1,8 +1,8 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
 import { ref, onMounted, computed } from "vue"
-import { useTasks } from "../stores/store"
 import { useRouter } from "vue-router"
+import { useTasks } from "../stores/store.js"
 
 const router = useRouter()
 const showAlertAdd = ref(false)
@@ -14,10 +14,6 @@ const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const myTasks = useTasks()
 
-// const props = defineProps({
-//   todo: Object
-// })
-
 const todo = ref({
   title: "",
   description: "",
@@ -25,6 +21,7 @@ const todo = ref({
   status: "No Status"
 })
 
+const taskStore = useTasks()
 onMounted(async () => {
   const itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
@@ -36,28 +33,49 @@ const submitForm = async () => {
   const trimmedDescription = todo.value.description?.trim()
   const trimmedAssignees = todo.value.assignees?.trim()
 
-  const itemAdd = await addItem(baseUrlTask, {
-    title: trimmedTitle,
-    description: trimmedDescription,
-    assignees: trimmedAssignees,
-    status: todo.value.status
-  })
+  const tasksInStatus = myTasks
+    .getTasks()
+    .filter((task) => task.status === todo.value.status)
 
-  myTasks.addTask(
-    itemAdd.id,
-    itemAdd.title,
-    itemAdd.description,
-    itemAdd.assignees,
-    itemAdd.status,
-    itemAdd.createdOn,
-    itemAdd.updateOn
-  )
-  if (itemAdd.status === 200) {
+
+  if (
+    myTasks.getIsLimitEnabled &&
+    tasksInStatus.length >= myTasks.getMaxTasks &&
+    todo.value.status !== "No Status" &&
+    todo.value.status !== "Done"
+  ) {
+    alert(
+      `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
+    )
+    return
+  }
+
+  try {
+    const itemAdd = await addItem(baseUrlTask, {
+      title: trimmedTitle,
+      description: trimmedDescription,
+      assignees: trimmedAssignees,
+      status: todo.value.status
+    })
+
+    myTasks.addTask(
+      itemAdd.id,
+      itemAdd.title,
+      itemAdd.description,
+      itemAdd.assignees,
+      itemAdd.status,
+      itemAdd.createdOn,
+      itemAdd.updateOn
+    )
+
     showAlertAdd.value = true
     showAlertAfterClose.value = true
     setTimeout(() => {
       showAlertAfterClose.value = false
     }, 2300)
+
+  } catch (error) {
+    console.error("Error adding task:", error)
   }
 
 }
@@ -89,6 +107,17 @@ const isFormValid = computed(() => {
   )
 })
 
+const isLimitReached = computed(() => {
+  if (taskStore.isLimitEnabled) {
+    const tasksInStatus = taskStore
+      .getTasks()
+      .filter((task) => task.status === todo.value.status)
+    return tasksInStatus.length >= taskStore.maxTasks
+  }
+  return false
+})
+
+//Limit
 </script>
 
 <template>
@@ -159,7 +188,12 @@ const isFormValid = computed(() => {
               <form method="dialog">
                 <button type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
-                  style="background-color: #f785b1" :class="{ disabled: !isFormValid }" :disabled="!isFormValid">
+
+                  style="background-color: #f785b1"
+                  :class="{ disabled: !isFormValid || isLimitReached }"
+                  :disabled="!isFormValid || isLimitReached"
+                >
+
                   Save
                 </button>
               </form>

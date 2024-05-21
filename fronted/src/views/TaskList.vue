@@ -172,6 +172,11 @@ const openNewStatus = () => {
   router.push({ name: "StatusesList" })
 }
 
+// ----------------------- Limit ---------------------------
+const toggleLimit = () => {
+  taskStore.setLimitEnabled(isLimitEnabled.value)
+}
+
 
 </script>
 
@@ -272,12 +277,12 @@ const openNewStatus = () => {
 
         <div class="flex items-center mt-4">
           <span class="mr-2">Enable Status Limit</span>
-          <input type="checkbox" class="toggle" v-model="isLimitEnabled"  />
+          <input type="checkbox" class="toggle" v-model="isLimitEnabled" @change="toggleLimit"/>
         </div>
 
         <div v-if="isLimitEnabled" class="mt-4">
         <label for="status-limit" class="mr-2">Set Maximum Tasks:</label>
-        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" />
+        <input type="number" id="status-limit" class="input input-bordered"v-model.number="maxTasks" @input="taskStore.setMaxTasks(maxTasks)"/>
       </div>
 
         <div class="modal-action">
