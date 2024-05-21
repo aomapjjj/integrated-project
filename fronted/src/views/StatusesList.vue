@@ -465,11 +465,11 @@ const isFormValid = computed(() => {
         </div>
 
         <table
-          class="table-auto mt-10 rounded-xl overflow-hidden"
+          class="table-auto1 mt-10 rounded-xl overflow-hidden"
           style="table-layout: fixed"
         >
           <!-- table -->
-          <thead>
+          <thead >
             <tr class="bg-base-200 mt-4 md:mt-0">
               <th
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
@@ -746,27 +746,34 @@ const isFormValid = computed(() => {
 <style>
 /* เพิ่ม media query เพื่อปรับขนาดของตารางเมื่อจอมีขนาดเล็กกว่า 576px */
 @media (max-width: 576px) {
-  .table-auto {
+  .table-auto1 {
     width: 100%;
     overflow-x: auto;
     /* เพิ่ม overflow-x: auto; เพื่อให้เกิดการเลื่อนตารางแนวนอน */
   }
 
-  .table-auto thead,
-  .table-auto tbody {
+  .table-auto1 thead,
+  .table-auto1 tbody {
     display: block;
   }
 
-  .table-auto thead th {
+  .table-auto1 thead th {
     display: none;
   }
 
-  .table-auto tbody td {
+  .table-auto1 tbody td {
     border-bottom: 1px solid #ccc;
     display: block;
     text-align: center;
   }
 }
+.table-auto1 th,
+.table-auto1 td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ebebeb;
+}
+
 
 /* ใช้ word-break เพื่อให้ข้อความยาว ๆ ขึ้นบรรทัดใหม่ */
 .itbkk-status-description label {
