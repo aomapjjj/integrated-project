@@ -185,7 +185,7 @@ const openNewStatus = () => {
 
 <template>
   <div class="min-h-full max-h-fit">
-    <nav class="bg-white shadow" style="margin-top: 10px; background-color: #d8f1f1 ;">
+    <nav class="bg-white shadow" style=" background-color: #d8f1f1 ;">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
           <img
@@ -671,34 +671,28 @@ const openNewStatus = () => {
           transform: translateX(-50%);
           z-index: 9999;
           width: 500px;
-          color: red;
+          color: rgb(74 222 128 / var(--tw-text-opacity));
           animation: fadeInOut 1.5s infinite;
         "
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          class="stroke-info shrink-0 w-6 h-6"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
-        </svg>
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
         <div>
-          <h2 class="itbkk-message font-bold">The task has been deleted</h2>
+          <h2 class="itbkk-message font-bold text-green-400">The task has been deleted</h2>
         </div>
         <div>
-          <button
-            class="btn btn-sm"
-            style="background-color: #9fc3e9"
-            @click="deleteComplete = false"
-          >
-            Close
-          </button>
+  
         </div>
       </div>
     </div>
