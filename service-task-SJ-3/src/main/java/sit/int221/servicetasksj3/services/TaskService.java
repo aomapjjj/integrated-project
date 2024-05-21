@@ -125,6 +125,7 @@ public class TaskService {
         repository.delete(task);
         return deletedTaskDTO;
     }
+
     // EDIT
     @Transactional
     public Task updateTask(Integer id, TaskNewDTO task) {
@@ -135,29 +136,35 @@ public class TaskService {
         TaskStatus status = statusRepository.findByName(task.getStatus());
         task1.setStatus(status);
 
-        if (task.getTitle().length() > 100) {
-            throw new ValidationException("Title must be between 0 and 100");
+        if (task.getTitle() != null && task.getTitle().length() > 100) {
+            throw new ValidationException("Title must be between 0 and 100 characters");
         }
         if (task.getDescription() != null && task.getDescription().length() > 500) {
-            throw new ValidationException("Description must be between 0 and 500");
+            throw new ValidationException("Description must be between 0 and 500 characters");
         }
-        if (task.getAssignees().length() > 30) {
-            throw new ValidationException("Assignees must be between 0 and 30");
+        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
+            throw new ValidationException("Assignees must be between 0 and 30 characters");
         }
 
-        if (task.getTitle() != null && !task.getTitle().isEmpty()) {
-            task.setTitle(task.getTitle().trim());
+        if (task.getTitle() != null) {
+            existingTask.setTitle(task.getTitle().trim());
         }
         if (task.getDescription() != null) {
-            task.setDescription(task.getDescription().trim());
+            existingTask.setDescription(task.getDescription().trim());
         }
         if (task.getAssignees() != null) {
-            task.setAssignees(task.getAssignees().trim());
+            existingTask.setAssignees(task.getAssignees().trim());
         }
         if (task.getStatus() != null) {
-            task.setStatus(task.getStatus());
+            existingTask.setStatus(status);
         }
+
         task1.setId(id);
         return repository.save(task1);
     }
+
+
+
+
+
 }
