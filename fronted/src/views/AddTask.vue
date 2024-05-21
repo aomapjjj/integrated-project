@@ -244,6 +244,7 @@ const isFormValid = computed(() => {
             transform: translateX(-50%);
             z-index: 9999;
             width: 400px;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
             animation: fadeInOut 1.5s infinite;
           "
         >

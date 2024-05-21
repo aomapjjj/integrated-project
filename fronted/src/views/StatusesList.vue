@@ -86,7 +86,6 @@ const closeModalAdd = () => {
   modal.close()
 }
 
-
 // logic for submitting the form
 
 // ----------------------- Add -----------------------
@@ -107,7 +106,7 @@ const UpdateStatus = async () => {
     name: statusName,
     description: statusDescription
   })
-  if (statusExists(statusName,statusId)) {
+  if (statusExists(statusName, statusId)) {
     alert("Status name already exists")
     return
   }
@@ -155,12 +154,11 @@ const isEdited = computed(() => {
 
 const statusExists = (name, id) => {
   return statusList.value.some(
-    (status) => 
-      status.name?.trim().toLowerCase() === name?.trim().toLowerCase() && 
+    (status) =>
+      status.name?.trim().toLowerCase() === name?.trim().toLowerCase() &&
       status.id !== id
   )
 }
-
 
 //ติดตรงเวลาจะแก้ description มันก็ขึ้นด้วย
 
@@ -271,116 +269,157 @@ const isFormValid = computed(() => {
     isValidDescription(status.value.description)
   )
 })
-
-
 </script>
 
 <template>
-  <div class="min-h-full">
-    <nav class="bg-gray-800" style="background-color: #f785b1">
-      <div class="mx-auto max-w-7xl px-1">
-        <div class="flex h-16 items-center justify-between">
-          <div class="flex items-center">
-            <div class="hidden md:block"></div>
+  <div class="min-h-full max-h-fit">
+    <nav class="bg-white shadow" style="background-color: #d8f1f1">
+      <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-4">
+          <img
+            src="/src/image/sj3.png"
+            alt="LOGO"
+            class="w-[100px] h-[100px]"
+          />
+          <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
+            <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
+            <h1
+              class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight"
+              style="
+                color: #9391e4;
+                text-align: center;
+                text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
+              "
+            >
+              IT-Bangmod Kradan Kanban
+            </h1>
+          </div>
+        </a>
+        <div class="itbkk-button-add">
+          <button
+      onclick="my_modal_4.showModal()"
+      class="itbkk-button-add btn ml-4"
+      style="
+        position: relative;
+        border-radius: 30px;
+        background-color: #9391e4;
+        color: white;
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill="currentColor"
+          d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
+        />
+      </svg>
+      Add new task
+    </button>
+        </div>
+        <div class="flex items-center">
+          <div class="hidden md:block">
+            <div class="flex space-x-1.5"></div>
           </div>
         </div>
       </div>
     </nav>
   </div>
 
-  <!-- header -->
+  <div>
+    <!-- Add new status -->
+  
+    <dialog id="my_modal_4" class="itbkk-modal-status modal">
+      <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
+        <span
+          class="block text-2xl font-bold leading-6 mb-1"
+          style="margin: 15px; color: #9391e4; text-align: center;"
+          >Add Status</span
+        >
 
-  <header class="bg-white shadow">
-    <div
-      class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10 flex justify-between items-center"
-    >
-      <h1
-        class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-gray-900"
-        style="color: #9391e4"
-      >
-        IT-Bangmod Kradan Kanban
-      </h1>
-      <!-- Add new status -->
-      <div class="itbkk-button-add">
-        <button class="btn" onclick="my_modal_4.showModal()">Add status</button>
-      </div>
-      <dialog id="my_modal_4" class="itbkk-modal-status modal">
-        <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
-          <span
-            class="block text-2xl font-bold leading-6 text-gray-900 mb-1"
-            style="margin: 15px"
-            >Add Status</span
+        <!-- Modal content -->
+        <div class="modal-action flex flex-col justify-between">
+          <!-- name -->
+
+          <div
+            class="modal-content py-4 text-left px-6 flex-grow"
           >
-
-          <!-- Modal content -->
-          <div class="modal-action flex flex-col justify-between">
-            <!-- name -->
-
-            <div
-              class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
+          <div class="label">
+                <span
+                  class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
+                  >Name
+                </span>
+              </div>
+            <label
+              class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4">
+              <input
+                type="text"
+                class="grow"
+                placeholder="Enter Your Title"
+                v-model="status.name"
+              />
+            </label>
+            <p
+              class="text-sm text-gray-400 mb-2 mt-2"
+              style="text-align: right"
             >
-              <label
-                class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4 mb-8"
-              >
-                <input
-                  type="text"
-                  class="grow"
-                  placeholder="Enter Your Title"
-                  v-model="status.name"
-                />
-                <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                  {{ status.name?.length }}/50
-                </p>
-              </label>
-              <!-- Description -->
-              <label
-                for="description"
-                class="itbkk-status-description form-control flex-grow ml-4 mb-8"
-              >
-                <div class="label">
-                  <span
-                    class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                    >Description
-                    <p class="text-sm text-red-400 ml-4 mb-2 mt-2">
-                      {{ status.description?.length }}/200
-                    </p>
-                  </span>
-                </div>
+              {{ status.name?.length }}/50
+            </p>
+            <!-- Description -->
+            <label
+              for="description"
+              class="itbkk-status-description form-control flex-grow ml-4"
+            >
+              <div class="label">
+                <span
+                  class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                  >Description
+                </span>
+              </div>
 
-                <textarea
-                  id="description"
-                  class="itbkk-description textarea textarea-bordered flex-grow w-full"
-                  rows="4"
-                  placeholder="No Description Provided"
-                  v-model="status.description"
-                ></textarea>
-              </label>
-            </div>
-            <!-- Buttons -->
-            <div class="flex justify-end">
-              <form form @submit.prevent="submitForm" method="dialog">
-                <button
-                  type="submit"
-                  class="itbkk-button-confirm btn mr-2"
-                  style="flex: 3; margin: 10px; background-color: #f785b1"
-                  :disabled="!isFormValid"
-                >
-                  Save
-                </button>
-              </form>
+              <textarea
+                id="description"
+                class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                rows="4"
+                placeholder="No Description Provided"
+                v-model="status.description"
+              ></textarea>
+            </label>
+            <p
+              class="text-sm text-gray-400 mb-2 mt-2"
+              style="text-align: right"
+            >
+              {{ status.description?.length }}/200
+            </p>
+          </div>
+          <!-- Buttons -->
+          <div class="flex justify-end">
+            <form form @submit.prevent="submitForm" method="dialog">
               <button
-                class="itbkk-button-cancel btn"
-                style="margin: 10px"
-                @click="closeModalAdd()"
+                type="submit"
+                class="itbkk-button-confirm btn mr-2"
+                style="flex: 3; margin: 10px; background-color: #f785b1"
+                :disabled="!isFormValid"
               >
-                Cancel
+                Save
               </button>
-            </div>
+            </form>
+            <button
+              class="itbkk-button-cancel btn"
+              style="margin: 10px"
+              @click="closeModalAdd()"
+            >
+              Cancel
+            </button>
           </div>
         </div>
-      </dialog>
-    </div>
-  </header>
+      </div>
+    </dialog>
+  </div>
+
   <div class="flex flex-col items-center mt-1">
     <div class="overflow-x-auto">
       <div class="min-w-full">
@@ -701,7 +740,6 @@ const isFormValid = computed(() => {
             </tr>
           </tbody>
         </table>
-        
       </div>
     </div>
   </div>
