@@ -12,7 +12,7 @@ const myTasks = useTasks()
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 const notFound = ref(false)
-const error = ref('')
+const error = ref("")
 const props = defineProps({
   todoId: Number
 })
@@ -80,11 +80,9 @@ const UpdateTask = async () => {
       notFound.value = false
     }, 1800)
     notFound.value = true
-    return error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
-
+    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`)
   }
   try {
-
     const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
     myTasks.updateTask(
       edit.id,
@@ -131,8 +129,6 @@ const isFormValid = computed(() => {
     (!todo.value.assignees || todo.value.assignees.trim().length <= 30)
   )
 })
-
-
 </script>
 
 <template>
@@ -142,15 +138,27 @@ const isFormValid = computed(() => {
   </label>
   <!-- Modal window -->
   <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex">
-    <div class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+    <div
+      class="modal-container bg-white w-full xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
+    >
       <div class="modal-content py-4 text-left px-6 flex-grow">
         <!-- Title -->
         <div class="relative">
-          <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mt-1"
-            style="background-color: #9fc3e9">
-            <input type="text" class="grow" v-model="todo.title" placeholder="Enter Your Title" />
+          <label
+            class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4 mt-1"
+            style="background-color: #9fc3e9"
+          >
+            <input
+              type="text"
+              class="grow"
+              v-model="todo.title"
+              placeholder="Enter Your Title"
+            />
           </label>
-          <p class="text-sm text-gray-400 mb-2 mt-2 ml-4" style="text-align: right">
+          <p
+            class="text-sm text-gray-400 mb-2 mt-2 ml-4"
+            style="text-align: right"
+          >
             {{ todo.title?.length }}/100
           </p>
         </div>
@@ -158,15 +166,29 @@ const isFormValid = computed(() => {
         <div class="relative">
           <label for="description" class="form-control flex-grow ml-4 mb-8">
             <div class="label">
-              <span class="block text-lg font-bold leading-6 text-gray-900 mb-1" style="color: #9391e4">Description
+              <span
+                class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                style="color: #9391e4"
+                >Description
               </span>
             </div>
-            <textarea id="description" class="itbkk-description textarea textarea-bordered h-3/4" rows="4"
-              v-model="todo.description" :class="{
-    'italic text-gray-500':
-      !todo.description || todo.description.trim() === ''
-  }" placeholder="No Description Provided" style="height: 400px">{{ todo.description }}</textarea>
-            <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
+            <textarea
+              id="description"
+              class="itbkk-description textarea textarea-bordered h-3/4"
+              rows="4"
+              v-model="todo.description"
+              :class="{
+                'italic text-gray-500':
+                  !todo.description || todo.description.trim() === ''
+              }"
+              placeholder="No Description Provided"
+              style="height: 400px"
+              >{{ todo.description }}</textarea
+            >
+            <p
+              class="text-sm text-gray-400 mb-2 mt-2"
+              style="text-align: right"
+            >
               {{ todo.description?.length }}/500
             </p>
           </label>
@@ -175,21 +197,39 @@ const isFormValid = computed(() => {
       <div class="modal-content py-4 text-left px-10" style="margin-top: 65px">
         <!-- Assignees -->
         <div class="mt-10">
-          <span class="block text-lg font-bold leading-6 text-gray-900" style="color: #9391e4">Assignees</span>
-          <textarea id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" rows="4"
-            v-model="todo.assignees" :class="{
-    'italic text-gray-500':
-      !todo.assignees || todo.assignees.trim() === ''
-  }" placeholder="Unassigned">{{ todo.assignees }}
-            </textarea>
+          <span
+            class="block text-lg font-bold leading-6 text-gray-900"
+            style="color: #9391e4"
+            >Assignees</span
+          >
+          <textarea
+            id="assignees"
+            class="itbkk-assignees textarea textarea-bordered w-full mt-1"
+            rows="4"
+            v-model="todo.assignees"
+            :class="{
+              'italic text-gray-500':
+                !todo.assignees || todo.assignees.trim() === ''
+            }"
+            placeholder="Unassigned"
+            >{{ todo.assignees }}
+            </textarea
+          >
           <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
             {{ todo.assignees?.length }}/30
           </p>
         </div>
         <!-- Status -->
         <div class="itbkk-status mb-4 mt-2">
-          <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
-          <select class="select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
+          <span
+            class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+            style="color: #9391e4"
+            >Status</span
+          >
+          <select
+            class="select select-bordered w-full max-w-xs mt-1"
+            v-model="todo.status"
+          >
             <option v-for="status in statusList" :value="status.name">
               {{ status.name }}
             </option>
@@ -198,19 +238,31 @@ const isFormValid = computed(() => {
         <!-- TimeZone -->
         <div class="itbkk-timezone">
           <div class="mb-4 flex items-center">
-            <label for="timezone" class="label mr-2 text-lg font-bold" style="color: #9391e4">TimeZone :
+            <label
+              for="timezone"
+              class="label mr-2 text-lg font-bold"
+              style="color: #9391e4"
+              >TimeZone :
             </label>
             <h1>{{ TimeZone }}</h1>
           </div>
           <!-- CreatedOn -->
           <div class="mb-4 flex items-center itbkk-created-on">
-            <label for="timezone" class="label mr-2 text-lg font-bold" style="color: #9391e4">Created On :
+            <label
+              for="timezone"
+              class="label mr-2 text-lg font-bold"
+              style="color: #9391e4"
+              >Created On :
             </label>
             <h1>{{ toDate(todo.createdOn) }}</h1>
           </div>
           <!-- UpdatedOn -->
           <div class="mb-4 flex items-center itbkk-updated-on">
-            <label for="timezone" class="label mr-2 text-lg font-bold" style="color: #9391e4">Updated On :
+            <label
+              for="timezone"
+              class="label mr-2 text-lg font-bold"
+              style="color: #9391e4"
+              >Updated On :
             </label>
             <h1>{{ toDate(todo.updatedOn) }}</h1>
           </div>
@@ -218,26 +270,33 @@ const isFormValid = computed(() => {
 
         <!-- Save & Close Button -->
         <div class="modal-action flex justify-between ml-20">
-          <form method="dialog" style="
+          <div
+            style="
               display: flex;
               justify-content: flex-end;
-              margin-top: -10px;
+              margin-left: 10px;
               flex: 1;
-            ">
-
-
-          </form>
-          <button @click="UpdateTask" type="submit" class="btn" style="background-color: #f785b1"
-            :disabled="!isFormValid || checkEqual" :class="{ disabled: !isFormValid || checkEqual }">
-            Save
-          </button>
-          <button class="btn" style="margin-top: -10px" @click="closeModal">
-            Close
-          </button>
-
+            "
+          >
+            <button
+              @click="UpdateTask"
+              type="submit"
+              class="btn "
+              style="background-color: #f785b1"
+              :disabled="!isFormValid || checkEqual"
+              :class="{ disabled: !isFormValid || checkEqual }"
+            >
+              Save
+            </button>
+            <button class="btn ml-2" @click="closeModal">
+              Close
+            </button>
+          </div>
         </div>
         <div role="alert" v-show="notFound">
-          <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+          <div
+            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"
+          >
             {{ error }}
           </div>
         </div>
