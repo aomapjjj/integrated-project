@@ -8,7 +8,8 @@ const router = useRouter()
 const showAlertAdd = ref(false)
 const showAlertAfterClose = ref(false)
 const statusList = ref([])
-
+const notFound = ref(false)
+const error = ref('')
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
@@ -44,10 +45,12 @@ const submitForm = async () => {
     todo.value.status !== "No Status" &&
     todo.value.status !== "Done"
   ) {
-    alert(
-      `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
-    )
-    return
+    setTimeout(() => {
+        notFound.value = false
+      }, 1800)
+      notFound.value = true
+    return error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`
+    
   }
 
   try {
@@ -121,6 +124,7 @@ const isLimitReached = computed(() => {
 </script>
 
 <template>
+  
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
     <button onclick="my_modal_1.showModal()" class="itbkk-button-add btn ml-4" style="
@@ -188,11 +192,8 @@ const isLimitReached = computed(() => {
               <form method="dialog">
                 <button type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
-
-                  style="background-color: #f785b1"
-                  :class="{ disabled: !isFormValid || isLimitReached }"
-                  :disabled="!isFormValid || isLimitReached"
-                >
+                  style="background-color: #f785b1" :class="{ disabled: !isFormValid || isLimitReached }"
+                  :disabled="!isFormValid || isLimitReached">
 
                   Save
                 </button>
@@ -201,6 +202,11 @@ const isLimitReached = computed(() => {
                 Cancel
               </button>
             </div>
+            <div role="alert" v-show="notFound">
+          <div class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+            {{ error }}
+          </div>
+        </div>
           </div>
         </div>
 
