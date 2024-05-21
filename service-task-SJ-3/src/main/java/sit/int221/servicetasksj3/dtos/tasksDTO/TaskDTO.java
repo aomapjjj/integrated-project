@@ -1,7 +1,5 @@
-package sit.int221.servicetasksj3.dtos;
+package sit.int221.servicetasksj3.dtos.tasksDTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 

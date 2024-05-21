@@ -1,8 +1,5 @@
-package sit.int221.servicetasksj3.dtos;
+package sit.int221.servicetasksj3.dtos.tasksDTO;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
