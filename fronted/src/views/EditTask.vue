@@ -50,7 +50,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const myModal = ref(null);
 
 const openModal = () => {
-  router.push({ name: 'TaskDetail', params: { id: props.todoId } });
+  router.push({ name: 'TaskEdit', params: { id: props.todoId } });
   myModal.value.showModal();
   console.log([props.todoId]);
 };
