@@ -96,7 +96,7 @@ const UpdateTask = async () => {
       edit.updateOn
     )
     console.log(edit)
-    router.push({ name: "TaskList" })
+    
   } catch (error) {
     console.error("Error updating task:", error)
   }
