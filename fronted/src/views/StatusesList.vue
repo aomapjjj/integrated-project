@@ -174,6 +174,7 @@ const closeModalEdit = () => {
   const modal = document.getElementById('my_modal_edit');
   modal.close();
   router.go(-1);
+  clearForm()
 };
 
 const isEdited = computed(() => {
