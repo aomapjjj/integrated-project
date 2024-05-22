@@ -272,8 +272,8 @@ const toggleLimit = () => {
     </dialog>
     <!-- FILTER -->
     <details class="dropdown">
-      <summary class="m-1 btn" style="border-radius: 30px">
-        <button>
+      <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
+        <button >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -298,21 +298,21 @@ const toggleLimit = () => {
         Filter
       </summary>
       <ul
-        class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+        class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
       >
         <li
           v-for="status in statusList"
           :key="status.name"
           class="flex items-center"
         >
-          <label class="flex items-center space-x-2 w-full">
+          <label class="itbkk-status-choice flex items-center space-x-2 w-full">
             <input
               type="checkbox"
               :value="status.name"
               v-model="searchQuery"
               class="mr-2"
             />
-            <span>{{ status.name }}</span>
+            <span class="itbkk-status-choice">{{status.name}}</span>
           </label>
         </li>
       </ul>
@@ -325,7 +325,7 @@ const toggleLimit = () => {
         class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
         style="background-color: rgb(247, 133, 177)"
       >
-        <span>{{ status }}</span>
+        <span >{{ status }}</span>
         <button
           @click="removeStatus(status)"
           class="ml-2 text-gray-900 hover:text-white"
