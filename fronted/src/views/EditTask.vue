@@ -126,16 +126,24 @@ const checkEqual = computed(() => {
 // ----------------------- Validate -----------------------
 
 const isValidTitle = (title) => {
-  return title && title.trim().length > 0 && title.trim().length <= 100;
-};
+  return title && title.trim().length >= 0 && title.trim().length <= 100
+}
 
 const isFormValid = computed(() => {
   return (
     isValidTitle(todo.value.title) &&
     (!todo.value.description || todo.value.description.trim().length <= 500) &&
-    (!todo.value.assignees || todo.value.assignees.trim().length <= 30)
-  );
-});
+    (!todo.value.assignees || todo.value.assignees.trim().length <= 30) 
+  )
+})
+
+const assigneesLength = computed(() => {
+  return todo.value.assignees ? todo.value.assignees.length : 0
+})
+
+const descriptionLength = computed(() => {
+  return todo.value.description ? todo.value.description.length : 0
+})
 </script>
 
 <template>
@@ -166,7 +174,7 @@ const isFormValid = computed(() => {
             class="text-sm text-gray-400 mb-2 mt-2 ml-4"
             style="text-align: right"
           >
-            {{ todo.title?.length }}/100
+            {{ todo.title.length }}/100
           </p>
         </div>
         <!-- Description -->
@@ -196,7 +204,7 @@ const isFormValid = computed(() => {
               class="text-sm text-gray-400 mb-2 mt-2"
               style="text-align: right"
             >
-              {{ todo.description?.length }}/500
+              {{ descriptionLength }}/500
             </p>
           </label>
         </div>
@@ -223,7 +231,7 @@ const isFormValid = computed(() => {
             </textarea
           >
           <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
-            {{ todo.assignees?.length }}/30
+            {{ assigneesLength }}/30
           </p>
         </div>
         <!-- Status -->
