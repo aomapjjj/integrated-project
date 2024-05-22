@@ -11,14 +11,15 @@ async function getItems(url) {
   }
 }
 async function getItemById(id) {
-  try {
+  if (id > 0) {  try {
     console.log("id : ", id)
     const data = await fetch(`${baseUrlTask}/${id}`)
     //const item = await data.json()
     return data
   } catch (error) {
     console.log(`error: ${error}`)
-  }
+  }}
+
 }
 
 async function deleteItemById(url, id) {
