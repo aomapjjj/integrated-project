@@ -4,6 +4,7 @@ import ErrorPage from "@/views/ErrorPage.vue";
 import AddTask from "@/views/AddTask.vue";
 import StatusesList from "@/views/StatusesList.vue";
 import TaskDetail from "@/views/TaskDetail.vue";
+import EditTask from "@/views/EditTask.vue";
 
 export const routes = [
   {
@@ -24,6 +25,11 @@ export const routes = [
         path: "/task/:id",
         name: "TaskDetail",
         component: TaskDetail,
+      },
+      {
+        path: "/task/:id/edit",
+        name: "TaskEdit",
+        component: EditTask,
       },
     ],
   },
