@@ -27,7 +27,7 @@ watch(
   async (newValue) => {
       const response = await getItemById(newValue)
     console.log(newValue)
-    if (response.status === 200) {
+    if (response && response.status === 200) {
       todo.value = await response.json()
       console.log(todo.value)
       isLoading.value = false
