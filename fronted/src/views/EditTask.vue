@@ -1,89 +1,91 @@
 <script setup>
 // Import ref from Vue
-import { ref, watch, computed } from "vue"
-import { getItems, getItemById, editItem } from "@/libs/fetchUtils"
-import { useTasks } from "../stores/store"
-import { toDate } from "../libs/toDate"
-import { useRouter } from "vue-router"
+import { ref, watch, computed } from 'vue';
+import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
+import { useTasks } from '../stores/store';
+import { toDate } from '../libs/toDate';
+import { useRouter } from 'vue-router';
 
-const statusList = ref([])
-const router = useRouter()
-const myTasks = useTasks()
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-const notFound = ref(false)
-const error = ref("")
+const statusList = ref([]);
+const router = useRouter();
+const myTasks = useTasks();
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const notFound = ref(false);
+const error = ref('');
 const props = defineProps({
-  todoId: Number
-})
+  todoId: Number,
+});
+const showAlertEdit = ref(false);
+const showAlertAfterEdit = ref(false);
 
 const todo = ref({
-  id: "",
-  title: "",
-  description: "",
-  assignees: "",
-  status: "",
-  createdOn: "",
-  updatedOn: ""
-})
+  id: '',
+  title: '',
+  description: '',
+  assignees: '',
+  status: '',
+  createdOn: '',
+  updatedOn: '',
+});
 
-const oldValue = ref({})
+const oldValue = ref({});
 
 watch(
   () => props.todoId,
   async (newValue) => {
-    const response = await getItemById(newValue)
+    const response = await getItemById(newValue);
     if (response.status === 200) {
-      todo.value = await response.json()
-      oldValue.value = { ...todo.value }
+      todo.value = await response.json();
+      oldValue.value = { ...todo.value };
     }
-    const itemsStatus = await getItems(baseUrlStatus)
-    statusList.value = itemsStatus
+    const itemsStatus = await getItems(baseUrlStatus);
+    statusList.value = itemsStatus;
   },
   { immediate: true }
-)
+);
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-const myModal = ref(null)
+const myModal = ref(null);
 
 const openModal = () => {
-  router.push({ name: "TaskDetail", params: { id: props.todoId } })
-  myModal.value.showModal()
-  console.log([props.todoId])
-}
+  router.push({ name: 'TaskDetail', params: { id: props.todoId } });
+  myModal.value.showModal();
+  console.log([props.todoId]);
+};
 
 const closeModal = () => {
-  myModal.value.close()
-  router.go(-1)
-}
+  myModal.value.close();
+  router.go(-1);
+};
 
 const UpdateTask = async () => {
   const trimmedTodo = {
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
     assignees: todo.value.assignees?.trim(),
-    status: todo.value.status
-  }
+    status: todo.value.status,
+  };
 
   const tasksInStatus = myTasks
     .getTasks()
-    .filter((task) => task.status === todo.value.status)
+    .filter((task) => task.status === todo.value.status);
 
   if (
     myTasks.getIsLimitEnabled &&
     tasksInStatus.length >= myTasks.getMaxTasks &&
-    todo.value.status !== "No Status" &&
-    todo.value.status !== "Done"
+    todo.value.status !== 'No Status' &&
+    todo.value.status !== 'Done'
   ) {
     setTimeout(() => {
-      notFound.value = false
-    }, 1800)
-    notFound.value = true
-    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`)
+      notFound.value = false;
+    }, 1800);
+    notFound.value = true;
+    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`);
   }
   try {
-    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
+    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo);
     myTasks.updateTask(
       edit.id,
       edit.title,
@@ -92,29 +94,34 @@ const UpdateTask = async () => {
       edit.status,
       edit.createdOn,
       edit.updateOn
-    )
-    console.log(edit)
+    );
 
+    showAlertEdit.value = true;
+    showAlertAfterEdit.value = true;
+    setTimeout(() => {
+      showAlertAfterEdit.value = false;
+    }, 2300);
+    console.log(edit);
   } catch (error) {
-    console.error("Error updating task:", error)
+    console.error('Error updating task:', error);
   }
-}
+};
 
 const checkEqual = computed(() => {
   const trimmedTodo = {
     ...todo.value,
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
-    assignees: todo.value.assignees?.trim()
-  }
+    assignees: todo.value.assignees?.trim(),
+  };
   const trimmedOldValue = {
     ...oldValue.value,
     title: oldValue.value.title?.trim(),
     description: oldValue.value.description?.trim(),
-    assignees: oldValue.value.assignees?.trim()
-  }
-  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue)
-})
+    assignees: oldValue.value.assignees?.trim(),
+  };
+  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue);
+});
 
 // ----------------------- Validate -----------------------
 
@@ -187,7 +194,7 @@ const descriptionLength = computed(() => {
               v-model="todo.description"
               :class="{
                 'italic text-gray-500':
-                  !todo.description || todo.description.trim() === ''
+                  !todo.description || todo.description.trim() === '',
               }"
               placeholder="No Description Provided"
               style="height: 400px"
@@ -217,7 +224,7 @@ const descriptionLength = computed(() => {
             v-model="todo.assignees"
             :class="{
               'italic text-gray-500':
-                !todo.assignees || todo.assignees.trim() === ''
+                !todo.assignees || todo.assignees.trim() === '',
             }"
             placeholder="Unassigned"
             >{{ todo.assignees }}
@@ -276,6 +283,74 @@ const descriptionLength = computed(() => {
           </div>
         </div>
 
+
+        <div
+        role="alert"
+        class="alert shadow-lg alert-error"
+        v-show="notFound"
+        style="
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 9999;
+          width: 500px;
+          animation: fadeInOut 1.5s infinite;
+        "
+      >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>{{ error }}</span>
+        </div>
+
+        
+
+        <div
+        role="alert"
+        class="alert shadow-lg"
+        :class="{ hidden: !showAlertAfterEdit }"
+        style="
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 9999;
+          width: 500px;
+          color: rgb(74 222 128 / var(--tw-text-opacity));
+          animation: fadeInOut 1.5s infinite;
+        "
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <div>
+          <h2 class="itbkk-message font-bold text-green-400">
+            The task has been successfully edited
+          </h2>
+        </div>
+      </div>
+
         <!-- Save & Close Button -->
         <div class="modal-action flex justify-between ml-20">
           <div
@@ -289,27 +364,33 @@ const descriptionLength = computed(() => {
             <button
               @click="UpdateTask"
               type="submit"
-              class="btn "
+              class="btn"
               style="background-color: #f785b1"
               :disabled="!isFormValid || checkEqual"
               :class="{ disabled: !isFormValid || checkEqual }"
             >
               Save
             </button>
-            <button class="btn ml-2" @click="closeModal">
-              Close
-            </button>
-          </div>
-        </div>
-        <div role="alert" v-show="notFound">
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"
-          >
-            {{ error }}
+            <button class="btn ml-2" @click="closeModal">Close</button>
           </div>
         </div>
       </div>
     </div>
   </dialog>
 </template>
-<style></style>
+<style>
+.fixed-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  max-width: 600px;
+  padding: 15px;
+  text-align: center;
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  animation: fadeInOut 4s infinite;
+}
+</style>
