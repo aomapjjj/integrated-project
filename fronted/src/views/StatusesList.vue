@@ -33,7 +33,10 @@ const showAlertAfterAdd = ref(false);
 const showAlertDelete = ref(false);
 const showAlertAfterDelete = ref(false);
 
+const limitStatusNumber = ref([])
+
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/limit`;
 
 const myStatuses = useStatuses();
 // ------------------------------
@@ -52,6 +55,10 @@ onMounted(async () => {
     myStatuses.addStatuses(await items);
     console.table(items);
   }
+
+  const limitStatus = await getLimit(baseUrlLimit, limitStatusNumber)
+  limitStatusNumber.value = limitStatus
+  
   statusList.value = myStatuses.getStatuses();
   console.log(myStatuses.getStatuses());
   console.log({ ...statusList.value });

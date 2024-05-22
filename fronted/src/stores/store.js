@@ -5,17 +5,19 @@ import { ref , computed } from 'vue'
 const useTasks = defineStore('tasks', () => {
   
   const tasks = ref([])
- 
+  const limit = ref([])
+
   const getTasks = () => {
     return tasks.value
   }
 
+  const getLimit = () => {
+    return limit.value
+  }
+
   const isLimitEnabled = ref(false)
   const maxTasks = ref(10)
-  
-
   const getIsLimitEnabled = computed(() => isLimitEnabled.value)
-
   const getMaxTasks = computed(() => maxTasks.value)
 
 
@@ -33,8 +35,6 @@ const useTasks = defineStore('tasks', () => {
     )
   }
   const addTask = (id, title, description, assignees, status, createdOn, updateOn) => {
-   
-
     tasks.value.push({
       id: id,
       title: title,
@@ -43,6 +43,22 @@ const useTasks = defineStore('tasks', () => {
       status: status,
       createdOn: createdOn,
       updateOn: updateOn,
+    })
+  }
+
+  const addLimits = (newLimits) => {
+    return newLimits.map((newLimit) => ({
+      id: newLimit.id,
+      maximumTask: newLimit.maximumTask,
+      isLimit: newLimit.isLimit,
+    }));
+  }
+  
+  const addLimit = (id, maximumTask, isLimit) => {
+    limit.value.push({
+      id: id,
+      maximumTask: maximumTask,
+      isLimit: isLimit,
     })
   }
   const updateTask = (id, title, description, assignees, status, createdOn, updateOn) => {
@@ -88,6 +104,9 @@ const useTasks = defineStore('tasks', () => {
     setMaxTasks,
     getIsLimitEnabled,
     getMaxTasks,
+    getLimit,
+    addLimit,
+    addLimits,
   }
 })
 

@@ -13,6 +13,7 @@ const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 const notFound = ref(false);
 const error = ref('');
+
 const props = defineProps({
   todoId: Number,
 });
@@ -41,6 +42,7 @@ watch(
     }
     const itemsStatus = await getItems(baseUrlStatus);
     statusList.value = itemsStatus;
+
   },
   { immediate: true }
 );

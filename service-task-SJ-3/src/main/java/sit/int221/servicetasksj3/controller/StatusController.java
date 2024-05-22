@@ -1,6 +1,8 @@
 package sit.int221.servicetasksj3.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +60,7 @@ public class StatusController {
     }
 
     @PatchMapping("/maximumtask")
-    public ResponseEntity<SimpleLimitDTO> updateLimitTask(@RequestParam Integer maximumTask, @RequestParam Boolean isLimit) {
+    public ResponseEntity<SimpleLimitDTO> updateLimitTask(@RequestParam @Min(0) @Max(30) Integer maximumTask, @RequestParam Boolean isLimit) {
         return ResponseEntity.ok(service.updateLimitTask(maximumTask, isLimit));
     }
 }
