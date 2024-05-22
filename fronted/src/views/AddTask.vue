@@ -322,7 +322,6 @@ const isLimitReached = computed(() => {
     </dialog>
   </div>
 </template>
-
 <style>
 .fixed-alert {
   position: fixed;

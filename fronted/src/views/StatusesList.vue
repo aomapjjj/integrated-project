@@ -24,6 +24,15 @@ const errorEdit = ref('');
 const notAdd = ref(false);
 const notEdit = ref(false);
 
+const showAlertEdit = ref(false);
+const showAlertAfterEdit = ref(false);
+
+const showAlertAdd = ref(false);
+const showAlertAfterAdd = ref(false);
+
+const showAlertDelete = ref(false);
+const showAlertAfterDelete = ref(false);
+
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const myStatuses = useStatuses();
@@ -80,6 +89,12 @@ const submitForm = async () => {
     itemAdd.createdOn,
     itemAdd.updateOn
   );
+  showAlertAdd.value = true;
+  showAlertAfterAdd.value = true;
+  setTimeout(() => {
+    showAlertAfterAdd.value = false;
+  }, 2300);
+
   clearForm();
 };
 
@@ -138,6 +153,12 @@ const UpdateStatus = async () => {
   if (statusIndex !== -1) {
     statusList.value[statusIndex] = { ...edit };
   }
+  showAlertEdit.value = true;
+  showAlertAfterEdit.value = true;
+  setTimeout(() => {
+    showAlertAfterEdit.value = false;
+  }, 2300);
+  router.go(-1);
 };
 
 const openModalToEdit = (statusId) => {
@@ -172,8 +193,6 @@ const statusExists = (name, id) => {
   );
 };
 
-//ติดตรงเวลาจะแก้ description มันก็ขึ้นด้วย
-
 // ----------------------- Edit -----------------------
 
 // ----------------------- Delete -----------------------
@@ -196,6 +215,11 @@ const deleteStatus = async (statusId) => {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
       );
+      showAlertDelete.value = true;
+      showAlertAfterDelete.value = true;
+      setTimeout(() => {
+        showAlertAfterDelete.value = false;
+      }, 2300);
     } else {
       console.error(`Failed to delete item with ID ${statusId}`);
     }
@@ -427,11 +451,22 @@ const isFormValid = computed(() => {
           </div>
         </div>
 
-        <!-- Add Alert -->
+        <!-- Add Error Alert -->
         <div
           role="alert"
+          class="alert shadow-lg alert-error"
           v-show="notAdd"
-          class="flex flex-col fixed-alert alert"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            animation: fadeInOut 1.5s infinite;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
+          "
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -446,8 +481,41 @@ const isFormValid = computed(() => {
               d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span class="text-red-500">Error! Status cannot be added</span>
           <span>{{ errorAdd }}</span>
+        </div>
+
+        <!-- Add Success Alert -->
+        <div
+          role="alert"
+          class="alert shadow-lg"
+          :class="{ hidden: !showAlertAfterAdd }"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            animation: fadeInOut 1.5s infinite;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2 class="itbkk-message font-bold text-green-400">
+            The Status has been successfully added
+          </h2>
         </div>
       </div>
     </dialog>
@@ -457,12 +525,54 @@ const isFormValid = computed(() => {
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- HOME -->
-
+        <!-- Edit Alert Success -->
+        <div
+          role="alert"
+          class="alert shadow-lg"
+          :class="{ hidden: !showAlertAfterEdit }"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            animation: fadeInOut 1.5s infinite;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h2 class="itbkk-message font-bold text-green-400">
+            The Status has been successfully edited
+          </h2>
+        </div>
         <!-- Edit Alert -->
         <div
           role="alert"
+          class="alert shadow-lg alert-error"
           v-show="notEdit"
-          class="flex flex-col fixed-alert alert"
+          style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 500px;
+            color: rgb(74 222 128 / var(--tw-text-opacity));
+            animation: fadeInOut 1.5s infinite;
+          "
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -477,7 +587,6 @@ const isFormValid = computed(() => {
               d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span class="text-red-500">Error! Status cannot be added</span>
           <span>{{ errorEdit }}</span>
         </div>
         <div class="text-sm breadcrumbs mt-4">
@@ -655,12 +764,13 @@ const isFormValid = computed(() => {
                     <div class="modal-action flex flex-col justify-between">
                       <div
                         class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
-                      >            <div class="label">
-              <span
-                class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
-                >Name
-              </span>
-            </div>
+                      >
+                        <div class="label">
+                          <span
+                            class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
+                            >Name
+                          </span>
+                        </div>
                         <label
                           class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4"
                         >
@@ -738,7 +848,7 @@ const isFormValid = computed(() => {
                 <button
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
                   class="itbkk-button-delete btn btn-circle bg-red-400"
-                  style="margin-left: 10px;"
+                  style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
                 >
                   <svg
@@ -786,48 +896,89 @@ const isFormValid = computed(() => {
                     </div>
                   </div>
                 </dialog>
+                <div
+                  role="alert"
+                  class="alert shadow-lg"
+                  :class="{ hidden: !showAlertAfterDelete }"
+                  style="
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 9999;
+                    width: 500px;
+                    color: rgb(74 222 128 / var(--tw-text-opacity));
+                    animation: fadeInOut 1.5s infinite;
+                  "
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="stroke-current shrink-0 h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <div>
+                    <h2 class="itbkk-message font-bold text-green-400">
+                      The Status has been deleted
+                    </h2>
+                  </div>
+                </div>
 
                 <!-- Delete And Trans -->
-
                 <dialog id="my_modal_deleteTrans" class="modal">
-                  <div class="modal-box" style="max-width: 1000px">
-                    <h3 class="itbkk-message font-bold text-lg">
+                  <div class="modal-box" style="max-width: 500px">
+                    <h3
+                      class="itbkk-message font-bold text-lg"
+                      style="color: #9391e4"
+                    >
                       Transfer a Status
                     </h3>
                     <p class="py-4 font-medium" style="word-wrap: break-word">
                       There is some task associated with the ...
                     </p>
 
-                    <div class="itbkk-status mb-4 mt-2">
+                    <div
+                      class="itbkk-status mb-4 mt-2 w-full flex flex-col items-center"
+                    >
                       <span
-                        class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-                        >Transfer To</span
+                        class="block text-lg font-bold leading-6 text-gray-900 mb-2 text-center"
+                        >Transfer a task to</span
                       >
                       <select
                         v-model="status.id"
                         class="select select-bordered w-full max-w-xs mt-1"
+                        style="text-align: center"
                       >
                         <option v-for="status in statusList" :value="status.id">
                           {{ status.name }}
                         </option>
                       </select>
-                      <button
-                        class="itbkk-button-confirm btn bg-green-400"
-                        style="color: #fff"
-                        @click="confirmDeleteTrans(status.id)"
-                      >
-                        Confirm
-                      </button>
-                    </div>
 
-                    <div class="modal-action">
-                      <button
-                        class="itbkk-button-cancel btn"
-                        @click="closeModalTrans"
-                        style="color: #eb4343"
+                      <div
+                        class="flex justify-center w-full max-w-xs mt-4 space-x-5"
                       >
-                        Cancel
-                      </button>
+                        <button
+                          class="itbkk-button-cancel btn"
+                          @click="closeModalTrans"
+                          style="color: #eb4343"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          class="itbkk-button-confirm btn bg-green-400"
+                          style="color: #fff"
+                          @click="confirmDeleteTrans(status.id)"
+                        >
+                          Confirm
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </dialog>
@@ -872,5 +1023,4 @@ thead th {
 .itbkk-status-description label {
   word-break: break-word;
 }
-
 </style>

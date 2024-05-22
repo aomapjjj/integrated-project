@@ -242,7 +242,7 @@ const toggleLimit = () => {
           <span class="mr-2">Limit tasks in this status</span>
           <input
             type="checkbox"
-            class="toggle "
+            class="toggle"
             v-model="isLimitEnabled"
             @change="toggleLimit"
           />
@@ -688,10 +688,11 @@ const toggleLimit = () => {
               </td>
             </tr>
 
-            <!-- DELETE COMPLETE -->
+          
           </tbody>
         </table>
       </div>
+  <!-- DELETE COMPLETE -->
       <div
         role="alert"
         class="alert shadow-lg"
@@ -725,8 +726,8 @@ const toggleLimit = () => {
             The task has been deleted
           </h2>
         </div>
-        <div></div>
       </div>
+
     </div>
   </div>
 
@@ -805,7 +806,6 @@ thead th {
 
 .toggle:checked {
   --tw-text-opacity: 1;
-    color: rgb(74 222 128 / var(--tw-text-opacity));
+  color: rgb(74 222 128 / var(--tw-text-opacity));
 }
-
 </style>
