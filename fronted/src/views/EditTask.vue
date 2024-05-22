@@ -94,6 +94,7 @@ const UpdateTask = async () => {
       edit.updateOn
     )
     console.log(edit)
+
   } catch (error) {
     console.error("Error updating task:", error)
   }

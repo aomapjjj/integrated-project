@@ -246,7 +246,7 @@ const toggleLimit = () => {
   <div class="flex justify-start mt-9 mx-auto ml-[100px]">
     <!-- LIMIT -->
     <button
-      class="btn btn-circle btn-outline mr-2"
+      class="btn btn-circle btn-outline mr-2 itbkk-status-setting"
       onclick="my_modal_limit.showModal()"
     >
       <svg
@@ -321,11 +321,11 @@ const toggleLimit = () => {
       </button>
       filter
     </summary>
-    <ul class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+    <ul class=" itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52 " >
       <li v-for="status in statusList" :key="status.name" class="flex items-center">
         <label class="flex items-center space-x-2 w-full">
-          <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
-          <span>{{ status.name }}</span>
+          <input type="checkbox" :value="status.name" v-model="searchQuery" class=" mr-2" />
+          <span class="itbkk-status-choice">{{ status.name }}</span>
         </label>
       </li>
     </ul>
@@ -389,7 +389,7 @@ const toggleLimit = () => {
                   color: #fff;
                 "
               >
-                <button
+                <button class="itbkk-status-sort"
                   style="display: flex; align-items: center"
                   @click="sortByStatus(), toggleIcon()"
                 >
