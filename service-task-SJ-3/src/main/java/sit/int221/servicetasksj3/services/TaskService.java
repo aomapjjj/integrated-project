@@ -5,13 +5,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.TaskDTO;
-import sit.int221.servicetasksj3.dtos.TaskNewDTO;
+import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
+import sit.int221.servicetasksj3.dtos.tasksDTO.TaskNewDTO;
 import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
+import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
@@ -26,6 +28,8 @@ public class TaskService {
     private TaskRepository repository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private LimitRepository limitRepository;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -68,7 +72,6 @@ public class TaskService {
     public Task createNewTasks(TaskNewDTO task){
         Task task1 = modelMapper.map(task, Task.class);
         TaskStatus status;
-
         try {
             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
                     () -> new InternalServerErrorException("Invalid status ID"));
@@ -85,8 +88,103 @@ public class TaskService {
         if (task.getTitle() == null || task.getTitle().isBlank()) {
             validationError.addValidationError("title", "must not be blank");
         }
+        if (task.getTitle() != null && task.getTitle().length() > 100) {
+            validationError.addValidationError("title", "size must be between 0 and 100");
+        }
+        if (task.getDescription() != null && task.getDescription().length() > 500) {
+            validationError.addValidationError("description", "size must be between 0 and 500");
+        }
         if (task.getAssignees() != null && task.getAssignees().length() > 30) {
             validationError.addValidationError("assignees", "size must be between 0 and 30");
+        }
+        if (status == null) {
+            validationError.addValidationError("status", "does not exist");
+        }
+        if (!validationError.getErrors().isEmpty()) {
+            throw validationError;
+        }
+        if (task.getTitle() == null || task.getTitle().trim().isEmpty()) {
+            throw new InternalServerErrorException("NOT FOUND");
+        }
+        if (task.getTitle().trim().length() > 100) {
+            throw new InternalServerErrorException("Title cannot exceed 100 characters");
+        }
+        if (task.getDescription() != null && task.getDescription().trim().length() > 500) {
+            throw new InternalServerErrorException("Description cannot exceed 500 characters");
+        }
+        if (task.getAssignees() != null && task.getAssignees().trim().length() > 30) {
+            throw new InternalServerErrorException("Assignees cannot exceed 30 characters");
+        }
+        if (status == null) {
+            throw new ValidationException("status does not exist");
+        }
+
+        // Limit
+        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+                () -> new ItemNotFoundException("Task limit configuration not found"));
+        if (taskLimit.getIsLimit()) {
+            if (!status.getName().equals("No Status") && !status.getName().equals("Done")) {
+                List<Task> tasks = status.getTasks();
+                if (tasks == null) {
+                    tasks = new ArrayList<>();
+                    status.setTasks(tasks);
+                }
+                if (tasks.size() >= taskLimit.getMaximumTask()) {
+                    validationError.addValidationError("status", "the status has reached the limit");                }
+            }
+        }
+        try {
+            List<Task> taskList = new ArrayList<>();
+            taskList.add(task1);
+            status.setTasks(taskList);
+            statusRepository.save(status);
+            Task savedTask = repository.save(task1);
+            return savedTask;
+        } catch (Exception exception) {
+            throw new ItemNotFoundException("Failed to save task");
+        }
+    }
+
+    // DELETE
+    @Transactional
+    public TaskDTO removeTasks(Integer id){
+        Task task = repository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("NOT FOUND"));
+        TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
+        repository.delete(task);
+        return deletedTaskDTO;
+    }
+
+    // EDIT
+    @Transactional
+    public Task updateTask(Integer id, TaskNewDTO task) {
+        Task existingTask = repository.findById(id).orElseThrow(
+                () -> new ItemNotFoundException("NOT FOUND"));
+
+        TaskStatus status = statusRepository.findByName(task.getStatus());
+
+        Task task1 = modelMapper.map(task, Task.class);
+        task1.setStatus(status);
+
+        // Validation
+        ValidationException validationError = new ValidationException("Validation error");
+        if (task.getTitle() == null) {
+            validationError.addValidationError("title", "must not be null");
+        }
+        if (task.getTitle() == null || task.getTitle().isBlank()) {
+            validationError.addValidationError("title", "must not be blank");
+        }
+        if (task.getTitle() != null && task.getTitle().length() > 100) {
+            validationError.addValidationError("title", "size must be between 0 and 100");
+        }
+        if (task.getDescription() != null && task.getDescription().length() > 500) {
+            validationError.addValidationError("description", "size must be between 0 and 500");
+        }
+        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
+            validationError.addValidationError("assignees", "size must be between 0 and 30");
+        }
+        if (status == null) {
+            validationError.addValidationError("status", "does not exist");
         }
         if (!validationError.getErrors().isEmpty()) {
             throw validationError;
@@ -104,67 +202,26 @@ public class TaskService {
         if (task.getAssignees() != null && task.getAssignees().trim().length() > 30) {
             throw new InternalServerErrorException("Assignees cannot exceed 30 characters");
         }
-
-        try {
-            List<Task> taskList = new ArrayList<>();
-            taskList.add(task1);
-            status.setTasks(taskList);
-            statusRepository.save(status);
-            Task savedTask = repository.save(task1);
-            return savedTask;
-        } catch (Exception exception) {
-            throw new ItemNotFoundException("Failed to save task");
-        }
-    }
-    // DELETE
-    @Transactional
-    public TaskDTO removeTasks(Integer id){
-        Task task = repository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("NOT FOUND"));
-        TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
-        repository.delete(task);
-        return deletedTaskDTO;
-    }
-
-    // EDIT
-    @Transactional
-    public Task updateTask(Integer id, TaskNewDTO task) {
-        Task existingTask = repository.findById(id).orElseThrow(
-                () -> new ItemNotFoundException("NOT FOUND"));
-
-        Task task1 = modelMapper.map(task, Task.class);
-        TaskStatus status = statusRepository.findByName(task.getStatus());
-        task1.setStatus(status);
-
-        if (task.getTitle() != null && task.getTitle().length() > 100) {
-            throw new ValidationException("Title must be between 0 and 100 characters");
-        }
-        if (task.getDescription() != null && task.getDescription().length() > 500) {
-            throw new ValidationException("Description must be between 0 and 500 characters");
-        }
-        if (task.getAssignees() != null && task.getAssignees().length() > 30) {
-            throw new ValidationException("Assignees must be between 0 and 30 characters");
+        if (status == null) {
+            throw new ValidationException("status does not exist");
         }
 
-        if (task.getTitle() != null) {
-            existingTask.setTitle(task.getTitle().trim());
-        }
-        if (task.getDescription() != null) {
-            existingTask.setDescription(task.getDescription().trim());
-        }
-        if (task.getAssignees() != null) {
-            existingTask.setAssignees(task.getAssignees().trim());
-        }
-        if (task.getStatus() != null) {
-            existingTask.setStatus(status);
-        }
+        // ดึงค่า Limit
+        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+                () -> new ItemNotFoundException("Task limit configuration not found"));
 
+        if (taskLimit.getIsLimit()) {
+            if (!status.getName().equals("No Status") && !status.getName().equals("Done")) {
+                List<Task> tasks = status.getTasks();
+                if (tasks == null) {
+                    tasks = new ArrayList<>();
+                    status.setTasks(tasks);
+                }
+                if (tasks.size() >= taskLimit.getMaximumTask()) {
+                    validationError.addValidationError("status", "the status has reached the limit");                }
+            }
+        }
         task1.setId(id);
         return repository.save(task1);
     }
-
-
-
-
-
 }

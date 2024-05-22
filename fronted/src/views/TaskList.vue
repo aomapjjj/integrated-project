@@ -282,7 +282,7 @@ const toggleLimit = () => {
 
         <div v-if="isLimitEnabled" class="mt-4">
         <label for="status-limit" class="mr-2">Set Maximum Tasks:</label>
-        <input type="number" id="status-limit" class="input input-bordered"v-model.number="maxTasks" @input="taskStore.setMaxTasks(maxTasks)"/>
+        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" @input="taskStore.setMaxTasks(maxTasks)" max="30" />
       </div>
 
         <div class="modal-action">
