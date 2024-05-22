@@ -1,188 +1,184 @@
 <script setup>
-import { ref, onMounted , computed } from "vue"
-import { getItemById, getItems, deleteItemById } from "../libs/fetchUtils.js"
-import TaskDetail from "../views/TaskDetail.vue"
-import AddTask from "../views/AddTask.vue"
-import EditTask from "../views/EditTask.vue"
-import { useTasks } from "../stores/store"
-import { useRoute, useRouter } from "vue-router"
+import { ref, onMounted, computed } from 'vue';
+import { getItemById, getItems, deleteItemById } from '../libs/fetchUtils.js';
+import TaskDetail from '../views/TaskDetail.vue';
+import AddTask from '../views/AddTask.vue';
+import EditTask from '../views/EditTask.vue';
+import { useTasks } from '../stores/store';
+import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
-const todoList = ref([])
-const selectedTodoId = ref(0)
-const notFound = ref(false)
-const deleteComplete = ref(false)
-const showDetail = ref(false)
-const statusList = ref([])
-let items = [] 
-let itemsStatus = [] 
-const indexDelete = ref(0)
-const isLimitEnabled = ref(false)
-const maxTasks = ref(10) 
+const route = useRoute();
+const router = useRouter();
+const todoList = ref([]);
+const selectedTodoId = ref(0);
+const notFound = ref(false);
+const deleteComplete = ref(false);
+const showDetail = ref(false);
+const statusList = ref([]);
+let items = [];
+let itemsStatus = [];
+const indexDelete = ref(0);
+const isLimitEnabled = ref(false);
+const maxTasks = ref(10);
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
-const taskStore = useTasks()
+const taskStore = useTasks();
 onMounted(async () => {
   if (taskStore.getTasks().length === 0) {
-    items = await getItems(baseUrlTask)
-    taskStore.addTasks(await items)
+    items = await getItems(baseUrlTask);
+    taskStore.addTasks(await items);
   }
 
-  
-
-  itemsStatus = await getItems(baseUrlStatus)
-  statusList.value = itemsStatus
-  console.log("itemStatuss", itemsStatus)
-  todoList.value = items
-  console.log("items", items)
-  const taskId = route.params.id
+  itemsStatus = await getItems(baseUrlStatus);
+  statusList.value = itemsStatus;
+  console.log('itemStatuss', itemsStatus);
+  todoList.value = items;
+  console.log('items', items);
+  const taskId = route.params.id;
   if (taskId !== undefined) {
-    console.log(taskId)
-    const response = await getItemById(taskId)
+    console.log(taskId);
+    const response = await getItemById(taskId);
     if (response.status === 404 || response.status === 400) {
-      router.push("/task/error")
-      notFound.value = true
+      router.push('/task/error');
+      notFound.value = true;
     }
   }
-  return items
-})
+  return items;
+});
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-  router.push({ name: "TaskDetail", params: { id: todoId } });
-}
-  selectedTodoId.value = todoId
-  showDetail.value = true
-}
+    router.push({ name: 'TaskDetail', params: { id: todoId } });
+  }
+  selectedTodoId.value = todoId;
+  showDetail.value = true;
+};
 
 // ----------------------- Delete -----------------------
 
-const selectedItemIdToDelete = ref(0)
+const selectedItemIdToDelete = ref(0);
 
 const deleteTodo = async (todoId) => {
   try {
-    const status = await deleteItemById(baseUrlTask, todoId)
+    const status = await deleteItemById(baseUrlTask, todoId);
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
+      todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
     } else {
-      console.error(`Failed to delete item with ID ${todoId}`)
+      console.error(`Failed to delete item with ID ${todoId}`);
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${todoId}:`, error)
+    console.error(`Error deleting item with ID ${todoId}:`, error);
   }
-}
+};
 
 const openModalToDelete = (itemId, index) => {
-  selectedItemIdToDelete.value = itemId
-  indexDelete.value = index
-  const modal = document.getElementById("my_modal_delete")
-  modal.showModal()
-}
+  selectedItemIdToDelete.value = itemId;
+  indexDelete.value = index;
+  const modal = document.getElementById('my_modal_delete');
+  modal.showModal();
+};
 
 const closeModal = () => {
-  const modal = document.getElementById("my_modal_delete")
-  modal.close()
-}
+  const modal = document.getElementById('my_modal_delete');
+  modal.close();
+};
 
 const confirmDelete = () => {
-  taskStore.removeTask(selectTodo.id)
-  deleteTodo(selectedItemIdToDelete.value)
-  closeModal()
-  deleteComplete.value = true
+  taskStore.removeTask(selectTodo.id);
+  deleteTodo(selectedItemIdToDelete.value);
+  closeModal();
+  deleteComplete.value = true;
   setTimeout(() => {
-    deleteComplete.value = false
-  }, 2300)
-}
+    deleteComplete.value = false;
+  }, 2300);
+};
 
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id)
+  const item = items.find((item) => item.id === id);
   if (item) {
-    console.log(item.title)
-    return item.title
+    console.log(item.title);
+    return item.title;
   } else {
-    console.log(`No item found with id ${id}`)
-    return ""
+    console.log(`No item found with id ${id}`);
+    return '';
   }
-}
+};
 
 // ----------------------- filterAndLogTitleById -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref("default")
-const statusSortOrder = ref("asc")
+const showIcon = ref('default');
+const statusSortOrder = ref('asc');
 
 const toggleIcon = () => {
-  if (showIcon.value === "default") {
-    showIcon.value = "asc"
-    statusSortOrder.value = "asc"
-  } else if (showIcon.value === "asc") {
-    showIcon.value = "desc"
-    statusSortOrder.value = "desc"
+  if (showIcon.value === 'default') {
+    showIcon.value = 'asc';
+    statusSortOrder.value = 'asc';
+  } else if (showIcon.value === 'asc') {
+    showIcon.value = 'desc';
+    statusSortOrder.value = 'desc';
   } else {
-    showIcon.value = "default"
-    statusSortOrder.value = "default"
+    showIcon.value = 'default';
+    statusSortOrder.value = 'default';
   }
 
-  sortByStatus()
-}
+  sortByStatus();
+};
 
 const sortByStatus = () => {
-  const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === "asc") {
-    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === "desc") {
-    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
+  const currentSortOrder = statusSortOrder.value;
+  if (currentSortOrder === 'asc') {
+    taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status));
+  } else if (currentSortOrder === 'desc') {
+    taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status));
   } else {
-    taskStore.getTasks().sort((a, b) => a.id - b.id)
+    taskStore.getTasks().sort((a, b) => a.id - b.id);
   }
-}
-
+};
 
 // ----------------------- Filter -----------------------
 
-const searchQuery = ref([])
+const searchQuery = ref([]);
 
 const filteredTasks = computed(() => {
   if (searchQuery.value.length === 0) {
-    return taskStore.getTasks()
-    
+    return taskStore.getTasks();
   }
-  return taskStore.getTasks().filter(task => searchQuery.value.includes(task.status))
-})
+  return taskStore
+    .getTasks()
+    .filter((task) => searchQuery.value.includes(task.status));
+});
 
 const removeStatus = (status) => {
-  const index = searchQuery.value.indexOf(status)
+  const index = searchQuery.value.indexOf(status);
   if (index > -1) {
-    searchQuery.value.splice(index, 1)
+    searchQuery.value.splice(index, 1);
   }
-}
+};
 
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
-}
+  router.push({ name: 'StatusesList' });
+};
 
 // ----------------------- Limit ---------------------------
 const toggleLimit = () => {
-  taskStore.setLimitEnabled(isLimitEnabled.value)
-}
-
-
+  taskStore.setLimitEnabled(isLimitEnabled.value);
+};
 </script>
 
 <template>
   <div class="min-h-full max-h-fit">
-    <nav class="bg-white shadow" style=" background-color: #d8f1f1 ;">
+    <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
           <img
@@ -194,59 +190,25 @@ const toggleLimit = () => {
             <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
             <h1
               class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight"
-              style="color: #9391e4; text-align: center; text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;"
+              style="
+                color: #9391e4;
+                text-align: center;
+                text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
+              "
             >
               IT-Bangmod Kradan Kanban
             </h1>
           </div>
         </a>
-        <div class="flex items-center">
-          <div class="hidden md:block">
-            <div class="flex space-x-1.5">
-              <!-- ADD BUTTON -->
-              <AddTask />
-              <!-- MANAGE STATUS -->
-              <button
-                class="itbkk-manage-status btn bg-gray-200"
-                style="
-                  color: white;
-                  background-color: #f785b1;
-                  border-radius: 30px;
-                "
-                @click="openNewStatus()"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                >
-                  <g
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
-                    />
-                    <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
-                  </g>
-                </svg>
-                Manage Status
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </nav>
   </div>
 
-  <div class="flex justify-start mt-9 mx-auto ml-[100px]">
+  <div class="flex mt-9 mx-auto ml-[100px]">
     <!-- LIMIT -->
     <button
-      class="btn btn-circle btn-outline mr-2"
+      class="btn mr-2 mt-1"
+      style="border-radius: 30px; background-color: #aff3c9"
       onclick="my_modal_limit.showModal()"
     >
       <svg
@@ -256,7 +218,7 @@ const toggleLimit = () => {
         viewBox="0 0 14 14"
       >
         <path
-          fill="#9FC3E9"
+          fill="white"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -265,80 +227,149 @@ const toggleLimit = () => {
       </svg>
     </button>
     <dialog id="my_modal_limit" class="modal modal-bottom sm:modal-middle">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg">Status Settings</h3>
+      <div class="modal-box" style="max-width: 400px">
+        <h3 class="font-bold text-lg" style="color: #9391e4">
+          Status Settings
+        </h3>
         <p class="py-4">
-          User can limit the number of task in status by setting the Maximum
+          User can limit the number of tasks in status by setting the Maximum
           task in each status
+          <br /><span style="color: #eb4343"
+            >( except "No Status" and "Done" statuses )</span
+          >
         </p>
-        <span style="color: red"
-          >( except "No Status" and "Done" statuses )</span
-        >
-
         <div class="flex items-center mt-4">
-          <span class="mr-2">Enable Status Limit</span>
-          <input type="checkbox" class="toggle" v-model="isLimitEnabled" @change="toggleLimit"/>
+          <span class="mr-2">Limit tasks in this status</span>
+          <input
+            type="checkbox"
+            class="toggle "
+            v-model="isLimitEnabled"
+            @change="toggleLimit"
+          />
         </div>
 
-        <div v-if="isLimitEnabled" class="mt-4">
-        <label for="status-limit" class="mr-2">Set Maximum Tasks:</label>
-        <input type="number" id="status-limit" class="input input-bordered" v-model.number="maxTasks" @input="taskStore.setMaxTasks(maxTasks)" max="30" />
-      </div>
+        <div v-if="isLimitEnabled" class="mt-4 flex flex-col items-center">
+          <div class="flex items-center justify-center">
+            <label for="status-limit" class="mr-2">Set Maximum Tasks</label>
+          </div>
+          <input
+            type="number"
+            id="status-limit"
+            class="input input-bordered input-centered"
+            v-model.number="maxTasks"
+            @input="taskStore.setMaxTasks(maxTasks)"
+            max="30"
+          />
+        </div>
 
         <div class="modal-action">
           <form method="dialog">
-            <button class="btn mr-2 bg-green-400">Confirm</button>
+            <button class="btn mr-2 bg-green-400 text-w">Confirm</button>
             <button class="btn">Close</button>
           </form>
         </div>
       </div>
     </dialog>
     <!-- FILTER -->
-     
     <details class="dropdown">
-    <summary class="m-1 btn">
-      <button>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 14 14"
-        >
-          <g
-            fill="#9FC3E9"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+      <summary class="m-1 btn" style="border-radius: 30px">
+        <button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 14 14"
           >
-            <circle cx="2" cy="2" r="1.5" />
-            <path d="M3.5 2h10" />
-            <circle cx="7" cy="7" r="1.5" />
-            <path d="M.5 7h5m3 0h5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <path d="M10.5 12H.5" />
-          </g>
-        </svg>
-      </button>
-      filter
-    </summary>
-    <ul class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-      <li v-for="status in statusList" :key="status.name" class="flex items-center">
-        <label class="flex items-center space-x-2 w-full">
-          <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
-          <span>{{ status.name }}</span>
-        </label>
-      </li>
-    </ul>
-  </details>
+            <g
+              fill="#9FC3E9"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="2" cy="2" r="1.5" />
+              <path d="M3.5 2h10" />
+              <circle cx="7" cy="7" r="1.5" />
+              <path d="M.5 7h5m3 0h5" />
+              <circle cx="12" cy="12" r="1.5" />
+              <path d="M10.5 12H.5" />
+            </g>
+          </svg>
+        </button>
+        Filter
+      </summary>
+      <ul
+        class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+      >
+        <li
+          v-for="status in statusList"
+          :key="status.name"
+          class="flex items-center"
+        >
+          <label class="flex items-center space-x-2 w-full">
+            <input
+              type="checkbox"
+              :value="status.name"
+              v-model="searchQuery"
+              class="mr-2"
+            />
+            <span>{{ status.name }}</span>
+          </label>
+        </li>
+      </ul>
+    </details>
 
-  <div class="selected-filters flex flex-wrap mt-2">
-    <div v-for="status in searchQuery" :key="status" class="selected-filter bg-blue-200 text-blue-800 rounded-full px-4 py-2 mr-2 mt-2 flex items-center">
-      <span>{{ status }}</span>
-      <button @click="removeStatus(status)" class="ml-2 text-blue-600 hover:text-blue-800">
-        &times;
-      </button>
+    <div class="selected-filters flex flex-wrap mt-2">
+      <div
+        v-for="status in searchQuery"
+        :key="status"
+        class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
+        style="background-color: rgb(247, 133, 177)"
+      >
+        <span>{{ status }}</span>
+        <button
+          @click="removeStatus(status)"
+          class="ml-2 text-gray-900 hover:text-white"
+        >
+          &times;
+        </button>
+      </div>
     </div>
-  </div>
+
+    <div class="flex-grow flex justify-end items-center mr-[100px]">
+      <div class="hidden md:block">
+        <div class="flex space-x-1.5">
+          <!-- ADD BUTTON -->
+          <AddTask />
+          <!-- MANAGE STATUS -->
+          <button
+            class="itbkk-manage-status btn bg-gray-200"
+            style="color: white; background-color: #f785b1; border-radius: 30px"
+            @click="openNewStatus()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+              >
+                <path
+                  d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+                />
+                <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
+              </g>
+            </svg>
+            Manage Status
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="flex flex-col items-center mt-9">
@@ -471,7 +502,11 @@ const toggleLimit = () => {
           <tbody>
             <!-- Iterate over todoList -->
             <TaskDetail :todo-id="selectedTodoId" />
-            <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
+            <tr
+              class="itbkk-item"
+              v-for="(item, index) in filteredTasks"
+              :key="index"
+            >
               <td
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
@@ -481,7 +516,6 @@ const toggleLimit = () => {
                 class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
               >
                 <label
-                
                   for="my_modal_6"
                   @click="selectTodo(item.id)"
                   style="display: block; width: 100%; height: 100%"
@@ -492,12 +526,12 @@ const toggleLimit = () => {
               <td
                 class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.assignees || item.assignees.length === 0
+                  italic: !item.assignees || item.assignees.length === 0,
                 }"
               >
                 {{
                   !item.assignees || item.assignees.length === 0
-                    ? "Unassigned"
+                    ? 'Unassigned'
                     : item.assignees
                 }}
               </td>
@@ -512,7 +546,7 @@ const toggleLimit = () => {
                     'border-red-500 text-red-500': item.status === 'To Do',
                     'border-yellow-500 text-yellow-500':
                       item.status === 'Doing',
-                    'border-green-500 text-green-500': item.status === 'Done'
+                    'border-green-500 text-green-500': item.status === 'Done',
                   }"
                 >
                   {{ item.status }}
@@ -611,14 +645,14 @@ const toggleLimit = () => {
                   </div>
 
                   <dialog id="my_modal_delete" class="modal">
-                    <div class="modal-box" style="max-width: 1000px">
+                    <div class="modal-box" style="max-width: 500px">
                       <h3 class="font-bold text-lg">Delete a Task</h3>
                       <p
                         class="itbkk-message py-4 font-medium"
                         style="word-wrap: break-word"
                       >
                         Do you want to delete the task number
-                        {{ indexDelete + 1 }} - "{{
+                        {{ selectedItemIdToDelete }} - "{{
                           filterAndLogTitleById(selectedItemIdToDelete)
                         }}"?
                       </p>
@@ -644,15 +678,15 @@ const toggleLimit = () => {
                   <!-- DELETE -->
                 </td>
               </div>
-              
             </tr>
-            <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0" >
+            <tr
+              class="bg-base-100 mt-4 md:mt-0"
+              v-if="filteredTasks?.length === 0"
+            >
               <td colspan="5" class="text-center py-4 text-gray-400">
                 No task
               </td>
-              </tr>
-           
-
+            </tr>
 
             <!-- DELETE COMPLETE -->
           </tbody>
@@ -674,39 +708,30 @@ const toggleLimit = () => {
         "
       >
         <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
         <div>
-          <h2 class="itbkk-message font-bold text-green-400">The task has been deleted</h2>
+          <h2 class="itbkk-message font-bold text-green-400">
+            The task has been deleted
+          </h2>
         </div>
-        <div>
-  
-        </div>
+        <div></div>
       </div>
     </div>
   </div>
 
   <footer class="footer footer-center p-5 text-primary-content">
     <aside class="flex items-center space-x-20">
-      <!-- <img
-        src="/src/image/sit.png"
-        alt="SIT logo"
-        style="width: 180px; margin-right: 100px"
-      /> -->
-      <!-- <p class="font-bold mb-2 text-gray-900">
-        IT-Bangmod Kradan Kanban was created by 2nd year undergraduate students
-        <br />( INT221 Integrated Information Technology Project I )
-      </p> -->
       <p style="color: #f785b1">Thank you for choosing Kradan Kanban!</p>
     </aside>
   </footer>
@@ -773,31 +798,14 @@ tr:nth-child(odd) {
 thead th {
   height: 3rem;
 }
-.selected-filters {
-  display: flex;
-  flex-wrap: wrap;
+
+.input-centered {
+  text-align: center; /* จัดตำแหน่งข้อความให้อยู่ตรงกลางแนวนอน */
 }
 
-.selected-filter {
-  display: flex;
-  align-items: center;
-  background-color: #cce5ff;
-  color: #004085;
-  border-radius: 9999px;
-  padding: 0.5rem 1rem;
-  margin-right: 0.5rem;
-  margin-top: 0.5rem;
+.toggle:checked {
+  --tw-text-opacity: 1;
+    color: rgb(74 222 128 / var(--tw-text-opacity));
 }
 
-.selected-filter button {
-  margin-left: 0.5rem;
-  background: none;
-  border: none;
-  color: #004085;
-  cursor: pointer;
-}
-
-.selected-filter button:hover {
-  color: #002752;
-}
 </style>

@@ -267,6 +267,28 @@ const isFormValid = computed(() => {
           </div>
         </div>
 
+        <div
+              role="alert"
+              v-show="notFound"
+              class="flex flex-col fixed-alert alert"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span class="text-red-500">Error! Tasks cannot be added</span>
+              <span>{{ error }}</span>
+            </div>
+
         <!-- Save & Close Button -->
         <div class="modal-action flex justify-between ml-20">
           <div
@@ -292,15 +314,24 @@ const isFormValid = computed(() => {
             </button>
           </div>
         </div>
-        <div role="alert" v-show="notFound">
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"
-          >
-            {{ error }}
-          </div>
-        </div>
+
       </div>
     </div>
   </dialog>
 </template>
-<style></style>
+<style>
+.fixed-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  max-width: 600px;
+  padding: 15px;
+  text-align: center;
+  border-radius: 30px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  animation: fadeInOut 4s infinite;
+}
+</style>
