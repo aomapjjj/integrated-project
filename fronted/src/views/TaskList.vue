@@ -618,7 +618,7 @@ const toggleLimit = () => {
                         style="word-wrap: break-word"
                       >
                         Do you want to delete the task number
-                        {{ indexDelete + 1 }} - "{{
+                        {{ selectedItemIdToDelete }} - "{{
                           filterAndLogTitleById(selectedItemIdToDelete)
                         }}"?
                       </p>
