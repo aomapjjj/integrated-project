@@ -242,7 +242,7 @@ const toggleLimit = () => {
           <span class="mr-2">Limit tasks in this status</span>
           <input
             type="checkbox"
-            class="toggle"
+            class="itbkk-limit-task toggle"
             v-model="isLimitEnabled"
             @change="toggleLimit"
           />

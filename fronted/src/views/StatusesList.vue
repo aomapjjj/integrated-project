@@ -60,8 +60,11 @@ onMounted(async () => {
   if (statusId !== undefined) {
     const response = await getItemById(statusId);
     if (response.status === 404 || response.status === 400) {
-      router.push('/task');
+      router.push('/status');
       notFound.value = true;
+      setTimeout(() => {
+    notFound.value = false;
+  }, 1500);
     }
   }
 });
@@ -310,6 +313,12 @@ const isFormValid = computed(() => {
 
 <template>
   <div class="min-h-full max-h-fit">
+    <div role="alert" class="alert alert-error" v-show="notFound">
+  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  <span>Error! Status not found</span>
+
+
+</div>
     <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
@@ -332,7 +341,7 @@ const isFormValid = computed(() => {
             </h1>
           </div>
         </a>
-        <div class="itbkk-button-add ml-auto">
+        <div class=" ml-auto">
           <button
             onclick="my_modal_4.showModal()"
             class="itbkk-button-add btn ml-4"
@@ -388,11 +397,11 @@ const isFormValid = computed(() => {
               </span>
             </div>
             <label
-              class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4"
+              class=" input input-bordered flex items-center gap-2 font-bold ml-4"
             >
               <input
                 type="text"
-                class="grow"
+                class="itbkk-status-name grow "
                 placeholder="Enter Your Status Name"
                 v-model="status.name"
               />
@@ -406,7 +415,7 @@ const isFormValid = computed(() => {
             <!-- Description -->
             <label
               for="description"
-              class="itbkk-status-description form-control flex-grow ml-4"
+              class=" form-control flex-grow ml-4"
             >
               <div class="label">
                 <span
@@ -417,7 +426,7 @@ const isFormValid = computed(() => {
 
               <textarea
                 id="description"
-                class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
                 rows="4"
                 placeholder="No Description Provided"
                 v-model="status.description"
@@ -523,6 +532,7 @@ const isFormValid = computed(() => {
   </div>
 
   <div class="flex flex-col items-center mt-1">
+    
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- HOME -->
@@ -733,6 +743,7 @@ const isFormValid = computed(() => {
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
                 >
+                <p>Edit</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -773,11 +784,11 @@ const isFormValid = computed(() => {
                           </span>
                         </div>
                         <label
-                          class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4"
+                          class=" input input-bordered flex items-center gap-2 font-bold ml-4"
                         >
                           <input
                             type="text"
-                            class="grow"
+                            class="itbkk-status-name grow"
                             placeholder="Enter Your Status Name"
                             maxlength="100"
                             v-model="status.name"
@@ -793,7 +804,7 @@ const isFormValid = computed(() => {
                         <!-- Description -->
                         <label
                           for="description"
-                          class="form-control flex-grow ml-4"
+                          class="itbkk-status-description form-control flex-grow ml-4"
                         >
                           <div class="label">
                             <span
@@ -804,7 +815,7 @@ const isFormValid = computed(() => {
 
                           <textarea
                             id="description"
-                            class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                            class="textarea textarea-bordered flex-grow w-full"
                             maxlength="500"
                             rows="4"
                             placeholder="No Description Provided"
@@ -852,6 +863,7 @@ const isFormValid = computed(() => {
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
                 >
+                <p>Delete</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -877,7 +889,7 @@ const isFormValid = computed(() => {
                       style="word-wrap: break-word"
                     >
                       Do you want to delete
-                      {{ getNameById(selectedItemIdToDelete) }}
+                      {{ getNameById(selectedItemIdToDelete) }} ?
                     </p>
                     <div class="modal-action">
                       <button
@@ -1021,7 +1033,5 @@ thead th {
   table-layout: fixed;
 }
 
-.itbkk-status-description label {
-  word-break: break-word;
-}
+
 </style>
