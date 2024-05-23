@@ -41,12 +41,10 @@ onMounted(async () => {
   statusList.value = itemsStatus;
 
 
-  if (taskStore.getLimit().length === 0) {
-    itemLimit = await getItems(baseUrlLimit);
-    taskStore.addLimits(await itemLimit);
-  }
 
-  console.log(taskStore.getLimit());
+    itemLimit = await getItems(baseUrlLimit);
+    limitStatusNumber.value = itemLimit
+    console.log(limitStatusNumber)
 
   console.log(limitStatusNumber.value)
   console.log('itemStatuss', itemsStatus);
@@ -65,7 +63,7 @@ onMounted(async () => {
 });
 
 const UpdateLimit = async () => {
-  const edit = await editLimit(baseUrlLimitMax, 5, true, 5)
+  const edit = await editLimit(baseUrlLimitMax, 1, true, 1)
   console.log(edit)
   console.log(limitStatusNumber.value)
 }

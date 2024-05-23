@@ -5,7 +5,7 @@ import { ref , computed } from 'vue'
 const useTasks = defineStore('tasks', () => {
   
   const tasks = ref([])
-  const limit = ref([])
+  const limit = ref({})
 
   const getTasks = () => {
     return tasks.value
@@ -47,13 +47,13 @@ const useTasks = defineStore('tasks', () => {
   }
 
   const addLimits = (newLimits) => {
-    return newLimits.map((newLimit) => ({
+    newLimits.forEach((newLimit) => ({
       id: newLimit.id,
       maximumTask: newLimit.maximumTask,
       isLimit: newLimit.isLimit,
     }));
   }
-  
+
   const addLimit = (id, maximumTask, isLimit) => {
     limit.value.push({
       id: id,

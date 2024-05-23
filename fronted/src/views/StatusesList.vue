@@ -18,6 +18,7 @@ const selectedStatusId = ref(0);
 const notFound = ref(false);
 const myModal = ref(null);
 let items = [];
+let itemLimit = []
 const errorAdd = ref('');
 const errorEdit = ref('');
 
@@ -36,7 +37,7 @@ const showAlertAfterDelete = ref(false);
 const limitStatusNumber = ref([])
 
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/limit`;
+const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`;
 
 const myStatuses = useStatuses();
 // ------------------------------
@@ -56,8 +57,10 @@ onMounted(async () => {
     console.table(items);
   }
 
-  const limitStatus = await getLimit(baseUrlLimit, limitStatusNumber)
-  limitStatusNumber.value = limitStatus
+
+    itemLimit = await getItems(baseUrlLimit);
+    limitStatusNumber.value = itemLimit
+    console.log(limitStatusNumber.value)
   
   statusList.value = myStatuses.getStatuses();
   console.log(myStatuses.getStatuses());
@@ -274,12 +277,14 @@ const closeModalTrans = () => {
 };
 
 const confirmDeleteTrans = (statusId) => {
+  
   deleteandtrans(selectedItemIdToDelete.value, statusId);
   closeModalTrans();
   console.log(selectedItemIdToDelete.value);
 };
 
 const deleteandtrans = async (statusId, newID) => {
+  
   try {
     const status = await deleteItemAndTransfer(baseUrlStatus, statusId, newID);
     if (status === 200) {

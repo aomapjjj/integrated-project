@@ -1,5 +1,5 @@
 let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-let baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+
 
 async function getItems(url) {
   try {
