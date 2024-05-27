@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { getItemById, getItems, deleteItemById, editLimit } from '../libs/fetchUtils.js';
 import TaskDetail from '../views/TaskDetail.vue';
 import AddTask from '../views/AddTask.vue';
@@ -62,20 +62,12 @@ onMounted(async () => {
 });
 
 const UpdateLimit = async () => {
-  const updatedLimit = await editLimit(baseUrlLimitMax, 5, true); // Adjust arguments as necessary
-  console.log('Updated Limit:', updatedLimit);
-
+  const updatedLimit = await editLimit(baseUrlLimitMax, maxTasks.value, isLimitEnabled.value); // Adjust arguments as necessary
   // Update the limit in the store
-  limitStore.updateLimit(updatedLimit.maximumTask, updatedLimit.isLimit);
-
+  limitStore.updateLimit(1, updatedLimit.limitMaximumtask);
+  console.log(updatedLimit);
   // Log the current limit to verify the update
   console.log('Current Limit:', limitStore.getLimit());
-  const currentLimit = limitStore.getLimit();
-console.log('Current Limit:', {
-  id: currentLimit.id,
-  maximumTask: currentLimit.maximumTask,
-  isLimit: currentLimit.isLimit
-});
 };
 
 // ----------------------- Delete -----------------------
@@ -193,9 +185,7 @@ const openNewStatus = () => {
 };
 
 // ----------------------- Limit ---------------------------
-const toggleLimit = () => {
-  taskStore.setLimitEnabled(isLimitEnabled.value);
-};
+
 </script>
 
 <template>
@@ -240,7 +230,7 @@ const toggleLimit = () => {
         </p>
         <div class="flex items-center mt-4">
           <span class="mr-2">Limit tasks in this status</span>
-          <input type="checkbox" class="toggle" v-model="isLimitEnabled" @change="toggleLimit" />
+          <input type="checkbox" class="toggle" v-model="isLimitEnabled" />
         </div>
 
         <div v-if="isLimitEnabled" class="mt-4 flex flex-col items-center">
