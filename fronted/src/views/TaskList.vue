@@ -4,6 +4,7 @@ import { getItemById, getItems, deleteItemById, editLimit } from '../libs/fetchU
 import TaskDetail from '../views/TaskDetail.vue';
 import AddTask from '../views/AddTask.vue';
 import EditTask from '../views/EditTask.vue';
+import { useLimitStore } from '../stores/storeLimit';
 import { useTasks } from '../stores/store';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -13,17 +14,14 @@ const todoList = ref([]);
 const selectedTodoId = ref(0);
 const notFound = ref(false);
 const deleteComplete = ref(false);
-const showDetail = ref(false);
 const statusList = ref([]);
 let items = [];
 let itemsStatus = [];
-let itemLimit = []
 const indexDelete = ref(0);
 const isLimitEnabled = ref(false);
 const limitStatusNumber = ref([])
 const maxTasks = ref(10);
-const maximumTask = 10;
-const isLimit = true;
+
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
@@ -31,6 +29,8 @@ const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`;
 const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/maximumtask`;
 
 const taskStore = useTasks();
+const limitStore = useLimitStore();
+
 onMounted(async () => {
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask);
@@ -41,10 +41,9 @@ onMounted(async () => {
   statusList.value = itemsStatus;
 
 
-
-    itemLimit = await getItems(baseUrlLimit);
-    limitStatusNumber.value = itemLimit
-    console.log(limitStatusNumber)
+  const itemLimit = await getItems(baseUrlLimit);
+  limitStore.setLimit(itemLimit);
+  console.log('Initial Limit:', limitStore.getLimit());
 
   console.log(limitStatusNumber.value)
   console.log('itemStatuss', itemsStatus);
@@ -63,10 +62,21 @@ onMounted(async () => {
 });
 
 const UpdateLimit = async () => {
-  const edit = await editLimit(baseUrlLimitMax, 1, true, 1)
-  console.log(edit)
-  console.log(limitStatusNumber.value)
-}
+  const updatedLimit = await editLimit(baseUrlLimitMax, 5, true); // Adjust arguments as necessary
+  console.log('Updated Limit:', updatedLimit);
+
+  // Update the limit in the store
+  limitStore.updateLimit(updatedLimit.maximumTask, updatedLimit.isLimit);
+
+  // Log the current limit to verify the update
+  console.log('Current Limit:', limitStore.getLimit());
+  const currentLimit = limitStore.getLimit();
+console.log('Current Limit:', {
+  id: currentLimit.id,
+  maximumTask: currentLimit.maximumTask,
+  isLimit: currentLimit.isLimit
+});
+};
 
 // ----------------------- Delete -----------------------
 
