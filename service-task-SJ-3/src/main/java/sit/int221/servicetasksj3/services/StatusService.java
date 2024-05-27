@@ -240,7 +240,6 @@ public class StatusService {
     public SimpleLimitDTO updateLimitTask(Integer maximumTask, Boolean isLimit) {
         // Update the task limit configuration
         limitRepository.updateLimit(1, maximumTask, isLimit);
-        return new SimpleLimitDTO(isLimit);
+        return new SimpleLimitDTO(maximumTask, isLimit);
     }
-
 }

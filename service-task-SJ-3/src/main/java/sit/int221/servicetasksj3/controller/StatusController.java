@@ -60,7 +60,9 @@ public class StatusController {
     }
 
     @PatchMapping("/maximumtask")
-    public ResponseEntity<SimpleLimitDTO> updateLimitTask(@RequestParam @Min(0) @Max(30) Integer maximumTask, @RequestParam Boolean isLimit) {
+    public ResponseEntity<SimpleLimitDTO> updateLimitTask(
+            @RequestParam @Min(0) @Max(30) Integer maximumTask,
+            @RequestParam Boolean isLimit) {
         return ResponseEntity.ok(service.updateLimitTask(maximumTask, isLimit));
     }
 }
