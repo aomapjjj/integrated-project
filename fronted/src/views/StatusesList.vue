@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed } from "vue"
 import {
   getItemById,
   getItems,
@@ -18,7 +18,6 @@ const router = useRouter()
 const statusList = ref([])
 const selectedStatusId = ref(0)
 const notFound = ref(false)
-let items = []
 const errorAdd = ref("")
 const errorEdit = ref("")
 
@@ -34,16 +33,15 @@ const showAlertAfterAdd = ref(false)
 const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-
-const myStatuses = useStatuses()
-
 const limitAlert = ref(false);
 const errorLimit = ref('');
 const errorTrans = ref(false)
 
+const myStatuses = useStatuses()
 const limitStore = useLimitStore()
 const taskStore = useTasks()
+
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 // ------------------------------
 
@@ -65,14 +63,11 @@ const todo = ref({
 
 onMounted(async () => {
   if (myStatuses.getStatuses().length === 0) {
-    items = await getItems(baseUrlStatus)
+    const items = await getItems(baseUrlStatus)
     myStatuses.addStatuses(await items)
     console.table(items)
   }
   statusList.value = myStatuses.getStatuses()
-  console.log(myStatuses.getStatuses())
-  console.log({ ...statusList.value })
-
   const statusId = route.params.id
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
@@ -114,7 +109,6 @@ const submitForm = async () => {
   setTimeout(() => {
     showAlertAfterAdd.value = false
   }, 2300)
-
   clearForm()
 }
 
@@ -128,8 +122,6 @@ const closeModalAdd = () => {
   const modal = document.getElementById("my_modal_4")
   modal.close()
 }
-
-// logic for submitting the form
 
 // ----------------------- Add -----------------------
 
@@ -158,7 +150,6 @@ const UpdateStatus = async () => {
     return (errorEdit.value = "Status name already exists")
   }
 
-  console.log(edit)
   myStatuses.updateStatus(
     edit.id,
     edit.name,
@@ -252,10 +243,7 @@ const deleteStatus = async (statusId) => {
         (status) => status.id !== statusId
       )
       openModalToDeleteTrans(statusId)
-
     }
-
-
   } catch (error) {
     console.error(`Error deleting item with ID ${statusId}:`, error)
   }
@@ -274,10 +262,7 @@ const closeModal = () => {
 
 const confirmDelete = () => {
   deleteStatus(selectedItemIdToDelete.value)
-
   closeModal()
-
-  console.log(selectedItemIdToDelete.value)
 }
 
 const openModalToDeleteTrans = (statusId) => {
@@ -297,7 +282,6 @@ const confirmDeleteTrans = (statusId) => {
   }
   deleteandtrans(selectedItemIdToDelete.value, statusId);
   closeModalTrans();
-  console.log(selectedItemIdToDelete.value);
 };
 
 const deleteandtrans = async (statusId, newID) => {
@@ -369,27 +353,7 @@ const isFormValid = computed(() => {
 
   <div class="min-h-full max-h-fit">
 
-    <!-- <div role="alert" class="alert alert-error" v-show="errorTrans">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>Error! Limit is enable</span>
-    </div>
-    <div role="alert" class="alert alert-error" v-show="notFound">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>Error! Status not found</span>
-    </div> -->
-
-    <!-- Alert Status not found -->
-    <div
-      role="alert"
-      class="alert alert-error"
-      v-show="notFound"
-      style="
+    <div role="alert" class="alert alert-error" v-show="errorTrans" style="
         position: fixed;
         top: 20px;
         left: 50%;
@@ -397,20 +361,27 @@ const isFormValid = computed(() => {
         z-index: 9999;
         width: 500px;
         animation: fadeInOut 1.5s infinite;
-      "
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="stroke-current shrink-0 h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
+      ">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>Error! Limit is Enable</span>
+    </div>
+
+    <!-- Alert Status not found -->
+    <div role="alert" class="alert alert-error" v-show="notFound" style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 500px;
+        animation: fadeInOut 1.5s infinite;
+      ">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <span>Error! Status not found</span>
     </div>
@@ -433,10 +404,7 @@ const isFormValid = computed(() => {
 
 
         <div class="ml-auto">
-          <button
-            onclick="my_modal_4.showModal()"
-            class="itbkk-button-add btn ml-4"
-            style="
+          <button onclick="my_modal_4.showModal()" class="itbkk-button-add btn ml-4" style="
               position: relative;
               border-radius: 30px;
               background-color: #f785b1;
@@ -475,15 +443,9 @@ const isFormValid = computed(() => {
               </span>
             </div>
 
-            <label
-              class="input input-bordered flex items-center gap-2 font-bold ml-4"
-            >
-              <input
-                type="text"
-                class="itbkk-status-name grow"
-                placeholder="Enter Your Status Name"
-                v-model="status.name"
-              />
+            <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
+              <input type="text" class="itbkk-status-name grow" placeholder="Enter Your Status Name"
+                v-model="status.name" />
 
             </label>
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
@@ -496,13 +458,8 @@ const isFormValid = computed(() => {
                 </span>
               </div>
 
-              <textarea
-                id="description"
-                class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
-                rows="4"
-                placeholder="No Description Provided"
-                v-model="status.description"
-              ></textarea>
+              <textarea id="description" class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
+                rows="4" placeholder="No Description Provided" v-model="status.description"></textarea>
 
             </label>
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
@@ -533,20 +490,11 @@ const isFormValid = computed(() => {
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
 
           </svg>
           <span>{{ errorAdd }}</span>
@@ -645,10 +593,7 @@ const isFormValid = computed(() => {
 
 
         <!-- TABLE -->
-        <table
-          class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10"
-          style="table-layout: fixed"
-        >
+        <table class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10" style="table-layout: fixed">
 
           <thead>
             <tr class="bg-base-200">
@@ -661,9 +606,7 @@ const isFormValid = computed(() => {
                 No.
               </th>
 
-              <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                style="
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                   background-color: #9391e4;
                   border-bottom: 2px solid #9391e4;
 
@@ -672,9 +615,7 @@ const isFormValid = computed(() => {
                 Name
               </th>
 
-              <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                style="
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                   background-color: #9391e4;
                   border-bottom: 2px solid #9391e4;
 
@@ -683,9 +624,7 @@ const isFormValid = computed(() => {
                 Description
               </th>
 
-              <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                style="
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                   background-color: #9391e4;
                   border-bottom: 2px solid #9391e4;
 
@@ -728,20 +667,10 @@ const isFormValid = computed(() => {
               <!-- Edit modal-->
 
 
-              <td
-                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
-              >
-                <button
-                  class="itbkk-button-edit btn"
-                  @click="openModalToEdit(item.id)"
-                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
+              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
+                <button class="itbkk-button-edit btn" @click="openModalToEdit(item.id)"
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
 
                     <g fill="none">
                       <path
@@ -765,16 +694,9 @@ const isFormValid = computed(() => {
                           </span>
                         </div>
 
-                        <label
-                          class="input input-bordered flex items-center gap-2 font-bold ml-4"
-                        >
-                          <input
-                            type="text"
-                            class="itbkk-status-name grow"
-                            placeholder="Enter Your Status Name"
-                            maxlength="100"
-                            v-model="status.name"
-                          />
+                        <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
+                          <input type="text" class="itbkk-status-name grow" placeholder="Enter Your Status Name"
+                            maxlength="100" v-model="status.name" />
 
                         </label>
                         <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
@@ -783,24 +705,15 @@ const isFormValid = computed(() => {
 
                         <!-- Description -->
 
-                        <label
-                          for="description"
-                          class="itbkk-status-description form-control flex-grow ml-4"
-                        >
+                        <label for="description" class="itbkk-status-description form-control flex-grow ml-4">
 
                           <div class="label">
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
                           </div>
 
 
-                          <textarea
-                            id="description"
-                            class="textarea textarea-bordered flex-grow w-full"
-                            maxlength="500"
-                            rows="4"
-                            placeholder="No Description Provided"
-                            v-model="status.description"
-                          >
+                          <textarea id="description" class="textarea textarea-bordered flex-grow w-full" maxlength="500"
+                            rows="4" placeholder="No Description Provided" v-model="status.description">
 
                             No description is provided
                           </textarea>
@@ -830,18 +743,10 @@ const isFormValid = computed(() => {
 
                 <!-- Delete Modal -->
 
-                <button
-                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
-                  class="itbkk-button-delete btn bg-red-400"
-                  style="margin-left: 10px"
-                  @click="openModalToDelete(item.id)"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
+                <button v-if="item.name !== 'No Status' && item.name !== 'Done'"
+                  class="itbkk-button-delete btn bg-red-400" style="margin-left: 10px"
+                  @click="openModalToDelete(item.id)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
 
                     <g fill="none" fill-rule="evenodd">
                       <path

@@ -6,11 +6,11 @@ import { useTasks } from "../stores/store.js"
 import { useLimitStore } from "../stores/storeLimit"
 
 const router = useRouter()
-const showAlertAdd = ref(false)
-const showAlertAfterClose = ref(false)
+const alertAdd = ref(false)
 const statusList = ref([])
-const notFound = ref(false)
+const alertLimitAdd = ref(false)
 const error = ref("")
+
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
@@ -27,9 +27,7 @@ const todo = ref({
 onMounted(async () => {
   const itemsStatus = await getItems(baseUrlStatus)
   statusList.value = itemsStatus
-  console.log("itemStatuss", itemsStatus)
 })
-
 
 const submitForm = async () => {
   const trimmedTitle = todo.value.title?.trim()
@@ -54,10 +52,9 @@ const submitForm = async () => {
       itemAdd.updateOn
     )
 
-    showAlertAdd.value = true
-    showAlertAfterClose.value = true
+    alertAdd.value = true
     setTimeout(() => {
-      showAlertAfterClose.value = false
+      alertAdd.value = false
     }, 2300)
   } catch (error) {
     console.error("Error adding task:", error)
@@ -103,9 +100,9 @@ const isLimitReached = computed(() => {
       .filter((task) => task.status === status);
     if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
       setTimeout(() => {
-        notFound.value = false;
+        alertLimitAdd.value = false;
       }, 1800);
-      notFound.value = true;
+      alertLimitAdd.value = true;
       return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`);
     }
   }
@@ -241,7 +238,7 @@ const isLimitReached = computed(() => {
 
             <div
               role="alert"
-              v-show="notFound"
+              v-show="alertLimitAdd"
               class="flex flex-col fixed-alert alert"
             >
               <svg
@@ -285,7 +282,7 @@ const isLimitReached = computed(() => {
         <div
           role="alert"
           class="alert shadow-lg"
-          :class="{ hidden: !showAlertAfterClose }"
+          :class="{ hidden: !alertAdd }"
           style="
             position: fixed;
             top: 20px;

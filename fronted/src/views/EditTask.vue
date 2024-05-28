@@ -1,5 +1,4 @@
 <script setup>
-// Import ref from Vue
 import { ref, watch, computed } from 'vue';
 import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
 import { useTasks } from '../stores/store';
@@ -10,20 +9,21 @@ import { useLimitStore } from '../stores/storeLimit';
 const statusList = ref([]);
 const router = useRouter();
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 const cantEdit = ref(false);
 const error = ref('');
 const limitStore = useLimitStore();
 const myTasks = useTasks();
-
-
+const oldValue = ref({});
 
 const props = defineProps({
   todoId: Number,
 });
+
 const showAlertEdit = ref(false);
 const showAlertAfterEdit = ref(false);
+
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
 
 const todo = ref({
   id: '',
@@ -35,7 +35,7 @@ const todo = ref({
   updatedOn: '',
 });
 
-const oldValue = ref({});
+
 
 watch(
   () => props.todoId,
@@ -59,7 +59,6 @@ const myModal = ref(null);
 const openModal = () => {
   router.push({ name: 'TaskEdit', params: { id: props.todoId } });
   myModal.value.showModal();
-  console.log([props.todoId]);
 };
 
 const closeModal = () => {
@@ -97,7 +96,6 @@ const UpdateTask = async () => {
     setTimeout(() => {
       showAlertAfterEdit.value = false;
     }, 2300);
-    console.log(edit);
   } catch (error) {
     console.error('Error updating task:', error);
   }
