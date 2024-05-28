@@ -64,10 +64,11 @@ onMounted(async () => {
 const UpdateLimit = async () => {
   const updatedLimit = await editLimit(baseUrlLimitMax, maxTasks.value, isLimitEnabled.value); // Adjust arguments as necessary
   // Update the limit in the store
-  limitStore.updateLimit(1, updatedLimit.limitMaximumtask);
+  limitStore.updateLimit( updatedLimit.maximumTask, updatedLimit.limitMaximumtask);
   console.log(updatedLimit);
   // Log the current limit to verify the update
   console.log('Current Limit:', limitStore.getLimit());
+  console.log(limitStore.getLimit())
 };
 
 // ----------------------- Delete -----------------------
