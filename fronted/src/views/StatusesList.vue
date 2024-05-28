@@ -296,7 +296,7 @@ const deleteandtrans = async (statusId, newID) => {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
       );
-      if (isLimitReached.value) { // Check the computed property value
+      if (isLimitReached.value) { 
         console.error(errorLimit.value);
       }
       errorTrans.value = true
@@ -310,6 +310,7 @@ const deleteandtrans = async (statusId, newID) => {
     console.error(`Error deleting item with ID ${statusId}:`, error);
   }
 };
+
 
 const isLimitReached = computed(() => {
   const status = todo.value.status;
@@ -352,7 +353,6 @@ const isFormValid = computed(() => {
 <template>
 
   <div class="min-h-full max-h-fit">
-
     <div role="alert" class="alert alert-error" v-show="errorTrans" style="
         position: fixed;
         top: 20px;
@@ -360,13 +360,22 @@ const isFormValid = computed(() => {
         transform: translateX(-50%);
         z-index: 9999;
         width: 500px;
-        animation: fadeInOut 1.5s infinite;
-      ">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        animation: fadeInOut 1.5s infinite;"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
-      <span>Error! Limit is Enable</span>
+      <span> "Cannot transfer to status since it will exceed the limit. Please choose another status to transfer to." </span>
     </div>
 
     <!-- Alert Status not found -->
