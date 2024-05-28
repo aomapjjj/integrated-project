@@ -38,12 +38,6 @@ const useStatuses = defineStore('statuses', () => {
           : status
       })
     }
-    const findTodo = (searchId) => {
-      return todos.value.find((todo) => todo.id === searchId)
-    }
-    const findIndexTodo = (searchId) => {
-      return todos.value.findIndex((todo) => todo.id === searchId)
-    }
     const removeStatus = (removeId) => {
       statuses.value.splice(
         statuses.value.findIndex((status) => status.id === removeId),
@@ -55,8 +49,6 @@ const useStatuses = defineStore('statuses', () => {
       addStatuses,
       addStatus,
       updateStatus,
-      findIndexTodo,
-      findTodo,
       removeStatus
     }
   })

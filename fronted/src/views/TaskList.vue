@@ -1,61 +1,50 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
-import {
-  getItemById,
-  getItems,
-  deleteItemById,
-  editLimit
-} from "../libs/fetchUtils.js"
-import TaskDetail from "../views/TaskDetail.vue"
-import AddTask from "../views/AddTask.vue"
-import EditTask from "../views/EditTask.vue"
-import { useLimitStore } from "../stores/storeLimit"
-import { useTasks } from "../stores/store"
-import { useRoute, useRouter } from "vue-router"
+import { ref, onMounted, computed } from 'vue';
+import { getItemById, getItems, deleteItemById, editLimit } from '../libs/fetchUtils.js';
+import TaskDetail from '../views/TaskDetail.vue';
+import AddTask from '../views/AddTask.vue';
+import EditTask from '../views/EditTask.vue';
+import { useLimitStore } from '../stores/storeLimit';
+import { useTasks } from '../stores/store';
+import { useRoute, useRouter } from 'vue-router';
 
-const route = useRoute()
-const router = useRouter()
-const todoList = ref([])
-const selectedTodoId = ref(0)
-const notFound = ref(false)
-const deleteComplete = ref(false)
-const statusList = ref([])
-const showDetail = ref(false)
-let items = []
-let itemsStatus = []
-const indexDelete = ref(0)
+const route = useRoute();
+const router = useRouter();
+const todoList = ref([]);
+const selectedTodoId = ref(0);
+const notFound = ref(false);
+const deleteComplete = ref(false);
+const statusList = ref([]);
+const showDetail = ref(false);
+const indexDelete = ref(0);
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
-const baseUrlLimitMax = `${
-  import.meta.env.VITE_BASE_URL_MAIN
-}/statuses/maximumtask`
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`;
+const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/maximumtask`;
 
-const taskStore = useTasks()
-const limitStore = useLimitStore()
+const taskStore = useTasks();
+const limitStore = useLimitStore();
+
+let items = [];
 
 onMounted(async () => {
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
   }
+  todoList.value = items;
 
-  itemsStatus = await getItems(baseUrlStatus)
-  statusList.value = itemsStatus
+  const itemsStatus = await getItems(baseUrlStatus);
+  statusList.value = itemsStatus;
 
-  const itemLimit = await getItems(baseUrlLimit)
-  limitStore.setLimit(itemLimit)
-  console.log("Initial Limit:", limitStore.getLimit())
+  const itemLimit = await getItems(baseUrlLimit);
+  limitStore.setLimit(itemLimit);
 
-  console.log(limitStore.getLimit().maximumTask)
-  console.log("itemStatuss", itemsStatus)
-  todoList.value = items
-  console.log("items", items)
-  const taskId = route.params.id
+  const taskId = route.params.id;
   if (taskId !== undefined) {
-    console.log(taskId)
-    const response = await getItemById(taskId)
+    const response = await getItemById(taskId);
+
     if (response.status === 404 || response.status === 400) {
       router.push("/task/error")
       notFound.value = true
@@ -65,21 +54,9 @@ onMounted(async () => {
 })
 
 const UpdateLimit = async () => {
-  const updatedLimit = await editLimit(
-    baseUrlLimitMax,
-    limitStore.getLimit().maximumTask,
-    limitStore.getLimit().isLimit
-  ) // Adjust arguments as necessary
-  // Update the limit in the store
-  limitStore.updateLimit(
-    updatedLimit.maximumTask,
-    updatedLimit.limitMaximumtask
-  )
-  console.log(updatedLimit)
-  // Log the current limit to verify the update
-  console.log("Current Limit:", limitStore.getLimit())
-  console.log(limitStore.getLimit())
-}
+  const updatedLimit = await editLimit(baseUrlLimitMax, limitStore.getLimit().maximumTask, limitStore.getLimit().isLimit);
+  limitStore.updateLimit(updatedLimit.maximumTask, updatedLimit.limitMaximumtask);
+};
 
 // ----------------------- Delete -----------------------
 
@@ -135,17 +112,12 @@ const confirmDelete = () => {
 const filterAndLogTitleById = (id) => {
   const item = items.find((item) => item.id === id)
   if (item) {
-    console.log(item.title)
-    return item.title
+    return item.title;
   } else {
     console.log(`No item found with id ${id}`)
     return ""
   }
 }
-
-// ----------------------- filterAndLogTitleById -----------------------
-
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- STATUS SORT -----------------------
 const showIcon = ref("default")
@@ -299,13 +271,9 @@ const updateLimitText = () => {
           <div class="flex items-center justify-center">
             <label for="status-limit" class="mr-2">The Kanban board will limit the number of tasks in each status to </label>
           </div>
-          <input
-            type="number"
-            id="status-limit"
-            class="input input-bordered input-centered"
-            v-model.number="limitStore.getLimit().maximumTask"
-            max="30"
-          />
+
+          <input type="number" id="status-limit" class="input input-bordered input-centered"
+            v-model.number="limitStore.getLimit().maximumTask" max="30" />
         </div>
 
         <div class="modal-action">
@@ -346,21 +314,10 @@ const updateLimitText = () => {
         Filter
       </summary>
 
-      <ul
-        class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
-      >
-        <li
-          v-for="status in statusList"
-          :key="status.name"
-          class="flex items-center"
-        >
+      <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+        <li v-for="status in statusList" :key="status.name" class="flex items-center">
           <label class="itbkk-status-choice flex items-center space-x-2 w-full">
-            <input
-              type="checkbox"
-              :value="status.name"
-              v-model="searchQuery"
-              class="mr-2"
-            />
+            <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
             <span class="itbkk-status-choice">{{ status.name }}</span>
           </label>
         </li>
@@ -463,19 +420,14 @@ const updateLimitText = () => {
 
               <!-- STATUS SORT -->
 
-              <th
-                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                style="
+              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                "
-              >
-                <button
-                  class="itbkk-status-sort"
-                  style="display: flex; align-items: center"
-                  @click="sortByStatus(), toggleIcon()"
-                >
+                ">
+                <button class="itbkk-status-sort" style="display: flex; align-items: center"
+                  @click="sortByStatus(), toggleIcon()">
+
                   <div class="mr-2">Status</div>
                   <!-- Default -->
                   <svg
@@ -748,11 +700,7 @@ const updateLimitText = () => {
       </div>
       <!-- DELETE COMPLETE -->
 
-      <div
-        role="alert"
-        class="alert shadow-lg"
-        v-show="deleteComplete"
-        style="
+      <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
           position: fixed;
           top: 20px;
           left: 50%;
@@ -803,20 +751,24 @@ const updateLimitText = () => {
   thead {
     display: none;
   }
+
   tbody tr {
     display: block;
     margin-bottom: 1rem;
     border: 1px solid #ababab;
     border-radius: 10px;
   }
+
   td {
     display: block;
     text-align: left;
     border: none;
   }
+
   td:before {
     display: none;
   }
+
   .itbkk-button-action td:before {
     display: none;
   }

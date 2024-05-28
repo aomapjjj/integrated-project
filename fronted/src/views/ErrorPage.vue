@@ -37,9 +37,6 @@ const goBackHome = () => {
     <div class="mt-10 flex items-center justify-center gap-x-6">
       <p class="error-title">{{ countdown }}</p>
     </div>
-    <!-- <div class="mt-10 flex items-center justify-center gap-x-6">
-      <p class="loading loading-spinner loading-lg" style="color: #9391E4"></p>
-    </div> -->
   </div>
 </template>
 

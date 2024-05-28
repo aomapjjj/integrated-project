@@ -1,7 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { ref } from 'vue'
 
-
 const useTasks = defineStore('tasks', () => {
   
   const tasks = ref([])
@@ -47,12 +46,6 @@ const useTasks = defineStore('tasks', () => {
         : task
     })
   }
-  const findTodo = (searchId) => {
-    return todos.value.find((todo) => todo.id === searchId)
-  }
-  const findIndexTodo = (searchId) => {
-    return todos.value.findIndex((todo) => todo.id === searchId)
-  }
   const removeTask = (removeId) => {
     tasks.value.splice(
       tasks.value.findIndex((Task) => Task.id === removeId),
@@ -65,8 +58,6 @@ const useTasks = defineStore('tasks', () => {
     addTasks,
     addTask,
     updateTask,
-    findIndexTodo,
-    findTodo,
     removeTask,
   }
 })

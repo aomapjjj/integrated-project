@@ -4,7 +4,7 @@ let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 async function getItems(url) {
   try {
     console.log(URL)
-    const data = await fetch(`${url}`) //GET Method
+    const data = await fetch(`${url}`) 
     const items = await data.json()
     return items
   } catch (error) {
@@ -15,7 +15,6 @@ async function getItemById(id) {
   if (id > 0) {  try {
     console.log("id : ", id)
     const data = await fetch(`${baseUrlTask}/${id}`)
-    //const item = await data.json()
     return data
   } catch (error) {
     console.log(`error: ${error}`)
@@ -79,7 +78,6 @@ async function editItem(url, id, editItem) {
     const editedItem = await res.json()
     return editedItem
 
-    // return res.status
   } catch (error) {
     console.log(`error: ${error}`)
   }
