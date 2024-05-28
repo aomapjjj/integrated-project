@@ -290,7 +290,7 @@ const closeModalTrans = () => {
 }
 const confirmDeleteTrans = (statusId) => {
   if (isLimitReached.value) {
-    console.error(errorLimit.value);
+    console.error(error.value);
     return;
   }
   deleteandtrans(selectedItemIdToDelete.value, statusId);
@@ -336,18 +336,7 @@ const isLimitReached = computed(() => {
   return false;
 });
 
-watch(isLimitReached, (newValue) => {
-  if (newValue) {
-    limitAlert.value = true;
-    errorLimit.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`;
-    setTimeout(() => {
-      limitAlert.value = false;
-    }, 1800);
-  } else {
-    limitAlert.value = false;
-    errorLimit.value = '';
-  }
-});
+
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
