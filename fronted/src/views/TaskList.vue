@@ -269,7 +269,7 @@ const updateLimitText = () => {
           class="mt-4 flex flex-col items-center"
         >
           <div class="flex items-center justify-center">
-            <label for="status-limit" class="mr-2">The Kanban board will limit the number of tasks in each status to </label>
+            <label for="status-limit" class="mr-2">Set maximum tasks</label>
           </div>
 
           <input type="number" id="status-limit" class="input input-bordered input-centered"
