@@ -12,7 +12,6 @@ const route = useRoute();
 const router = useRouter();
 const todoList = ref([]);
 const selectedTodoId = ref(0);
-const notFound = ref(false);
 const deleteComplete = ref(false);
 const statusList = ref([]);
 const showDetail = ref(false);
@@ -44,10 +43,8 @@ onMounted(async () => {
   const taskId = route.params.id;
   if (taskId !== undefined) {
     const response = await getItemById(taskId);
-
     if (response.status === 404 || response.status === 400) {
       router.push("/task/error")
-      notFound.value = true
     }
   }
   return items
@@ -114,14 +111,13 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title;
   } else {
-    console.log(`No item found with id ${id}`)
     return ""
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
 const showIcon = ref("default")
-const statusSortOrder = ref("asc")
+const statusSortOrder = ref("default")
 
 const toggleIcon = () => {
   if (showIcon.value === "default") {
@@ -134,7 +130,6 @@ const toggleIcon = () => {
     showIcon.value = "default"
     statusSortOrder.value = "default"
   }
-
   sortByStatus()
 }
 
@@ -151,21 +146,21 @@ const sortByStatus = () => {
 
 // ----------------------- Filter -----------------------
 
-const searchQuery = ref([])
+const filter = ref([])
 
 const filteredTasks = computed(() => {
-  if (searchQuery.value.length === 0) {
+  if (filter.value.length === 0) {
     return taskStore.getTasks()
   }
   return taskStore
     .getTasks()
-    .filter((task) => searchQuery.value.includes(task.status))
+    .filter((task) => filter.value.includes(task.status))
 })
 
 const removeStatus = (status) => {
-  const index = searchQuery.value.indexOf(status)
+  const index = filter.value.indexOf(status)
   if (index > -1) {
-    searchQuery.value.splice(index, 1)
+    filter.value.splice(index, 1)
   }
 }
 
@@ -317,7 +312,7 @@ const updateLimitText = () => {
       <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
         <li v-for="status in statusList" :key="status.name" class="flex items-center">
           <label class="itbkk-status-choice flex items-center space-x-2 w-full">
-            <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
+            <input type="checkbox" :value="status.name" v-model="filter" class="mr-2" />
             <span class="itbkk-status-choice">{{ status.name }}</span>
           </label>
         </li>
@@ -326,7 +321,7 @@ const updateLimitText = () => {
 
     <div class="selected-filters flex flex-wrap mt-2">
       <div
-        v-for="status in searchQuery"
+        v-for="status in filter"
         :key="status"
         class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
         style="background-color: rgb(247, 133, 177)"

@@ -26,7 +26,7 @@ watch(
     if (response && response.status === 200) {
       todo.value = await response.json()
     }
-  }, { immediate: true }
+  }
 )
 
 const closeModal = () => {

@@ -1,9 +1,7 @@
 let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 
-
 async function getItems(url) {
   try {
-    console.log(URL)
     const data = await fetch(`${url}`) 
     const items = await data.json()
     return items
@@ -13,17 +11,14 @@ async function getItems(url) {
 }
 async function getItemById(id) {
   if (id > 0) {  try {
-    console.log("id : ", id)
     const data = await fetch(`${baseUrlTask}/${id}`)
     return data
   } catch (error) {
     console.log(`error: ${error}`)
   }}
-
 }
 
 async function deleteItemById(url, id) {
-  console.log(`${url}/${id}`)
   try {
     const res = await fetch(`${url}/${id}`, {
       method: "DELETE"
@@ -35,7 +30,6 @@ async function deleteItemById(url, id) {
 }
 
 async function deleteItemAndTransfer(url, id, newid) {
-  console.log(`${url}/${id}/${newid}`)
   try {
     const res = await fetch(`${url}/${id}/${newid}`, {
       method: "DELETE"

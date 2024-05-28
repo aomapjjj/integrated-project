@@ -27,7 +27,6 @@ const notEdit = ref(false)
 const showAlertEdit = ref(false)
 const showAlertAfterEdit = ref(false)
 
-const showAlertAdd = ref(false)
 const showAlertAfterAdd = ref(false)
 
 const showAlertDelete = ref(false)
@@ -65,7 +64,7 @@ onMounted(async () => {
   if (myStatuses.getStatuses().length === 0) {
     const items = await getItems(baseUrlStatus)
     myStatuses.addStatuses(await items)
-    console.table(items)
+
   }
   statusList.value = myStatuses.getStatuses()
   const statusId = route.params.id
@@ -104,7 +103,6 @@ const submitForm = async () => {
     itemAdd.createdOn,
     itemAdd.updateOn
   )
-  showAlertAdd.value = true
   showAlertAfterAdd.value = true
   setTimeout(() => {
     showAlertAfterAdd.value = false
@@ -328,10 +326,6 @@ const isLimitReached = computed(() => {
   return false;
 });
 
-
-// ----------------------- Delete -----------------------
-
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- Validate -----------------------
 const isValidName = (name) => {
