@@ -39,8 +39,8 @@ const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
 const myStatuses = useStatuses()
 
-const cantEdit = ref(false);
-const error = ref('');
+const limitAlert = ref(false);
+const errorLimit = ref('');
 
 const limitStore = useLimitStore()
 const taskStore = useTasks()
@@ -250,7 +250,10 @@ const deleteStatus = async (statusId) => {
         (status) => status.id !== statusId
       )
       openModalToDeleteTrans(statusId)
+
     }
+   
+
   } catch (error) {
     console.error(`Error deleting item with ID ${statusId}:`, error)
   }
@@ -285,59 +288,66 @@ const closeModalTrans = () => {
   const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.close()
 }
-
 const confirmDeleteTrans = (statusId) => {
-  deleteandtrans(selectedItemIdToDelete.value, statusId)
-  closeModalTrans()
-  console.log(selectedItemIdToDelete.value)
-}
+  if (isLimitReached.value) {
+    console.error(errorLimit.value);
+    return;
+  }
+  deleteandtrans(selectedItemIdToDelete.value, statusId);
+  closeModalTrans();
+  console.log(selectedItemIdToDelete.value);
+};
 
 const deleteandtrans = async (statusId, newID) => {
-  if (isLimitReached.value) {
-    console.error(error.value)
-    return // Exit the function if the limit is reached
-  }
-
   try {
-    const status = await deleteItemAndTransfer(baseUrlStatus, statusId, newID)
+    const status = await deleteItemAndTransfer(baseUrlStatus, statusId, newID);
     if (status === 200) {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
-      )
+      );
+    } else if (status === 400) {
+      statusList.value = statusList.value.filter(
+        (status) => status.id !== statusId
+      );
+      if (isLimitReached.value) { // Check the computed property value
+        console.error(errorLimit.value);
+      }
     } else {
-      console.error(`Failed to delete item with ID ${statusId}`)
+      console.error(`Failed to delete item with ID ${statusId}`);
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${statusId}:`, error)
+    console.error(`Error deleting item with ID ${statusId}:`, error);
   }
-}
+};
 
 const isLimitReached = computed(() => {
-  const status = todo.value.status
-  if (status === "No Status" || status === "Done") {
-    return false
+  const status = todo.value.status;
+  if (status === 'No Status' || status === 'Done') {
+    return false;
   }
-
   if (limitStore.getLimit().isLimit) {
     const tasksInStatus = taskStore
       .getTasks()
-      .filter((task) => task.status === status)
+      .filter((task) => task.status === status);
     if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
-      setTimeout(() => {
-        cantEdit.value = false
-      }, 1800)
-      cantEdit.value = true
-      return (error.value = `The status "${
-        todo.value.status
-      }" has reached the maximum limit of ${
-        limitStore.getLimit().maximumTask
-      } tasks.`)
+      return true;
     }
   }
+  return false;
+});
 
-  return false
-})
-
+watch(isLimitReached, (newValue) => {
+  if (newValue) {
+    limitAlert.value = true;
+    errorLimit.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`;
+    setTimeout(() => {
+      limitAlert.value = false;
+    }, 1800);
+  } else {
+    limitAlert.value = false;
+    errorLimit.value = '';
+  }
+});
 // ----------------------- Delete -----------------------
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -589,6 +599,7 @@ const isFormValid = computed(() => {
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- HOME -->
+
         <!-- Edit Alert Success -->
         <div
           role="alert"
@@ -884,35 +895,8 @@ const isFormValid = computed(() => {
                           {{ status.description?.length }}/200
                         </p>
                       </div>
-                      <div
-                        role="alert"
-                        class="alert shadow-lg alert-error"
-                        v-show="cantEdit"
-                        style="
-                          position: fixed;
-                          top: 20px;
-                          left: 50%;
-                          transform: translateX(-50%);
-                          z-index: 9999;
-                          width: 500px;
-                          animation: fadeInOut 1.5s infinite;
-                        "
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="stroke-current shrink-0 h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <span>{{ error }}</span>
-                      </div>
+
+                      
 
                       <!-- Buttons -->
                       <div class="flex justify-end">
@@ -1075,7 +1059,38 @@ const isFormValid = computed(() => {
                         </button>
                       </div>
                     </div>
+                    <!-- LimitAlert -->
+                    <div
+                        role="alert"
+                        class="alert shadow-lg alert-error"
+                        v-show="limitAlert"
+                        style="
+                          position: fixed;
+                          top: 20px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          z-index: 9999;
+                          width: 500px;
+                          animation: fadeInOut 1.5s infinite;
+                        "
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="stroke-current shrink-0 h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span>{{ errorLimit }}</span>
+                      </div>
                   </div>
+
                 </dialog>
               </td>
             </tr>
