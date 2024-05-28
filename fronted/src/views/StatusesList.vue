@@ -63,8 +63,8 @@ onMounted(async () => {
       router.push('/status');
       notFound.value = true;
       setTimeout(() => {
-    notFound.value = false;
-  }, 1500);
+        notFound.value = false;
+      }, 1800);
     }
   }
 });
@@ -177,7 +177,7 @@ const closeModalEdit = () => {
   const modal = document.getElementById('my_modal_edit');
   modal.close();
   router.go(-1);
-  clearForm()
+  clearForm();
 };
 
 const isEdited = computed(() => {
@@ -313,12 +313,37 @@ const isFormValid = computed(() => {
 
 <template>
   <div class="min-h-full max-h-fit">
-    <div role="alert" class="alert alert-error" v-show="notFound">
-  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-  <span>Error! Status not found</span>
+    <!-- Alert Status not found -->
+    <div
+      role="alert"
+      class="alert alert-error"
+      v-show="notFound"
+      style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 500px;
+        animation: fadeInOut 1.5s infinite;
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>Error! Status not found</span>
+    </div>
 
-
-</div>
     <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
@@ -341,7 +366,8 @@ const isFormValid = computed(() => {
             </h1>
           </div>
         </a>
-        <div class=" ml-auto">
+
+        <div class="ml-auto">
           <button
             onclick="my_modal_4.showModal()"
             class="itbkk-button-add btn ml-4"
@@ -387,8 +413,8 @@ const isFormValid = computed(() => {
 
         <!-- Modal content -->
         <div class="modal-action flex flex-col justify-between">
-          <!-- name -->
 
+          <!-- Name -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
             <div class="label">
               <span
@@ -397,11 +423,11 @@ const isFormValid = computed(() => {
               </span>
             </div>
             <label
-              class=" input input-bordered flex items-center gap-2 font-bold ml-4"
+              class="input input-bordered flex items-center gap-2 font-bold ml-4"
             >
               <input
                 type="text"
-                class="itbkk-status-name grow "
+                class="itbkk-status-name grow"
                 placeholder="Enter Your Status Name"
                 v-model="status.name"
               />
@@ -413,17 +439,13 @@ const isFormValid = computed(() => {
               {{ status.name?.length }}/50
             </p>
             <!-- Description -->
-            <label
-              for="description"
-              class=" form-control flex-grow ml-4"
-            >
+            <label for="description" class="form-control flex-grow ml-4">
               <div class="label">
                 <span
                   class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                   >Description
                 </span>
               </div>
-
               <textarea
                 id="description"
                 class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
@@ -439,6 +461,7 @@ const isFormValid = computed(() => {
               {{ status.description?.length }}/200
             </p>
           </div>
+
           <!-- Buttons -->
           <div class="flex justify-end">
             <form form @submit.prevent="submitForm" method="dialog">
@@ -470,12 +493,10 @@ const isFormValid = computed(() => {
             position: fixed;
             top: 20px;
             left: 50%;
-            color: rgb(74 222 128 / var(--tw-text-opacity));
             transform: translateX(-50%);
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-            color: rgb(74 222 128 / var(--tw-text-opacity));
           "
         >
           <svg
@@ -532,7 +553,6 @@ const isFormValid = computed(() => {
   </div>
 
   <div class="flex flex-col items-center mt-1">
-    
     <div class="overflow-x-auto">
       <div class="min-w-full">
         <!-- HOME -->
@@ -638,18 +658,18 @@ const isFormValid = computed(() => {
           </ul>
         </div>
 
+        <!-- TABLE -->
         <table
           class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10"
           style="table-layout: fixed"
         >
-          <!-- table -->
           <thead>
             <tr class="bg-base-200">
               <th
                 class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
                   color: #fff;
                 "
               >
@@ -658,8 +678,8 @@ const isFormValid = computed(() => {
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
                   color: #fff;
                 "
               >
@@ -668,8 +688,8 @@ const isFormValid = computed(() => {
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
                   color: #fff;
                 "
               >
@@ -678,8 +698,8 @@ const isFormValid = computed(() => {
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
                   color: #fff;
                   text-align: center;
                   vertical-align: middle;
@@ -739,11 +759,10 @@ const isFormValid = computed(() => {
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
               >
                 <button
-                  class="itbkk-button-edit btn btn-circle"
+                  class="itbkk-button-edit btn"
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
                 >
-                <p>Edit</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -760,6 +779,7 @@ const isFormValid = computed(() => {
                       />
                     </g>
                   </svg>
+                  <p>Edit</p>
                 </button>
 
                 <dialog id="my_modal_edit" class="modal">
@@ -784,7 +804,7 @@ const isFormValid = computed(() => {
                           </span>
                         </div>
                         <label
-                          class=" input input-bordered flex items-center gap-2 font-bold ml-4"
+                          class="input input-bordered flex items-center gap-2 font-bold ml-4"
                         >
                           <input
                             type="text"
@@ -859,11 +879,10 @@ const isFormValid = computed(() => {
                 <!-- Delete Modal -->
                 <button
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
-                  class="itbkk-button-delete btn btn-circle bg-red-400"
+                  class="itbkk-button-delete btn bg-red-400"
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
                 >
-                <p>Delete</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -880,6 +899,7 @@ const isFormValid = computed(() => {
                       />
                     </g>
                   </svg>
+                  <p>Delete</p>
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 500px">
@@ -1032,6 +1052,4 @@ thead th {
 .table-auto1 {
   table-layout: fixed;
 }
-
-
 </style>

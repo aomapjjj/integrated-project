@@ -273,7 +273,7 @@ const toggleLimit = () => {
     <!-- FILTER -->
     <details class="dropdown">
       <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
-        <button >
+        <button>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4"
@@ -312,7 +312,7 @@ const toggleLimit = () => {
               v-model="searchQuery"
               class="mr-2"
             />
-            <span class="itbkk-status-choice">{{status.name}}</span>
+            <span class="itbkk-status-choice">{{ status.name }}</span>
           </label>
         </li>
       </ul>
@@ -325,7 +325,7 @@ const toggleLimit = () => {
         class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
         style="background-color: rgb(247, 133, 177)"
       >
-        <span >{{ status }}</span>
+        <span>{{ status }}</span>
         <button
           @click="removeStatus(status)"
           class="ml-2 text-gray-900 hover:text-white"
@@ -376,7 +376,7 @@ const toggleLimit = () => {
     <div class="overflow-x-auto max-h-96 w-min-full">
       <div class="min-w-full">
         <table class="table-auto" style="table-layout: fixed">
-          <!-- table -->
+          <!-- TABLE -->
           <thead>
             <tr class="bg-base-200 mt-4 md:mt-0">
               <th
@@ -411,7 +411,6 @@ const toggleLimit = () => {
               </th>
 
               <!-- STATUS SORT -->
-
               <th
                 class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
@@ -420,7 +419,8 @@ const toggleLimit = () => {
                   color: #fff;
                 "
               >
-                <button class="itbkk-status-sort"
+                <button
+                  class="itbkk-status-sort"
                   style="display: flex; align-items: center"
                   @click="sortByStatus(), toggleIcon()"
                 >
@@ -584,7 +584,9 @@ const toggleLimit = () => {
                       >
                         <!-- EDIT -->
                         <li>
-                          <a><EditTask :todo-id="item.id" /></a>
+                          <a>
+                            <EditTask :todo-id="item.id" />
+                          </a>
                         </li>
 
                         <!-- Delete -->
@@ -628,7 +630,9 @@ const toggleLimit = () => {
                       >
                         <!-- EDIT -->
                         <li>
-                          <a><EditTask :todo-id="item.id" /></a>
+                          <a>
+                            <EditTask :todo-id="item.id" />
+                          </a>
                         </li>
 
                         <!-- Delete -->
@@ -687,12 +691,10 @@ const toggleLimit = () => {
                 No task
               </td>
             </tr>
-
-          
           </tbody>
         </table>
       </div>
-  <!-- DELETE COMPLETE -->
+      <!-- DELETE COMPLETE -->
       <div
         role="alert"
         class="alert shadow-lg"
@@ -727,7 +729,6 @@ const toggleLimit = () => {
           </h2>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -741,40 +742,26 @@ const toggleLimit = () => {
 <style scoped>
 /* Responsive table styles */
 @media screen and (max-width: 640px) {
-  /* Hide the table header */
   thead {
     display: none;
   }
-
-  /* Make table rows display as blocks for better stacking on small screens */
   tbody tr {
     display: block;
     margin-bottom: 1rem;
-    border: 1px solid #ababab; /* Add border to separate rows */
-    border-radius: 10px; /* Add border radius for rounded corners */
+    border: 1px solid #ababab;
+    border-radius: 10px;
   }
-
-  /* Make table cells display as block elements */
   td {
     display: block;
     text-align: left;
-    border: none; /* Remove border to separate cells */
+    border: none;
   }
-
-  /* Hide the table cell labels */
   td:before {
     display: none;
   }
-
-  /* Hide the "Action" column labels */
   .itbkk-button-action td:before {
     display: none;
   }
-}
-
-#tasktable {
-  width: 100%;
-  overflow: scroll;
 }
 
 table {
@@ -801,11 +788,12 @@ thead th {
 }
 
 .input-centered {
-  text-align: center; /* จัดตำแหน่งข้อความให้อยู่ตรงกลางแนวนอน */
+  text-align: center;
 }
 
 .toggle:checked {
   --tw-text-opacity: 1;
   color: rgb(74 222 128 / var(--tw-text-opacity));
 }
+
 </style>
