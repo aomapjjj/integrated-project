@@ -41,7 +41,7 @@ describe(`TC-PBI8-DELETE-STATUS-1\n
         cy.get('.itbkk-message').contains('Do you want to delete ')
         cy.get('.itbkk-message').contains('Maximum001Maximum002Maximum003Maximum004Maximum005')
         cy.get('.itbkk-button-confirm').contains('Confirm')
-        cy.get('.itbkk-button-cancel').contains('Cancel').click()
+        cy.get('.itbkk-button-cancel').contains('Cancel').click({force:true})
         cy.wait(100)
 
         cy.url().should('contain','/status')

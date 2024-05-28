@@ -77,11 +77,11 @@ onMounted(async () => {
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
     if (response.status === 404 || response.status === 400) {
-      router.push("/status")
-      notFound.value = true
+      router.push('/status');
+      notFound.value = true;
       setTimeout(() => {
-        notFound.value = false
-      }, 1500)
+        notFound.value = false;
+      }, 1800);
     }
   }
 })
@@ -191,11 +191,12 @@ const openModalToEdit = (statusId) => {
 }
 
 const closeModalEdit = () => {
-  const modal = document.getElementById("my_modal_edit")
-  modal.close()
-  router.go(-1)
-  clearForm()
-}
+  const modal = document.getElementById('my_modal_edit');
+  modal.close();
+  router.go(-1);
+  clearForm();
+};
+
 
 const isEdited = computed(() => {
   return (
@@ -367,6 +368,7 @@ const isFormValid = computed(() => {
 <template>
 
   <div class="min-h-full max-h-fit">
+
     <!-- <div role="alert" class="alert alert-error" v-show="errorTrans">
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -381,6 +383,38 @@ const isFormValid = computed(() => {
       </svg>
       <span>Error! Status not found</span>
     </div> -->
+
+    <!-- Alert Status not found -->
+    <div
+      role="alert"
+      class="alert alert-error"
+      v-show="notFound"
+      style="
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 500px;
+        animation: fadeInOut 1.5s infinite;
+      "
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>Error! Status not found</span>
+    </div>
+
     <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
@@ -396,8 +430,13 @@ const isFormValid = computed(() => {
             </h1>
           </div>
         </a>
+
+
         <div class="ml-auto">
-          <button onclick="my_modal_4.showModal()" class="itbkk-button-add btn ml-4" style="
+          <button
+            onclick="my_modal_4.showModal()"
+            class="itbkk-button-add btn ml-4"
+            style="
               position: relative;
               border-radius: 30px;
               background-color: #f785b1;
@@ -428,16 +467,24 @@ const isFormValid = computed(() => {
 
         <!-- Modal content -->
         <div class="modal-action flex flex-col justify-between">
-          <!-- name -->
 
+          <!-- Name -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
             <div class="label">
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4">Name
               </span>
             </div>
-            <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
-              <input type="text" class="itbkk-status-name grow" placeholder="Enter Your Status Name"
-                v-model="status.name" />
+
+            <label
+              class="input input-bordered flex items-center gap-2 font-bold ml-4"
+            >
+              <input
+                type="text"
+                class="itbkk-status-name grow"
+                placeholder="Enter Your Status Name"
+                v-model="status.name"
+              />
+
             </label>
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ status.name?.length }}/50
@@ -449,13 +496,20 @@ const isFormValid = computed(() => {
                 </span>
               </div>
 
-              <textarea id="description" class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
-                rows="4" placeholder="No Description Provided" v-model="status.description"></textarea>
+              <textarea
+                id="description"
+                class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
+                rows="4"
+                placeholder="No Description Provided"
+                v-model="status.description"
+              ></textarea>
+
             </label>
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ status.description?.length }}/200
             </p>
           </div>
+
           <!-- Buttons -->
           <div class="flex justify-end">
             <form form @submit.prevent="submitForm" method="dialog">
@@ -475,16 +529,25 @@ const isFormValid = computed(() => {
             position: fixed;
             top: 20px;
             left: 50%;
-            color: rgb(74 222 128 / var(--tw-text-opacity));
             transform: translateX(-50%);
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-          ">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+
           </svg>
           <span>{{ errorAdd }}</span>
         </div>
@@ -580,35 +643,52 @@ const isFormValid = computed(() => {
           </ul>
         </div>
 
-        <table class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10" style="table-layout: fixed">
-          <!-- table -->
+
+        <!-- TABLE -->
+        <table
+          class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10"
+          style="table-layout: fixed"
+        >
+
           <thead>
             <tr class="bg-base-200">
               <th class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
                 style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
                   color: #fff;
                 ">
                 No.
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
+
                   color: #fff;
                 ">
                 Name
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
+
                   color: #fff;
                 ">
                 Description
               </th>
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
-                  background-color: #9fc3e9;
-                  border-bottom: 2px solid #9fc3e9;
+
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
+                  background-color: #9391e4;
+                  border-bottom: 2px solid #9391e4;
+
                   color: #fff;
                   text-align: center;
                   vertical-align: middle;
@@ -647,11 +727,22 @@ const isFormValid = computed(() => {
 
               <!-- Edit modal-->
 
-              <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status">
-                <button class="itbkk-button-edit btn btn-circle" @click="openModalToEdit(item.id)"
-                  v-if="item.name !== 'No Status' && item.name !== 'Done'">
-                  <p>Edit</p>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+
+              <td
+                class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
+              >
+                <button
+                  class="itbkk-button-edit btn"
+                  @click="openModalToEdit(item.id)"
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+
                     <g fill="none">
                       <path
                         d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
@@ -659,6 +750,7 @@ const isFormValid = computed(() => {
                         d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z" />
                     </g>
                   </svg>
+                  <p>Edit</p>
                 </button>
 
                 <dialog id="my_modal_edit" class="modal">
@@ -672,22 +764,44 @@ const isFormValid = computed(() => {
                           <span class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4">Name
                           </span>
                         </div>
-                        <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
-                          <input type="text" class="itbkk-status-name grow" placeholder="Enter Your Status Name"
-                            maxlength="100" v-model="status.name" />
+
+                        <label
+                          class="input input-bordered flex items-center gap-2 font-bold ml-4"
+                        >
+                          <input
+                            type="text"
+                            class="itbkk-status-name grow"
+                            placeholder="Enter Your Status Name"
+                            maxlength="100"
+                            v-model="status.name"
+                          />
+
                         </label>
                         <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
                           {{ status.name?.length }}/50
                         </p>
 
                         <!-- Description -->
-                        <label for="description" class="itbkk-status-description form-control flex-grow ml-4">
+
+                        <label
+                          for="description"
+                          class="itbkk-status-description form-control flex-grow ml-4"
+                        >
+
                           <div class="label">
                             <span class="block text-lg font-bold leading-6 text-gray-900 mb-1">Description</span>
                           </div>
 
-                          <textarea id="description" class="textarea textarea-bordered flex-grow w-full" maxlength="500"
-                            rows="4" placeholder="No Description Provided" v-model="status.description">
+
+                          <textarea
+                            id="description"
+                            class="textarea textarea-bordered flex-grow w-full"
+                            maxlength="500"
+                            rows="4"
+                            placeholder="No Description Provided"
+                            v-model="status.description"
+                          >
+
                             No description is provided
                           </textarea>
                         </label>
@@ -715,11 +829,20 @@ const isFormValid = computed(() => {
                 </dialog>
 
                 <!-- Delete Modal -->
-                <button v-if="item.name !== 'No Status' && item.name !== 'Done'"
-                  class="itbkk-button-delete btn btn-circle bg-red-400" style="margin-left: 10px"
-                  @click="openModalToDelete(item.id)">
-                  <p>Delete</p>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+
+                <button
+                  v-if="item.name !== 'No Status' && item.name !== 'Done'"
+                  class="itbkk-button-delete btn bg-red-400"
+                  style="margin-left: 10px"
+                  @click="openModalToDelete(item.id)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+
                     <g fill="none" fill-rule="evenodd">
                       <path
                         d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
@@ -727,6 +850,7 @@ const isFormValid = computed(() => {
                         d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z" />
                     </g>
                   </svg>
+                  <p>Delete</p>
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 500px">

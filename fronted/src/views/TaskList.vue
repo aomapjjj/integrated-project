@@ -239,7 +239,9 @@ const openNewStatus = () => {
         </p>
         <div class="flex items-center mt-4">
           <span class="mr-2">Limit tasks in this status</span>
+
           <input type="checkbox" class="toggle" v-model="limitStore.getLimit().isLimit" />
+
         </div>
 
         <div v-if="limitStore.getLimit().isLimit" class="mt-4 flex flex-col items-center">
@@ -259,7 +261,7 @@ const openNewStatus = () => {
     </dialog>
     <!-- FILTER -->
     <details class="dropdown">
-      <summary class="m-1 btn" style="border-radius: 30px">
+      <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
         <button>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
             <g fill="#9FC3E9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -274,11 +276,24 @@ const openNewStatus = () => {
         </button>
         Filter
       </summary>
-      <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-        <li v-for="status in statusList" :key="status.name" class="flex items-center">
-          <label class="flex items-center space-x-2 w-full">
-            <input type="checkbox" :value="status.name" v-model="searchQuery" class="mr-2" />
-            <span>{{ status.name }}</span>
+
+      <ul
+        class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+      >
+        <li
+          v-for="status in statusList"
+          :key="status.name"
+          class="flex items-center"
+        >
+          <label class="itbkk-status-choice flex items-center space-x-2 w-full">
+            <input
+              type="checkbox"
+              :value="status.name"
+              v-model="searchQuery"
+              class="mr-2"
+            />
+            <span class="itbkk-status-choice">{{ status.name }}</span>
+
           </label>
         </li>
       </ul>
@@ -321,7 +336,7 @@ const openNewStatus = () => {
     <div class="overflow-x-auto max-h-96 w-min-full">
       <div class="min-w-full">
         <table class="table-auto" style="table-layout: fixed">
-          <!-- table -->
+          <!-- TABLE -->
           <thead>
             <tr class="bg-base-200 mt-4 md:mt-0">
               <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
@@ -348,13 +363,20 @@ const openNewStatus = () => {
 
               <!-- STATUS SORT -->
 
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
-                <button class="itbkk-status-sort" style="display: flex; align-items: center"
-                  @click="sortByStatus(), toggleIcon()">
+                "
+              >
+                <button
+                  class="itbkk-status-sort"
+                  style="display: flex; align-items: center"
+                  @click="sortByStatus(), toggleIcon()"
+                >
+
                   <div class="mr-2">Status</div>
                   <!-- Default -->
                   <svg v-if="showIcon === 'default'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -521,13 +543,17 @@ const openNewStatus = () => {
                 No task
               </td>
             </tr>
-
-
           </tbody>
         </table>
       </div>
       <!-- DELETE COMPLETE -->
-      <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
+
+      <div
+        role="alert"
+        class="alert shadow-lg"
+        v-show="deleteComplete"
+        style="
+
           position: fixed;
           top: 20px;
           left: 50%;
@@ -547,7 +573,6 @@ const openNewStatus = () => {
           </h2>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -561,44 +586,28 @@ const openNewStatus = () => {
 <style scoped>
 /* Responsive table styles */
 @media screen and (max-width: 640px) {
-
-  /* Hide the table header */
   thead {
     display: none;
   }
-
-  /* Make table rows display as blocks for better stacking on small screens */
   tbody tr {
     display: block;
     margin-bottom: 1rem;
     border: 1px solid #ababab;
-    /* Add border to separate rows */
     border-radius: 10px;
-    /* Add border radius for rounded corners */
-  }
 
-  /* Make table cells display as block elements */
+  }
   td {
     display: block;
     text-align: left;
     border: none;
-    /* Remove border to separate cells */
-  }
 
-  /* Hide the table cell labels */
+  }
   td:before {
     display: none;
   }
-
-  /* Hide the "Action" column labels */
   .itbkk-button-action td:before {
     display: none;
   }
-}
-
-#tasktable {
-  width: 100%;
-  overflow: scroll;
 }
 
 table {
@@ -626,11 +635,14 @@ thead th {
 
 .input-centered {
   text-align: center;
-  /* จัดตำแหน่งข้อความให้อยู่ตรงกลางแนวนอน */
+
 }
 
 .toggle:checked {
   --tw-text-opacity: 1;
   color: rgb(74 222 128 / var(--tw-text-opacity));
 }
+
 </style>
+
+
