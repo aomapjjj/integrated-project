@@ -13,10 +13,6 @@ const notFound = ref(false)
 const error = ref("")
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
-const baseUrlLimitMax = `${
-  import.meta.env.VITE_BASE_URL_MAIN
-}/statuses/maximumtask`
 
 const limitStore = useLimitStore()
 const taskStore = useTasks()
