@@ -35,8 +35,6 @@ const todo = ref({
   updatedOn: '',
 });
 
-
-
 watch(
   () => props.todoId,
   async (newValue) => {
@@ -68,8 +66,7 @@ const closeModal = () => {
 
 const UpdateTask = async () => {
   if (isLimitReached.value) {
-    console.error(error.value);
-    return; // Exit the function if the limit is reached
+    return; 
   }
 
   const trimmedTodo = {
