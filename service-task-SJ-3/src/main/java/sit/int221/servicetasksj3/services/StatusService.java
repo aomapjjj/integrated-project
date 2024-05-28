@@ -209,18 +209,19 @@ public class StatusService {
             throw validationError;
         }
 
-
         TaskStatus oldStatus = repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Old status not found"));
         TaskStatus newStatus = repository.findById(newId).orElseThrow(() -> new ItemNotFoundException("New status not found"));
 
         // Check the task limit
-        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(() -> new ItemNotFoundException("Task limit configuration not found"));
-        if (taskLimit.getIsLimit()) {
-            List<Task> newStatusTasks = taskRepository.findByStatus(newStatus);
-            List<Task> oldStatusTasks = taskRepository.findByStatus(oldStatus);
-            if (newStatusTasks.size() + oldStatusTasks.size() > taskLimit.getMaximumTask()) {
-                validationError.addValidationError("status", "the destination status cannot be over the limit after transfer");
-                throw validationError;
+        if (!"No Status".equalsIgnoreCase(newStatus.getName()) && !"Done".equalsIgnoreCase(newStatus.getName())) {
+            TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(() -> new ItemNotFoundException("Task limit configuration not found"));
+            if (taskLimit.getIsLimit()) {
+                List<Task> newStatusTasks = taskRepository.findByStatus(newStatus);
+                List<Task> oldStatusTasks = taskRepository.findByStatus(oldStatus);
+                if (newStatusTasks.size() + oldStatusTasks.size() > taskLimit.getMaximumTask()) {
+                    validationError.addValidationError("status", "the destination status cannot be over the limit after transfer");
+                    throw validationError;
+                }
             }
         }
 
