@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useLimitStore = defineStore("limitStore", () => {
-  const limit = ref({ maximumTask: 10, isLimit: false });
+  
+  const limit = ref({});
 
   const setLimit = (newLimit) => {
     if (newLimit) {

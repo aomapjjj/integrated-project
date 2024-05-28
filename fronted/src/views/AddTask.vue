@@ -1,65 +1,54 @@
 <script setup>
-import { getItems, addItem } from '../libs/fetchUtils.js';
-import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useTasks } from '../stores/store.js';
+import { getItems, addItem } from "../libs/fetchUtils.js"
+import { ref, onMounted, computed } from "vue"
+import { useRouter } from "vue-router"
+import { useTasks } from "../stores/store.js"
+import { useLimitStore } from "../stores/storeLimit"
 
-const router = useRouter();
-const showAlertAdd = ref(false);
-const showAlertAfterClose = ref(false);
-const statusList = ref([]);
-const notFound = ref(false);
-const error = ref('');
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const router = useRouter()
+const showAlertAdd = ref(false)
+const showAlertAfterClose = ref(false)
+const statusList = ref([])
+const notFound = ref(false)
+const error = ref("")
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
+const baseUrlLimitMax = `${
+  import.meta.env.VITE_BASE_URL_MAIN
+}/statuses/maximumtask`
 
-const myTasks = useTasks();
+const limitStore = useLimitStore()
+const taskStore = useTasks()
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status',
-});
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
 
-const taskStore = useTasks();
 onMounted(async () => {
-  const itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
-  console.log('itemStatuss', itemsStatus);
-});
+  const itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
+  console.log("itemStatuss", itemsStatus)
+})
+
 
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title?.trim();
-  const trimmedDescription = todo.value.description?.trim();
-  const trimmedAssignees = todo.value.assignees?.trim();
-
-  const tasksInStatus = myTasks
-    .getTasks()
-    .filter((task) => task.status === todo.value.status);
-
-  if (
-    myTasks.getIsLimitEnabled &&
-    tasksInStatus.length >= myTasks.getMaxTasks &&
-    todo.value.status !== 'No Status' &&
-    todo.value.status !== 'Done'
-  ) {
-    setTimeout(() => {
-      notFound.value = false;
-    }, 1800);
-    notFound.value = true;
-    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`);
-  }
-
+  const trimmedTitle = todo.value.title?.trim()
+  const trimmedDescription = todo.value.description?.trim()
+  const trimmedAssignees = todo.value.assignees?.trim()
+  
   try {
     const itemAdd = await addItem(baseUrlTask, {
       title: trimmedTitle,
       description: trimmedDescription,
       assignees: trimmedAssignees,
-      status: todo.value.status,
-    });
+      status: todo.value.status
+    })
 
-    myTasks.addTask(
+    taskStore.addTask(
       itemAdd.id,
       itemAdd.title,
       itemAdd.description,
@@ -67,56 +56,67 @@ const submitForm = async () => {
       itemAdd.status,
       itemAdd.createdOn,
       itemAdd.updateOn
-    );
+    )
 
-    showAlertAdd.value = true;
-    showAlertAfterClose.value = true;
+    showAlertAdd.value = true
+    showAlertAfterClose.value = true
     setTimeout(() => {
-      showAlertAfterClose.value = false;
-    }, 2300);
+      showAlertAfterClose.value = false
+    }, 2300)
   } catch (error) {
-    console.error('Error adding task:', error);
+    console.error("Error adding task:", error)
   }
-};
+}
 
 const closeModal = () => {
-  my_modal_1.close();
-  router.go(-1);
-  clearForm();
-};
+  my_modal_1.close()
+  router.go(-1)
+  clearForm()
+}
 
 const clearForm = () => {
-  todo.value.title = '';
-  todo.value.description = '';
-  todo.value.assignees = '';
-  todo.value.status = 'No Status';
-};
+  todo.value.title = ""
+  todo.value.description = ""
+  todo.value.assignees = ""
+  todo.value.status = "No Status"
+}
 
 // ----------------------- Validate -----------------------
 
 const isValidTitle = (title) => {
-  return title && title?.trim().length > 0 && title?.trim().length <= 100;
-};
+  return title && title?.trim().length > 0 && title?.trim().length <= 100
+}
 
 const isFormValid = computed(() => {
   return (
     isValidTitle(todo.value.title) &&
     todo.value.description.trim().length <= 500 &&
     todo.value.assignees.trim().length <= 30
-  );
-});
+  )
+})
+
 
 const isLimitReached = computed(() => {
-  if (taskStore.isLimitEnabled) {
-    const tasksInStatus = taskStore
-      .getTasks()
-      .filter((task) => task.status === todo.value.status);
-    return tasksInStatus.length >= taskStore.maxTasks;
+  const status = todo.value.status;
+  if (status === "No Status" || status === "Done") {
+    return false;
   }
+
+  if (limitStore.getLimit().isLimit) {
+    const tasksInStatus = taskStore.getTasks()
+      .filter((task) => task.status === status);
+    if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
+      setTimeout(() => {
+        notFound.value = false;
+      }, 1800);
+      notFound.value = true;
+      return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`);
+    }
+  }
+
   return false;
 });
 
-//Limit
 </script>
 
 <template>

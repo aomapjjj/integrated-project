@@ -1,96 +1,106 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
   addItem,
   editItem,
   deleteItemById,
-  deleteItemAndTransfer,
-} from '../libs/fetchUtils.js';
-import { useStatuses } from '../stores/storeStatus';
-import { useRoute, useRouter } from 'vue-router';
+  deleteItemAndTransfer
+} from "../libs/fetchUtils.js"
+import { useStatuses } from "../stores/storeStatus"
+import { useRoute, useRouter } from "vue-router"
+import { useLimitStore } from '../stores/storeLimit';
+import { useTasks } from '../stores/store';
 
-const route = useRoute();
-const router = useRouter();
-const statusList = ref([]);
-const selectedStatusId = ref(0);
-const notFound = ref(false);
-const myModal = ref(null);
-let items = [];
-let itemLimit = []
-const errorAdd = ref('');
-const errorEdit = ref('');
+const route = useRoute()
+const router = useRouter()
+const statusList = ref([])
+const selectedStatusId = ref(0)
+const notFound = ref(false)
+const myModal = ref(null)
+let items = []
+const errorAdd = ref("")
+const errorEdit = ref("")
 
-const notAdd = ref(false);
-const notEdit = ref(false);
+const notAdd = ref(false)
+const notEdit = ref(false)
 
-const showAlertEdit = ref(false);
-const showAlertAfterEdit = ref(false);
+const showAlertEdit = ref(false)
+const showAlertAfterEdit = ref(false)
 
-const showAlertAdd = ref(false);
-const showAlertAfterAdd = ref(false);
+const showAlertAdd = ref(false)
+const showAlertAfterAdd = ref(false)
 
-const showAlertDelete = ref(false);
-const showAlertAfterDelete = ref(false);
+const showAlertDelete = ref(false)
+const showAlertAfterDelete = ref(false)
 
-const limitStatusNumber = ref([])
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`;
+const myStatuses = useStatuses()
 
-const myStatuses = useStatuses();
+const cantEdit = ref(false);
+const error = ref('');
+
+const limitStore = useLimitStore()
+const taskStore = useTasks()
+
 // ------------------------------
 
 const status = ref({
-  id: '',
-  name: '',
-  description: '',
-  createdOn: '',
-  updatedOn: '',
-});
+  id: "",
+  name: "",
+  description: "",
+  createdOn: "",
+  updatedOn: ""
+})
+
+
+const todo = ref({
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
 
 onMounted(async () => {
   if (myStatuses.getStatuses().length === 0) {
-    items = await getItems(baseUrlStatus);
-    myStatuses.addStatuses(await items);
-    console.table(items);
+    items = await getItems(baseUrlStatus)
+    myStatuses.addStatuses(await items)
+    console.table(items)
   }
+  statusList.value = myStatuses.getStatuses()
+  console.log(myStatuses.getStatuses())
+  console.log({ ...statusList.value })
 
-
-    itemLimit = await getItems(baseUrlLimit);
-    limitStatusNumber.value = itemLimit
-    console.log(limitStatusNumber.value)
-  
-  statusList.value = myStatuses.getStatuses();
-  console.log(myStatuses.getStatuses());
-  console.log({ ...statusList.value });
-
-  const statusId = route.params.id;
+  const statusId = route.params.id
   if (statusId !== undefined) {
-    const response = await getItemById(statusId);
+    const response = await getItemById(statusId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task');
-      notFound.value = true;
+      router.push("/status")
+      notFound.value = true
+      setTimeout(() => {
+        notFound.value = false
+      }, 1500)
     }
   }
-});
+})
 
 // ----------------------- Add -----------------------
 
 const submitForm = async () => {
-  const statusName = status.value.name.trim();
-  const statusDescription = status.value.description.trim();
+  const statusName = status.value.name.trim()
+  const statusDescription = status.value.description.trim()
   const itemAdd = await addItem(baseUrlStatus, {
     name: statusName,
-    description: statusDescription,
-  });
+    description: statusDescription
+  })
   if (statusExists(statusName)) {
     setTimeout(() => {
-      notAdd.value = false;
-    }, 1800);
-    notAdd.value = true;
-    return (errorAdd.value = 'Status name already exists');
+      notAdd.value = false
+    }, 1800)
+    notAdd.value = true
+    return (errorAdd.value = "Status name already exists")
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -98,94 +108,94 @@ const submitForm = async () => {
     itemAdd.description,
     itemAdd.createdOn,
     itemAdd.updateOn
-  );
-  showAlertAdd.value = true;
-  showAlertAfterAdd.value = true;
+  )
+  showAlertAdd.value = true
+  showAlertAfterAdd.value = true
   setTimeout(() => {
-    showAlertAfterAdd.value = false;
-  }, 2300);
+    showAlertAfterAdd.value = false
+  }, 2300)
 
-  clearForm();
-};
+  clearForm()
+}
 
 const clearForm = () => {
-  status.value.name = '';
-  status.value.description = '';
-};
+  status.value.name = ""
+  status.value.description = ""
+}
 
 const closeModalAdd = () => {
-  clearForm();
-  const modal = document.getElementById('my_modal_4');
-  modal.close();
-};
+  clearForm()
+  const modal = document.getElementById("my_modal_4")
+  modal.close()
+}
 
 // logic for submitting the form
 
 // ----------------------- Add -----------------------
 
 const selectStatus = (statusId) => {
-  selectedStatusId.value = statusId;
-};
+  selectedStatusId.value = statusId
+}
 
 // ----------------------- Edit -----------------------
-const originalStatus = ref({});
+const originalStatus = ref({})
 
 const UpdateStatus = async () => {
-  const statusName = status.value.name;
-  const statusDescription = status.value.description;
-  const statusId = status.value.id;
+  const statusName = status.value.name
+  const statusDescription = status.value.description
+  const statusId = status.value.id
 
   const edit = await editItem(baseUrlStatus, statusId, {
     name: statusName,
-    description: statusDescription,
-  });
+    description: statusDescription
+  })
 
   if (statusExists(statusName, statusId)) {
     setTimeout(() => {
-      notEdit.value = false;
-    }, 1800);
-    notEdit.value = true;
-    return (errorEdit.value = 'Status name already exists');
+      notEdit.value = false
+    }, 1800)
+    notEdit.value = true
+    return (errorEdit.value = "Status name already exists")
   }
 
-  console.log(edit);
+  console.log(edit)
   myStatuses.updateStatus(
     edit.id,
     edit.name,
     edit.description,
     edit.createdOn,
     edit.updateOn
-  );
+  )
 
   const statusIndex = statusList.value.findIndex(
     (status) => status.id === statusId
-  );
+  )
   if (statusIndex !== -1) {
-    statusList.value[statusIndex] = { ...edit };
+    statusList.value[statusIndex] = { ...edit }
   }
-  showAlertEdit.value = true;
-  showAlertAfterEdit.value = true;
+  showAlertEdit.value = true
+  showAlertAfterEdit.value = true
   setTimeout(() => {
-    showAlertAfterEdit.value = false;
-  }, 2300);
-  router.go(-1);
-};
+    showAlertAfterEdit.value = false
+  }, 2300)
+  router.go(-1)
+}
 
 const openModalToEdit = (statusId) => {
-  const statusToEdit = statusList.value.find((item) => item.id === statusId);
-  status.value = { ...statusToEdit };
-  originalStatus.value = { ...statusToEdit };
-  const modal = document.getElementById('my_modal_edit');
-  modal.showModal();
-  router.push({ name: 'EditStatus', params: { id: statusId } });
-};
+  const statusToEdit = statusList.value.find((item) => item.id === statusId)
+  status.value = { ...statusToEdit }
+  originalStatus.value = { ...statusToEdit }
+  const modal = document.getElementById("my_modal_edit")
+  modal.showModal()
+  router.push({ name: "EditStatus", params: { id: statusId } })
+}
 
 const closeModalEdit = () => {
-  const modal = document.getElementById('my_modal_edit');
-  modal.close();
-  router.go(-1);
+  const modal = document.getElementById("my_modal_edit")
+  modal.close()
+  router.go(-1)
   clearForm()
-};
+}
 
 const isEdited = computed(() => {
   return (
@@ -193,135 +203,180 @@ const isEdited = computed(() => {
       status.value.description !== originalStatus.value.description) &&
     (status.value.name.trim().length > 0 ||
       status.value.description.trim().length > 0)
-  );
-});
+  )
+})
 
 const statusExists = (name, id) => {
   return statusList.value.some(
     (status) =>
       status.name?.trim().toLowerCase() === name?.trim().toLowerCase() &&
       status.id !== id
-  );
-};
+  )
+}
 
 // ----------------------- Edit -----------------------
 
 // ----------------------- Delete -----------------------
 
 const getNameById = (id) => {
-  const item = statusList.value.find((item) => item.id === id);
+  const item = statusList.value.find((item) => item.id === id)
   if (item) {
-    return item.name;
+    return item.name
   } else {
-    return null; // หรือให้คืนค่าที่เหมาะสมในกรณีที่ไม่พบ ID
+    return null
   }
-};
+}
 
-const selectedItemIdToDelete = ref(0);
+const selectedItemIdToDelete = ref(0)
 
 const deleteStatus = async (statusId) => {
   try {
-    const status = await deleteItemById(baseUrlStatus, statusId);
+    const status = await deleteItemById(baseUrlStatus, statusId)
     if (status === 200) {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
-      );
-      showAlertDelete.value = true;
-      showAlertAfterDelete.value = true;
+      )
+      showAlertDelete.value = true
+      showAlertAfterDelete.value = true
       setTimeout(() => {
-        showAlertAfterDelete.value = false;
-      }, 2300);
+        showAlertAfterDelete.value = false
+      }, 2300)
     } else {
-      console.error(`Failed to delete item with ID ${statusId}`);
+      console.error(`Failed to delete item with ID ${statusId}`)
     }
 
     if (status === 500) {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
-      );
-      openModalToDeleteTrans(statusId);
+      )
+      openModalToDeleteTrans(statusId)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${statusId}:`, error);
+    console.error(`Error deleting item with ID ${statusId}:`, error)
   }
-};
+}
 
 const openModalToDelete = (statusId) => {
-  selectedItemIdToDelete.value = statusId;
-  const modal3 = document.getElementById('my_modal_delete');
-  modal3?.showModal();
-};
+  selectedItemIdToDelete.value = statusId
+  const modal3 = document.getElementById("my_modal_delete")
+  modal3?.showModal()
+}
 
 const closeModal = () => {
-  const modal3 = document.getElementById('my_modal_delete');
-  modal3?.close();
-};
+  const modal3 = document.getElementById("my_modal_delete")
+  modal3?.close()
+}
 
 const confirmDelete = () => {
-  myStatuses.removeStatus(selectedItemIdToDelete.value);
-  deleteStatus(selectedItemIdToDelete.value);
-  closeModal();
+  myStatuses.removeStatus(selectedItemIdToDelete.value)
+  deleteStatus(selectedItemIdToDelete.value)
+  closeModal()
 
-  console.log(selectedItemIdToDelete.value);
-};
+  console.log(selectedItemIdToDelete.value)
+}
 
 const openModalToDeleteTrans = (statusId) => {
-  selectedItemIdToDelete.value = statusId;
-  const modal3 = document.getElementById('my_modal_deleteTrans');
-  modal3?.showModal();
-};
+  selectedItemIdToDelete.value = statusId
+  const modal3 = document.getElementById("my_modal_deleteTrans")
+  modal3?.showModal()
+}
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById('my_modal_deleteTrans');
-  modal3?.close();
-};
+  const modal3 = document.getElementById("my_modal_deleteTrans")
+  modal3?.close()
+}
 
 const confirmDeleteTrans = (statusId) => {
-  
-  deleteandtrans(selectedItemIdToDelete.value, statusId);
-  closeModalTrans();
-  console.log(selectedItemIdToDelete.value);
-};
+  deleteandtrans(selectedItemIdToDelete.value, statusId)
+  closeModalTrans()
+  console.log(selectedItemIdToDelete.value)
+}
 
 const deleteandtrans = async (statusId, newID) => {
-  
+  if (isLimitReached.value) {
+    console.error(error.value)
+    return // Exit the function if the limit is reached
+  }
+
   try {
-    const status = await deleteItemAndTransfer(baseUrlStatus, statusId, newID);
+    const status = await deleteItemAndTransfer(baseUrlStatus, statusId, newID)
     if (status === 200) {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
-      );
+      )
     } else {
-      console.error(`Failed to delete item with ID ${statusId}`);
+      console.error(`Failed to delete item with ID ${statusId}`)
     }
   } catch (error) {
-    console.error(`Error deleting item with ID ${statusId}:`, error);
+    console.error(`Error deleting item with ID ${statusId}:`, error)
   }
-};
+}
+
+const isLimitReached = computed(() => {
+  const status = todo.value.status
+  if (status === "No Status" || status === "Done") {
+    return false
+  }
+
+  if (limitStore.getLimit().isLimit) {
+    const tasksInStatus = taskStore
+      .getTasks()
+      .filter((task) => task.status === status)
+    if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
+      setTimeout(() => {
+        cantEdit.value = false
+      }, 1800)
+      cantEdit.value = true
+      return (error.value = `The status "${
+        todo.value.status
+      }" has reached the maximum limit of ${
+        limitStore.getLimit().maximumTask
+      } tasks.`)
+    }
+  }
+
+  return false
+})
 
 // ----------------------- Delete -----------------------
 
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 // ----------------------- Validate -----------------------
 const isValidName = (name) => {
-  return name && name.trim().length > 0 && name.trim().length <= 50;
-};
+  return name && name.trim().length > 0 && name.trim().length <= 50
+}
 
 const isValidDescription = (description) => {
-  return !description || description.trim().length <= 200;
-};
+  return !description || description.trim().length <= 200
+}
 
 const isFormValid = computed(() => {
   return (
     isValidName(status.value.name) &&
     isValidDescription(status.value.description)
-  );
-});
+  )
+})
 </script>
 
 <template>
   <div class="min-h-full max-h-fit">
+    <div role="alert" class="alert alert-error" v-show="notFound">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <span>Error! Status not found</span>
+    </div>
     <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
@@ -344,7 +399,7 @@ const isFormValid = computed(() => {
             </h1>
           </div>
         </a>
-        <div class="itbkk-button-add ml-auto">
+        <div class="ml-auto">
           <button
             onclick="my_modal_4.showModal()"
             class="itbkk-button-add btn ml-4"
@@ -400,11 +455,11 @@ const isFormValid = computed(() => {
               </span>
             </div>
             <label
-              class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4"
+              class="input input-bordered flex items-center gap-2 font-bold ml-4"
             >
               <input
                 type="text"
-                class="grow"
+                class="itbkk-status-name grow"
                 placeholder="Enter Your Status Name"
                 v-model="status.name"
               />
@@ -416,10 +471,7 @@ const isFormValid = computed(() => {
               {{ status.name?.length }}/50
             </p>
             <!-- Description -->
-            <label
-              for="description"
-              class="itbkk-status-description form-control flex-grow ml-4"
-            >
+            <label for="description" class="form-control flex-grow ml-4">
               <div class="label">
                 <span
                   class="block text-lg font-bold leading-6 text-gray-900 mb-1"
@@ -429,7 +481,7 @@ const isFormValid = computed(() => {
 
               <textarea
                 id="description"
-                class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
                 rows="4"
                 placeholder="No Description Provided"
                 v-model="status.description"
@@ -478,7 +530,6 @@ const isFormValid = computed(() => {
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-            color: rgb(74 222 128 / var(--tw-text-opacity));
           "
         >
           <svg
@@ -718,18 +769,18 @@ const isFormValid = computed(() => {
               <td
                 class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
                 :class="{
-                  italic: !item.description || item.description?.length === 0,
+                  italic: !item.description || item.description?.length === 0
                 }"
               >
                 <label
                   for="my_modal_6"
                   :class="{
-                    italic: !item.description || item.description?.length === 0,
+                    italic: !item.description || item.description?.length === 0
                   }"
                 >
                   {{
                     !item.description || item.description.length === 0
-                      ? 'No description is provided'
+                      ? "No description is provided"
                       : item.description
                   }}
                 </label>
@@ -745,6 +796,7 @@ const isFormValid = computed(() => {
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
                 >
+                  <p>Edit</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -785,11 +837,11 @@ const isFormValid = computed(() => {
                           </span>
                         </div>
                         <label
-                          class="itbkk-status-name input input-bordered flex items-center gap-2 font-bold ml-4"
+                          class="input input-bordered flex items-center gap-2 font-bold ml-4"
                         >
                           <input
                             type="text"
-                            class="grow"
+                            class="itbkk-status-name grow"
                             placeholder="Enter Your Status Name"
                             maxlength="100"
                             v-model="status.name"
@@ -805,7 +857,7 @@ const isFormValid = computed(() => {
                         <!-- Description -->
                         <label
                           for="description"
-                          class="form-control flex-grow ml-4"
+                          class="itbkk-status-description form-control flex-grow ml-4"
                         >
                           <div class="label">
                             <span
@@ -816,7 +868,7 @@ const isFormValid = computed(() => {
 
                           <textarea
                             id="description"
-                            class="itbkk-description textarea textarea-bordered flex-grow w-full"
+                            class="textarea textarea-bordered flex-grow w-full"
                             maxlength="500"
                             rows="4"
                             placeholder="No Description Provided"
@@ -831,6 +883,35 @@ const isFormValid = computed(() => {
                         >
                           {{ status.description?.length }}/200
                         </p>
+                      </div>
+                      <div
+                        role="alert"
+                        class="alert shadow-lg alert-error"
+                        v-show="cantEdit"
+                        style="
+                          position: fixed;
+                          top: 20px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          z-index: 9999;
+                          width: 500px;
+                          animation: fadeInOut 1.5s infinite;
+                        "
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="stroke-current shrink-0 h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <span>{{ error }}</span>
                       </div>
 
                       <!-- Buttons -->
@@ -864,6 +945,7 @@ const isFormValid = computed(() => {
                   style="margin-left: 10px"
                   @click="openModalToDelete(item.id)"
                 >
+                  <p>Delete</p>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="18"
@@ -889,7 +971,7 @@ const isFormValid = computed(() => {
                       style="word-wrap: break-word"
                     >
                       Do you want to delete
-                      {{ getNameById(selectedItemIdToDelete) }}
+                      {{ getNameById(selectedItemIdToDelete) }} ?
                     </p>
                     <div class="modal-action">
                       <button
@@ -1031,9 +1113,5 @@ thead th {
 
 .table-auto1 {
   table-layout: fixed;
-}
-
-.itbkk-status-description label {
-  word-break: break-word;
 }
 </style>

@@ -5,14 +5,19 @@ import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
 import { useTasks } from '../stores/store';
 import { toDate } from '../libs/toDate';
 import { useRouter } from 'vue-router';
+import { useLimitStore } from '../stores/storeLimit';
 
 const statusList = ref([]);
 const router = useRouter();
-const myTasks = useTasks();
+
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
-const notFound = ref(false);
+const cantEdit = ref(false);
 const error = ref('');
+const limitStore = useLimitStore();
+const myTasks = useTasks();
+
+
 
 const props = defineProps({
   todoId: Number,
@@ -63,6 +68,11 @@ const closeModal = () => {
 };
 
 const UpdateTask = async () => {
+  if (isLimitReached.value) {
+    console.error(error.value);
+    return; // Exit the function if the limit is reached
+  }
+
   const trimmedTodo = {
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
@@ -70,22 +80,6 @@ const UpdateTask = async () => {
     status: todo.value.status,
   };
 
-  const tasksInStatus = myTasks
-    .getTasks()
-    .filter((task) => task.status === todo.value.status);
-
-  if (
-    myTasks.getIsLimitEnabled &&
-    tasksInStatus.length >= myTasks.getMaxTasks &&
-    todo.value.status !== 'No Status' &&
-    todo.value.status !== 'Done'
-  ) {
-    setTimeout(() => {
-      notFound.value = false;
-    }, 1800);
-    notFound.value = true;
-    return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${myTasks.getMaxTasks} tasks.`);
-  }
   try {
     const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo);
     myTasks.updateTask(
@@ -146,6 +140,31 @@ const assigneesLength = computed(() => {
 const descriptionLength = computed(() => {
   return todo.value.description ? todo.value.description.length : 0
 })
+
+//------------------------------------ Limit ----------------------------
+
+const isLimitReached = computed(() => {
+  const status = todo.value.status;
+  if (status === "No Status" || status === "Done") {
+    return false;
+  }
+
+  if (limitStore.getLimit().isLimit) {
+    const tasksInStatus = myTasks.getTasks()
+      .filter((task) => task.status === status);
+    if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
+      setTimeout(() => {
+        cantEdit.value = false;
+      }, 1800);
+      cantEdit.value = true;
+      error.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`;
+      return true;
+    }
+  }
+
+  return false;
+});
+
 </script>
 
 <template>
@@ -289,7 +308,7 @@ const descriptionLength = computed(() => {
         <div
         role="alert"
         class="alert shadow-lg alert-error"
-        v-show="notFound"
+        v-show="cantEdit"
         style="
           position: fixed;
           top: 20px;
@@ -368,8 +387,8 @@ const descriptionLength = computed(() => {
               type="submit"
               class="btn"
               style="background-color: #f785b1"
-              :disabled="!isFormValid || checkEqual"
-              :class="{ disabled: !isFormValid || checkEqual }"
+              :disabled="!isFormValid || checkEqual || isLimitReached"
+              :class="{ disabled: !isFormValid || checkEqual || isLimitReached }"
             >
               Save
             </button>
@@ -380,6 +399,7 @@ const descriptionLength = computed(() => {
     </div>
   </dialog>
 </template>
+
 <style>
 .fixed-alert {
   position: fixed;

@@ -15,12 +15,11 @@ const selectedTodoId = ref(0);
 const notFound = ref(false);
 const deleteComplete = ref(false);
 const statusList = ref([]);
+const showDetail = ref(false);
 let items = [];
 let itemsStatus = [];
 const indexDelete = ref(0);
-const isLimitEnabled = ref(false);
-const limitStatusNumber = ref([])
-const maxTasks = ref(10);
+
 
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
@@ -45,7 +44,7 @@ onMounted(async () => {
   limitStore.setLimit(itemLimit);
   console.log('Initial Limit:', limitStore.getLimit());
 
-  console.log(limitStatusNumber.value)
+  console.log(limitStore.getLimit().maximumTask)
   console.log('itemStatuss', itemsStatus);
   todoList.value = items;
   console.log('items', items);
@@ -62,7 +61,7 @@ onMounted(async () => {
 });
 
 const UpdateLimit = async () => {
-  const updatedLimit = await editLimit(baseUrlLimitMax, maxTasks.value, isLimitEnabled.value); // Adjust arguments as necessary
+  const updatedLimit = await editLimit(baseUrlLimitMax, limitStore.getLimit().maximumTask , limitStore.getLimit().isLimit); // Adjust arguments as necessary
   // Update the limit in the store
   limitStore.updateLimit( updatedLimit.maximumTask, updatedLimit.limitMaximumtask);
   console.log(updatedLimit);
@@ -72,6 +71,15 @@ const UpdateLimit = async () => {
 };
 
 // ----------------------- Delete -----------------------
+
+
+const selectTodo = (todoId) => {
+  if (todoId !== 0) {
+    router.push({ name: 'TaskDetail', params: { id: todoId } });
+  }
+  selectedTodoId.value = todoId;
+  showDetail.value = true;
+};
 
 const selectedItemIdToDelete = ref(0);
 
@@ -231,15 +239,14 @@ const openNewStatus = () => {
         </p>
         <div class="flex items-center mt-4">
           <span class="mr-2">Limit tasks in this status</span>
-          <input type="checkbox" class="toggle" v-model="isLimitEnabled" />
+          <input type="checkbox" class="toggle" v-model="limitStore.getLimit().isLimit" />
         </div>
 
-        <div v-if="isLimitEnabled" class="mt-4 flex flex-col items-center">
+        <div v-if="limitStore.getLimit().isLimit" class="mt-4 flex flex-col items-center">
           <div class="flex items-center justify-center">
             <label for="status-limit" class="mr-2">Set Maximum Tasks</label>
           </div>
-          <input type="number" id="status-limit" class="input input-bordered input-centered" v-model.number="maxTasks"
-            @input="taskStore.setMaxTasks(maxTasks)" max="30" />
+          <input type="number" id="status-limit" class="input input-bordered input-centered" v-model.number="limitStore.getLimit().maximumTask"  max="30" />
         </div>
 
         <div class="modal-action">

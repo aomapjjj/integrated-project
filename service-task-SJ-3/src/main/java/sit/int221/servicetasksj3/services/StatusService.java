@@ -81,12 +81,13 @@ public class StatusService {
             throw validationError;
         }
 
-        // Check if task limit is enabled and the status has reached the limit
+        // Check if task limit is enabled and th
+
         TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
         if (taskLimit.getIsLimit()) {
             long statusCount = repository.count();
-            if (statusCount >= taskLimit.getMaximumTask()) {
+            if (statusCount > taskLimit.getMaximumTask()) {
                 validationError.addValidationError("status", "the status has reached the limit");
                 throw validationError;
             }
