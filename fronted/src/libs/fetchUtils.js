@@ -1,5 +1,6 @@
 let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
 
+
 async function getItems(url) {
   try {
     console.log(URL)
@@ -84,6 +85,26 @@ async function editItem(url, id, editItem) {
   }
 }
 
+async function editLimit(baseUrlLimit, maximumTask, isLimit) {
+  try {
+    const res = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const editedItem = await res.json();
+    return editedItem;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+}
+
 
 export {
   getItems,
@@ -91,5 +112,6 @@ export {
   deleteItemById,
   addItem,
   editItem,
-  deleteItemAndTransfer
+  deleteItemAndTransfer,
+  editLimit
 }

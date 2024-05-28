@@ -1,23 +1,14 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { ref , computed } from 'vue'
+import { ref } from 'vue'
 
 
 const useTasks = defineStore('tasks', () => {
   
   const tasks = ref([])
- 
+
   const getTasks = () => {
     return tasks.value
   }
-
-  const isLimitEnabled = ref(false)
-  const maxTasks = ref(10)
-  
-
-  const getIsLimitEnabled = computed(() => isLimitEnabled.value)
-
-  const getMaxTasks = computed(() => maxTasks.value)
-
 
   //actions
   const addTasks = (newTasks) => {
@@ -33,8 +24,6 @@ const useTasks = defineStore('tasks', () => {
     )
   }
   const addTask = (id, title, description, assignees, status, createdOn, updateOn) => {
-   
-
     tasks.value.push({
       id: id,
       title: title,
@@ -45,6 +34,7 @@ const useTasks = defineStore('tasks', () => {
       updateOn: updateOn,
     })
   }
+
   const updateTask = (id, title, description, assignees, status, createdOn, updateOn) => {
     tasks.value = tasks.value.map((task) => {
       return task.id === id
@@ -69,13 +59,7 @@ const useTasks = defineStore('tasks', () => {
       1
     )
   }
-  const setLimitEnabled = (enabled) => {
-    isLimitEnabled.value = enabled
-  }
 
-  const setMaxTasks = (limit) => {
-    maxTasks.value = limit
-  }
   return {
     getTasks,
     addTasks,
@@ -84,10 +68,6 @@ const useTasks = defineStore('tasks', () => {
     findIndexTodo,
     findTodo,
     removeTask,
-    setLimitEnabled,
-    setMaxTasks,
-    getIsLimitEnabled,
-    getMaxTasks,
   }
 })
 

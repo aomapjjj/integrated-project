@@ -8,5 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleLimitDTO {
+    private Integer maximumTask;
     private Boolean limitMaximumtask;
 }
