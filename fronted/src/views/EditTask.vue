@@ -157,7 +157,7 @@ const isLimitReached = computed(() => {
         cantEdit.value = false;
       }, 1800);
       cantEdit.value = true;
-      error.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`;
+      error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`;
       return true;
     }
   }

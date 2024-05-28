@@ -106,7 +106,7 @@ const isLimitReached = computed(() => {
         notFound.value = false;
       }, 1800);
       notFound.value = true;
-      return (error.value = `The status "${todo.value.status}" has reached the maximum limit of ${limitStore.getLimit().maximumTask} tasks.`);
+      return (error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`);
     }
   }
 
