@@ -183,6 +183,11 @@ const updateLimitText = () => {
   }
 }
 
+const closeLimit = () => {
+  const modal = document.getElementById("my_modal_limit")
+  modal.close()
+
+}
 
 
 </script>
@@ -268,7 +273,7 @@ const updateLimitText = () => {
           </div>
 
           <input type="number" id="status-limit" class="input input-bordered input-centered"
-            v-model.number="limitStore.getLimit().maximumTask" max="30" />
+            v-model.number="limitStore.getLimit().maximumTask" max="10" />
         </div>
 
         <div class="modal-action">
@@ -276,8 +281,9 @@ const updateLimitText = () => {
             <button class="btn mr-2 bg-green-400 text-w" @click="UpdateLimit">
               Confirm
             </button>
-            <button class="btn">Close</button>
+            
           </form>
+          <button class="btn"  @click="closeLimit">Close</button>
         </div>
       </div>
     </dialog>
