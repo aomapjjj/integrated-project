@@ -273,7 +273,7 @@ const closeLimit = () => {
           </div>
 
           <input type="number" id="status-limit" class="input input-bordered input-centered"
-            v-model.number="limitStore.getLimit().maximumTask" max="10" />
+            v-model.number="limitStore.getLimit().maximumTask" max="10" min="0"/>
         </div>
 
         <div class="modal-action">
