@@ -18,25 +18,49 @@ const openHomePage = () => {
 </script>
 
 <template>
-  <div class="w-full h-screen" style="background-color: #c4d9bf">
-     <div class="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-red-100 border border-red-400 text-red-600 px-6 py-4 rounded-md shadow-lg" role="alert">
+  <div class="w-full h-screen bg-customPurple">
+    <div
+      class="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-red-100 border border-red-400 text-red-600 px-6 py-4 rounded-md shadow-lg"
+      role="alert"
+    >
       <strong class="font-bold text-lg">Error!</strong>
       <span class="block">Username or Password is incorrect.</span>
-      <button class="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700">
-        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path fill="none" stroke="currentColor" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      <button
+        class="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700"
+      >
+        <svg
+          class="h-5 w-5"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
     </div>
 
     <div class="flex flex-col md:flex-row min-h-screen">
-       <div class="flex-1 flex items-center justify-center p-4 lg:p-16">
+      <div class="flex-1 flex items-center justify-center p-4 lg:p-16">
         <div class="text-center lg:text-left max-w-lg">
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white">
-            Hi, Welcome to Kradan Kanban
+          <div class="flex justify-center lg:justify-start">
+            <img
+              src="../image/logo2.png"
+              class="h-40 w-40 lg:h-48 lg:w-48"
+              alt="Kradan Kanban Logo"
+            />
+          </div>
+          <h1
+            class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white text-shadowCustom"
+          >
+            Hi, Welcome to <br />
+            Kradan Kanban
           </h1>
-          <p class="text-base md:text-lg lg:text-xl text-white">
-            ช่วยคิดแคปชั่นหน่อยจะดีมาก
+          <p class="md:text-lg text-white">
+            Visualize your work, maximize efficiency, and manage work-in-progress limits with a beautiful board view that works for you.
           </p>
         </div>
       </div>
