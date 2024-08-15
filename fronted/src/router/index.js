@@ -5,6 +5,7 @@ import AddTask from "@/views/AddTask.vue";
 import StatusesList from "@/views/StatusesList.vue";
 import TaskDetail from "@/views/TaskDetail.vue";
 import EditTask from "@/views/EditTask.vue";
+import Login from "@/views/Login.vue";
 
 export const routes = [
   {
@@ -53,6 +54,10 @@ export const routes = [
         component: StatusesList,
       },
     ],
+  },
+  {
+    path: "/login",
+    component: Login,
   },
 ];
 
