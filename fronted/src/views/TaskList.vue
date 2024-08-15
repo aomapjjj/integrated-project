@@ -1,48 +1,55 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { getItemById, getItems, deleteItemById, editLimit } from '../libs/fetchUtils.js';
-import TaskDetail from '../views/TaskDetail.vue';
-import AddTask from '../views/AddTask.vue';
-import EditTask from '../views/EditTask.vue';
-import { useLimitStore } from '../stores/storeLimit';
-import { useTasks } from '../stores/store';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted, computed } from "vue"
+import {
+  getItemById,
+  getItems,
+  deleteItemById,
+  editLimit
+} from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import { useLimitStore } from "../stores/storeLimit"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
 
-const route = useRoute();
-const router = useRouter();
-const todoList = ref([]);
-const selectedTodoId = ref(0);
-const deleteComplete = ref(false);
-const statusList = ref([]);
-const showDetail = ref(false);
-const indexDelete = ref(0);
+const route = useRoute()
+const router = useRouter()
+const todoList = ref([])
+const selectedTodoId = ref(0)
+const deleteComplete = ref(false)
+const statusList = ref([])
+const showDetail = ref(false)
+const indexDelete = ref(0)
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`;
-const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/maximumtask`;
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
+const baseUrlLimitMax = `${
+  import.meta.env.VITE_BASE_URL_MAIN
+}/statuses/maximumtask`
 
-const taskStore = useTasks();
-const limitStore = useLimitStore();
+const taskStore = useTasks()
+const limitStore = useLimitStore()
 
-let items = [];
+let items = []
 
 onMounted(async () => {
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
   }
-  todoList.value = items;
+  todoList.value = items
 
-  const itemsStatus = await getItems(baseUrlStatus);
-  statusList.value = itemsStatus;
+  const itemsStatus = await getItems(baseUrlStatus)
+  statusList.value = itemsStatus
 
-  const itemLimit = await getItems(baseUrlLimit);
-  limitStore.setLimit(itemLimit);
+  const itemLimit = await getItems(baseUrlLimit)
+  limitStore.setLimit(itemLimit)
 
-  const taskId = route.params.id;
+  const taskId = route.params.id
   if (taskId !== undefined) {
-    const response = await getItemById(taskId);
+    const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
       router.push("/task/error")
     }
@@ -51,11 +58,20 @@ onMounted(async () => {
 })
 
 const UpdateLimit = async () => {
-  const updatedLimit = await editLimit(baseUrlLimitMax, limitStore.getLimit().maximumTask, limitStore.getLimit().isLimit);
-  limitStore.updateLimit(updatedLimit.maximumTask, updatedLimit.limitMaximumtask);
-};
+  const updatedLimit = await editLimit(
+    baseUrlLimitMax,
+    limitStore.getLimit().maximumTask,
+    limitStore.getLimit().isLimit
+  )
+  limitStore.updateLimit(
+    updatedLimit.maximumTask,
+    updatedLimit.limitMaximumtask
+  )
+}
 
 // ----------------------- Delete -----------------------
+
+const showModalDelete = ref(false)
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
@@ -87,15 +103,9 @@ const openModalToDelete = (itemId, index) => {
   modal.showModal()
 }
 
-const closeModal = () => {
-  const modal = document.getElementById("my_modal_delete")
-  modal.close()
-}
-
 const confirmDelete = () => {
   taskStore.removeTask(selectTodo.id)
   deleteTodo(selectedItemIdToDelete.value)
-  closeModal()
   deleteComplete.value = true
   setTimeout(() => {
     deleteComplete.value = false
@@ -109,7 +119,7 @@ const confirmDelete = () => {
 const filterAndLogTitleById = (id) => {
   const item = items.find((item) => item.id === id)
   if (item) {
-    return item.title;
+    return item.title
   } else {
     return ""
   }
@@ -172,24 +182,21 @@ const openNewStatus = () => {
 
 // ----------------------- Limit ---------------------------
 
-
-
 const updateLimitText = () => {
   if (limitStore.getLimit().isLimit) {
-    return "The Kanban board now limits " + limitStore.getLimit().maximumTask + " tasks in each status"
+    return (
+      "The Kanban board now limits " +
+      limitStore.getLimit().maximumTask +
+      " tasks in each status"
+    )
   } else {
-   return "The Kanban board has disabled the task limit in each status."
-
+    return "The Kanban board has disabled the task limit in each status."
   }
 }
 
 const closeLimit = () => {
-  const modal = document.getElementById("my_modal_limit")
-  modal.close()
-
+  my_modal_limit.close()
 }
-
-
 </script>
 
 <template>
@@ -212,7 +219,7 @@ const closeLimit = () => {
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               "
             >
-              IT-Bangmod Kradan Kanban
+              IT-Bangmod Kradan Kanban {{ showModalDelete }}
             </h1>
           </div>
         </a>
@@ -272,8 +279,14 @@ const closeLimit = () => {
             <label for="status-limit" class="mr-2">Set maximum tasks</label>
           </div>
 
-          <input type="number" id="status-limit" class="input input-bordered input-centered"
-            v-model.number="limitStore.getLimit().maximumTask" max="10" min="0"/>
+          <input
+            type="number"
+            id="status-limit"
+            class="input input-bordered input-centered"
+            v-model.number="limitStore.getLimit().maximumTask"
+            max="10"
+            min="1"
+          />
         </div>
 
         <div class="modal-action">
@@ -281,9 +294,11 @@ const closeLimit = () => {
             <button class="btn mr-2 bg-green-400 text-w" @click="UpdateLimit">
               Confirm
             </button>
-            
+
+            <button class="btn mr-2 bg-grey-400 text-w" @click="closeLimit()">
+              Close
+            </button>
           </form>
-          <button class="btn"  @click="closeLimit">Close</button>
         </div>
       </div>
     </dialog>
@@ -315,10 +330,21 @@ const closeLimit = () => {
         Filter
       </summary>
 
-      <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-        <li v-for="status in statusList" :key="status.name" class="flex items-center">
+      <ul
+        class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+      >
+        <li
+          v-for="status in statusList"
+          :key="status.name"
+          class="flex items-center"
+        >
           <label class="itbkk-status-choice flex items-center space-x-2 w-full">
-            <input type="checkbox" :value="status.name" v-model="filter" class="mr-2" />
+            <input
+              type="checkbox"
+              :value="status.name"
+              v-model="filter"
+              class="mr-2"
+            />
             <span class="itbkk-status-choice">{{ status.name }}</span>
           </label>
         </li>
@@ -346,7 +372,6 @@ const closeLimit = () => {
       <div class="hidden md:block">
         <!-- Limit Notice -->
         <div class="flex space-x-1">
-          
           <!-- ADD BUTTON -->
           <AddTask />
           <!-- MANAGE STATUS -->
@@ -421,14 +446,19 @@ const closeLimit = () => {
 
               <!-- STATUS SORT -->
 
-              <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+              <th
+                class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                style="
                   background-color: #9fc3e9;
                   border-bottom: 2px solid #9fc3e9;
                   color: #fff;
-                ">
-                <button class="itbkk-status-sort" style="display: flex; align-items: center"
-                  @click="sortByStatus(), toggleIcon()">
-
+                "
+              >
+                <button
+                  class="itbkk-status-sort"
+                  style="display: flex; align-items: center"
+                  @click="sortByStatus(), toggleIcon()"
+                >
                   <div class="mr-2">Status</div>
                   <!-- Default -->
                   <svg
@@ -595,13 +625,14 @@ const closeLimit = () => {
                         </li>
 
                         <!-- Delete -->
+
                         <li>
                           <a
                             style="width: 150px; margin-left: 17px"
                             class="itbkk-button-delete btn"
                             @click="openModalToDelete(item.id, index)"
-                            >Delete</a
-                          >
+                            >Delete
+                          </a>
                         </li>
                       </ul>
                     </div>
@@ -646,6 +677,7 @@ const closeLimit = () => {
                             style="width: 150px; margin-left: 17px"
                             class="itbkk-button-delete btn"
                             @click="openModalToDelete(item.id)"
+                            
                             >Delete</a
                           >
                         </li>
@@ -665,25 +697,27 @@ const closeLimit = () => {
                           filterAndLogTitleById(selectedItemIdToDelete)
                         }}"?
                       </p>
-                      <div class="modal-action">
-                        <button
-                          class="itbkk-button-cancel btn"
-                          @click="closeModal"
-                          style="color: #eb4343"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          class="itbkk-button-confirm btn bg-green-400"
-                          style="color: #fff"
-                          @click="confirmDelete"
-                        >
-                          Confirm
-                        </button>
-                      </div>
+                      <form method="dialog">
+                        <div class="modal-action">
+                          <button
+                            class="itbkk-button-cancel btn"
+                            style="color: #eb4343"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            class="itbkk-button-confirm btn bg-green-400"
+                            style="color: #fff"
+                            @click="confirmDelete()"
+                          >
+                            Confirm
+                          </button>
+                        </div>
+                      </form>
                     </div>
                   </dialog>
 
+               
                   <!-- DELETE -->
                 </td>
               </div>
@@ -701,7 +735,11 @@ const closeLimit = () => {
       </div>
       <!-- DELETE COMPLETE -->
 
-      <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
+      <div
+        role="alert"
+        class="alert shadow-lg"
+        v-show="deleteComplete"
+        style="
           position: fixed;
           top: 20px;
           left: 50%;
@@ -734,10 +772,22 @@ const closeLimit = () => {
     </div>
   </div>
 
-  <div class="flex justify-center space-x-20 mt-3 mb-3"> 
-   
-    <button class="btn" style="border-radius: 30px"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1024 1024"><path fill="#eb4343" d="M512 244c176.18 0 319 142.82 319 319v233a32 32 0 0 1-32 32H225a32 32 0 0 1-32-32V563c0-176.18 142.82-319 319-319M484 68h56a8 8 0 0 1 8 8v96a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V76a8 8 0 0 1 8-8M177.25 191.66a8 8 0 0 1 11.32 0l67.88 67.88a8 8 0 0 1 0 11.31l-39.6 39.6a8 8 0 0 1-11.31 0l-67.88-67.88a8 8 0 0 1 0-11.31l39.6-39.6zm669.6 0l39.6 39.6a8 8 0 0 1 0 11.3l-67.88 67.9a8 8 0 0 1-11.32 0l-39.6-39.6a8 8 0 0 1 0-11.32l67.89-67.88a8 8 0 0 1 11.31 0M192 892h640a32 32 0 0 1 32 32v24a8 8 0 0 1-8 8H168a8 8 0 0 1-8-8v-24a32 32 0 0 1 32-32m148-317v253h64V575z"/></svg>     
-    {{ updateLimitText() }}</button></div>
+  <div class="flex justify-center space-x-20 mt-3 mb-3">
+    <button class="btn" style="border-radius: 30px">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 1024 1024"
+      >
+        <path
+          fill="#eb4343"
+          d="M512 244c176.18 0 319 142.82 319 319v233a32 32 0 0 1-32 32H225a32 32 0 0 1-32-32V563c0-176.18 142.82-319 319-319M484 68h56a8 8 0 0 1 8 8v96a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V76a8 8 0 0 1 8-8M177.25 191.66a8 8 0 0 1 11.32 0l67.88 67.88a8 8 0 0 1 0 11.31l-39.6 39.6a8 8 0 0 1-11.31 0l-67.88-67.88a8 8 0 0 1 0-11.31l39.6-39.6zm669.6 0l39.6 39.6a8 8 0 0 1 0 11.3l-67.88 67.9a8 8 0 0 1-11.32 0l-39.6-39.6a8 8 0 0 1 0-11.32l67.89-67.88a8 8 0 0 1 11.31 0M192 892h640a32 32 0 0 1 32 32v24a8 8 0 0 1-8 8H168a8 8 0 0 1-8-8v-24a32 32 0 0 1 32-32m148-317v253h64V575z"
+        />
+      </svg>
+      {{ updateLimitText() }}
+    </button>
+  </div>
 
   <footer class="footer footer-center p-5 text-primary-content">
     <aside class="flex items-center space-x-20">
