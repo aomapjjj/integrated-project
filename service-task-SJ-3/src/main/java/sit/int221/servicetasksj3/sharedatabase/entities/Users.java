@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "users", schema = "itbkk_shared", catalog = "")
-public class UsersEntity {
+public class Users {
     
     @Id
     @Column(name = "oid")
@@ -26,7 +26,7 @@ public class UsersEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 
