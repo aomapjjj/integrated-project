@@ -10,7 +10,7 @@ import Login from "@/views/Login.vue";
 export const routes = [
   {
     path: "/",
-    redirect: { name: "TaskList" },
+    redirect: { name: "Login" },
   },
   {
     path: "/task",
@@ -19,7 +19,7 @@ export const routes = [
     children: [
       {
         path: "add",
-        name: 'AddTask',
+        name: "AddTask",
         component: AddTask,
       },
       {
@@ -35,7 +35,7 @@ export const routes = [
     ],
   },
   {
-    path: '/:catchAll(.*)',
+    path: "/:catchAll(.*)",
     redirect: { name: "TaskList" },
   },
   {
@@ -50,13 +50,14 @@ export const routes = [
     children: [
       {
         path: "/status/:id/edit",
-        name: 'EditStatus',
+        name: "EditStatus",
         component: StatusesList,
       },
     ],
   },
   {
     path: "/login",
+    name: "Login",
     component: Login,
   },
 ];
