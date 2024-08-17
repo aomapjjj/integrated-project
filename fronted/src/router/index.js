@@ -19,7 +19,7 @@ export const routes = [
     children: [
       {
         path: "add",
-        name: 'AddTask',
+        name: "AddTask",
         component: AddTask,
       },
       {
@@ -35,7 +35,7 @@ export const routes = [
     ],
   },
   {
-    path: '/:catchAll(.*)',
+    path: "/:catchAll(.*)",
     redirect: { name: "TaskList" },
   },
   {
@@ -50,7 +50,7 @@ export const routes = [
     children: [
       {
         path: "/status/:id/edit",
-        name: 'EditStatus',
+        name: "EditStatus",
         component: StatusesList,
       },
     ],
