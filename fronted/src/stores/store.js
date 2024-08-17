@@ -11,7 +11,7 @@ const useTasks = defineStore('tasks', () => {
 
   //actions
   const addTasks = (newTasks) => {
-    newTasks.forEach((newTask) =>
+    newTasks?.forEach((newTask) =>
       addTask(  newTask.id,
                 newTask.title, 
                 newTask.description, 
