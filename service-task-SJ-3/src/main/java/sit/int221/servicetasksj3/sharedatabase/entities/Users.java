@@ -1,6 +1,8 @@
 package sit.int221.servicetasksj3.sharedatabase.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,11 +19,12 @@ public class Users {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "username")
+    @Column(name = "username" )
     private String username;
 
     @Column(name = "email")
     private String email;
+
 
     @Column(name = "password")
     private String password;
