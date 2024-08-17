@@ -19,17 +19,14 @@ public class Users {
     @Column(name = "name")
     private String name;
 
-    @NotBlank
-    @NotEmpty
-    @Column(name = "username" , nullable = false, length = 50)
+    @Column(name = "username" )
     private String username;
 
     @Column(name = "email")
     private String email;
 
-    @NotBlank
-    @NotEmpty
-    @Column(name = "password", nullable = false, length = 50)
+
+    @Column(name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,7 @@
 package sit.int221.servicetasksj3.sharedatabase.controllers;
 
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.sharedatabase.dtos.UserDTO;
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping("")
-    public boolean Authentication(@RequestBody UserDTO user) {
+    public boolean Authentication(@Valid  @RequestBody UserDTO user) {
         return userService.Authentication(user.getUserName(), user.getPassword());
 
 //        if (authenticatedUser != null) {
