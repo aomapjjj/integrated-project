@@ -30,11 +30,5 @@ public class UserController {
     @PostMapping("")
     public boolean Authentication(@RequestBody UserDTO user) {
         return userService.Authentication(user.getUserName(), user.getPassword());
-//        if (authenticatedUser != null) {
-//            return ResponseEntity.ok(authenticatedUser);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-//        }
-//    }
     }
 }
