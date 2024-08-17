@@ -10,7 +10,7 @@ import Login from "@/views/Login.vue";
 export const routes = [
   {
     path: "/",
-    redirect: { name: "TaskList" },
+    redirect: { name: "Login" },
   },
   {
     path: "/task",
@@ -57,6 +57,7 @@ export const routes = [
   },
   {
     path: "/login",
+    name: "Login", 
     component: Login,
   },
 ];
