@@ -1,13 +1,8 @@
 package sit.int221.servicetasksj3.sharedatabase.controllers;
 
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTOTwo;
 import sit.int221.servicetasksj3.sharedatabase.dtos.UserDTO;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.services.UserService;
