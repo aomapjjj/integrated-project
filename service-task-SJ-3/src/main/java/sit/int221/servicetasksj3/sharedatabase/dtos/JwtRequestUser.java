@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class JwtRequestUser {
     @Column(name = "username" , nullable = false, length = 50)
     @Size(min = 1 , max = 50)
     @NotEmpty
