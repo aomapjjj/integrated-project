@@ -59,6 +59,4 @@ public class JwtUserDetailsService implements UserDetailsService {
             return argon2.verify(users.getPassword(), passwordArray);
         }
     }
-
-
 }

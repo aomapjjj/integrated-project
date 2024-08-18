@@ -11,10 +11,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import sit.int221.servicetasksj3.sharedatabase.dtos.JwtRequestUser;
+import sit.int221.servicetasksj3.sharedatabase.dtos.JwtResponseTokenDTO;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
@@ -61,7 +61,7 @@ public class AuthenticationController {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = jwtTokenUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(new JwtResponseTokenDTO(token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
