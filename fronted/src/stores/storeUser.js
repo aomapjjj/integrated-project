@@ -4,16 +4,16 @@ import { ref } from "vue";
 const useUsers = defineStore("users", () => {
   // state
   const users = ref([]);
+  const user = ref({ username: '' });
+
+  // Load user data from localStorage if available
+  if (localStorage.getItem('user')) {
+    user.value = JSON.parse(localStorage.getItem('user'));
+  }
 
   // view
   const getUsers = () => {
     return users.value;
-  };
-
-  const user = ref({ username: '' });
-
-  const setUser = (userName) => {
-    user.value = { username: userName };
   };
 
   const getUser = () => {
@@ -21,6 +21,11 @@ const useUsers = defineStore("users", () => {
   };
 
   // actions
+  const setUser = (userName) => {
+    user.value = { username: userName };
+    localStorage.setItem('user', JSON.stringify(user.value)); 
+  };
+
   const addUsers = (newUsers) => {
     if (Array.isArray(newUsers)) {
       newUsers.forEach((newUser) => {
