@@ -1,14 +1,23 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from "../stores/storeUser"
+import { getItems } from "../libs/fetchUtils.js"
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
 
-const route = useRoute()
 const router = useRouter()
-
+const alertLogin = ref(false)
 const userInput = ref('')
 const passwordInput = ref('')
+
+const userStore = useUsers()
+
+onMounted(async () => {
+    const users = await getItems(baseUrlUsers)
+    userStore.addUsers(await users)
+    console.log(users.value)
+})
 
 // disabled btn sing in
 
@@ -23,18 +32,45 @@ const isValidPassword = computed(() => {
 })
 
 const isFormValid = computed(() => {
-  return isValidPassword.value && isValidUsername.value
+  return isValidPassword.value && isValidUsername.value 
+  
 })
 
 const openHomePage = () => {
   router.push({ name: 'TaskList' })
 }
 
+// fetch util รอเเปป
 const submitForm = async () => {
-  await addItem(baseUrlTask, {
-    userName: userInput,
-    password: passwordInput
-  })
+  try {
+    const response = await fetch(baseUrlUsers, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userName: userInput.value,
+        password: passwordInput.value
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error('Login failed')
+    }
+
+    const data = await response.json()
+    if (data.success) {
+      openHomePage()
+    } else {
+      alertLogin.value = true 
+    }
+  } catch (error) {
+    alertLogin.value = true 
+  }
+}
+
+const closeAlert = () => {
+  alertLogin.value = false
 }
 
 </script>
@@ -43,10 +79,10 @@ const submitForm = async () => {
   <div class="w-full h-screen bg-customPurple">
     <div
       class="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-red-100 border border-red-400 text-red-600 px-6 py-4 rounded-md shadow-lg"
-      role="alert">
+      role="alert" v-show="alertLogin">
       <strong class="font-bold text-lg">Error!</strong>
       <span class="block">Username or Password is incorrect.</span>
-      <button class="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700">
+      <button class="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700" @click="closeAlert">
         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path fill="none" stroke="currentColor" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
