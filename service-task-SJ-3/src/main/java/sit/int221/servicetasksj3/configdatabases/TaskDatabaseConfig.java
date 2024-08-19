@@ -1,4 +1,4 @@
-package sit.int221.servicetasksj3.configs;
+package sit.int221.servicetasksj3.configdatabases;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
