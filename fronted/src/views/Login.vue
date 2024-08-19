@@ -50,7 +50,7 @@ const submitForm = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: userInput.value,
+        userName: userInput.value,
         password: passwordInput.value,
       }),
     });
@@ -70,7 +70,6 @@ const submitForm = async () => {
     // Handle any errors that might occur during the process
     alertLogin.value = true;
   }
-  console.log("eeee")
 }
 
 const closeAlert = () => {
@@ -157,7 +156,7 @@ const closeAlert = () => {
                 </div>
               </div>
               <!-- Sign in Btn -->
-              <button type="submit" :disabled="!isFormValid" @click="openHomePage()"
+              <button type="submit" :disabled="!isFormValid"
                 class="itbkk-button-signin w-full py-2 px-4 bg-customPink text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed">
                 Sign in
               </button>
