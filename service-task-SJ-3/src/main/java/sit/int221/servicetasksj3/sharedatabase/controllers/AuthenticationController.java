@@ -42,18 +42,11 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid  @RequestBody JwtRequestUser user) {
-//        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(user.getUserName());
-//        String token = jwtTokenUtil.generateToken(userDetails);
-//        return ResponseEntity.ok(token);
-//        UsernamePasswordAuthenticationToken authenticationToken =
-//                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
-//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-//        if (! authentication.isAuthenticated()){
-//            throw new UsernameNotFoundException("Invalid user or password");
-//        }
-//        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-//        String token = jwtTokenUtil.generateToken(userDetails);
-//        return ResponseEntity.ok(token);
+        // Input validation: Check if the username and password meet the required conditions.
+        if (user.getUserName().isEmpty() || user.getUserName().length() > 50 ||
+                user.getPassword().isEmpty() || user.getPassword().length() > 14){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or Password is incorrect.");
+        }
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
@@ -63,7 +56,7 @@ public class AuthenticationController {
 
             return ResponseEntity.ok(new JwtResponseTokenDTO(token));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username or Password is incorrect.");
         }
     }
 
