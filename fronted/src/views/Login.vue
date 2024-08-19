@@ -1,14 +1,23 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from "../stores/storeUser"
+import { getItems } from "../libs/fetchUtils.js"
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
 
-const route = useRoute()
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref('')
 const passwordInput = ref('')
+
+const userStore = useUsers()
+
+onMounted(async () => {
+    const users = await getItems(baseUrlUsers)
+    userStore.addUsers(await users)
+    console.log(users.value)
+})
 
 // disabled btn sing in
 
@@ -30,11 +39,11 @@ const isFormValid = computed(() => {
 const openHomePage = () => {
   router.push({ name: 'TaskList' })
 }
-// fetch util รอเเปป
 
+// fetch util รอเเปป
 const submitForm = async () => {
   try {
-    const response = await fetch(baseUrlTask, {
+    const response = await fetch(baseUrlUsers, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

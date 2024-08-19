@@ -10,7 +10,7 @@ const useUsers = defineStore('users', () => {
     }
     //actions
     const addUsers = (newUsers) => {
-      newUsers.forEach((newUser) =>
+      newUsers?.forEach((newUser) =>
         addStatus(  newUser.oid,
             newUser.name, 
             newUser.username, 
@@ -58,5 +58,5 @@ const useUsers = defineStore('users', () => {
 
   
 if (import.meta.hot) {
-    import.meta.hot.accept(acceptHMRUpdate(useStatuses, import.meta.hot))
+    import.meta.hot.accept(acceptHMRUpdate(useUsers, import.meta.hot))
   }
