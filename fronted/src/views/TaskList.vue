@@ -22,6 +22,7 @@ const deleteComplete = ref(false)
 const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
+const displayName = ref('');
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -29,16 +30,31 @@ const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
 const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN
   }/statuses/maximumtask`
 
+const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
+
+
+
 const taskStore = useTasks()
 const limitStore = useLimitStore()
 const userStore = useUsers();
 
-const username = userStore.getUser().username;
 
 let items = []
 
+const findNameByUsername = (users, targetUsername) => {
+  const user = users.find(user => user.username === targetUsername);
+  return user ? user.name : null;
+};
+  
 onMounted(async () => {
-  console.log(userStore.getUser())
+  const users = await getItems(baseUrlUsers);
+  userStore.addUsers(users);
+  console.log(users);
+  const targetUsername = userStore.getUser().username;
+  const name = findNameByUsername(users, targetUsername);
+  displayName.value = name;
+
+
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
@@ -59,6 +75,7 @@ onMounted(async () => {
     }
   }
   return items
+ 
 })
 
 const UpdateLimit = async () => {
@@ -209,12 +226,12 @@ const closeLimit = () => {
           <img src="/src/image/sj3.png" alt="LOGO" class="w-[100px] h-[100px]" />
           <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
             <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight" style="
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight flex flex-row" style="
                 color: #9391e4;
                 text-align: center;
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               ">
-              IT-Bangmod Kradan Kanban  Welcome, {{ username }}!
+              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  displayName  }}</div>
             </h1>
           </div>
         </a>

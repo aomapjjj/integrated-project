@@ -38,8 +38,8 @@ const isFormValid = computed(() => {
 })
 
 const openHomePage = () => {
-  userStore.setUser(userInput.value); // Ensure this sets the user correctly
-  console.log(userStore.getUser());   // This should now log the set username
+  userStore.setUser(userInput.value); 
+  console.log(userStore.getUser());   
   router.push({ name: 'TaskList' });
 };
 
@@ -58,19 +58,15 @@ const submitForm = async () => {
       }),
     });
 
-    // Check the response status code
+    
     if (response.status === 200) {
-      // If the status code is 200, proceed to the home page
       openHomePage();
     } else if (response.status === 401) {
-      // If the status code is 401, show an error alert
       alertLogin.value = true;
     } else {
-      // For any other status code, show a generic error alert
       alertLogin.value = true;
     }
   } catch (error) {
-    // Handle any errors that might occur during the process
     alertLogin.value = true;
   }
 }
@@ -134,7 +130,7 @@ const closeAlert = () => {
                 <div class="flex flex-col -mb-6">
                   <input v-model="userInput" id="login" type="text"
                     class="ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
-                    placeholder="User" maxlength="50" required />
+                    placeholder="Username" maxlength="50" required />
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ userInput.length }}/50
                   </p>
