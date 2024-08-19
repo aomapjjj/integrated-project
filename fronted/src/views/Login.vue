@@ -6,6 +6,7 @@ import { getItems } from "../libs/fetchUtils.js"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
 
+
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref('')
@@ -37,8 +38,10 @@ const isFormValid = computed(() => {
 })
 
 const openHomePage = () => {
-  router.push({ name: 'TaskList' })
-}
+  userStore.setUser(userInput.value); // Ensure this sets the user correctly
+  console.log(userStore.getUser());   // This should now log the set username
+  router.push({ name: 'TaskList' });
+};
 
 // fetch util รอเเปป
 const submitForm = async () => {
