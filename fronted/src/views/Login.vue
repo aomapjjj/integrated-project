@@ -16,7 +16,7 @@ const userStore = useUsers()
 onMounted(async () => {
     const users = await getItems(baseUrlUsers)
     userStore.addUsers(await users)
-    console.log(users.value)
+    console.log(users)
 })
 
 // disabled btn sing in
@@ -43,29 +43,32 @@ const openHomePage = () => {
 // fetch util รอเเปป
 const submitForm = async () => {
   try {
+    // Send the login request to the server
     const response = await fetch(baseUrlUsers, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         userName: userInput.value,
-        password: passwordInput.value
-      })
-    })
+        password: passwordInput.value,
+      }),
+    });
 
-    if (!response.ok) {
-      throw new Error('Login failed')
-    }
-
-    const data = await response.json()
-    if (data.success) {
-      openHomePage()
+    // Check the response status code
+    if (response.status === 200) {
+      // If the status code is 200, proceed to the home page
+      openHomePage();
+    } else if (response.status === 401) {
+      // If the status code is 401, show an error alert
+      alertLogin.value = true;
     } else {
-      alertLogin.value = true 
+      // For any other status code, show a generic error alert
+      alertLogin.value = true;
     }
   } catch (error) {
-    alertLogin.value = true 
+    // Handle any errors that might occur during the process
+    alertLogin.value = true;
   }
 }
 
@@ -153,7 +156,7 @@ const closeAlert = () => {
                 </div>
               </div>
               <!-- Sign in Btn -->
-              <button type="submit" :disabled="!isFormValid" @click="openHomePage()"
+              <button type="submit" :disabled="!isFormValid"
                 class="itbkk-button-signin w-full py-2 px-4 bg-customPink text-white rounded-md disabled:bg-gray-300 disabled:cursor-not-allowed">
                 Sign in
               </button>

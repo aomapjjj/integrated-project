@@ -32,8 +32,8 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
                                 .requestMatchers("/validate-token").permitAll()
-//                                .requestMatchers("/statuses/**").permitAll()
-//                                .requestMatchers("/tasks/**").permitAll()
+                                .requestMatchers("/statuses/**").permitAll()
+                                .requestMatchers("/tasks/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());

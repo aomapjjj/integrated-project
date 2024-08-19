@@ -7,8 +7,8 @@ export const useLimitStore = defineStore("limitStore", () => {
 
   const setLimit = (newLimit) => {
       limit.value = {
-        maximumTask: newLimit.maximumTask,
-        isLimit: newLimit.isLimit,
+        maximumTask: newLimit?.maximumTask,
+        isLimit: newLimit?.isLimit,
       };
   };
 

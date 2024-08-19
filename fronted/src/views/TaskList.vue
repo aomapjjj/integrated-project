@@ -70,8 +70,6 @@ const UpdateLimit = async () => {
 
 // ----------------------- Delete -----------------------
 
-const showModalDelete = ref(false)
-
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
     router.push({ name: "TaskDetail", params: { id: todoId } })
@@ -211,7 +209,7 @@ const closeLimit = () => {
                 text-align: center;
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               ">
-              IT-Bangmod Kradan Kanban {{ showModalDelete }}
+              IT-Bangmod Kradan Kanban 
             </h1>
           </div>
         </a>
