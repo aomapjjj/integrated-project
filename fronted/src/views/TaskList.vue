@@ -10,6 +10,7 @@ import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
 import { useLimitStore } from "../stores/storeLimit"
+import { useUsers } from "../stores/storeUser"
 import { useTasks } from "../stores/store"
 import { useRoute, useRouter } from "vue-router"
 
@@ -30,10 +31,14 @@ const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN
 
 const taskStore = useTasks()
 const limitStore = useLimitStore()
+const userStore = useUsers();
+
+const username = userStore.getUser().username;
 
 let items = []
 
 onMounted(async () => {
+  console.log(userStore.getUser())
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
@@ -209,7 +214,7 @@ const closeLimit = () => {
                 text-align: center;
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               ">
-              IT-Bangmod Kradan Kanban 
+              IT-Bangmod Kradan Kanban  Welcome, {{ username }}!
             </h1>
           </div>
         </a>

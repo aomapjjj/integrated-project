@@ -10,6 +10,16 @@ const useUsers = defineStore("users", () => {
     return users.value;
   };
 
+  const user = ref({ username: '' });
+
+  const setUser = (userName) => {
+    user.value = { username: userName };
+  };
+
+  const getUser = () => {
+    return user.value;
+  };
+
   // actions
   const addUsers = (newUsers) => {
     if (Array.isArray(newUsers)) {
@@ -66,6 +76,8 @@ const useUsers = defineStore("users", () => {
     addUser,
     updateStatus,
     removeUser,
+    setUser,
+    getUser
   };
 });
 

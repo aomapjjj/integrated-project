@@ -16,6 +16,7 @@ export const routes = [
     path: "/task",
     name: "TaskList",
     component: TaskList,
+    props: true,
     children: [
       {
         path: "add",
