@@ -17,6 +17,7 @@ public class JwtRequestUser {
     @Size(min = 1, max = 50, message = "Username length must be between 1 and 50 characters.")
     @NotBlank(message = "Username must not be empty.")
     private String userName;
+
     @Column(name = "password", nullable = false, length = 14)
     @Size(min = 1, max = 14, message = "Password length must be between 1 and 14 characters.")
     @NotBlank(message = "Password must not be empty.")

@@ -1,6 +1,5 @@
 package sit.int221.servicetasksj3.sharedatabase.controllers;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.Valid;
@@ -13,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.sharedatabase.dtos.JwtRequestUser;
 import sit.int221.servicetasksj3.sharedatabase.dtos.JwtResponseTokenDTO;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
@@ -42,21 +42,19 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid  @RequestBody JwtRequestUser user) {
-        // Input validation: Check if the username and password meet the required conditions.
-        if (user.getUserName().isEmpty() || user.getUserName().length() > 50 ||
-                user.getPassword().isEmpty() || user.getPassword().length() > 14){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username or Password is incorrect.");
-        }
         try {
+            // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
-
+            // Generate the JWT token
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String token = jwtTokenUtil.generateToken(userDetails);
-
+            // Return the JWT response DTO
             return ResponseEntity.ok(new JwtResponseTokenDTO(token));
+        } catch (UnauthorizedException e) {
+            throw new UnauthorizedException("Username or Password is incorrect.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username or Password is incorrect.");
+            throw new UnauthorizedException("Username or Password is incorrect.");
         }
     }
 

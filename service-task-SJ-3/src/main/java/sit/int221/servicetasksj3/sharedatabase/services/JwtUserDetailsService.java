@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
@@ -34,8 +35,9 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Users users = userRepository.findByUsername(userName);
         if(users == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, userName+ " does not exist !!");
+            throw new UnauthorizedException(userName + " does not exist !!");
         }
+
         List<GrantedAuthority> roles = new ArrayList<>();
         GrantedAuthority grantedAuthority = new GrantedAuthority() {
             @Override
@@ -44,12 +46,13 @@ public class JwtUserDetailsService implements UserDetailsService {
             }
         };
         roles.add(grantedAuthority);
+
         return new AuthUser(users.getUsername(), users.getPassword(), roles,
                 users.getOid(), users.getEmail(), users.getRole());
     }
 
     @Transactional
-    public boolean Authentication(String username, String password) {
+    public boolean authenticateUser(String username, String password) {
         Users users = userRepository.findByUsername(username);
         if (users == null){
             return false;
