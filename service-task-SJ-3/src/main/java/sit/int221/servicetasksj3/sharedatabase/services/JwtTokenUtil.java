@@ -40,7 +40,6 @@ public class JwtTokenUtil implements Serializable {
     }
     public String generateToken(UserDetails userDetails) {
         AuthUser authUser = (AuthUser) userDetails;
-
         Map<String, Object> claims = new HashMap<>();
         claims.put("name", authUser.getUsername());
         claims.put("oid", authUser.getOid());
@@ -49,13 +48,15 @@ public class JwtTokenUtil implements Serializable {
         return doGenerateToken(claims, userDetails.getUsername());
     }
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setHeaderParam("typ", "JWT")
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuer("https://intproj23.sit.kmutt.ac.th/ft/")
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(signatureAlgorithm, SECRET_KEY).compact();
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/sj3/")
+                .setIssuedAt(new Date(System.currentTimeMillis())) // Set iat (issued at)
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)) // Set exp (expiration)
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
     }
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);

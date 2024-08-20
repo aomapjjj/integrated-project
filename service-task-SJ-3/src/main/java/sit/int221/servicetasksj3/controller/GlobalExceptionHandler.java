@@ -1,7 +1,9 @@
 package sit.int221.servicetasksj3.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -9,8 +11,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import sit.int221.servicetasksj3.exceptions.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestControllerAdvice(assignableTypes = {TaskController.class, StatusController.class})
+@RestControllerAdvice
 
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // 404 - ItemNotFoundException
@@ -29,15 +32,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return createErrorResponse("Validation error. Check 'errors' field for details. taskForCreateOrUpdate", HttpStatus.BAD_REQUEST, request, exception.getErrors());
     }
     // 401 - UnauthorizeException
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception, WebRequest request) {
-        return createErrorResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED, request);
-    }
-
+//    @ExceptionHandler(UnauthorizedException.class)
+//    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception, WebRequest request) {
+//        return createErrorResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED, request);
+//    }
+    // Helper method for creating standard error responses (ErrorResponse)
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message, request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(httpStatus).body(errorResponse);
     }
+    // Helper method for creating validation error responses (ErrorDetails)
     private ResponseEntity<ErrorDetails> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request, List<ErrorDetails.ValidationError> errors) {
         ErrorDetails errorDetails = new ErrorDetails();
             errorDetails.setStatus(httpStatus.value());
