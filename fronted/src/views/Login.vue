@@ -21,14 +21,11 @@ onMounted(async () => {
     console.log(users)
 })
 
-// disabled btn sing in
 
-// Validate username
 const isValidUsername = computed(() => {
   return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
 })
 
-// Validate password
 const isValidPassword = computed(() => {
   return passwordInput.value && passwordInput.value.length > 0 && passwordInput.value.length <= 14
 })
@@ -43,7 +40,12 @@ const openHomePage = () => {
   console.log(userStore.getUser());   
   router.push({ name: 'TaskList' });
 };
-
+const showAlert = () => {
+  alertLogin.value = true;
+  setTimeout(() => {
+    alertLogin.value = false;
+  }, 2000); 
+};
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
@@ -66,24 +68,24 @@ const submitForm = async () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${data.access_token}`, // Sending token in the Authorization header
+          'Authorization': `Bearer ${data.access_token}`, 
         },
       });
 
       if (validateResponse.status === 200) {
-        // Token validated successfully, proceed to home page
+       
         openHomePage(); // ไปที่หน้าหลัก
       } else {
-        // Token validation failed, handle the error
-        alertLogin.value = true;
+        
+        showAlert()
       }
     } else if (response.status === 401) {
-      alertLogin.value = true;
+      showAlert()
     } else {
-      alertLogin.value = true;
+      showAlert()
     }
   } catch (error) {
-    alertLogin.value = true;
+    showAlert()
   }
 };
 
