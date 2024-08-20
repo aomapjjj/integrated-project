@@ -14,6 +14,13 @@ public class ErrorDetails {
     private String instance;
     private List<ValidationError> errors;
 
+    // Constructor for non-validation errors
+    public ErrorDetails(int status, String message, String instance) {
+        this.status = status;
+        this.message = message;
+        this.instance = instance;
+    }
+    // Inner class for validation errors
     @Data
     @RequiredArgsConstructor
     public static class ValidationError { // inner class
