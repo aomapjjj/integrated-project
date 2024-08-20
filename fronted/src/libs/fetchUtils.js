@@ -9,6 +9,8 @@ async function getItems(url) {
     console.log(`error: ${error}`)
   }
 }
+
+
 async function getItemById(id) {
   if (id > 0) {  try {
     const data = await fetch(`${baseUrlTask}/${id}`)

@@ -5,6 +5,7 @@ import { useUsers } from "../stores/storeUser"
 import { getItems } from "../libs/fetchUtils.js"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
+const baseUrlUsersvalidate = `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`
 
 
 const router = useRouter()
@@ -43,10 +44,8 @@ const openHomePage = () => {
   router.push({ name: 'TaskList' });
 };
 
-// fetch util รอเเปป
 const submitForm = async () => {
   try {
-    // Send the login request to the server
     const response = await fetch(baseUrlUsers, {
       method: 'POST',
       headers: {
@@ -58,9 +57,26 @@ const submitForm = async () => {
       }),
     });
 
-    
     if (response.status === 200) {
-      openHomePage();
+      const data = await response.json(); // ดึงข้อมูล JSON ที่ส่งกลับมา
+      console.log(data.access_token); // ใช้ข้อมูลตามต้องการ เช่น แสดงใน console
+
+      // Sending the access token to baseUrlUsersvalidate
+      const validateResponse = await fetch(baseUrlUsersvalidate, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${data.access_token}`, // Sending token in the Authorization header
+        },
+      });
+
+      if (validateResponse.status === 200) {
+        // Token validated successfully, proceed to home page
+        openHomePage(); // ไปที่หน้าหลัก
+      } else {
+        // Token validation failed, handle the error
+        alertLogin.value = true;
+      }
     } else if (response.status === 401) {
       alertLogin.value = true;
     } else {
@@ -69,7 +85,7 @@ const submitForm = async () => {
   } catch (error) {
     alertLogin.value = true;
   }
-}
+};
 
 const closeAlert = () => {
   alertLogin.value = false
