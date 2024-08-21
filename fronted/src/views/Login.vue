@@ -15,12 +15,6 @@ const passwordInput = ref('')
 
 const userStore = useUsers()
 
-onMounted(async () => {
-    const users = await getItems(baseUrlUsers)
-    userStore.addUsers(await users)
-    console.log(users)
-})
-
 
 const isValidUsername = computed(() => {
   return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
@@ -60,10 +54,9 @@ const submitForm = async () => {
     });
 
     if (response.status === 200) {
-      const data = await response.json(); // ดึงข้อมูล JSON ที่ส่งกลับมา
-      console.log(data.access_token); // ใช้ข้อมูลตามต้องการ เช่น แสดงใน console
+      const data = await response.json(); 
+      console.log(data.access_token);
 
-      // Sending the access token to baseUrlUsersvalidate
       const validateResponse = await fetch(baseUrlUsersvalidate, {
         method: 'GET',
         headers: {
