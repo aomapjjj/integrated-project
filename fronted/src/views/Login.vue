@@ -2,7 +2,6 @@
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from "../stores/storeUser"
-import { getItems } from "../libs/fetchUtils.js"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
 const baseUrlUsersvalidate = `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`
@@ -14,7 +13,6 @@ const userInput = ref('')
 const passwordInput = ref('')
 
 const userStore = useUsers()
-
 
 const isValidUsername = computed(() => {
   return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
@@ -31,15 +29,17 @@ const isFormValid = computed(() => {
 
 const openHomePage = () => {
   userStore.setUser(userInput.value); 
-  console.log(userStore.getUser());   
+  console.log(userStore.getUser());
   router.push({ name: 'TaskList' });
 };
+
 const showAlert = () => {
   alertLogin.value = true;
   setTimeout(() => {
     alertLogin.value = false;
   }, 2000); 
 };
+
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
@@ -66,7 +66,6 @@ const submitForm = async () => {
       });
 
       if (validateResponse.status === 200) {
-       
         openHomePage(); // ไปที่หน้าหลัก
       } else {
         
