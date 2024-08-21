@@ -6,6 +6,7 @@ import {
   deleteItemById,
   editLimit
 } from "../libs/fetchUtils.js"
+import { jwtDecode } from "jwt-decode";
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
@@ -22,7 +23,7 @@ const deleteComplete = ref(false)
 const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
-const displayName = ref('');
+
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -215,7 +216,7 @@ const closeLimit = () => {
                 text-align: center;
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               ">
-              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  displayName  }}</div>
+              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  userName  }}</div>
             </h1>
           </div>
         </a>
