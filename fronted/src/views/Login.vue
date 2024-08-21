@@ -12,8 +12,8 @@ const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref('')
 const passwordInput = ref('')
-
 const userStore = useUsers()
+const nameJWT = ref('')
 
 const isValidUsername = computed(() => {
   return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
@@ -29,7 +29,7 @@ const isFormValid = computed(() => {
 })
 
 const openHomePage = () => {
-  userStore.setUser(userInput.value); 
+  userStore.setUser(nameJWT.value); 
   console.log(userStore.getUser());
   router.push({ name: 'TaskList' });
 };
@@ -57,8 +57,9 @@ const submitForm = async () => {
     if (response.status === 200) {
       const data = await response.json(); 
       console.log(data.access_token);
-      const decoded = jwtDecode(data.access_token, {header: true});
-      console.log(decoded)
+      const decoded = jwtDecode(data.access_token);
+      nameJWT.value = decoded.name
+      console.log(decoded.name)
       const validateResponse = await fetch(baseUrlUsersvalidate, {
         method: 'GET',
         headers: {
