@@ -42,7 +42,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         roles.add(grantedAuthority);
 
         return new AuthUser(users.getUsername(), users.getPassword(), roles,
-                users.getOid(), users.getEmail(), users.getRole());
+                users.getName(), users.getOid(), users.getEmail(), users.getRole());
     }
 
     @Transactional
