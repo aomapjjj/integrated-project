@@ -25,12 +25,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    //Get all users
-    @Transactional
-    public List<Users> getAllUser(){
-        return userRepository.findAll();
-    }
-
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Users users = userRepository.findByUsername(userName);
