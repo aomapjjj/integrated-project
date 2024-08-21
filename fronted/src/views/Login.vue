@@ -1,4 +1,5 @@
 <script setup>
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from "../stores/storeUser"
@@ -56,7 +57,8 @@ const submitForm = async () => {
     if (response.status === 200) {
       const data = await response.json(); 
       console.log(data.access_token);
-
+      const decoded = jwtDecode(data.access_token, {header: true});
+      console.log(decoded)
       const validateResponse = await fetch(baseUrlUsersvalidate, {
         method: 'GET',
         headers: {
