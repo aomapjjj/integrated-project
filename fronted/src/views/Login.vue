@@ -167,6 +167,7 @@ const closeAlert = () => {
                   <input v-model="passwordInput" id="password" type="password" 
                     class="itbkk-password  ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Password" maxlength="14" required />
+
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ passwordInput.length }}/14
                   </p>
