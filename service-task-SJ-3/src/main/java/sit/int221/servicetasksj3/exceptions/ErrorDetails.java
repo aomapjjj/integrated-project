@@ -34,6 +34,5 @@ public class ErrorDetails {
         }
         errors.add(new ValidationError(field, message));
     }
-
 }
 

@@ -36,7 +36,7 @@ public class AuthenticationController {
     AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid  @RequestBody JwtRequestUser user) {
+    public ResponseEntity<Object> login(@Valid @RequestBody JwtRequestUser user) {
         try {
             // Authenticate the user
             Authentication authentication = authenticationManager.authenticate(
