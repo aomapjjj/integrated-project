@@ -1,76 +1,85 @@
 <script setup>
-import { jwtDecode } from "jwt-decode";
-import { useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
+import { jwtDecode } from "jwt-decode"
+import { useRouter } from "vue-router"
+import { ref, computed, onMounted } from "vue"
 import { useUsers } from "../stores/storeUser"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
-const baseUrlUsersvalidate = `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`
+const baseUrlUsersvalidate = `${
+  import.meta.env.VITE_BASE_URL_MAIN
+}/validate-token`
 
 const router = useRouter()
 const alertLogin = ref(false)
-const userInput = ref('')
-const passwordInput = ref('')
+const userInput = ref("")
+const passwordInput = ref("")
 const userStore = useUsers()
-const nameJWT = ref('')
+const nameJWT = ref("")
+const isPasswordVisible = ref(false)
 
 const isValidUsername = computed(() => {
-  return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
+  return (
+    userInput.value &&
+    userInput.value.length > 0 &&
+    userInput.value.length <= 50
+  )
 })
 
 const isValidPassword = computed(() => {
-  return passwordInput.value && passwordInput.value.length > 0 && passwordInput.value.length <= 14
+  return (
+    passwordInput.value &&
+    passwordInput.value.length > 0 &&
+    passwordInput.value.length <= 14
+  )
 })
 
 const isFormValid = computed(() => {
-  return isValidPassword.value && isValidUsername.value 
-  
+  return isValidPassword.value && isValidUsername.value
 })
 
 const openHomePage = () => {
-  userStore.setUser(nameJWT.value); 
-  console.log(userStore.getUser());
-  router.push({ name: 'TaskList' });
-};
+  userStore.setUser(nameJWT.value)
+  console.log(userStore.getUser())
+  router.push({ name: "TaskList" })
+}
 
 const showAlert = () => {
-  alertLogin.value = true;
+  alertLogin.value = true
   setTimeout(() => {
-    alertLogin.value = false;
-  }, 2000); 
-};
+    alertLogin.value = false
+  }, 2000)
+}
 
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         userName: userInput.value,
-        password: passwordInput.value,
-      }),
-    });
+        password: passwordInput.value
+      })
+    })
 
     if (response.status === 200) {
-      const data = await response.json(); 
-      console.log(data.access_token);
-      const decoded = jwtDecode(data.access_token);
+      const data = await response.json()
+      console.log(data.access_token)
+      const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name
       console.log(decoded.name)
       const validateResponse = await fetch(baseUrlUsersvalidate, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${data.access_token}`, 
-        },
-      });
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.access_token}`
+        }
+      })
 
       if (validateResponse.status === 200) {
-        openHomePage(); // ไปที่หน้าหลัก
+        openHomePage() // ไปที่หน้าหลัก
       } else {
-        
         showAlert()
       }
     } else if (response.status === 401) {
@@ -81,7 +90,7 @@ const submitForm = async () => {
   } catch (error) {
     showAlert()
   }
-};
+}
 
 const closeAlert = () => {
   alertLogin.value = false
@@ -89,7 +98,7 @@ const closeAlert = () => {
 </script>
 
 <template>
-  <div class="w-full h-screen bg-customPurple">
+  <div class="w-full h-screen bg-White">
     <div
       class="fixed top-4 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-red-100 border border-red-400 text-red-600 px-6 py-4 rounded-md shadow-lg"
       role="alert"
@@ -118,9 +127,9 @@ const closeAlert = () => {
       </button>
     </div>
 
-    <div class="flex flex-col md:flex-row min-h-screen">
-      <div class="flex-1 flex items-center justify-center p-4 lg:p-16">
-        <div class="text-center lg:text-left max-w-lg">
+    <div class="flex flex-col md:flex-row min-h-screen ">
+      <div class="flex-1 flex items-center justify-center p-4 lg:p-16 bg-gradient-to-r from-violet-400 to-purple-300">
+        <div class="text-focus-in text-center lg:text-left max-w-md">
           <div class="flex justify-center lg:justify-start">
             <img
               src="../image/logo2.png"
@@ -129,7 +138,7 @@ const closeAlert = () => {
             />
           </div>
           <h1
-            class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white text-shadowCustom border-black"
+            class=" text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white text-shadowCustom border-black"
           >
             Hi, Welcome to <br />
             Kradan Kanban
@@ -143,10 +152,13 @@ const closeAlert = () => {
       </div>
 
       <!-- Form -->
-      <div class="flex-1 flex items-center justify-center p-4 lg:p-16">
+      <div class="flex-1 flex items-center justify-center p-4 lg:p-16 bg-gradient-to-tr from-slate-50 to-gray-50" >
         <!-- Main Content Area -->
         <div class="flex-1 flex items-center justify-center">
-          <div class="w-full max-w-md rounded-lg shadow-md p-20 bg-white">
+          <div
+            id="formLogin"
+            class="w-full max-w-md rounded-lg shadow-lg p-20 bg-white scale-up-center"
+          >
             <h2 class="text-2xl font-semibold text-customPink text-center">
               Login
             </h2>
@@ -207,7 +219,7 @@ const closeAlert = () => {
                   <input
                     v-model="passwordInput"
                     id="password"
-                    type="password"
+                    :type="isPasswordVisible ? 'text' : 'password'"
                     class="itbkk-password w-full ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Password"
                     maxlength="14"
@@ -218,11 +230,13 @@ const closeAlert = () => {
                   </p>
                   <!-- eyes open -->
                   <svg
+                    v-if="isPasswordVisible"
+                    @click="isPasswordVisible = !isPasswordVisible"
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
                     height="24"
                     viewBox="0 0 1024 1024"
-                    class="absolute right-6 top-2/4 transform -translate-y-2/4 cursor-pointer"
+                    class="eye-icon absolute right-6 top-2/4 transform -translate-y-2/4 cursor-pointer"
                   >
                     <path
                       fill="#d9d9d9"
@@ -245,11 +259,13 @@ const closeAlert = () => {
                   </svg>
                   <!-- eyes close -->
                   <svg
+                    v-else
+                    @click="isPasswordVisible = !isPasswordVisible"
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
                     height="24"
                     viewBox="0 0 1024 1024"
-                    class="absolute right-6 top-2/4 transform -translate-y-2/4 cursor-pointer"
+                    class="eye-icon absolute right-6 top-2/4 transform -translate-y-2/4 cursor-pointer"
                   >
                     <path
                       fill="#d9d9d9"
@@ -302,5 +318,79 @@ const closeAlert = () => {
     </div>
   </div>
 </template>
+<style scoped>
 
-<style scoped></style>
+
+.text-focus-in {
+	-webkit-animation: text-focus-in 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+	        animation: text-focus-in 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+}
+@-webkit-keyframes text-focus-in {
+  0% {
+    -webkit-filter: blur(12px);
+            filter: blur(12px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-filter: blur(0px);
+            filter: blur(0px);
+    opacity: 1;
+  }
+}
+@keyframes text-focus-in {
+  0% {
+    -webkit-filter: blur(12px);
+            filter: blur(12px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-filter: blur(0px);
+            filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+
+
+.eye-icon {
+  display: inline-block;
+}
+
+
+@media (max-width: 640px) {
+  .eye-icon {
+    display: none;
+  }
+
+
+}
+
+
+@-webkit-keyframes scale-up-center {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-up-center {
+  0% {
+    -webkit-transform: scale(0.5);
+    transform: scale(0.5);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+.scale-up-center {
+  -webkit-animation: scale-up-center 0.7s cubic-bezier(0.39, 0.575, 0.565, 1)
+    both;
+  animation: scale-up-center 0.7s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+</style>
