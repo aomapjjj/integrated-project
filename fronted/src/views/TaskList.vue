@@ -6,11 +6,12 @@ import {
   deleteItemById,
   editLimit
 } from "../libs/fetchUtils.js"
+import { jwtDecode } from "jwt-decode";
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
 import { useLimitStore } from "../stores/storeLimit"
-import { useUsers } from "../stores/storeUser"
+import { useUsers } from "@/stores/storeUser"
 import { useTasks } from "../stores/store"
 import { useRoute, useRouter } from "vue-router"
 
@@ -22,7 +23,7 @@ const deleteComplete = ref(false)
 const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
-const displayName = ref('');
+
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -30,31 +31,16 @@ const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
 const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN
   }/statuses/maximumtask`
 
-const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
-
-
-
 const taskStore = useTasks()
 const limitStore = useLimitStore()
-const userStore = useUsers();
+const userStore = useUsers()
+
+const userName = userStore.getUser().username
 
 
 let items = []
 
-const findNameByUsername = (users, targetUsername) => {
-  const user = users.find(user => user.username === targetUsername);
-  return user ? user.name : null;
-};
-  
 onMounted(async () => {
-  const users = await getItems(baseUrlUsers);
-  userStore.addUsers(users);
-  console.log(users);
-  const targetUsername = userStore.getUser().username;
-  const name = findNameByUsername(users, targetUsername);
-  displayName.value = name;
-
-
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
@@ -231,7 +217,7 @@ const closeLimit = () => {
                 text-align: center;
                 text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
               ">
-              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  displayName  }}</div>
+              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  userName  }}</div>
             </h1>
           </div>
         </a>

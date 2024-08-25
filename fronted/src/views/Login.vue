@@ -1,87 +1,76 @@
 <script setup>
+import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '../stores/storeUser'
-import { getItems } from '../libs/fetchUtils.js'
+import { useUsers } from "../stores/storeUser"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
-const baseUrlUsersvalidate = `${
-  import.meta.env.VITE_BASE_URL_MAIN
-}/validate-token`
+const baseUrlUsersvalidate = `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`
 
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref('')
 const passwordInput = ref('')
-
 const userStore = useUsers()
-
-onMounted(async () => {
-  const users = await getItems(baseUrlUsers)
-  userStore.addUsers(await users)
-  console.log(users)
-})
+const nameJWT = ref('')
 
 const isValidUsername = computed(() => {
-  return (
-    userInput.value &&
-    userInput.value.length > 0 &&
-    userInput.value.length <= 50
-  )
+  return userInput.value && userInput.value.length > 0 && userInput.value.length <= 50
 })
 
 const isValidPassword = computed(() => {
-  return (
-    passwordInput.value &&
-    passwordInput.value.length > 0 &&
-    passwordInput.value.length <= 14
-  )
+  return passwordInput.value && passwordInput.value.length > 0 && passwordInput.value.length <= 14
 })
 
 const isFormValid = computed(() => {
-  return isValidPassword.value && isValidUsername.value
+  return isValidPassword.value && isValidUsername.value 
+  
 })
 
 const openHomePage = () => {
-  userStore.setUser(userInput.value)
-  console.log(userStore.getUser())
-  router.push({ name: 'TaskList' })
-}
+  userStore.setUser(nameJWT.value); 
+  console.log(userStore.getUser());
+  router.push({ name: 'TaskList' });
+};
+
 const showAlert = () => {
-  alertLogin.value = true
+  alertLogin.value = true;
   setTimeout(() => {
-    alertLogin.value = false
-  }, 2000)
-}
+    alertLogin.value = false;
+  }, 2000); 
+};
+
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         userName: userInput.value,
-        password: passwordInput.value
-      })
-    })
+        password: passwordInput.value,
+      }),
+    });
 
     if (response.status === 200) {
-      const data = await response.json() // ดึงข้อมูล JSON ที่ส่งกลับมา
-      console.log(data.access_token) // ใช้ข้อมูลตามต้องการ เช่น แสดงใน console
-
-      // Sending the access token to baseUrlUsersvalidate
+      const data = await response.json(); 
+      console.log(data.access_token);
+      const decoded = jwtDecode(data.access_token);
+      nameJWT.value = decoded.name
+      console.log(decoded.name)
       const validateResponse = await fetch(baseUrlUsersvalidate, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${data.access_token}`
-        }
-      })
+          'Authorization': `Bearer ${data.access_token}`, 
+        },
+      });
 
       if (validateResponse.status === 200) {
-        openHomePage() // ไปที่หน้าหลัก
+        openHomePage(); // ไปที่หน้าหลัก
       } else {
+        
         showAlert()
       }
     } else if (response.status === 401) {
@@ -92,7 +81,7 @@ const submitForm = async () => {
   } catch (error) {
     showAlert()
   }
-}
+};
 
 const closeAlert = () => {
   alertLogin.value = false
