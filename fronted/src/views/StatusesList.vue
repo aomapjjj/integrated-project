@@ -12,6 +12,8 @@ import { useStatuses } from "../stores/storeStatus"
 import { useRoute, useRouter } from "vue-router"
 import { useLimitStore } from '../stores/storeLimit';
 import { useTasks } from '../stores/store';
+import { useUsers } from '@/stores/storeUser'
+const userStore = useUsers()
 
 const route = useRoute()
 const router = useRouter()
@@ -39,6 +41,7 @@ const errorTrans = ref(false)
 const myStatuses = useStatuses()
 const limitStore = useLimitStore()
 const taskStore = useTasks()
+const token = localStorage.getItem("access_token");
 
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 
@@ -61,6 +64,7 @@ const todo = ref({
 })
 
 onMounted(async () => {
+  userStore.setToken(token)
   if (myStatuses.getStatuses().length === 0) {
     const items = await getItems(baseUrlStatus)
     myStatuses.addStatuses(await items)

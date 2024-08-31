@@ -6,7 +6,6 @@ import {
   deleteItemById,
   editLimit
 } from '../libs/fetchUtils.js'
-import { jwtDecode } from 'jwt-decode'
 import TaskDetail from '../views/TaskDetail.vue'
 import AddTask from '../views/AddTask.vue'
 import EditTask from '../views/EditTask.vue'
@@ -37,10 +36,12 @@ const limitStore = useLimitStore()
 const userStore = useUsers()
 
 const userName = userStore.getUser().username
+const token = localStorage.getItem("access_token");
 
 let items = []
 
 onMounted(async () => {
+  userStore.setToken(token)
   if (taskStore.getTasks().length === 0) {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
@@ -206,7 +207,6 @@ const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
 }
 
-console.log('fsesef')
 </script>
 
 <template>
