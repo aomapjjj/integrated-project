@@ -1,6 +1,6 @@
 <script setup>
 import { jwtDecode } from "jwt-decode"
-import { useRouter } from "vue-router"
+import { useRouter, useRoute } from "vue-router"
 import { ref, computed, onMounted } from "vue"
 import { useUsers } from "../stores/storeUser"
 
@@ -9,6 +9,7 @@ const baseUrlUsersvalidate = `${
   import.meta.env.VITE_BASE_URL_MAIN
 }/validate-token`
 
+const route = useRoute()
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref("")
@@ -55,46 +56,73 @@ const submitForm = async () => {
     const response = await fetch(baseUrlUsers, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         userName: userInput.value,
-        password: passwordInput.value
-      })
-    })
+        password: passwordInput.value,
+      }),
+    });
 
     if (response.status === 200) {
-      const data = await response.json()
-      console.log(data.access_token)
-      const decoded = jwtDecode(data.access_token)
-      nameJWT.value = decoded.name
-      console.log(decoded.name)
+      const data = await response.json();
+      const decoded = jwtDecode(data.access_token);
+      nameJWT.value = decoded.name;
+
       const validateResponse = await fetch(baseUrlUsersvalidate, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${data.access_token}`
-        }
-      })
+          Authorization: `Bearer ${data.access_token}`,
+        },
+      });
 
       if (validateResponse.status === 200) {
-        openHomePage() // ไปที่หน้าหลัก
+        openHomePage(); // ไปที่หน้าหลัก
+      } else if (validateResponse.status === 401) {
+        handleUnauthorized();
       } else {
-        showAlert()
+        showAlert();
       }
     } else if (response.status === 401) {
-      showAlert()
+      handleUnauthorized();
     } else {
-      showAlert()
+      showAlert();
     }
   } catch (error) {
-    showAlert()
+    showAlert();
   }
-}
+};
+
+const handleUnauthorized = () => {
+  userStore.setUser(null); 
+  router.push({ name: 'Login' }); 
+  showAlert();
+};
 
 const closeAlert = () => {
   alertLogin.value = false
 }
+
+router.beforeEach(async (to, from, next) => {
+  try {
+    const validateResponse = await fetch(baseUrlUsersvalidate, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userStore.getUserToken()}`, 
+      },
+    });
+
+    if (validateResponse.status === 401) {
+      handleUnauthorized(); 
+    } else {
+      next(); 
+    }
+  } catch (error) {
+    handleUnauthorized(); 
+  }
+});
 </script>
 
 <template>
