@@ -4,20 +4,19 @@ import { ref } from "vue"
 const useUsers = defineStore("users", () => {
   const users = ref([])
   const user = ref({ username: "" })
-  const name = ref({ name: "" })
+  const token = ref("")
 
-  const setName = (name) => {
-    name.value = { name : name }
-    localStorage.setItem("name", JSON.stringify(name.value))
+  const setToken = (newToken) => {
+    token.value = newToken
+    localStorage.setItem("token", JSON.stringify(token.value))
   }
-
-
-
   
+  const getToken = (token) => {
+    return token.value
+  }
   if (localStorage.getItem("user")) {
     user.value = JSON.parse(localStorage.getItem("user"))
   }
-
 
   const getUser = () => {
     return user.value
@@ -38,7 +37,10 @@ const useUsers = defineStore("users", () => {
   return {
     removeUser,
     setUser,
-    getUser
+    getUser,
+    setToken,
+    token,
+    getToken
   }
 })
 

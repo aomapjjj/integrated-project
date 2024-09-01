@@ -1,105 +1,127 @@
-let baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
+// Utility function to get the token from localStorage
+function getToken() {
+  return localStorage.getItem("access_token");
+}
 
 async function getItems(url) {
+  const token = getToken();
   try {
-    const data = await fetch(`${url}`) 
-    const items = await data.json()
-    return items
+    const response = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const items = await response.json();
+    return items;
   } catch (error) {
-    console.log(`error: ${error}`)
+    console.log(`error: ${error}`);
   }
 }
 
-
 async function getItemById(id) {
-  if (id > 0) {  try {
-    const data = await fetch(`${baseUrlTask}/${id}`)
-    return data
-  } catch (error) {
-    console.log(`error: ${error}`)
-  }}
+  const token = getToken();
+  if (id > 0) {
+    try {
+      const response = await fetch(`${baseUrlTask}/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const item = await response.json();
+      return item;
+    } catch (error) {
+      console.log(`error: ${error}`);
+    }
+  }
 }
 
 async function deleteItemById(url, id) {
+  const token = getToken();
   try {
-    const res = await fetch(`${url}/${id}`, {
-      method: "DELETE"
-    })
-    return res.status
+    const response = await fetch(`${url}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    return response.status;
   } catch (error) {
-    console.log(`error: ${error}`)
+    console.log(`error: ${error}`);
   }
 }
 
 async function deleteItemAndTransfer(url, id, newid) {
+  const token = getToken();
   try {
-    const res = await fetch(`${url}/${id}/${newid}`, {
-      method: "DELETE"
-    })
-    return res.status
+    const response = await fetch(`${url}/${id}/${newid}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    return response.status;
   } catch (error) {
-    console.log(`error: ${error}`)
+    console.log(`error: ${error}`);
   }
 }
 
 async function addItem(url, newItem) {
+  const token = getToken();
   try {
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        "content-type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({
-        ...newItem
-      })
-    })
-    const addedItem = await res.json()
-    return addedItem
+      body: JSON.stringify({ ...newItem })
+    });
+    const addedItem = await response.json();
+    return addedItem;
   } catch (error) {
-    console.log(`error: ${error}`)
+    console.log(`error: ${error}`);
   }
 }
 
 async function editItem(url, id, editItem) {
+  const token = getToken();
   try {
-    const res = await fetch(`${url}/${id}`, {
+    const response = await fetch(`${url}/${id}`, {
       method: "PUT",
       headers: {
-        "content-type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({
-        ...editItem
-      })
-    })
-    const editedItem = await res.json()
-    return editedItem
-
+      body: JSON.stringify({ ...editItem })
+    });
+    const editedItem = await response.json();
+    return editedItem;
   } catch (error) {
-    console.log(`error: ${error}`)
+    console.log(`error: ${error}`);
   }
 }
 
 async function editLimit(baseUrlLimit, maximumTask, isLimit) {
+  const token = getToken();
   try {
-    const res = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
+    const response = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       }
     });
 
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const editedItem = await res.json();
+    const editedItem = await response.json();
     return editedItem;
   } catch (error) {
     console.log(`Error: ${error.message}`);
   }
-  
 }
-
 
 export {
   getItems,
