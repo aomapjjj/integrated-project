@@ -1,14 +1,11 @@
 <script setup>
 import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
-import { ref, computed, onMounted } from "vue"
+import { ref, computed } from "vue"
 import { useUsers } from "../stores/storeUser"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
-const baseUrlUsersvalidate = `${import.meta.env.VITE_BASE_URL_MAIN
-  }/validate-token`
 
-const route = useRoute()
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref("")
