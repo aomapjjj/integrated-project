@@ -27,9 +27,8 @@ const sidebarTasks = ref(true)
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
 const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
-const baseUrlLimitMax = `${
-  import.meta.env.VITE_BASE_URL_MAIN
-}/statuses/maximumtask`
+const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN
+  }/statuses/maximumtask`
 
 const taskStore = useTasks()
 const limitStore = useLimitStore()
@@ -218,48 +217,24 @@ const toggleSidebar = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <aside
-        id="sidebar"
-        v-if="sidebarTasks"
-        class="w-64 bg-gray-100 shadow-lg transition-transform transform translate-x-0"
-      >
+      <aside id="sidebar" v-if="sidebarTasks"
+        class="w-64 bg-gray-100 shadow-lg transition-transform transform translate-x-0">
         <div class="p-6">
-          <img
-            src="/src/image/sj3.png"
-            alt="LOGO"
-            class="w-24 h-24 mx-auto"
-          />
+          <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
           <h2 class="text-xl text-center font-bold mt-4">Kradan Kanban</h2>
           <nav class="mt-6">
             <ul>
               <li class="my-3">
-                <a
-                  href="#"
-                  class="flex items-center text-gray-700 hover:bg-gray-200 hover:text-blue-500 transition duration-200 rounded-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
+                <a href="#"
+                  class="flex items-center text-gray-700 hover:bg-gray-200 hover:text-blue-500 transition duration-200 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <g fill="none">
-                      <path
-                        fill="#d9d9d9"
-                        fill-opacity=".25"
-                        d="M16 16H8.415c-1.184 0-1.776 0-2.299.202q-.412.16-.76.43c-.442.344-.747.852-1.356 1.868V7c0-1.886 0-2.828.586-3.414S6.114 3 8 3h8c1.886 0 2.828 0 3.414.586S20 5.114 20 7v5c0 1.886 0 2.828-.586 3.414S17.886 16 16 16"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-width="1.2"
-                        d="M20 12v5c0 1.886 0 2.828-.586 3.414S17.886 21 16 21H6.5a2.5 2.5 0 0 1 0-5H16c1.886 0 2.828 0 3.414-.586S20 13.886 20 12V7c0-1.886 0-2.828-.586-3.414S17.886 3 16 3H8c-1.886 0-2.828 0-3.414.586S4 5.114 4 7v11.5"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-linecap="round"
-                        stroke-width="1.2"
-                        d="m9 10l1.293 1.293a1 1 0 0 0 1.414 0L15 8"
-                      />
+                      <path fill="#d9d9d9" fill-opacity=".25"
+                        d="M16 16H8.415c-1.184 0-1.776 0-2.299.202q-.412.16-.76.43c-.442.344-.747.852-1.356 1.868V7c0-1.886 0-2.828.586-3.414S6.114 3 8 3h8c1.886 0 2.828 0 3.414.586S20 5.114 20 7v5c0 1.886 0 2.828-.586 3.414S17.886 16 16 16" />
+                      <path stroke="#d9d9d9" stroke-width="1.2"
+                        d="M20 12v5c0 1.886 0 2.828-.586 3.414S17.886 21 16 21H6.5a2.5 2.5 0 0 1 0-5H16c1.886 0 2.828 0 3.414-.586S20 13.886 20 12V7c0-1.886 0-2.828-.586-3.414S17.886 3 16 3H8c-1.886 0-2.828 0-3.414.586S4 5.114 4 7v11.5" />
+                      <path stroke="#d9d9d9" stroke-linecap="round" stroke-width="1.2"
+                        d="m9 10l1.293 1.293a1 1 0 0 0 1.414 0L15 8" />
                     </g>
                   </svg>
 
@@ -274,48 +249,24 @@ const toggleSidebar = () => {
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <nav
-          class="bg-white shadow px-4 py-6 flex justify-between items-center"
-          style="background-color: #d8f1f1"
-        >
+        <nav class="bg-white shadow px-4 py-6 flex justify-between items-center" style="background-color: #d8f1f1">
           <label class="btn btn-circle swap swap-rotate">
             <input id="sidebarToggle" type="checkbox" />
 
             <!-- hamburger icon -->
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              v-if="!sidebarTasks"
-              @click="toggleSidebar"
-            >
-              <path
-                fill="#F785B1"
-                d="M20 10.75H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0-4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 8H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" v-if="!sidebarTasks"
+              @click="toggleSidebar">
+              <path fill="#F785B1"
+                d="M20 10.75H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0-4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 8H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5" />
             </svg>
             <!-- close icon -->
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              v-if="sidebarTasks"
-              @click="toggleSidebar"
-            >
-              <path
-                fill="#F785B1"
-                stroke="#d9d9d9"
-                stroke-linecap="round"
-                d="M12 21a9 9 0 1 1 0-18a9 9 0 0 1 0 18zM9 9l6 6m0-6l-6 6"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" v-if="sidebarTasks"
+              @click="toggleSidebar">
+              <path fill="#F785B1" stroke="#d9d9d9" stroke-linecap="round"
+                d="M12 21a9 9 0 1 1 0-18a9 9 0 0 1 0 18zM9 9l6 6m0-6l-6 6" />
             </svg>
           </label>
-          <div
-            class="text-2xl font-bold tracking-tight"
-            style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
-          >
+          <div class="text-2xl font-bold tracking-tight" style="color: #9391e4; text-shadow: 0 0 5px #ffffff">
             IT-Bangmod Kradan Kanban
           </div>
 
@@ -323,34 +274,40 @@ const toggleSidebar = () => {
             Welcome,
             <span class="itbkk-fullname flex font-bold">{{ userName }}</span>
           </h2>
+          <button class="btn bg-gray-200" style="
+                    color: white;
+                    background-color: #ff0000; 
+                    border-radius: 20px; 
+                    padding: 8px 16px; 
+                    font-size: 14px; 
+                    text-align: center; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                  " @click="clearToken()">
+                  
+                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2" width="16" height="16" viewBox="0 0 24 24">
+                      <path d="M17 16l4-4m0 0l-4-4m4 4H7m10-4H3m10 8h6a2 2 0 0 0 2-2v-6m-2-2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h6" />
+                    </svg>
+                  
+                  Logout
+</button>
+
+
+
         </nav>
 
         <div class="flex mt-9 mx-auto ml-[100px]">
           <!-- LIMIT -->
-          <button
-            class="itbkk-status-setting btn mr-2 mt-1"
-            style="border-radius: 30px; background-color: #aff3c9"
-            onclick="my_modal_limit.showModal()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                fill="white"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z"
-              />
+          <button class="itbkk-status-setting btn mr-2 mt-1" style="border-radius: 30px; background-color: #aff3c9"
+            onclick="my_modal_limit.showModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
+              <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z" />
             </svg>
           </button>
-          <dialog
-            id="my_modal_limit"
-            class="modal modal-bottom sm:modal-middle"
-          >
+          <dialog id="my_modal_limit" class="modal modal-bottom sm:modal-middle">
             <div class="modal-box" style="max-width: 400px">
               <h3 class="font-bold text-lg" style="color: #9391e4">
                 Status Settings
@@ -358,53 +315,30 @@ const toggleSidebar = () => {
               <p class="py-4">
                 User can limit the number of tasks in status by setting the
                 Maximum task in each status
-                <br /><span style="color: #eb4343"
-                  >( except "No Status" and "Done" statuses )</span
-                >
+                <br /><span style="color: #eb4343">( except "No Status" and "Done" statuses )</span>
               </p>
               <div class="flex items-center mt-4">
                 <span class="mr-2">Limit tasks in this status</span>
 
-                <input
-                  type="checkbox"
-                  class="toggle"
-                  v-model="limitStore.getLimit().isLimit"
-                />
+                <input type="checkbox" class="toggle" v-model="limitStore.getLimit().isLimit" />
               </div>
 
-              <div
-                v-if="limitStore.getLimit().isLimit"
-                class="mt-4 flex flex-col items-center"
-              >
+              <div v-if="limitStore.getLimit().isLimit" class="mt-4 flex flex-col items-center">
                 <div class="flex items-center justify-center">
-                  <label for="status-limit" class="mr-2"
-                    >Set maximum tasks</label
-                  >
+                  <label for="status-limit" class="mr-2">Set maximum tasks</label>
                 </div>
 
-                <input
-                  type="number"
-                  id="status-limit"
-                  class="input input-bordered input-centered"
-                  v-model.number="limitStore.getLimit().maximumTask"
-                  max="10"
-                  min="1"
-                />
+                <input type="number" id="status-limit" class="input input-bordered input-centered"
+                  v-model.number="limitStore.getLimit().maximumTask" max="10" min="1" />
               </div>
 
               <div class="modal-action">
                 <form method="dialog">
-                  <button
-                    class="btn mr-2 bg-green-400 text-w"
-                    @click="UpdateLimit"
-                  >
+                  <button class="btn mr-2 bg-green-400 text-w" @click="UpdateLimit">
                     Confirm
                   </button>
 
-                  <button
-                    class="btn mr-2 bg-grey-400 text-w"
-                    @click="closeLimit()"
-                  >
+                  <button class="btn mr-2 bg-grey-400 text-w" @click="closeLimit()">
                     Close
                   </button>
                 </form>
@@ -413,23 +347,10 @@ const toggleSidebar = () => {
           </dialog>
           <!-- FILTER -->
           <details class="dropdown">
-            <summary
-              class="itbkk-status-filter m-1 btn"
-              style="border-radius: 30px"
-            >
+            <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
               <button>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <g
-                    fill="#9FC3E9"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
+                  <g fill="#9FC3E9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="2" cy="2" r="1.5" />
                     <path d="M3.5 2h10" />
                     <circle cx="7" cy="7" r="1.5" />
@@ -442,23 +363,10 @@ const toggleSidebar = () => {
               Filter
             </summary>
 
-            <ul
-              class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
-            >
-              <li
-                v-for="status in statusList"
-                :key="status.name"
-                class="flex items-center"
-              >
-                <label
-                  class="itbkk-status-choice flex items-center space-x-2 w-full"
-                >
-                  <input
-                    type="checkbox"
-                    :value="status.name"
-                    v-model="filter"
-                    class="mr-2"
-                  />
+            <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+              <li v-for="status in statusList" :key="status.name" class="flex items-center">
+                <label class="itbkk-status-choice flex items-center space-x-2 w-full">
+                  <input type="checkbox" :value="status.name" v-model="filter" class="mr-2" />
                   <span class="itbkk-status-choice">{{ status.name }}</span>
                 </label>
               </li>
@@ -466,17 +374,11 @@ const toggleSidebar = () => {
           </details>
 
           <div class="selected-filters flex flex-wrap mt-2">
-            <div
-              v-for="status in filter"
-              :key="status"
+            <div v-for="status in filter" :key="status"
               class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
-              style="background-color: rgb(247, 133, 177)"
-            >
+              style="background-color: rgb(247, 133, 177)">
               <span>{{ status }}</span>
-              <button
-                @click="removeStatus(status)"
-                class="ml-2 text-gray-900 hover:text-white"
-              >
+              <button @click="removeStatus(status)" class="ml-2 text-gray-900 hover:text-white">
                 &times;
               </button>
             </div>
@@ -489,67 +391,20 @@ const toggleSidebar = () => {
                 <!-- ADD BUTTON -->
                 <AddTask />
                 <!-- MANAGE STATUS -->
-                <button
-                  class="itbkk-manage-status btn bg-gray-200"
-                  style="
+                <button class="itbkk-manage-status btn bg-gray-200" style="
                     color: white;
                     background-color: #f785b1;
                     border-radius: 30px;
-                  "
-                  @click="openNewStatus()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
-                    <g
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                    >
+                  " @click="openNewStatus()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2">
                       <path
-                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
-                      />
+                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1" />
                       <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
                     </g>
                   </svg>
                   Manage Status
-                </button>
-
-
-                <button
-                  class="btn bg-gray-200"
-                  style="
-                    color: white;
-                    background-color: #f785b1;
-                    border-radius: 30px;
-                  "
-                  @click="clearToken()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
-                    <g
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
-                      />
-                      <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
-                    </g>
-                  </svg>
-                  Log out
                 </button>
               </div>
             </div>
@@ -563,106 +418,66 @@ const toggleSidebar = () => {
                 <!-- TABLE -->
                 <thead>
                   <tr class="bg-base-200 mt-4 md:mt-0">
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       No.
                     </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       Title
                     </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       Assignees
                     </th>
 
                     <!-- STATUS SORT -->
 
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
-                      <button
-                        class="itbkk-status-sort"
-                        style="display: flex; align-items: center"
-                        @click="sortByStatus(), toggleIcon()"
-                      >
+                      ">
+                      <button class="itbkk-status-sort" style="display: flex; align-items: center"
+                        @click="sortByStatus(), toggleIcon()">
                         <div class="mr-2">Status</div>
                         <!-- Default -->
-                        <svg
-                          v-if="showIcon === 'default'"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-if="showIcon === 'default'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                          viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="currentColor"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
-                            />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                            <path fill="currentColor"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
                           </g>
                         </svg>
                         <!-- Asc -->
-                        <svg
-                          v-else-if="showIcon === 'asc'"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-else-if="showIcon === 'asc'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                          viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="#eb4343"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
-                            />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                            <path fill="#eb4343"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
                           </g>
                         </svg>
 
                         <!-- Des -->
-                        <svg
-                          v-else
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="#4361ee"
-                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z"
-                            />
+                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
+                            <path fill="#4361ee"
+                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z" />
                           </g>
                         </svg>
                       </button>
@@ -670,16 +485,13 @@ const toggleSidebar = () => {
 
                     <!-- STATUS SORT -->
 
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
                         text-align: center;
                         vertical-align: middle;
-                      "
-                    >
+                      ">
                       Action
                     </th>
                   </tr>
@@ -687,88 +499,53 @@ const toggleSidebar = () => {
                 <tbody>
                   <!-- Iterate over todoList -->
                   <TaskDetail :todo-id="selectedTodoId" />
-                  <tr
-                    class="itbkk-item"
-                    v-for="(item, index) in filteredTasks"
-                    :key="index"
-                  >
-                    <td
-                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
+                  <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
+                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
                       {{ index + 1 }}
                     </td>
-                    <td
-                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <label
-                        for="my_modal_6"
-                        @click="selectTodo(item.id)"
-                        style="display: block; width: 100%; height: 100%"
-                      >
+                    <td class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                      <label for="my_modal_6" @click="selectTodo(item.id)"
+                        style="display: block; width: 100%; height: 100%">
                         {{ item.title }}
                       </label>
                     </td>
-                    <td
-                      class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                      :class="{
-                        italic: !item.assignees || item.assignees.length === 0
-                      }"
-                    >
+                    <td class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700" :class="{
+        italic: !item.assignees || item.assignees.length === 0
+      }">
                       {{
-                        !item.assignees || item.assignees.length === 0
-                          ? 'Unassigned'
-                          : item.assignees
-                      }}
+        !item.assignees || item.assignees.length === 0
+          ? 'Unassigned'
+          : item.assignees
+      }}
                     </td>
-                    <td
-                      class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <span
-                        :class="{
-                          'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                          'border-blue-500 text-blue-500':
-                            item.status === 'No Status',
-                          'border-red-500 text-red-500':
-                            item.status === 'To Do',
-                          'border-yellow-500 text-yellow-500':
-                            item.status === 'Doing',
-                          'border-green-500 text-green-500':
-                            item.status === 'Done'
-                        }"
-                      >
+                    <td class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                      <span :class="{
+          'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+          'border-blue-500 text-blue-500':
+            item.status === 'No Status',
+          'border-red-500 text-red-500':
+            item.status === 'To Do',
+          'border-yellow-500 text-yellow-500':
+            item.status === 'Doing',
+          'border-green-500 text-green-500':
+            item.status === 'Done'
+        }">
                         {{ item.status }}
                       </span>
                     </td>
 
                     <div class="itbkk-button-action">
                       <td style="display: flex; justify-content: center">
-                        <div
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2"
-                        >
-                          <div
-                            v-if="index !== 0 && index !== 1"
-                            class="dropdown dropdown-top dropdown-end"
-                          >
+                        <div class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2">
+                          <div v-if="index !== 0 && index !== 1" class="dropdown dropdown-top dropdown-end">
                             <div tabindex="0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="28"
-                                height="28"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01"
-                                />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
+                                  d="M12 6h.01M12 12h.01M12 18h.01" />
                               </svg>
                             </div>
-                            <ul
-                              tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                            >
+                            <ul tabindex="0"
+                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                               <!-- EDIT -->
                               <li>
                                 <a>
@@ -779,11 +556,8 @@ const toggleSidebar = () => {
                               <!-- Delete -->
 
                               <li>
-                                <a
-                                  style="width: 150px; margin-left: 17px"
-                                  class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id, index)"
-                                  >Delete
+                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
+                                  @click="openModalToDelete(item.id, index)">Delete
                                 </a>
                               </li>
                             </ul>
@@ -791,31 +565,17 @@ const toggleSidebar = () => {
                         </div>
 
                         <!-- Dropdown  -->
-                        <div
-                          v-if="index === 0 || index === 1"
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8"
-                        >
+                        <div v-if="index === 0 || index === 1"
+                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8">
                           <div class="dropdown dropdown-end">
                             <div tabindex="0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="28"
-                                height="28"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01"
-                                />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
+                                  d="M12 6h.01M12 12h.01M12 18h.01" />
                               </svg>
                             </div>
-                            <ul
-                              tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                            >
+                            <ul tabindex="0"
+                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                               <!-- EDIT -->
                               <li>
                                 <a>
@@ -825,12 +585,8 @@ const toggleSidebar = () => {
 
                               <!-- Delete -->
                               <li>
-                                <a
-                                  style="width: 150px; margin-left: 17px"
-                                  class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id)"
-                                  >Delete</a
-                                >
+                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
+                                  @click="openModalToDelete(item.id)">Delete</a>
                               </li>
                             </ul>
                           </div>
@@ -839,28 +595,19 @@ const toggleSidebar = () => {
                         <dialog id="my_modal_delete" class="modal">
                           <div class="modal-box" style="max-width: 500px">
                             <h3 class="font-bold text-lg">Delete a Task</h3>
-                            <p
-                              class="itbkk-message py-4 font-medium"
-                              style="word-wrap: break-word"
-                            >
+                            <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
                               Do you want to delete the task number
                               {{ selectedItemIdToDelete }} - "{{
-                                filterAndLogTitleById(selectedItemIdToDelete)
-                              }}"?
+        filterAndLogTitleById(selectedItemIdToDelete)
+      }}"?
                             </p>
                             <form method="dialog">
                               <div class="modal-action">
-                                <button
-                                  class="itbkk-button-cancel btn"
-                                  style="color: #eb4343"
-                                >
+                                <button class="itbkk-button-cancel btn" style="color: #eb4343">
                                   Cancel
                                 </button>
-                                <button
-                                  class="itbkk-button-confirm btn bg-green-400"
-                                  style="color: #fff"
-                                  @click="confirmDelete()"
-                                >
+                                <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff"
+                                  @click="confirmDelete()">
                                   Confirm
                                 </button>
                               </div>
@@ -872,10 +619,7 @@ const toggleSidebar = () => {
                       </td>
                     </div>
                   </tr>
-                  <tr
-                    class="bg-base-100 mt-4 md:mt-0"
-                    v-if="filteredTasks?.length === 0"
-                  >
+                  <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0">
                     <td colspan="5" class="text-center py-4 text-gray-400">
                       No task
                     </td>
@@ -885,11 +629,7 @@ const toggleSidebar = () => {
             </div>
             <!-- DELETE COMPLETE -->
 
-            <div
-              role="alert"
-              class="alert shadow-lg"
-              v-show="deleteComplete"
-              style="
+            <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
                 position: fixed;
                 top: 20px;
                 left: 50%;
@@ -898,20 +638,11 @@ const toggleSidebar = () => {
                 width: 500px;
                 color: rgb(74 222 128 / var(--tw-text-opacity));
                 animation: fadeInOut 1.5s infinite;
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              ">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
                 <h2 class="itbkk-message font-bold text-green-400">
