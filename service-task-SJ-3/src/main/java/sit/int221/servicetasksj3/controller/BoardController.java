@@ -12,7 +12,7 @@ import sit.int221.servicetasksj3.services.BoardService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v3/boards")
+@RequestMapping("/boards")
 public class BoardController {
     @Autowired
     private BoardService boardService;
