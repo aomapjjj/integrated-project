@@ -67,7 +67,7 @@ public class BoardService {
         boardResponse.setOwner(ownerDTO);
         return boardResponse;
     }
-    
+
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
         AuthUser currentUser = sit.int221.servicetasksj3.utils.SecurityUtil.getCurrentUserDetails();
