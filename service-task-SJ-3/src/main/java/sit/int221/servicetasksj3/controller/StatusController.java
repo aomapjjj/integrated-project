@@ -34,7 +34,7 @@ public class StatusController {
     }
 
     @GetMapping("/limit")
-    public ResponseEntity<TaskLimit> getStatusesLimit(){
+    public ResponseEntity<List<TaskLimit>> getStatusesLimit(){
         return ResponseEntity.ok(service.getStatusesLimit());
     }
 

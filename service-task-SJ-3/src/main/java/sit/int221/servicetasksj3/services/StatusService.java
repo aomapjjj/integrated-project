@@ -16,6 +16,8 @@ import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,9 +45,8 @@ public class StatusService {
     }
 
     // GET STATUS LIMIT
-    public TaskLimit getStatusesLimit() {
-        return limitRepository.findById(1).orElseThrow(
-                () -> new ItemNotFoundException("NOT FOUND"));
+    public List<TaskLimit> getStatusesLimit() {
+        return limitRepository.findAll();
     }
 
     // ADD NEW STATUS
