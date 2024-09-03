@@ -49,7 +49,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 } catch (IllegalArgumentException e) {
                     throw new UnauthorizedException("Unable to get JWT Token"); //not authenticated
                 }
-
             } else {
                 throw new UnauthorizedException("JWT Token is missing or does not begin with Bearer String");
             }

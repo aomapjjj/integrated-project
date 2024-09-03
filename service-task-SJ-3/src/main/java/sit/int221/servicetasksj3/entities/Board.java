@@ -1,25 +1,30 @@
 package sit.int221.servicetasksj3.entities;
 
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.ZonedDateTime;
 
 
 @Getter
 @Setter
 @Entity
-@Table(name = "boards", schema = "kanbanIT")
+@Table(name = "boards")
 public class Board {
-
     @Id
-    @Column(name = "board_id", length = 10)
-    private String boardId;
+    @Column(name = "boardId", length = 10)
+    private String id;
 
-    @Column(name = "user_id", length = 36, nullable = false)
-    private String user_id;
+    @Column(name = "boardname", length = 50, nullable = false)
+    private String name;
 
+    @JsonIgnore
+    @Column(name = "userId", length = 50, nullable = false)
+    private String ownerId;
 
+//    @ManyToOne
+//    @JoinColumn(name = "userId", nullable = false)
+//    private Users owner;
+
+//    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+//    private List<TaskStatus> statuses;
 }
