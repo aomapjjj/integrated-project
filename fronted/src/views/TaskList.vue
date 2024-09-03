@@ -1,18 +1,19 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from "vue"
 import {
   getItemById,
   getItems,
   deleteItemById,
   editLimit
-} from '../libs/fetchUtils.js'
-import TaskDetail from '../views/TaskDetail.vue'
-import AddTask from '../views/AddTask.vue'
-import EditTask from '../views/EditTask.vue'
-import { useLimitStore } from '../stores/storeLimit'
-import { useUsers } from '@/stores/storeUser'
-import { useTasks } from '../stores/store'
-import { useRoute, useRouter } from 'vue-router'
+} from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import Board from "../views/Board.vue"
+import { useLimitStore } from "../stores/storeLimit"
+import { useUsers } from "@/stores/storeUser"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +37,7 @@ const limitStore = useLimitStore()
 const userStore = useUsers()
 
 const userName = userStore.getUser().username
-const token = localStorage.getItem("access_token");
+const token = localStorage.getItem("access_token")
 
 let items = []
 
@@ -58,7 +59,7 @@ onMounted(async () => {
   if (taskId !== undefined) {
     const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task/error')
+      router.push("/task/error")
     }
   }
   return items
@@ -80,7 +81,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: 'TaskDetail', params: { id: todoId } })
+    router.push({ name: "TaskDetail", params: { id: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -104,7 +105,7 @@ const deleteTodo = async (todoId) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById('my_modal_delete')
+  const modal = document.getElementById("my_modal_delete")
   modal.showModal()
 }
 
@@ -126,33 +127,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ''
+    return ""
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default')
-const statusSortOrder = ref('default')
+const showIcon = ref("default")
+const statusSortOrder = ref("default")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc'
-    statusSortOrder.value = 'asc'
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc'
-    statusSortOrder.value = 'desc'
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'default'
-    statusSortOrder.value = 'default'
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === 'asc') {
+  if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === 'desc') {
+  } else if (currentSortOrder === "desc") {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -182,12 +183,12 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' })
+  router.push({ name: "StatusesList" })
 }
 
 const clearToken = () => {
-  router.push({ name: 'Login' })
-  localStorage.removeItem("access_token"); // หรือ sessionStorage.removeItem("access_token");
+  router.push({ name: "Login" })
+  localStorage.removeItem("access_token") // หรือ sessionStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
@@ -195,12 +196,12 @@ const clearToken = () => {
 const updateLimitText = () => {
   if (limitStore.getLimit().isLimit) {
     return (
-      'The Kanban board now limits ' +
+      "The Kanban board now limits " +
       limitStore.getLimit().maximumTask +
-      ' tasks in each status'
+      " tasks in each status"
     )
   } else {
-    return 'The Kanban board has disabled the task limit in each status.'
+    return "The Kanban board has disabled the task limit in each status."
   }
 }
 
@@ -211,7 +212,6 @@ const closeLimit = () => {
 const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
 }
-
 </script>
 
 <template>
@@ -224,11 +224,7 @@ const toggleSidebar = () => {
         class="w-64 bg-gray-100 shadow-lg transition-transform transform translate-x-0"
       >
         <div class="p-6">
-          <img
-            src="/src/image/sj3.png"
-            alt="LOGO"
-            class="w-24 h-24 mx-auto"
-          />
+          <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
           <h2 class="text-xl text-center font-bold mt-4">Kradan Kanban</h2>
           <nav class="mt-6">
             <ul>
@@ -262,8 +258,9 @@ const toggleSidebar = () => {
                       />
                     </g>
                   </svg>
-
-                  <span class="ml-3">All Boards</span>
+                  <router-link :to="{ name: 'Board' }">
+                    <span class="ml-3">All Boards</span>
+                  </router-link>
                 </a>
               </li>
             </ul>
@@ -520,7 +517,6 @@ const toggleSidebar = () => {
                   Manage Status
                 </button>
 
-
                 <button
                   class="btn bg-gray-200"
                   style="
@@ -716,7 +712,7 @@ const toggleSidebar = () => {
                     >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? 'Unassigned'
+                          ? "Unassigned"
                           : item.assignees
                       }}
                     </td>
