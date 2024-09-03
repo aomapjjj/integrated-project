@@ -7,6 +7,7 @@ import TaskDetail from "@/views/TaskDetail.vue";
 import EditTask from "@/views/EditTask.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
+import BoardList from "@/views/BoardList.vue";
 import { useUsers } from "@/stores/storeUser";
 
 export const routes = [
@@ -68,6 +69,12 @@ export const routes = [
     name: "Board", 
     component: Board,
   },
+  {
+    path: "/board/:id",
+    name: "BoardList",
+    component: BoardList,
+  }
+  
 ];
 
 const router = createRouter({
