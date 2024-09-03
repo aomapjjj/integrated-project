@@ -22,9 +22,9 @@ const todo = ref({
 watch(
   () => props.todoId,
   async (newValue) => {
-      const response = await getItemById(newValue)
-    if (response && response.status === 200) {
-      todo.value = await response.json()
+      const {item, responsed} = await getItemById(newValue)
+    if (responsed === 200) {
+      todo.value = item
     }
   }
 )
