@@ -1,4 +1,5 @@
 // Utility function to get the token from localStorage
+
 function getToken() {
   return localStorage.getItem("access_token");
 }

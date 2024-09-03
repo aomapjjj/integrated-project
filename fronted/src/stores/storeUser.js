@@ -14,6 +14,7 @@ const useUsers = defineStore("users", () => {
   const getToken = (token) => {
     return token.value
   }
+  
   if (localStorage.getItem("user")) {
     user.value = JSON.parse(localStorage.getItem("user"))
   }
