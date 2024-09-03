@@ -1,18 +1,19 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from "vue"
 import {
   getItemById,
   getItems,
   deleteItemById,
   editLimit
-} from '../libs/fetchUtils.js'
-import TaskDetail from '../views/TaskDetail.vue'
-import AddTask from '../views/AddTask.vue'
-import EditTask from '../views/EditTask.vue'
-import { useLimitStore } from '../stores/storeLimit'
-import { useUsers } from '@/stores/storeUser'
-import { useTasks } from '../stores/store'
-import { useRoute, useRouter } from 'vue-router'
+} from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import Board from "../views/Board.vue"
+import { useLimitStore } from "../stores/storeLimit"
+import { useUsers } from "@/stores/storeUser"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +36,7 @@ const limitStore = useLimitStore()
 const userStore = useUsers()
 
 const userName = userStore.getUser().username
-const token = localStorage.getItem("access_token");
+const token = localStorage.getItem("access_token")
 
 let items = []
 
@@ -57,7 +58,7 @@ onMounted(async () => {
   if (taskId !== undefined) {
     const response = await getItemById(taskId)
     if (response.status === 404 || response.status === 400) {
-      router.push('/task/error')
+      router.push("/task/error")
     }
   }
   return items
@@ -79,7 +80,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: 'TaskDetail', params: { id: todoId } })
+    router.push({ name: "TaskDetail", params: { id: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -103,7 +104,7 @@ const deleteTodo = async (todoId) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById('my_modal_delete')
+  const modal = document.getElementById("my_modal_delete")
   modal.showModal()
 }
 
@@ -125,33 +126,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ''
+    return ""
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default')
-const statusSortOrder = ref('default')
+const showIcon = ref("default")
+const statusSortOrder = ref("default")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc'
-    statusSortOrder.value = 'asc'
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc'
-    statusSortOrder.value = 'desc'
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'default'
-    statusSortOrder.value = 'default'
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === 'asc') {
+  if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === 'desc') {
+  } else if (currentSortOrder === "desc") {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -181,12 +182,12 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' })
+  router.push({ name: "StatusesList" })
 }
 
 const clearToken = () => {
-  router.push({ name: 'Login' })
-  localStorage.removeItem("access_token"); // หรือ sessionStorage.removeItem("access_token");
+  router.push({ name: "Login" })
+  localStorage.removeItem("access_token") // หรือ sessionStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
@@ -194,12 +195,12 @@ const clearToken = () => {
 const updateLimitText = () => {
   if (limitStore.getLimit().isLimit) {
     return (
-      'The Kanban board now limits ' +
+      "The Kanban board now limits " +
       limitStore.getLimit().maximumTask +
-      ' tasks in each status'
+      " tasks in each status"
     )
   } else {
-    return 'The Kanban board has disabled the task limit in each status.'
+    return "The Kanban board has disabled the task limit in each status."
   }
 }
 
@@ -210,7 +211,6 @@ const closeLimit = () => {
 const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
 }
-
 </script>
 
 <template>
@@ -237,8 +237,9 @@ const toggleSidebar = () => {
                         d="m9 10l1.293 1.293a1 1 0 0 0 1.414 0L15 8" />
                     </g>
                   </svg>
-
-                  <span class="ml-3">All Boards</span>
+                  <router-link :to="{ name: 'Board' }">
+                    <span class="ml-3">All Boards</span>
+                  </router-link>
                 </a>
               </li>
             </ul>
@@ -406,6 +407,39 @@ const toggleSidebar = () => {
                   </svg>
                   Manage Status
                 </button>
+
+
+                <button
+                  class="btn bg-gray-200"
+                  style="
+                    color: white;
+                    background-color: #f785b1;
+                    border-radius: 30px;
+                  "
+                  @click="clearToken()"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+                      />
+                      <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
+                    </g>
+                  </svg>
+                  Log out
+                </button>
+
               </div>
             </div>
           </div>
@@ -513,10 +547,12 @@ const toggleSidebar = () => {
         italic: !item.assignees || item.assignees.length === 0
       }">
                       {{
+
         !item.assignees || item.assignees.length === 0
           ? 'Unassigned'
           : item.assignees
       }}
+
                     </td>
                     <td class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700">
                       <span :class="{

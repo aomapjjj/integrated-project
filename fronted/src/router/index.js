@@ -6,6 +6,7 @@ import StatusesList from "@/views/StatusesList.vue";
 import TaskDetail from "@/views/TaskDetail.vue";
 import EditTask from "@/views/EditTask.vue";
 import Login from "@/views/Login.vue";
+import Board from "@/views/Board.vue";
 import { useUsers } from "@/stores/storeUser";
 
 export const routes = [
@@ -61,6 +62,11 @@ export const routes = [
     path: "/login",
     name: "Login", 
     component: Login,
+  },
+  {
+    path: "/board",
+    name: "Board", 
+    component: Board,
   },
 ];
 

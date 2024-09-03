@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode"
 import { useRouter, useRoute } from "vue-router"
 import { ref, computed } from "vue"
 import { useUsers } from "../stores/storeUser"
+import Board from "../views/Board.vue"
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
 
@@ -37,7 +38,7 @@ const isFormValid = computed(() => {
 const openHomePage = () => {
   userStore.setUser(nameJWT.value)
   console.log(userStore.getUser())
-  router.push({ name: "TaskList" })
+  router.push({ name: "Board" })
 }
 
 const showAlert = () => {
