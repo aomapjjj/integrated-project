@@ -8,6 +8,7 @@ import {
   deleteItemById,
   editLimit
 } from "../libs/fetchUtils.js"
+
 const BoardsList = ref([])
 const openModalName = ref(false)
 
@@ -26,6 +27,14 @@ onMounted(async () => {
   BoardsList.value = itemsBoards
   console.log(BoardsList)
 })
+
+const toBoardsList = (boardId) => {
+  if (boardId !== null) {
+    router.push({ name: "BoardList", params: { id: boardId } })
+  }
+}
+
+
 </script>
 
 <template>
@@ -175,43 +184,42 @@ onMounted(async () => {
 
         <!------------------------- Create Board ------------------------->
         <button @click="openModalName = !openModalName">
-        <div
-          class="w-full p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-4 mt-2"
-        >
-          <div class="flex flex-col items-center relative">
-            
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-            >
-              <defs>
-                <mask id="letsIconsAddSquareDuotoneLine0">
-                  <g fill="none">
-                    <path
-                      stroke="silver"
-                      stroke-opacity=".25"
-                      d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
-                    />
-                    <path
-                      stroke="#fff"
-                      stroke-linejoin="round"
-                      d="M12 8v8m4-4H8"
-                    />
-                  </g>
-                </mask>
-              </defs>
-              <path
-                fill="#000000"
-                d="M0 0h24v24H0z"
-                mask="url(#letsIconsAddSquareDuotoneLine0)"
-              />
-            </svg>
-            <span class="itbkk-button-create mt-2">Create Board</span>
+          <div
+            class="w-full p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-4 mt-2"
+          >
+            <div class="flex flex-col items-center relative">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+              >
+                <defs>
+                  <mask id="letsIconsAddSquareDuotoneLine0">
+                    <g fill="none">
+                      <path
+                        stroke="silver"
+                        stroke-opacity=".25"
+                        d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
+                      />
+                      <path
+                        stroke="#fff"
+                        stroke-linejoin="round"
+                        d="M12 8v8m4-4H8"
+                      />
+                    </g>
+                  </mask>
+                </defs>
+                <path
+                  fill="#000000"
+                  d="M0 0h24v24H0z"
+                  mask="url(#letsIconsAddSquareDuotoneLine0)"
+                />
+              </svg>
+              <span class="itbkk-button-create mt-2">Create Board</span>
+            </div>
           </div>
-        </div>
-</button>
+        </button>
         <!------------------------- Board ------------------------->
 
         <div class="flex flex-col items-center mt-6">
@@ -241,7 +249,7 @@ onMounted(async () => {
                         scope="col"
                         class="px-12 py-3.5 text-sm font-normal text-center text-gray-500 dark:text-gray-400"
                       >
-                        Name
+                        Name Eiei
                       </th>
                       <th
                         scope="col"
@@ -271,10 +279,10 @@ onMounted(async () => {
                       <td
                         class="px-4 py-4 text-sm text-center whitespace-nowrap"
                       >
-                        <div>
-                          <h4 class="text-gray-700 dark:text-gray-200">
-                            {{ item.name }}
-                          </h4>
+                        <div @click="toBoardsList(item.id)">
+                            <h4 class="text-gray-700 dark:text-gray-200">
+                              {{ item.name }}
+                            </h4>
                         </div>
                       </td>
                       <td
@@ -293,11 +301,10 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-       
-
 
         <!------------------------- Modal ------------------------->
-        <div v-show="openModalName"
+        <div
+          v-show="openModalName"
           class="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
         >
           <div
@@ -306,32 +313,31 @@ onMounted(async () => {
             <div class="w-full">
               <div class="m-8 my-20 max-w-[400px] mx-auto">
                 <div class="mb-8">
-                  <h1 class="mb-4 text-3xl font-extrabold">
-                   New Board
-                  </h1>
-                  <input type="text" placeholder="Name" class="itbkk-board-name input input-bordered w-full max-w-s" />
+                  <h1 class="mb-4 text-3xl font-extrabold">New Board</h1>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    class="itbkk-board-name input input-bordered w-full max-w-s"
+                  />
                 </div>
                 <div class="space-y-4">
                   <button
                     class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
                   >
-                   Save
+                    Save
                   </button>
-                  <button @click="openModalName = false"
+
+                  <button
+                    @click="openModalName = false"
                     class="itbkk-button-cancel p-3 bg-white border rounded-full w-full font-semibold"
                   >
-                   Cancel
+                    Cancel
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-       
-
-
-
       </div>
     </div>
   </div>
