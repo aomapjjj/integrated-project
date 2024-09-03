@@ -1,10 +1,9 @@
 package sit.int221.servicetasksj3.sharedatabase.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
+import sit.int221.servicetasksj3.sharedatabase.entities.Role;
 
 @Getter
 @Setter
@@ -25,4 +24,7 @@ public class Users {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
+
+//    @OneToMany(mappedBy = "owner")
+//    private List<Board> boards;
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import sit.int221.servicetasksj3.entities.Task;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -34,6 +35,10 @@ public class TaskStatus {
     @Column(name = "updatedOn", updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
+
+//    @ManyToOne
+//    @JoinColumn(name = "boardId", nullable = false)
+//    private Board board;
 
     public void setName(String name) {
         if (name != null) {

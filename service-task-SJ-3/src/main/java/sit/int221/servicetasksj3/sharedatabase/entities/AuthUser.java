@@ -17,13 +17,13 @@ public class AuthUser extends User implements Serializable {
     private String email;
     private Role role;
     public AuthUser() {
-        super("anonymous", "", new ArrayList<GrantedAuthority>()); }
+        super("anonymous", "", new ArrayList<GrantedAuthority>());
+    }
+
     public AuthUser(String userName, String password) {
         super(userName, password, new ArrayList<GrantedAuthority>());
     }
-//    public AuthUser(String userName, String password, Collection<? extends GrantedAuthority> authorities) {
-//        super(userName, password, authorities);
-//    }
+
     public AuthUser(String userName, String password, Collection<? extends GrantedAuthority> authorities,
                     String name, String oid, String email, Role role) {
         super(userName, password, authorities);

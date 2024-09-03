@@ -1,4 +1,4 @@
-package sit.int221.servicetasksj3.sharedatabase.config;
+package sit.int221.servicetasksj3.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +31,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
-                                .requestMatchers("/validate-token").permitAll()
+//                                .requestMatchers("/validate-token").permitAll()
 //                                .requestMatchers("/statuses/**").permitAll()
 //                                .requestMatchers("/tasks/**").permitAll()
                                 .anyRequest().authenticated())
