@@ -34,6 +34,10 @@ public class Task {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
 
+    @ManyToOne
+    @JoinColumn(name = "boardId")
+    private Board board;
+
     public void setTitle(String title) {
         if (title == null || title.isEmpty()) {
             this.title = null;
