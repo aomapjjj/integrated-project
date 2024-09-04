@@ -1,5 +1,5 @@
 // Utility function to get the token from localStorage
-
+const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 function getToken() {
   return localStorage.getItem("access_token");
 }
@@ -29,7 +29,8 @@ async function getItemById(id) {
         }
       });
       const item = await response.json();
-      return item;
+      const responsed = response.status
+      return {item, responsed}
     } catch (error) {
       console.log(`error: ${error}`);
     }
