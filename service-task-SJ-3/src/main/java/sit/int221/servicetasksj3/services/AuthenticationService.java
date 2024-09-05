@@ -8,10 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
+import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.sharedatabase.dtos.JwtRequestUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
@@ -33,6 +35,8 @@ public class AuthenticationService {
     private BoardRepository boardRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private LimitRepository limitRepository;
 
     public String login(JwtRequestUser user) {
         Authentication authentication = authenticationManager.authenticate(
@@ -64,6 +68,9 @@ public class AuthenticationService {
                 statuses.add(status3);
                 statuses.add(status4);
                 statusRepository.saveAll(statuses);
+
+                TaskLimit limit = new TaskLimit(10,false, newBoard.getId());
+                limitRepository.save(limit);
             }
         } catch (Exception e) {
             throw new InternalServerErrorException("Cannot create user: " + e.getMessage());

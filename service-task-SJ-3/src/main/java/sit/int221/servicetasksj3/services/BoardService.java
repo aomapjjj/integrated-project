@@ -11,6 +11,7 @@ import sit.int221.servicetasksj3.dtos.boardsDTO.BoardResponseDTO;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
@@ -77,7 +78,17 @@ public class BoardService {
 
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
+        // Check if user is authenticated
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            throw new UnauthorizedException("User is not authorized");
+        }
+
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (currentUser == null) {
+            throw new UnauthorizedException("User not found or not authenticated");
+        }
+
         String oid = currentUser.getOid();
 
         Board board = new Board();
@@ -86,6 +97,8 @@ public class BoardService {
         board.setName(boardRequest.getName());
 
         Board newBoard = boardRepository.save(board);
+
+        // Add default statuses
         List<TaskStatus> statuses = new ArrayList<>();
         TaskStatus status1 = new TaskStatus("No Status","A status has not been assigned", newBoard.getId());
         TaskStatus status2 = new TaskStatus("To Do","The task is included in the project", newBoard.getId());

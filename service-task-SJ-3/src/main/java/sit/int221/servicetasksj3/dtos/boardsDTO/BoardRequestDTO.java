@@ -12,6 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BoardRequestDTO {
     @NotBlank(message = "Board name cannot be null or empty")
-    @Size(max = 100, message = "Board name cannot exceed 100 characters")
+    @Size(max = 50, message = "Board name cannot be longer than 50 characters")
     private String name;
 }
