@@ -129,7 +129,7 @@ public class TaskService {
         }
 
         // Limit
-        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+        TaskLimit taskLimit = limitRepository.findByBoardId(boardId).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
         if (taskLimit.getIsLimit()) {
             if (!status.getName().equals("No Status") && !status.getName().equals("Done")) {
@@ -220,7 +220,7 @@ public class TaskService {
         }
 
         // ดึงค่า Limit
-        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+        TaskLimit taskLimit = limitRepository.findByBoardId(boardId).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
 
         if (taskLimit.getIsLimit()) {

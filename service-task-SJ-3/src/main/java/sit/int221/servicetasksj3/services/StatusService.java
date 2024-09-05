@@ -20,6 +20,8 @@ import sit.int221.servicetasksj3.repositories.TaskRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+
 @Service
 public class StatusService {
     @Autowired
@@ -34,25 +36,25 @@ public class StatusService {
     private ListMapper listMapper;
 
     // GET ALL STATUSES
-    public List<StatusDTOTwo> getAllStatuses() {
-        return listMapper.mapList(repository.findAll(), StatusDTOTwo.class, modelMapper);
+    public List<StatusDTOTwo> getAllStatuses(String boardId) {
+        return listMapper.mapList(repository.findByBoardId(boardId), StatusDTOTwo.class, modelMapper);
     }
 
     // GET STATUS BY ID
-    public TaskStatus getStatusesById(Integer id) {
-        return repository.findById(id).orElseThrow(
+    public TaskStatus getStatusesById(String boardId, Integer id) {
+        return repository.findByBoardIdAndId(boardId,id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
     }
 
     // GET STATUS LIMIT
-    public List<TaskLimit> getStatusesLimit() {
-        return limitRepository.findAll();
+    public TaskLimit getStatusesLimit(String boardId) {
+        return limitRepository.findByBoardId(boardId).orElseThrow(
+                () -> new ItemNotFoundException("NOT FOUND"));
     }
 
     // ADD NEW STATUS
     @Transactional
-    public StatusDTO createNewStatuses(StatusDTO statusDTO) {
-        // Trim leading and trailing whitespace
+    public StatusDTO createNewStatuses(String boardId, StatusDTO statusDTO) {
         if (statusDTO.getName() != null) {
             statusDTO.setName(statusDTO.getName().trim());
         }
@@ -60,7 +62,6 @@ public class StatusService {
             statusDTO.setDescription(statusDTO.getDescription().trim());
         }
 
-        // Validation
         ValidationException validationError = new ValidationException("Validation error");
         if (statusDTO.getName() == null || statusDTO.getName().isEmpty()) {
             validationError.addValidationError("name", "must not be null");
@@ -76,14 +77,14 @@ public class StatusService {
             throw validationError;
         }
 
-        TaskStatus existingStatus = repository.findByName(statusDTO.getName());
+        // ตรวจสอบว่า status ใน boardId เดียวกันนี้มีชื่อซ้ำหรือไม่
+        TaskStatus existingStatus = repository.findByNameAndBoardId(statusDTO.getName(), boardId);
         if (existingStatus != null) {
-            validationError.addValidationError("name", "must be unique");
+            validationError.addValidationError("name", "must be unique within the board");
             throw validationError;
         }
 
         // Check if task limit is enabled and th
-
         TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
         if (taskLimit.getIsLimit()) {
@@ -95,7 +96,9 @@ public class StatusService {
         }
 
         try {
-            TaskStatus savedStatus = repository.save(modelMapper.map(statusDTO, TaskStatus.class));
+            TaskStatus newStatus = modelMapper.map(statusDTO, TaskStatus.class);
+            newStatus.setBoardId(boardId);
+            TaskStatus savedStatus = repository.save(newStatus);
             return modelMapper.map(savedStatus, StatusDTO.class);
         } catch (Exception e) {
             throw new InternalServerErrorException("Failed to save task status to the database: " + e.getMessage());
@@ -104,8 +107,8 @@ public class StatusService {
 
     // UPDATE STATUS
     @Transactional
-    public TaskStatus updateStatuses(Integer id, TaskStatus task) {
-        TaskStatus existingTask = repository.findById(id).orElseThrow(
+    public TaskStatus updateStatuses(String boardId, Integer id, TaskStatus task) {
+        TaskStatus existingTask = repository.findByBoardIdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
 
         // Validation
@@ -147,17 +150,25 @@ public class StatusService {
         }
 
         // Check if the status is unique
-        TaskStatus existingStatus = repository.findByName(task.getName().trim());
+//        TaskStatus existingStatus = repository.findByName(task.getName().trim());
+//        if (existingStatus != null && !existingStatus.getId().equals(id)) {
+//            validationError.addValidationError("name", "must be unique");
+//            throw validationError;
+//        }
+
+        // ตรวจสอบสถานะซ้ำใน boardId เดียวกัน
+        TaskStatus existingStatus = repository.findByNameAndBoardId(task.getName().trim(), boardId);
         if (existingStatus != null && !existingStatus.getId().equals(id)) {
-            validationError.addValidationError("name", "must be unique");
-            throw validationError;
+            validationError.addValidationError("name", "must be unique within the board");
         }
+
         try {
             Integer oldStatusId = existingTask.getId();
             if (task.getId() != null) {
                 taskRepository.updateStatusId(oldStatusId, task.getId());
             }
             task.setId(id);
+            task.setBoardId(boardId);
             return repository.save(task);
         } catch (Exception e) {
             throw new InternalServerErrorException("Failed to save task status to the database");
@@ -166,8 +177,8 @@ public class StatusService {
 
     // DELETE STATUS
     @Transactional
-    public TaskStatus removeStatuses(Integer id) {
-        TaskStatus status = repository.findById(id).orElseThrow(
+    public TaskStatus removeStatuses(String boardId, Integer id) {
+        TaskStatus status = repository.findByBoardIdAndId(boardId,id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
 
         ValidationException validationError = new ValidationException("Validation error");
@@ -197,7 +208,7 @@ public class StatusService {
 
     // TRANSFER
     @Transactional
-    public TaskStatus transferStatuses(Integer id, Integer newId) {
+    public TaskStatus transferStatuses(String boardId, Integer id, Integer newId) {
         // Check if the new status ID exists and throw a ValidationException if not
         ValidationException validationError = new ValidationException("Validation error");
         if (id.equals(newId)) {
@@ -210,8 +221,10 @@ public class StatusService {
             throw validationError;
         }
 
-        TaskStatus oldStatus = repository.findById(id).orElseThrow(() -> new ItemNotFoundException("Old status not found"));
-        TaskStatus newStatus = repository.findById(newId).orElseThrow(() -> new ItemNotFoundException("New status not found"));
+        TaskStatus oldStatus = repository.findByBoardIdAndId(boardId, id)
+                .orElseThrow(() -> new ItemNotFoundException("Old status not found"));
+        TaskStatus newStatus = repository.findByBoardIdAndId(boardId, newId)
+                .orElseThrow(() -> new ItemNotFoundException("New status not found"));
 
         // Check the task limit
         if (!"No Status".equalsIgnoreCase(newStatus.getName()) && !"Done".equalsIgnoreCase(newStatus.getName())) {
@@ -226,13 +239,13 @@ public class StatusService {
             }
         }
 
-        TaskStatus existingStatus = repository.findById(id).orElseThrow();
-        Integer newStatuses = repository.findById(newId).orElseThrow().getId();
+//        TaskStatus existingStatus = repository.findById(id).orElseThrow();
+//        Integer newStatuses = repository.findById(newId).orElseThrow().getId();
 
         try {
-            taskRepository.updateStatusId(existingStatus.getId(), newStatuses);
-            repository.delete(existingStatus);
-            return existingStatus;
+            taskRepository.updateStatusId(oldStatus.getId(), newStatus.getId());
+            repository.delete(oldStatus);
+            return oldStatus;
         } catch (Exception message) {
             throw new ItemNotFoundException("NOT FOUND");
         }
@@ -240,9 +253,9 @@ public class StatusService {
 
     // SET STATUS LIMIT
     @Transactional
-    public SimpleLimitDTO updateLimitTask(Integer maximumTask, Boolean isLimit) {
+    public SimpleLimitDTO updateLimitTask(String boardId, Integer maximumTask, Boolean isLimit) {
         // Update the task limit configuration
-        limitRepository.updateLimit(1, maximumTask, isLimit);
+        limitRepository.updateLimit(boardId, maximumTask, isLimit);
         return new SimpleLimitDTO(maximumTask, isLimit);
     }
 }
