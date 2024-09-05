@@ -3,12 +3,12 @@ import { ref, watch, computed } from 'vue';
 import { getItems, getItemById, editItem } from '@/libs/fetchUtils';
 import { useTasks } from '../stores/store';
 import { toDate } from '../libs/toDate';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from "vue-router"
 import { useLimitStore } from '../stores/storeLimit';
 
 const statusList = ref([]);
 const router = useRouter();
-
+const route = useRoute()
 const cantEdit = ref(false);
 const error = ref('');
 const limitStore = useLimitStore();
@@ -19,11 +19,21 @@ const props = defineProps({
   todoId: Number,
 });
 
+const boardId = ref()
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+
 const showAlertEdit = ref(false);
 const showAlertAfterEdit = ref(false);
-
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`;
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`;
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
+const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
 const todo = ref({
   id: '',
@@ -49,7 +59,7 @@ watch(
     const itemsStatus = await getItems(baseUrlStatus);
     statusList.value = itemsStatus;
   },
-  { immediate: true }
+  // { immediate: true }
 );
 
 
