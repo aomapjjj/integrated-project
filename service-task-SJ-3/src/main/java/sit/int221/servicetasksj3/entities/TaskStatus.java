@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "statustasks")
 public class TaskStatus {
     @Id
@@ -36,9 +37,17 @@ public class TaskStatus {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
 
+    @Column(name = "boardId", length = 10)
+    private String boardId;
 //    @ManyToOne
 //    @JoinColumn(name = "boardId", nullable = false)
 //    private Board board;
+
+    public TaskStatus(String name, String description, String boardId) {
+        this.name = name;
+        this.description = description;
+        this.boardId = boardId;
+    }
 
     public void setName(String name) {
         if (name != null) {
