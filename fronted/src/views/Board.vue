@@ -35,7 +35,7 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "BoardList", params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setID(boardId)
   }
 }
