@@ -18,6 +18,10 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
+// const userID = userStore.getUser()
+
+console.log("userStore.getUser()" , userStore.getUser())
+
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
