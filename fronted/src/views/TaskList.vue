@@ -24,6 +24,7 @@ const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
 const sidebarTasks = ref(true)
+const oid = ref('')
 
 const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
 const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
@@ -36,6 +37,10 @@ const limitStore = useLimitStore()
 const userStore = useUsers()
 
 const userName = userStore.getUser().username
+const userId = userStore.getUser()
+
+
+
 const token = localStorage.getItem("access_token")
 
 let items = []

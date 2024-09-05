@@ -5,6 +5,7 @@ const useUsers = defineStore("users", () => {
   const users = ref([])
   const user = ref({ username: "" })
   const token = ref("")
+  const oid = ref("")
 
   const setToken = (newToken) => {
     token.value = newToken
@@ -25,6 +26,15 @@ const useUsers = defineStore("users", () => {
 
   const setUser = (userName) => {
     user.value = { username: userName }
+    localStorage.setItem("user", JSON.stringify(user.value))
+  }
+
+  const getID = () => {
+    return oid.value
+  }
+
+  const setID = (id) => {
+    oid.value = { username: userName }
     localStorage.setItem("user", JSON.stringify(user.value))
   }
 
