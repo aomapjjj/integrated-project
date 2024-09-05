@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed , watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -43,7 +43,17 @@ const limitStore = useLimitStore()
 const taskStore = useTasks()
 const token = localStorage.getItem("access_token");
 
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const boardId = ref()
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
+const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
 // ------------------------------
 
