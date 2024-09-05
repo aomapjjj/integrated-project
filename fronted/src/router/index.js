@@ -16,7 +16,7 @@ export const routes = [
     redirect: { name: "Login" },
   },
   {
-    path: "/board/:id",
+    path: "/board/:id/task",
     name: "TaskList",
     component: TaskList,
     props: true,
