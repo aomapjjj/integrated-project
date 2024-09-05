@@ -38,17 +38,20 @@ const todo = ref({
 watch(
   () => props.todoId,
   async (newValue) => {
-    const response = await getItemById(newValue);
-    if (response.status === 200) {
-      todo.value = await response.json();
+    const {item, responsed} = await getItemById(newValue);
+    
+    if (responsed === 200) {
+      todo.value = item
       oldValue.value = { ...todo.value };
+    } else {
+      console.error('Failed to fetch item:', response);
     }
     const itemsStatus = await getItems(baseUrlStatus);
     statusList.value = itemsStatus;
-
   },
   { immediate: true }
 );
+
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -65,6 +68,8 @@ const closeModal = () => {
 };
 
 const UpdateTask = async () => {
+  console.log('Todo ID:', props.todoId);
+
   if (isLimitReached.value) {
     return; 
   }

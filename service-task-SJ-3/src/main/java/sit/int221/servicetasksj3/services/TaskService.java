@@ -4,18 +4,22 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskNewDTO;
+import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
+import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
+import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,26 +33,28 @@ public class TaskService {
     @Autowired
     private StatusRepository statusRepository;
     @Autowired
+    private BoardRepository boardRepository;
+    @Autowired
     private LimitRepository limitRepository;
     @Autowired
     private ModelMapper modelMapper;
 
     //GET ALL TASKS
     @Transactional
-    public List<TaskNewDTO> getAllTasksFiltered(String sortBy, String[] filterStatuses) {
+    public List<TaskNewDTO> getAllTasksFiltered(String boardId, String sortBy, String[] filterStatuses) {
         Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String oid = currentUser.getOid();
         try {
             List<Task> tasks;
             if (filterStatuses != null && filterStatuses.length > 0) {
-                tasks = repository.findTasksByStatus(filterStatuses, sort);
+                tasks = repository.findTasksByStatus(boardId, oid, filterStatuses, sort);
             } else {
-                tasks = repository.findAll(sort);
+                tasks = repository.findAllByBoardIdAndOid(boardId, oid, sort);
             }
-            // sort ตามชื่อ status
             if ("status".equals(sortBy)) {
                 tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
             }
-            // แปลง task เป็น TaskNewDTO และกำหนดค่า status
             return tasks.stream()
                     .map(task -> {
                         TaskNewDTO taskNewDTO = modelMapper.map(task, TaskNewDTO.class);
@@ -62,21 +68,24 @@ public class TaskService {
     }
 
     //GET ALL BY ID
-    public Task findByID(Integer id) {
-        return repository.findById(id).orElseThrow(
+    public Task findByID(String boardId, Integer id) {
+        return repository.findByBoard_IdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("Task id "+ id + " does not exist !!!"));
     }
 
     // ADD
     @Transactional
-    public Task createNewTasks(TaskNewDTO task){
+    public Task createNewTasks(String boardId, TaskNewDTO task){
         Task task1 = modelMapper.map(task, Task.class);
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new InternalServerErrorException("Invalid board"));
+        task1.setBoard(board);
         TaskStatus status;
         try {
             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
                     () -> new InternalServerErrorException("Invalid status ID"));
         } catch (Exception exception) {
-            status = statusRepository.findByName(task.getStatus());
+            status = statusRepository.findByNameAndBoardId(task.getStatus(), boardId);
         }
         task1.setStatus(status);
 
@@ -147,8 +156,8 @@ public class TaskService {
 
     // DELETE
     @Transactional
-    public TaskDTO removeTasks(Integer id){
-        Task task = repository.findById(id).orElseThrow(
+    public TaskDTO removeTasks(String boardId, Integer id){
+        Task task = repository.findByBoard_IdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
         TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
         repository.delete(task);
@@ -157,13 +166,17 @@ public class TaskService {
 
     // EDIT
     @Transactional
-    public Task updateTask(Integer id, TaskNewDTO task) {
-        Task existingTask = repository.findById(id).orElseThrow(
+    public Task updateTask(String boardId, Integer id, TaskNewDTO task) {
+        Task existingTask = repository.findByBoard_IdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
 
-        TaskStatus status = statusRepository.findByName(task.getStatus());
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new InternalServerErrorException("Invalid board"));
+
+        TaskStatus status = statusRepository.findByNameAndBoardId(task.getStatus(), boardId);
 
         Task task1 = modelMapper.map(task, Task.class);
+        task1.setBoard(board);
         task1.setStatus(status);
 
         // Validation

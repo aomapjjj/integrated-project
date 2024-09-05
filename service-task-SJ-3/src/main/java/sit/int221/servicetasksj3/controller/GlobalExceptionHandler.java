@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 import sit.int221.servicetasksj3.exceptions.*;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAllInternalServerErrorException(InternalServerErrorException exception, WebRequest request) {
         return createErrorResponse(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
-//     400 - ValidationException
+    // 400 - ValidationException
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorDetails> handleValidationException(ValidationException exception, WebRequest request) {
         return createErrorResponse("Validation error. Check 'errors' field for details. taskForCreateOrUpdate", HttpStatus.BAD_REQUEST, request, exception.getErrors());
@@ -31,8 +32,9 @@ public class GlobalExceptionHandler {
     // 401 - UnauthorizeException
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Username or Password is incorrect.", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Username or password is incorrect", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        //return createErrorResponse(exception.getMessage(), HttpStatus.UNAUTHORIZED, request);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -43,6 +45,7 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest().body(errorDetails);
     }
+
     // Helper method for creating standard error responses (ErrorResponse)
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message, request.getDescription(false).replace("uri=", ""));

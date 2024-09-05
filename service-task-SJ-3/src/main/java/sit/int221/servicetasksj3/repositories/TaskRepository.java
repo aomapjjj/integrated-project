@@ -10,6 +10,7 @@ import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Transactional
@@ -19,6 +20,11 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
 
     List<Task> findByStatus(TaskStatus status);
 
-    @Query("SELECT t FROM Task t WHERE t.status.name IN :filterStatuses")
-    List<Task> findTasksByStatus(@Param("filterStatuses") String[] filterStatuses, Sort sort);
+    @Query("SELECT t FROM Task t WHERE t.board.id = :boardId AND t.board.ownerId = :ownerId AND t.status.name IN :filterStatuses")
+    List<Task> findTasksByStatus(String boardId, String ownerId, @Param("filterStatuses") String[] filterStatuses, Sort sort);
+
+    @Query("SELECT t FROM Task t WHERE t.board.id=:boardID AND t.board.ownerId = :oid")
+    List<Task> findAllByBoardIdAndOid(@Param("boardID") String boardID, @Param("oid") String oid,Sort sort);
+
+    Optional<Task> findByBoard_IdAndId(String boardId, Integer id);
 }

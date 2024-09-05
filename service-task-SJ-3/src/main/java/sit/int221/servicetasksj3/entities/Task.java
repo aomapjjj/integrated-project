@@ -2,7 +2,6 @@ package sit.int221.servicetasksj3.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +33,10 @@ public class Task {
     @Column(name = "updatedOn", updatable = false, insertable = false)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
     private ZonedDateTime updatedOn;
+
+    @ManyToOne
+    @JoinColumn(name = "boardId")
+    private Board board;
 
     public void setTitle(String title) {
         if (title == null || title.isEmpty()) {
