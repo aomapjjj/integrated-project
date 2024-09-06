@@ -1,13 +1,14 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router"
-import { ref, computed, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
+import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
 import {
   getItemById,
   getItems,
   deleteItemById,
   editLimit,
-  addItem
+  addItem,
+  addBoard
 } from "../libs/fetchUtils.js"
 
 const BoardsList = ref([])
@@ -19,9 +20,10 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
+const userBoard = ref({name: ""})
 // const userID = userStore.getUser()
 
-console.log("userStore.getUser()" , userStore.getUser())
+console.log("userStore.getUser()", userStore.getUser())
 
 const router = useRouter()
 
@@ -40,152 +42,187 @@ const toBoardsList = (boardId) => {
   }
 }
 
-const addBoardsList = ref({
-  name: ""
-})
-
-
-
 const submitForm = async () => {
-  const nameBoard = addBoardsList.value
-
-  try {
-    const itemAdd = await addItem(baseUrlBoard, {
-       
-    })
-
-  } catch (error) {
-    console.error("Error adding task:", error)
-  }
+  await addBoard(baseUrlBoard, userBoard.value)
+  router.go()
 }
-
 
 </script>
 
 <template>
-  <div class="min-h-full max-h-fit">
+<div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <aside
+      <div
         id="sidebar"
-        v-if="sidebarTasks"
-        class="w-64 bg-gray-100 shadow-lg transition-transform transform translate-x-0"
+        class="hs-overlay fixed top-0 left-0 bottom-0 z-40 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
+        role="dialog"
+        tabindex="-1"
+        aria-label="Sidebar"
       >
-        <div class="p-6">
+        <div class="px-6">
           <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
-          <h2 class="text-xl text-center font-bold mt-4">
-            IT-Bangmod <br />Kradan Kanban
-          </h2>
-
-          <nav class="mt-6">
-            <ul>
-              <li class="my-3">
-                <a
-                  href="#"
-                  class="flex items-center text-gray-700 hover:bg-gray-200 hover:text-blue-500 transition duration-200 rounded-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
-                    <g fill="none">
-                      <path
-                        fill="#d9d9d9"
-                        fill-opacity=".25"
-                        d="M16 16H8.415c-1.184 0-1.776 0-2.299.202q-.412.16-.76.43c-.442.344-.747.852-1.356 1.868V7c0-1.886 0-2.828.586-3.414S6.114 3 8 3h8c1.886 0 2.828 0 3.414.586S20 5.114 20 7v5c0 1.886 0 2.828-.586 3.414S17.886 16 16 16"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-width="1.2"
-                        d="M20 12v5c0 1.886 0 2.828-.586 3.414S17.886 21 16 21H6.5a2.5 2.5 0 0 1 0-5H16c1.886 0 2.828 0 3.414-.586S20 13.886 20 12V7c0-1.886 0-2.828-.586-3.414S17.886 3 16 3H8c-1.886 0-2.828 0-3.414.586S4 5.114 4 7v11.5"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-linecap="round"
-                        stroke-width="1.2"
-                        d="m9 10l1.293 1.293a1 1 0 0 0 1.414 0L15 8"
-                      />
-                    </g>
-                  </svg>
-
-                  <span class="ml-3">All Boards</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
         </div>
-      </aside>
+
+        <nav
+          class="hs-accordion-group p-6 w-full flex-grow overflow-y-auto"
+          data-hs-accordion-always-open
+        >
+          <ul class="space-y-1.5">
+            <li>
+              <a
+                class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300"
+                href="#"
+              >
+                <svg
+                  class="size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="#9391E4"
+                    d="m21.743 12.331l-9-10c-.379-.422-1.107-.422-1.486 0l-9 10a1 1 0 0 0-.17 1.076c.16.361.518.593.913.593h2v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7h2a.998.998 0 0 0 .743-1.669"
+                  />
+                </svg>
+                <span class="itbkk-home">Home</span>
+              </a>
+            </li>
+            <li class="hs-accordion" id="projects-accordion">
+              <button
+                type="button"
+                class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
+                aria-expanded="true"
+                aria-controls="projects-accordion"
+              >
+                <svg
+                  class="size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="#9391E4"
+                    d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2M5 13h4v2H5z"
+                  />
+                </svg>
+                All boards
+                <svg
+                  class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+
+              <div
+                id="projects-accordion"
+                class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
+                role="region"
+                aria-labelledby="projects-accordion"
+              >
+                <ul class="pt-2 ps-2">
+                  <li>
+                    <a
+                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#"
+                    >
+                      Link 1
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#"
+                    >
+                      Link 2
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#"
+                    >
+                      Link 3
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+
+        <div
+          class="mt-auto p-4 bg-gray-100 dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <!-- User Icon -->
+              <!-- <img src="/path/to/user-icon.png" alt="User Avatar" class="w-10 h-10 rounded-full"> -->
+              <div class="avatar placeholder">
+                <div
+                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full"
+                ></div>
+              </div>
+              <!-- User Info -->
+              <div>
+                <p class="text-xs text-gray-500 dark:text-neutral-400">
+                  Welcome,
+                </p>
+                <p
+                  class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white"
+                >
+                  {{ userName }}
+                </p>
+              </div>
+            </div>
+            <!-- Log out -->
+            <div>
+              <button>
+                <svg
+                  @click="clearToken()"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="#ff6161"
+                    d="m21.207 11.293l-3-3a1 1 0 1 0-1.414 1.415L18.086 11H12.5a1 1 0 0 0 0 2h5.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.415Z"
+                  />
+                  <path
+                    fill="#ff6161"
+                    d="M12.5 13a1 1 0 0 1 0-2h4V5a3.003 3.003 0 0 0-3-3h-8a3.003 3.003 0 0 0-3 3v14a3.003 3.003 0 0 0 3 3h8a3.003 3.003 0 0 0 3-3v-6Z"
+                    opacity=".5"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Sidebar -->
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <nav
-          class="bg-white shadow py-4 flex justify-between items-center w-full"
-          style="background-color: #d8f1f1"
-        >
-          <div class="ml-10">
-            <label class="btn btn-circle swap swap-rotate">
-              <input id="sidebarToggle" type="checkbox" />
 
-              <!-- hamburger icon -->
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                v-if="!sidebarTasks"
-                @click="toggleSidebar"
-              >
-                <path
-                  fill="#F785B1"
-                  d="M20 10.75H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0-4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 8H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5m0 4H4a.75.75 0 0 1 0-1.5h16a.75.75 0 0 1 0 1.5"
-                />
-              </svg>
-              <!-- close icon -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                v-if="sidebarTasks"
-                @click="toggleSidebar"
-              >
-                <path
-                  fill="#F785B1"
-                  stroke="#d9d9d9"
-                  stroke-linecap="round"
-                  d="M12 21a9 9 0 1 1 0-18a9 9 0 0 1 0 18zM9 9l6 6m0-6l-6 6"
-                />
-              </svg>
-            </label>
-          </div>
+        <nav class="bg-white shadow px-4 py-6 flex justify-center items-center">
           <div
-            class="text-3xl font-bold tracking-tight"
+            class="text-2xl font-bold tracking-tight"
             style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
           >
-            Board List
-          </div>
-          <div class="flex items-center space-x-2 mr-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="32"
-              height="32"
-              viewBox="0 0 256 256"
-            >
-              <path
-                fill="#ffffff"
-                d="M128 26a102 102 0 1 0 102 102A102.12 102.12 0 0 0 128 26M71.44 198a66 66 0 0 1 113.12 0a89.8 89.8 0 0 1-113.12 0M94 120a34 34 0 1 1 34 34a34 34 0 0 1-34-34m99.51 69.64a77.53 77.53 0 0 0-40-31.38a46 46 0 1 0-51 0a77.53 77.53 0 0 0-40 31.38a90 90 0 1 1 131 0"
-              />
-            </svg>
-
-            <span
-              class="itbkk-fullname flex font-bold"
-              style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
-              >{{ userName }}</span
-            >
+            My Boards
           </div>
         </nav>
         <!-- <div>
@@ -208,46 +245,50 @@ const submitForm = async () => {
         </div> -->
 
         <!------------------------- Create Board ------------------------->
-        <button @click="openModalName = !openModalName">
-          <div
-            class="w-full p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-4 mt-2"
-          >
-            <div class="flex flex-col items-center relative">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-              >
-                <defs>
-                  <mask id="letsIconsAddSquareDuotoneLine0">
-                    <g fill="none">
-                      <path
-                        stroke="silver"
-                        stroke-opacity=".25"
-                        d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
-                      />
-                      <path
-                        stroke="#fff"
-                        stroke-linejoin="round"
-                        d="M12 8v8m4-4H8"
-                      />
-                    </g>
-                  </mask>
-                </defs>
-                <path
-                  fill="#000000"
-                  d="M0 0h24v24H0z"
-                  mask="url(#letsIconsAddSquareDuotoneLine0)"
-                />
-              </svg>
-              <span class="itbkk-button-create mt-2">Create Board</span>
+        <div class="bg-gray-200 w-auto h-auto">
+          <button @click="openModalName = !openModalName">
+            <div
+              class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
+            >
+              <div class="flex flex-col items-center relative">
+                <svg
+                  class="-mt-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <defs>
+                    <mask id="letsIconsAddSquareDuotoneLine0">
+                      <g fill="none">
+                        <path
+                          stroke="silver"
+                          stroke-opacity=".25"
+                          d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
+                        />
+                        <path
+                          stroke="#fff"
+                          stroke-linejoin="round"
+                          d="M12 8v8m4-4H8"
+                        />
+                      </g>
+                    </mask>
+                  </defs>
+                  <path
+                    fill="#000000"
+                    d="M0 0h24v24H0z"
+                    mask="url(#letsIconsAddSquareDuotoneLine0)"
+                  />
+                </svg>
+                <span class="itbkk-button-create mt-1 text-sm"
+                  >Create Board</span
+                >
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
+        </div>
         <!------------------------- Board ------------------------->
-
-        <div class="flex flex-col items-center mt-6">
+        <!-- <div class="flex flex-col items-center mt-6">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div
               class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8"
@@ -255,98 +296,191 @@ const submitForm = async () => {
               <div
                 class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg"
               >
-                <table
-                  class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"
-                >
-                  <thead class="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th
-                        scope="col"
-                        class="py-3.5 px-4 text-sm font-normal text-center text-gray-500 dark:text-gray-400"
-                      >
-                        <button
-                          class="flex items-center justify-center gap-x-3 focus:outline-none"
-                        >
-                          <span>No.</span>
-                        </button>
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-12 py-3.5 text-sm font-normal text-center text-gray-500 dark:text-gray-400"
-                      >
-                        Name Eiei
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-4 py-3.5 text-sm font-normal text-center text-gray-500 dark:text-gray-400"
-                      >
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
-                  >
-                    <tr
-                      class="itbkk-item"
-                      v-for="(item, index) in BoardsList"
-                      :key="index"
+                              <table class="table-auto" style="table-layout: fixed">
+                
+                <thead>
+                  <tr class="bg-base-200 mt-4 md:mt-0 i">
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
+                        background-color: #9fc3e9;
+                        border-bottom: 2px solid #9fc3e9;
+                        color: #fff;
+                      "
                     >
-                      <td
-                        class="px-4 py-4 text-sm font-medium text-center whitespace-nowrap"
+                      No.
+                    </th>
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
+                        background-color: #9fc3e9;
+                        border-bottom: 2px solid #9fc3e9;
+                        color: #fff;
+                      "
+                    >
+                     Name
+                    </th>
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
+                        background-color: #9fc3e9;
+                        border-bottom: 2px solid #9fc3e9;
+                        color: #fff;
+                      "
+                    >
+                     Action
+                    </th>
+
+              
+                  </tr>
+                </thead>
+                <tbody>
+                 
+                  <tr
+                    class="itbkk-item "
+                    v-for="(item, index) in BoardsList"
+                    :key="index"
+                  >
+                    <td
+                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      {{ index + 1 }}
+                    </td>
+                    <td
+                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      <label 
+                        for="my_modal_6"
+                        style="display: block; width: 100%; height: 100%"
                       >
-                        <div>
-                          <h2 class="font-medium text-gray-800 dark:text-white">
-                            {{ index + 1 }}
-                          </h2>
-                        </div>
-                      </td>
-                      <td
-                        class="px-4 py-4 text-sm text-center whitespace-nowrap"
-                      >
-                        <div @click="toBoardsList(item.id)">
+                       <div @click="toBoardsList(item.id)">
                             <h4 class="text-gray-700 dark:text-gray-200">
                               {{ item.name }}
                             </h4>
                         </div>
+                      </label>
+                    </td>
+                    
+                      <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                       
                       </td>
-                      <td
-                        class="px-12 py-4 text-sm font-medium text-center whitespace-nowrap"
-                      >
-                        <div
-                          class="inline px-3 py-1 text-sm font-normal rounded-full text-emerald-500 gap-x-2 bg-emerald-100/60 dark:bg-gray-800"
-                        >
-                          Customer
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+               
+                  </tr>
+                  
+                </tbody>
+              </table>
               </div>
             </div>
+          </div>
+        </div> -->
+
+        <div class="p-6">
+          <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Card 1 -->
+            <div class="bg-white rounded-lg shadow p-4">
+              <div class="relative">
+                <div
+                  class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center"
+                >
+                  <!-- <span class="text-gray-500">Board Thumbnail</span> -->
+                </div>
+                <!-- <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"/>
+          </svg>
+        </button> -->
+
+                <div
+                  class="dropdown absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                >
+                  <div tabindex="0" role="button" class="m-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"
+                      />
+                    </svg>
+                  </div>
+
+                  <ul
+                    tabindex="0"
+                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+                  >
+                    <li><a>Edit</a></li>
+                    <li class="customRed"><a>Delete</a></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="text-md font-semibold text-center">Board Title</p>
+            </div>
+
+            <!-- ห้ามลบบบบบบบบบบ -->
+            <!-- Card 2 (Duplicate for more boards) -->
+            <!-- <div class="bg-white rounded-lg shadow p-4">
+      <div class="relative">
+        <div class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center">
+          <span class="text-gray-500">Board Thumbnail</span>
+        </div>
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"/>
+          </svg>
+        </button>
+      </div>
+      <h3 class="text-lg font-semibold">Board Title</h3>
+    </div> -->
           </div>
         </div>
 
         <!------------------------- Modal ------------------------->
         <div
           v-show="openModalName"
-          class="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
+          class="fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
         >
           <div
-            class="max-h-full w-full max-w-xl overflow-y-auto sm:rounded-2xl bg-white"
+            class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
           >
             <div class="w-full">
               <div class="m-8 my-20 max-w-[400px] mx-auto">
                 <div class="mb-8">
-                  <h1 class="mb-4 text-3xl font-extrabold">New Board</h1>
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    class="itbkk-board-name input input-bordered w-full max-w-s"
-                  />
+                  <span
+                    class="block text-2xl font-bold leading-6 mb-1 customPurple text-center"
+                    >New Board</span
+                  >
+
+                  <div class="modal-content py-4 text-left px-6 flex-grow">
+                    <div class="label">
+                      <span
+                        class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
+                        >Title
+                      </span>
+                    </div>
+
+                    <label
+                      class="input input-bordered flex items-center gap-2 font-bold ml-4"
+                    >
+                      <input
+                        type="text"
+                        class="itbkk-board-name grow"
+                        placeholder="Enter Your Title Board"
+                      />
+                    </label>
+                    <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
+              {{ status.name?.length }}/50
+            </p> -->
+                  </div>
                 </div>
-                <div class="space-y-4">
-                  <button @click="submitForm()"
+                <!-- <div class="space-y-4">
+                  <button
                     class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
                   >
                     Save
@@ -355,6 +489,23 @@ const submitForm = async () => {
                   <button
                     @click="openModalName = false"
                     class="itbkk-button-cancel p-3 bg-white border rounded-full w-full font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div> -->
+                <!-- Buttons -->
+                <div class="flex justify-center">
+                  <form method="dialog">
+                    <button
+                      type="submit"
+                      class="itbkk-button-ok btn flex-3 mr-2 bg-customPink"
+                    >
+                      Save
+                    </button>
+                  </form>
+                  <button
+                    class="itbkk-button-cancel btn"
+                    @click="openModalName = false"
                   >
                     Cancel
                   </button>
@@ -369,19 +520,30 @@ const submitForm = async () => {
 </template>
 
 <style scoped>
+.customPink {
+  color: #f785b1;
+}
+.customPurple {
+  color: #9391e4;
+}
+.customBlue {
+  color: #9fc3e9;
+}
+.customRed {
+  color: #eb4343;
+}
 .fourth {
   border-color: #b7b7b7;
-  background-image: -webkit-linear-gradient(
-    45deg,
-    #9fc3e9 50%,
-    transparent 50%
-  );
+  background-image: -webkit-linear-gradient(45deg,
+      #9fc3e9 50%,
+      transparent 50%);
   background-image: linear-gradient(45deg, #9fc3e9 50%, transparent 50%);
   background-position: 100%;
   background-size: 400%;
   -webkit-transition: 300ms ease-in-out;
   transition: 300ms ease-in-out;
 }
+
 .fourth:hover {
   background-position: 0;
 }
