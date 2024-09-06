@@ -1,7 +1,7 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '@/stores/storeUser'
+import { useRouter, useRoute } from "vue-router"
+import { ref, computed, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
 import {
   getItemById,
   getItems,
@@ -13,14 +13,15 @@ import {
 
 const BoardsList = ref([])
 const openModalName = ref(false)
-
+const openModalToDelete = ref(false)
 const sidebarTasks = ref(true)
+const selectedItemIdToDelete = ref()
 const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
-const userBoard = ref({name: ""})
+const userBoard = ref({ name: "" })
 // const userID = userStore.getUser()
 
 console.log("userStore.getUser()", userStore.getUser())
@@ -47,10 +48,25 @@ const submitForm = async () => {
   router.go()
 }
 
+const deletBoard = async (boardId) =>{
+  await deleteItemById(baseUrlBoard , boardId)
+  router.go()
+}
+
+const openModalToDeleteBoard = (itemId) => {
+  selectedItemIdToDelete.value = itemId
+  openModalToDelete.value = true
+}
+
+const confirmDelete = () => {
+  deletBoard(selectedItemIdToDelete.value)
+}
+
+
 </script>
 
 <template>
-<div class="min-h-full max-h-fit">
+  <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
       <div
@@ -373,59 +389,84 @@ const submitForm = async () => {
             </div>
           </div>
         </div> -->
-
-        <div class="p-6">
-          <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Card 1 -->
-            <div class="bg-white rounded-lg shadow p-4">
-              <div class="relative">
-                <div
-                  class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center"
-                >
-                  <!-- <span class="text-gray-500">Board Thumbnail</span> -->
-                </div>
-                <!-- <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+        <div
+          v-for="(item, index) in BoardsList"
+          :key="index"
+        >
+          <div class="p-6">
+            <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
+            <div class="grid grid-cols-4 gap-6">
+              <!-- Card 1 -->
+              <div class="bg-white rounded-lg shadow p-4">
+                <div class="relative">
+                  <div
+                    class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center"
+                  >
+                    <!-- <span class="text-gray-500">Board Thumbnail</span> -->
+                  </div>
+                  <!-- <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"/>
           </svg>
         </button> -->
 
-                <div
-                  class="dropdown absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                >
-                  <div tabindex="0" role="button" class="m-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path
-                        d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"
-                      />
-                    </svg>
-                  </div>
-
-                  <ul
-                    tabindex="0"
-                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+                  <div
+                    class="dropdown absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                   >
-                    <li><a>Edit</a></li>
-                    <li class="customRed"><a>Delete</a></li>
-                  </ul>
+                    <div tabindex="0" role="button" class="m-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"
+                        />
+                      </svg>
+                    </div>
+
+                    <ul
+                      tabindex="0"
+                      class="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow"
+                    >
+                      <li><a>Edit</a></li>
+                      <li @click="openModalToDeleteBoard(item.id)" class="customRed"><a>Delete</a></li>
+                    </ul>
+                  </div>
+                </div>
+                <div @click="toBoardsList(item.id)">
+                  <p class="text-md font-semibold text-center">
+                    {{ item.name }}
+                  </p>
                 </div>
               </div>
-              <p class="text-md font-semibold text-center">Board Title</p>
-            </div>
+                   <!-- delete -->
+                   <div v-show="openModalToDelete" class="flex justify-center">
+                  <form method="dialog">
+                    <button
+                      type="submit"
+                      class="itbkk-button-ok btn flex-3 mr-2 bg-customPink"
+                     @click="deletBoard(item.id)"
+                    >
+                      Save
+                    </button>
+                  </form>
+                  <button
+                    class="itbkk-button-cancel btn"
+                    @click="openModalToDelete = false"
+                  >
+                    Cancel
+                  </button>
+                </div>
 
-            <!-- ห้ามลบบบบบบบบบบ -->
-            <!-- Card 2 (Duplicate for more boards) -->
-            <!-- <div class="bg-white rounded-lg shadow p-4">
+              <!-- ห้ามลบบบบบบบบบบ -->
+              <!-- Card 2 (Duplicate for more boards) -->
+              <!-- <div class="bg-white rounded-lg shadow p-4">
       <div class="relative">
         <div class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center">
           <span class="text-gray-500">Board Thumbnail</span>
@@ -438,6 +479,7 @@ const submitForm = async () => {
       </div>
       <h3 class="text-lg font-semibold">Board Title</h3>
     </div> -->
+            </div>
           </div>
         </div>
 
@@ -472,6 +514,7 @@ const submitForm = async () => {
                         type="text"
                         class="itbkk-board-name grow"
                         placeholder="Enter Your Title Board"
+                        v-model="userBoard.name"
                       />
                     </label>
                     <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
@@ -499,6 +542,7 @@ const submitForm = async () => {
                     <button
                       type="submit"
                       class="itbkk-button-ok btn flex-3 mr-2 bg-customPink"
+                      @click="submitForm()"
                     >
                       Save
                     </button>
@@ -510,13 +554,17 @@ const submitForm = async () => {
                     Cancel
                   </button>
                 </div>
+
+           
               </div>
             </div>
           </div>
         </div>
       </div>
+      
     </div>
   </div>
+  
 </template>
 
 <style scoped>
@@ -534,9 +582,11 @@ const submitForm = async () => {
 }
 .fourth {
   border-color: #b7b7b7;
-  background-image: -webkit-linear-gradient(45deg,
-      #9fc3e9 50%,
-      transparent 50%);
+  background-image: -webkit-linear-gradient(
+    45deg,
+    #9fc3e9 50%,
+    transparent 50%
+  );
   background-image: linear-gradient(45deg, #9fc3e9 50%, transparent 50%);
   background-position: 100%;
   background-size: 400%;
