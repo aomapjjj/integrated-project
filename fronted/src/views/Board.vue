@@ -7,7 +7,8 @@ import {
   getItems,
   deleteItemById,
   editLimit,
-  addItem
+  addItem,
+  addBoard
 } from "../libs/fetchUtils.js"
 
 const BoardsList = ref([])
@@ -19,6 +20,7 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
+const userBoard = ref({name: ""})
 // const userID = userStore.getUser()
 
 console.log("userStore.getUser()", userStore.getUser())
@@ -40,23 +42,10 @@ const toBoardsList = (boardId) => {
   }
 }
 
-const addBoardsList = ref({
-  name: ""
-})
-
-
 
 const submitForm = async () => {
-  const nameBoard = addBoardsList.value
-
-  try {
-    const itemAdd = await addItem(baseUrlBoard, {
-       
-    })
-
-  } catch (error) {
-    console.error("Error adding task:", error)
-  }
+  await addBoard(baseUrlBoard, userBoard.value)
+  router.go()
 }
 
 
@@ -236,13 +225,12 @@ const submitForm = async () => {
               <div class="m-8 my-20 max-w-[400px] mx-auto">
                 <div class="mb-8">
                   <h1 class="mb-4 text-3xl font-extrabold">New Board</h1>
-                  <input type="text" placeholder="Name" class="itbkk-board-name input input-bordered w-full max-w-s" />
+                  <input v-model="userBoard.name" type="text" placeholder="Name" class="itbkk-board-name input input-bordered w-full max-w-s" />
                 </div>
                 <div class="space-y-4">
 
                   <button @click="submitForm()"
-                    class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
-                  >
+                    class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold">
 
                     Save
                   </button>

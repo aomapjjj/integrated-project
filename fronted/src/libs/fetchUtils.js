@@ -125,6 +125,24 @@ async function editLimit(baseUrlLimit, maximumTask, isLimit) {
   }
 }
 
+async function addBoard(url, newBoard) {
+  const token = getToken();
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(newBoard) // ส่ง newItem เป็น string โดยตรง
+    });
+    const addedBoard = await response.json();
+    return addedBoard;
+  } catch (error) {
+    console.log(`error: ${error}`);
+  }
+}
+
 export {
   getItems,
   getItemById,
@@ -132,5 +150,6 @@ export {
   addItem,
   editItem,
   deleteItemAndTransfer,
-  editLimit
+  editLimit,
+  addBoard
 }
