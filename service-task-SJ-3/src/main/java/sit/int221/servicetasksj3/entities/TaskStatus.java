@@ -39,9 +39,6 @@ public class TaskStatus {
 
     @Column(name = "boardId", length = 10)
     private String boardId;
-//    @ManyToOne
-//    @JoinColumn(name = "boardId", nullable = false)
-//    private Board board;
 
     public TaskStatus(String name, String description, String boardId) {
         this.name = name;

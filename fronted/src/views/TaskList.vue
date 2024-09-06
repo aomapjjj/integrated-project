@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed , watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -9,7 +9,6 @@ import {
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
 import EditTask from "../views/EditTask.vue"
-import Board from "../views/Board.vue"
 import { useLimitStore } from "../stores/storeLimit"
 import { useUsers } from "@/stores/storeUser"
 import { useTasks } from "../stores/store"
@@ -24,20 +23,27 @@ const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
 const sidebarTasks = ref(true)
-const oid = ref('')
-
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
-const baseUrlLimit = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses/limit`
-const baseUrlLimitMax = `${import.meta.env.VITE_BASE_URL_MAIN
-  }/statuses/maximumtask`
 
 const taskStore = useTasks()
 const limitStore = useLimitStore()
 const userStore = useUsers()
+const boardId = ref()
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
+const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
+const baseUrlLimit = `${baseUrlboards}/${boardId.value}/statuses/limit`
+const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
+
 
 const userName = userStore.getUser().username
-const userId = userStore.getUser()
 
 const token = localStorage.getItem("access_token")
 

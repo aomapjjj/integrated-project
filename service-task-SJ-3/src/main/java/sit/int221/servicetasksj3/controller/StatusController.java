@@ -20,49 +20,49 @@ import java.util.List;
 @RequestMapping("/statuses")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
 public class StatusController {
-    @Autowired
-    private StatusService service;
-
-    @GetMapping("")
-    public List<StatusDTOTwo> getAllStatuses() {
-        return service.getAllStatuses();
-    }
-
-    @GetMapping("/{id}")
-    public TaskStatus getStatusesById(@PathVariable Integer id){
-        return service.getStatusesById(id);
-    }
-
-    @GetMapping("/limit")
-    public ResponseEntity<List<TaskLimit>> getStatusesLimit(){
-        return ResponseEntity.ok(service.getStatusesLimit());
-    }
-
-    @PostMapping("")
-    public ResponseEntity<StatusDTO> createNewStatuses(@Valid @RequestBody StatusDTO status) {
-        StatusDTO createdStatus = service.createNewStatuses(status);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Object> updateStatuses(@PathVariable Integer id, @RequestBody TaskStatus task) {
-        return ResponseEntity.ok(service.updateStatuses(id, task));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> removeStatuses(@Valid @PathVariable Integer id){
-        return ResponseEntity.ok(service.removeStatuses(id));
-    }
-
-    @DeleteMapping("/{id}/{newId}")
-    public ResponseEntity<Object> removeStatusAndReplace(@Valid @PathVariable Integer id , @PathVariable Integer newId){
-        return ResponseEntity.ok(service.transferStatuses(id,newId));
-    }
-
-    @PatchMapping("/maximumtask")
-    public ResponseEntity<SimpleLimitDTO> updateLimitTask(
-            @RequestParam @Min(0) @Max(30) Integer maximumTask,
-            @RequestParam Boolean isLimit) {
-        return ResponseEntity.ok(service.updateLimitTask(maximumTask, isLimit));
-    }
+//    @Autowired
+//    private StatusService statusService;
+//
+//    @GetMapping("")
+//    public List<StatusDTOTwo> getAllStatuses() {
+//        return statusService.getAllStatuses();
+//    }
+//
+//    @GetMapping("/{id}")
+//    public TaskStatus getStatusesById(@PathVariable Integer id){
+//        return statusService.getStatusesById(id);
+//    }
+//
+//    @GetMapping("/limit")
+//    public ResponseEntity<List<TaskLimit>> getStatusesLimit(){
+//        return ResponseEntity.ok(statusService.getStatusesLimit());
+//    }
+//
+//    @PostMapping("")
+//    public ResponseEntity<StatusDTO> createNewStatuses(@Valid @RequestBody StatusDTO status) {
+//        StatusDTO createdStatus = statusService.createNewStatuses(status);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(createdStatus);
+//    }
+//
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Object> updateStatuses(@PathVariable Integer id, @RequestBody TaskStatus task) {
+//        return ResponseEntity.ok(statusService.updateStatuses(id, task));
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Object> removeStatuses(@Valid @PathVariable Integer id){
+//        return ResponseEntity.ok(statusService.removeStatuses(id));
+//    }
+//
+//    @DeleteMapping("/{id}/{newId}")
+//    public ResponseEntity<Object> removeStatusAndReplace(@Valid @PathVariable Integer id , @PathVariable Integer newId){
+//        return ResponseEntity.ok(statusService.transferStatuses(id,newId));
+//    }
+//
+//    @PatchMapping("/maximumtask")
+//    public ResponseEntity<SimpleLimitDTO> updateLimitTask(
+//            @RequestParam @Min(0) @Max(30) Integer maximumTask,
+//            @RequestParam Boolean isLimit) {
+//        return ResponseEntity.ok(statusService.updateLimitTask(maximumTask, isLimit));
+//    }
 }

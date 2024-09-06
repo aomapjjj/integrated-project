@@ -27,6 +27,8 @@ onMounted(async () => {
   console.log(BoardsList)
 })
 
+
+
 const toTasksList = () => {
   router.push({ name: "TaskList" })
 
@@ -124,27 +126,7 @@ const toTasksList = () => {
           </button>
         </div> -->
 
-        <!------------------------- Create Board ------------------------->
-        <button @click="openModalName = !openModalName">
-          <div class="w-full p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-4 mt-2">
-            <div class="flex flex-col items-center relative">
-
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                <defs>
-                  <mask id="letsIconsAddSquareDuotoneLine0">
-                    <g fill="none">
-                      <path stroke="silver" stroke-opacity=".25"
-                        d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z" />
-                      <path stroke="#fff" stroke-linejoin="round" d="M12 8v8m4-4H8" />
-                    </g>
-                  </mask>
-                </defs>
-                <path fill="#000000" d="M0 0h24v24H0z" mask="url(#letsIconsAddSquareDuotoneLine0)" />
-              </svg>
-              <span class="itbkk-button-create mt-2">Create Board</span>
-            </div>
-          </div>
-        </button>
+      
         <!------------------------- Board ------------------------->
 
         <div class="flex flex-col items-center mt-6">

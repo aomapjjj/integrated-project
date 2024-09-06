@@ -6,7 +6,8 @@ import {
   getItemById,
   getItems,
   deleteItemById,
-  editLimit
+  editLimit,
+  addItem
 } from "../libs/fetchUtils.js"
 
 const BoardsList = ref([])
@@ -34,7 +35,27 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "BoardList", params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
+    userStore.setID(boardId)
+  }
+}
+
+const addBoardsList = ref({
+  name: ""
+})
+
+
+
+const submitForm = async () => {
+  const nameBoard = addBoardsList.value
+
+  try {
+    const itemAdd = await addItem(baseUrlBoard, {
+       
+    })
+
+  } catch (error) {
+    console.error("Error adding task:", error)
   }
 }
 
@@ -218,7 +239,11 @@ const toBoardsList = (boardId) => {
                   <input type="text" placeholder="Name" class="itbkk-board-name input input-bordered w-full max-w-s" />
                 </div>
                 <div class="space-y-4">
-                  <button class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold">
+
+                  <button @click="submitForm()"
+                    class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
+                  >
+
                     Save
                   </button>
 
