@@ -3,11 +3,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import {
-  getItemById,
   getItems,
-  deleteItemById,
-  editLimit,
-  addItem,
   addBoard
 } from "../libs/fetchUtils.js"
 
@@ -20,7 +16,7 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
-const userBoard = ref({name: ""})
+const userBoard = ref({ name: "" })
 // const userID = userStore.getUser()
 
 console.log("userStore.getUser()", userStore.getUser())
@@ -45,7 +41,19 @@ const toBoardsList = (boardId) => {
 const submitForm = async () => {
   await addBoard(baseUrlBoard, userBoard.value)
   router.go()
+  clearForm()
 }
+
+
+const clearForm = () => {
+  userBoard.value.name = ""
+}
+
+const cancelAction = () => {
+  clearForm();             
+  openModalName.value = false; 
+};
+
 
 </script>
 
@@ -245,48 +253,30 @@ const submitForm = async () => {
         </div> -->
 
         <!------------------------- Create Board ------------------------->
-        <div class="bg-gray-200 w-auto h-auto">
-          <button @click="openModalName = !openModalName">
-            <div
-              class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
-            >
+
+        <button @click="openModalName = !openModalName">
+          <router-link to="/board/add">
+            <div class="w-full p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-4 mt-2">
               <div class="flex flex-col items-center relative">
-                <svg
-                  class="-mt-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                   <defs>
                     <mask id="letsIconsAddSquareDuotoneLine0">
                       <g fill="none">
-                        <path
-                          stroke="silver"
-                          stroke-opacity=".25"
-                          d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
-                        />
-                        <path
-                          stroke="#fff"
-                          stroke-linejoin="round"
-                          d="M12 8v8m4-4H8"
-                        />
+                        <path stroke="silver" stroke-opacity=".25"
+                          d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z" />
+                        <path stroke="#fff" stroke-linejoin="round" d="M12 8v8m4-4H8" />
                       </g>
                     </mask>
                   </defs>
-                  <path
-                    fill="#000000"
-                    d="M0 0h24v24H0z"
-                    mask="url(#letsIconsAddSquareDuotoneLine0)"
-                  />
+                  <path fill="#000000" d="M0 0h24v24H0z" mask="url(#letsIconsAddSquareDuotoneLine0)" />
                 </svg>
-                <span class="itbkk-button-create mt-1 text-sm"
-                  >Create Board</span
-                >
+                <span class="itbkk-button-create mt-2">Create Board</span>
               </div>
             </div>
-          </button>
-        </div>
+          </router-link>
+        </button>
+
+
         <!------------------------- Board ------------------------->
         <!-- <div class="flex flex-col items-center mt-6">
           <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -452,10 +442,13 @@ const submitForm = async () => {
             <div class="w-full">
               <div class="m-8 my-20 max-w-[400px] mx-auto">
                 <div class="mb-8">
-                  <span
-                    class="block text-2xl font-bold leading-6 mb-1 customPurple text-center"
-                    >New Board</span
-                  >
+
+                  <span class="block text-2xl font-bold leading-6 mb-1 customPurple text-center">New Board</span>
+                  <input v-model="userBoard.name" type="text" placeholder="Name"
+                    class="itbkk-board-name input input-bordered w-full max-w-s" />
+                </div>
+                <div class="space-y-4">
+
 
                   <div class="modal-content py-4 text-left px-6 flex-grow">
                     <div class="label">
@@ -486,6 +479,8 @@ const submitForm = async () => {
                     Save
                   </button>
 
+
+
                   <button
                     @click="openModalName = false"
                     class="itbkk-button-cancel p-3 bg-white border rounded-full w-full font-semibold"
@@ -503,12 +498,13 @@ const submitForm = async () => {
                       Save
                     </button>
                   </form>
-                  <button
-                    class="itbkk-button-cancel btn"
-                    @click="openModalName = false"
-                  >
-                    Cancel
-                  </button>
+                  <router-link to="/board">
+                    <button @click="cancelAction"
+                      class="itbkk-button-cancel p-3 bg-white border rounded-full w-full font-semibold">
+                      Cancel
+                    </button>
+                  </router-link>
+
                 </div>
               </div>
             </div>

@@ -70,6 +70,11 @@ export const routes = [
     component: Board,
   },
   {
+    path: "/board/add",
+    name: "BoardAdd",
+    component: Board,
+  },
+  {
     path: "/board/:id",
     name: "BoardList",
     component: BoardList,
