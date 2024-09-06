@@ -6,8 +6,10 @@ import {
   getItemById,
   getItems,
   deleteItemById,
-  editLimit
-} from '../libs/fetchUtils.js'
+  editLimit,
+  addItem,
+  addBoard
+} from "../libs/fetchUtils.js"
 
 const BoardsList = ref([])
 const openModalName = ref(false)
@@ -18,6 +20,11 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
+const userBoard = ref({name: ""})
+// const userID = userStore.getUser()
+
+console.log("userStore.getUser()", userStore.getUser())
+
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
@@ -30,13 +37,20 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
+    userStore.setID(boardId)
   }
 }
+
+const submitForm = async () => {
+  await addBoard(baseUrlBoard, userBoard.value)
+  router.go()
+}
+
 </script>
 
 <template>
-  <div class="min-h-full max-h-fit">
+<div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
       <div
@@ -520,17 +534,16 @@ const toBoardsList = (boardId) => {
 }
 .fourth {
   border-color: #b7b7b7;
-  background-image: -webkit-linear-gradient(
-    45deg,
-    #9fc3e9 50%,
-    transparent 50%
-  );
+  background-image: -webkit-linear-gradient(45deg,
+      #9fc3e9 50%,
+      transparent 50%);
   background-image: linear-gradient(45deg, #9fc3e9 50%, transparent 50%);
   background-position: 100%;
   background-size: 400%;
   -webkit-transition: 300ms ease-in-out;
   transition: 300ms ease-in-out;
 }
+
 .fourth:hover {
   background-position: 0;
 }

@@ -1,18 +1,31 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
-import { ref, onMounted, computed } from "vue"
-import { useRouter } from "vue-router"
+import { ref, onMounted, computed, watch  } from "vue"
+import { useRouter , useRoute } from "vue-router"
 import { useTasks } from "../stores/store.js"
 import { useLimitStore } from "../stores/storeLimit"
-
+import { useUsers } from "@/stores/storeUser"
 const router = useRouter()
+const route = useRoute()
+
 const alertAdd = ref(false)
 const statusList = ref([])
 const alertLimitAdd = ref(false)
 const error = ref("")
 
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
-const baseUrlStatus = `${import.meta.env.VITE_BASE_URL_MAIN}/statuses`
+const userStore = useUsers()
+
+const boardId = ref()
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
+const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
 const limitStore = useLimitStore()
 const taskStore = useTasks()

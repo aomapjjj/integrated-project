@@ -16,13 +16,13 @@ export const routes = [
     redirect: { name: "Login" },
   },
   {
-    path: "/task",
+    path: "/board/:id",
     name: "TaskList",
     component: TaskList,
     props: true,
     children: [
       {
-        path: "add",
+        path: "/board/:id/task/add",
         name: "AddTask",
         component: AddTask,
       },
@@ -32,7 +32,7 @@ export const routes = [
         component: TaskDetail,
       },
       {
-        path: "/task/:id/edit",
+        path: "/board/:id/task/:task-id/edit",
         name: "TaskEdit",
         component: EditTask,
       },
@@ -48,7 +48,7 @@ export const routes = [
     component: ErrorPage,
   },
   {
-    path: "/status",
+    path: "/board/:id/status",
     name: "StatusesList",
     component: StatusesList,
     children: [
@@ -61,27 +61,25 @@ export const routes = [
   },
   {
     path: "/login",
-    name: "Login", 
+    name: "Login",
     component: Login,
   },
   {
     path: "/board",
-    name: "Board", 
+    name: "Board",
     component: Board,
   },
   {
     path: "/board/:id",
     name: "BoardList",
     component: BoardList,
-  }
-  
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
-
 
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem("access_token");
@@ -91,13 +89,16 @@ router.beforeEach(async (to, from, next) => {
     next({ name: "Login" });
   } else if (token) {
     try {
-      const validateResponse = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const validateResponse = await fetch(
+        `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log("Validate Response:", validateResponse.status);
 
@@ -117,7 +118,5 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
-
-
 
 export default router;
