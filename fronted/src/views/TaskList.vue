@@ -39,8 +39,6 @@ const userStore = useUsers()
 const userName = userStore.getUser().username
 const userId = userStore.getUser()
 
-
-
 const token = localStorage.getItem("access_token")
 
 let items = []
@@ -61,8 +59,8 @@ onMounted(async () => {
 
   const taskId = route.params.id
   if (taskId !== undefined) {
-    const {item, responsed} = await getItemById(taskId)
-    if (responsed === 404 || responsed === 400) {
+    const response = await getItemById(taskId)
+    if (response && (response.status === 404 || response.status === 400)) {
       router.push("/task/error")
     }
   }
