@@ -447,7 +447,33 @@ const cancelAction = () => {
                   <input v-model="userBoard.name" type="text" placeholder="Name"
                     class="itbkk-board-name input input-bordered w-full max-w-s" />
                 </div>
-                
+
+                <div class="space-y-4">
+
+
+                  <div class="modal-content py-4 text-left px-6 flex-grow">
+                    <div class="label">
+                      <span
+                        class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
+                        >Title
+                      </span>
+                    </div>
+
+                    <label
+                      class="input input-bordered flex items-center gap-2 font-bold ml-4"
+                    >
+                      <input
+                        type="text"
+                        class="itbkk-board-name grow"
+                        placeholder="Enter Your Title Board"
+                      />
+                    </label>
+                    <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
+              {{ status.name?.length }}/50
+            </p> -->
+                  </div>
+                </div>
+
                 <!-- <div class="space-y-4">
                   <button
                     class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
