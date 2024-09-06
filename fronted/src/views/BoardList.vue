@@ -31,58 +31,7 @@ onMounted(async () => {
 <template>
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
-      <!-- Sidebar -->
-      <aside
-        id="sidebar"
-        v-if="sidebarTasks"
-        class="w-64 bg-gray-100 shadow-lg transition-transform transform translate-x-0"
-      >
-        <div class="p-6">
-          <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
-          <h2 class="text-xl text-center font-bold mt-4">
-            IT-Bangmod <br />Kradan Kanban
-          </h2>
-
-          <nav class="mt-6">
-            <ul>
-              <li class="my-3">
-                <a
-                  href="#"
-                  class="flex items-center text-gray-700 hover:bg-gray-200 hover:text-blue-500 transition duration-200 rounded-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
-                    <g fill="none">
-                      <path
-                        fill="#d9d9d9"
-                        fill-opacity=".25"
-                        d="M16 16H8.415c-1.184 0-1.776 0-2.299.202q-.412.16-.76.43c-.442.344-.747.852-1.356 1.868V7c0-1.886 0-2.828.586-3.414S6.114 3 8 3h8c1.886 0 2.828 0 3.414.586S20 5.114 20 7v5c0 1.886 0 2.828-.586 3.414S17.886 16 16 16"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-width="1.2"
-                        d="M20 12v5c0 1.886 0 2.828-.586 3.414S17.886 21 16 21H6.5a2.5 2.5 0 0 1 0-5H16c1.886 0 2.828 0 3.414-.586S20 13.886 20 12V7c0-1.886 0-2.828-.586-3.414S17.886 3 16 3H8c-1.886 0-2.828 0-3.414.586S4 5.114 4 7v11.5"
-                      />
-                      <path
-                        stroke="#d9d9d9"
-                        stroke-linecap="round"
-                        stroke-width="1.2"
-                        d="m9 10l1.293 1.293a1 1 0 0 0 1.414 0L15 8"
-                      />
-                    </g>
-                  </svg>
-
-                  <span class="ml-3">All Boards</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </aside>
+ 
 
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
