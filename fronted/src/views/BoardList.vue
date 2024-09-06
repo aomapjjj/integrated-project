@@ -30,7 +30,7 @@ onMounted(async () => {
 
 
 const toTasksList = () => {
-    router.push({ name: "TaskList" })
+  router.push({ name: "TaskList" })
 
 }
 </script>
