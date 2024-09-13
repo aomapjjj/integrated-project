@@ -10,6 +10,7 @@ import Board from "@/views/Board.vue";
 import BoardList from "@/views/BoardList.vue";
 import { useUsers } from "@/stores/storeUser";
 
+
 export const routes = [
   {
     path: "/",
@@ -70,6 +71,11 @@ export const routes = [
     component: Board,
   },
   {
+    path: "/board/add",
+    name: "BoardAdd",
+    component: Board,
+  },
+  {
     path: "/board/:id",
     name: "BoardList",
     component: BoardList,
@@ -77,8 +83,9 @@ export const routes = [
   {
     path: "/board/home",
     name: "BoardHome",
-    component: BoardList,
+    component: Board,
   }
+  
 ];
 
 const router = createRouter({
