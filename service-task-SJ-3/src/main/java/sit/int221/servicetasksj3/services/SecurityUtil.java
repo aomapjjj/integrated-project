@@ -1,4 +1,4 @@
-package sit.int221.servicetasksj3.utils;
+package sit.int221.servicetasksj3.services;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

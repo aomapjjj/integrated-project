@@ -74,6 +74,11 @@ export const routes = [
     name: "BoardList",
     component: BoardList,
   },
+  {
+    path: "/board/home",
+    name: "BoardHome",
+    component: BoardList,
+  }
 ];
 
 const router = createRouter({
