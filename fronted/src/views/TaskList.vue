@@ -87,7 +87,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: 'TaskDetail', params: { id: todoId } })
+    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true

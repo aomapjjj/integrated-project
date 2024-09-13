@@ -289,93 +289,7 @@ const cancelAction = () => {
           </button>
         </div>
 
-       
-        <!------------------------- Board ------------------------->
-        <!-- <div class="flex flex-col items-center mt-6">
-          <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div
-              class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8"
-            >
-              <div
-                class="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg"
-              >
-                              <table class="table-auto" style="table-layout: fixed">
-                
-                <thead>
-                  <tr class="bg-base-200 mt-4 md:mt-0 i">
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9fc3e9;
-                        border-bottom: 2px solid #9fc3e9;
-                        color: #fff;
-                      "
-                    >
-                      No.
-                    </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9fc3e9;
-                        border-bottom: 2px solid #9fc3e9;
-                        color: #fff;
-                      "
-                    >
-                     Name
-                    </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9fc3e9;
-                        border-bottom: 2px solid #9fc3e9;
-                        color: #fff;
-                      "
-                    >
-                     Action
-                    </th>
 
-              
-                  </tr>
-                </thead>
-                <tbody>
-                 
-                  <tr
-                    class="itbkk-item "
-                    v-for="(item, index) in BoardsList"
-                    :key="index"
-                  >
-                    <td
-                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      {{ index + 1 }}
-                    </td>
-                    <td
-                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <label 
-                        for="my_modal_6"
-                        style="display: block; width: 100%; height: 100%"
-                      >
-                       <div @click="toBoardsList(item.id)">
-                            <h4 class="text-gray-700 dark:text-gray-200">
-                              {{ item.name }}
-                            </h4>
-                        </div>
-                      </label>
-                    </td>
-                    
-                      <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                       
-                      </td>
-               
-                  </tr>
-                  
-                </tbody>
-              </table>
-              </div>
-            </div>
-          </div>
-        </div> -->
 
         <div v-for="(item, index) in BoardsList" :key="index">
           <div class="p-6">
@@ -387,14 +301,9 @@ const cancelAction = () => {
                   <div
                     class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center"
                   >
-                    <!-- <span class="text-gray-500">Board Thumbnail</span> -->
+                  
                   </div>
-                  <!-- <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12H5.01M12 12H12.01M19 12H19.01M6 12C6 12.5523 5.55228 13 5 13C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11C5.55228 11 6 11.4477 6 12ZM13 12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11C12.5523 11 13 11.4477 13 12ZM20 12C20 12.5523 19.5523 13 19 13C18.4477 13 18 12.5523 18 12C18 11.4477 18.4477 11 19 11C19.5523 11 20 11.4477 20 12Z"/>
-          </svg>
-        </button> -->
+                 
 
                   <div
                     class="dropdown absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -504,7 +413,7 @@ const cancelAction = () => {
                       <input
                         type="text"
                         class="itbkk-board-name grow"
-                        placeholder="Enter Your Title Board"
+                        placeholder=""
                         v-model="userBoard.name"
                       />
                     </label>

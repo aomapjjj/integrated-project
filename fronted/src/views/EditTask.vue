@@ -29,6 +29,8 @@ watch(
   { immediate: true }
 )
 
+
+
 const showAlertEdit = ref(false);
 const showAlertAfterEdit = ref(false);
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
@@ -68,7 +70,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const myModal = ref(null);
 
 const openModal = () => {
-  router.push({ name: 'TaskEdit', params: { id: props.todoId } });
+  router.push({ name: 'TaskEdit', params: { taskid: props.todoId } });
   myModal.value.showModal();
 };
 
