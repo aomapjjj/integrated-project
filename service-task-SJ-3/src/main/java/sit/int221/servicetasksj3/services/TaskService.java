@@ -139,7 +139,8 @@ public class TaskService {
                     status.setTasks(tasks);
                 }
                 if (tasks.size() >= taskLimit.getMaximumTask()) {
-                    validationError.addValidationError("status", "the status has reached the limit");                }
+                    validationError.addValidationError("status", "the status has reached the limit");
+                }
             }
         }
         try {
