@@ -85,7 +85,7 @@ public class StatusService {
         }
 
         // Check if task limit is enabled and th
-        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+        TaskLimit taskLimit = limitRepository.findByBoardId(boardId).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
         if (taskLimit.getIsLimit()) {
             long statusCount = repository.count();
@@ -139,7 +139,7 @@ public class StatusService {
         }
 
         // Check if task limit is enabled and the status has reached the limit
-        TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(
+        TaskLimit taskLimit = limitRepository.findByBoardId(boardId).orElseThrow(
                 () -> new ItemNotFoundException("Task limit configuration not found"));
         if (taskLimit.getIsLimit()) {
             List<Task> tasks = taskRepository.findByStatus(existingTask);
