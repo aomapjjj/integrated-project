@@ -2,17 +2,22 @@ package sit.int221.servicetasksj3.services;
 
 
 import io.viascom.nanoid.NanoId;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.boardsDTO.BoardRequestDTO;
 import sit.int221.servicetasksj3.dtos.boardsDTO.BoardResponseDTO;
+import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
 import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.Task;
+import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
+import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
@@ -34,6 +39,9 @@ public class BoardService {
     private ModelMapper modelMapper;
     @Autowired
     private ListMapper listMapper;
+
+    @Autowired
+    private LimitRepository limitRepository;
 
     private String generateUniqueBoardId() {
         return NanoId.generate(10);
@@ -110,6 +118,9 @@ public class BoardService {
         statuses.add(status4);
         statusRepository.saveAll(statuses);
 
+        TaskLimit limit = new TaskLimit(10,false, newBoard.getId());
+        limitRepository.save(limit);
+
         // Map owner information
         BoardResponseDTO boardResponse = modelMapper.map(newBoard, BoardResponseDTO.class);
         BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
@@ -118,6 +129,14 @@ public class BoardService {
         boardResponse.setOwner(ownerDTO);
 
         return boardResponse;
+    }
+    @Transactional
+    public Board removeBoard(String boardId){
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new ItemNotFoundException("NOT FOUND"));
+        Board deleted = modelMapper.map(board, Board.class);
+        boardRepository.delete(board);
+        return deleted;
     }
 }
 

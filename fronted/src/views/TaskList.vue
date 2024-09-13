@@ -218,6 +218,10 @@ const closeLimit = () => {
 const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
 }
+
+const toBoardsList = () => {
+    router.push({ name: "Board" })    
+}
 </script>
 
 <template>
@@ -242,10 +246,12 @@ const toggleSidebar = () => {
           <ul class="space-y-1.5">
             <li class="hs-accordion" id="projects-accordion">
               <button
+    
                 type="button"
                 class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
                 aria-expanded="true"
                 aria-controls="projects-accordion"
+               @click="toBoardsList()"
               >
                 <svg
                   class="size-4"
