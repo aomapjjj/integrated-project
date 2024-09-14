@@ -39,6 +39,15 @@ const useUsers = defineStore("users", () => {
     return user.value;
   };
 
+  const setBoard = (newboard) => {
+    boardId.value = newboard;
+    localStorage.setItem("boardId", boardId.value);
+  };
+
+  const getBoard = () => {
+    return boardId.value
+  }
+
   // บันทึก boardId ใน localStorage
   // const setID = (id) => {
   //   boardId.value = id;
@@ -62,6 +71,8 @@ const useUsers = defineStore("users", () => {
     getUser,
     setToken,
     getToken,
+    setBoard,
+    getBoard
   };
 });
 

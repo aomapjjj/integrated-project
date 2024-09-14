@@ -29,8 +29,6 @@ watch(
   { immediate: true }
 )
 
-
-
 const showAlertEdit = ref(false);
 const showAlertAfterEdit = ref(false);
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
@@ -56,7 +54,7 @@ watch(
       todo.value = item
       oldValue.value = { ...todo.value };
     } else {
-      console.error('Failed to fetch item:', response);
+      console.error('Failed to fetch item:');
     }
     const itemsStatus = await getItems(baseUrlStatus);
     statusList.value = itemsStatus;
