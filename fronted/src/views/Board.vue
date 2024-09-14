@@ -14,7 +14,7 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
-const userBoard = ref({ name: "" })
+const userBoard = ref({ name: userName + ' personal Board' })
 // const userID = userStore.getUser()
 
 console.log("userStore.getUser()", userStore.getUser())
@@ -36,6 +36,13 @@ const toBoardsList = (boardId) => {
   }
 }
 
+
+// ----------------------- Validate -----------------------
+
+const isValidName = computed(() => {
+  return userBoard.value.name.length > 0 && userBoard.value.name.length <= 50
+})
+ 
 const submitForm = async () => {
   await addBoard(baseUrlBoard, userBoard.value)
   router.go()
@@ -456,6 +463,7 @@ const cancelAction = () => {
                       type="submit"
                       class="itbkk-button-ok btn flex-3 mr-2 bg-customPink"
                       @click="submitForm()"
+                      :disabled="!isValidName"
                     >
                       Save
                     </button>
