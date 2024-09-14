@@ -15,6 +15,7 @@ const limitStore = useLimitStore();
 const myTasks = useTasks();
 const oldValue = ref({});
 
+
 const props = defineProps({
   todoId: Number,
 });
@@ -35,6 +36,7 @@ const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
+
 const todo = ref({
   id: '',
   title: '',
@@ -48,19 +50,21 @@ const todo = ref({
 watch(
   () => props.todoId,
   async (newValue) => {
-    const {item, responsed} = await getItemById(newValue);
-    
-    if (responsed === 200) {
-      todo.value = item
+    const response = await getItemById(newValue,boardId.value);
+    if (response && response.responsed === 200) {
+      todo.value = response.item;
       oldValue.value = { ...todo.value };
-    } else {
-      console.error('Failed to fetch item:');
     }
     const itemsStatus = await getItems(baseUrlStatus);
     statusList.value = itemsStatus;
   },
-  // { immediate: true }
+  { immediate: true }
 );
+
+
+
+
+
 
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

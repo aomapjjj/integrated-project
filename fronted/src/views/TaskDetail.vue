@@ -6,6 +6,7 @@ import { toDate } from "../libs/toDate"
 import { useRoute, useRouter } from "vue-router"
 
 const userStore = useUsers()
+const router = useRouter()
 const route = useRoute()
 const props = defineProps({
   todoId: Number
