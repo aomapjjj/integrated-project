@@ -20,7 +20,7 @@ async function getItems(url) {
 }
 
 async function getItemById(taskId, boardId) {
-  console.log(taskId)
+
   const token = getToken();
   if (boardId && taskId) {
     try {
@@ -29,10 +29,10 @@ async function getItemById(taskId, boardId) {
           "Authorization": `Bearer ${token}`
         }
       });
-      console.log(response)
+      
       
       const item = await response.json();
-      console.log(item)
+     
       const responsed = response.status;
       return { item, responsed };
       

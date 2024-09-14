@@ -310,7 +310,7 @@ const clearToken = () => {
                     </div>
 
                     <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
-                      <input type="text" class="itbkk-board-name grow" placeholder="" v-model="userBoard.name" />
+                      <input type="text" class="itbkk-board-name grow" placeholder="Board Name" v-model="userBoard.name" />
                     </label>
                     <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ status.name?.length }}/50
