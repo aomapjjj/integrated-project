@@ -65,7 +65,7 @@ onMounted(async () => {
   if (taskId !== undefined) {
     const response = await getItemById(taskId)
     if (response && (response.status === 404 || response.status === 400)) {
-      router.push("/task/error")
+      router.push("/error")
     }
   }
   return items
