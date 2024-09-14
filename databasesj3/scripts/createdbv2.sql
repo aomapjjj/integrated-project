@@ -9,7 +9,7 @@ USE `kanbanIT`;
 -- Create boards table
 CREATE TABLE IF NOT EXISTS `kanbanIT`.`boards` (
   `boardId` CHAR(10) ,
-  `boardname` VARCHAR(50) NOT NULL,
+  `boardname` VARCHAR(120) NOT NULL,
   `userId` VARCHAR(36) , 
   PRIMARY KEY (`boardId`),
   INDEX `userId_index` (`userId` ASC)
