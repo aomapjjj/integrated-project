@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed , watch } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -220,7 +220,7 @@ const toggleSidebar = () => {
 }
 
 const toBoardsList = () => {
-    router.push({ name: "Board" })    
+  router.push({ name: "Board" })
 }
 </script>
 
@@ -228,88 +228,51 @@ const toBoardsList = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <div
-        id="sidebar"
+      <div id="sidebar"
         class="hs-overlay fixed top-0 left-0 bottom-0 z-40 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
-        role="dialog"
-        tabindex="-1"
-        aria-label="Sidebar"
-      >
+        role="dialog" tabindex="-1" aria-label="Sidebar">
         <div class="px-6">
           <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
         </div>
 
-        <nav
-          class="hs-accordion-group p-6 w-full flex-grow overflow-y-auto"
-          data-hs-accordion-always-open
-        >
+        <nav class="hs-accordion-group p-6 w-full flex-grow overflow-y-auto" data-hs-accordion-always-open>
           <ul class="space-y-1.5">
             <li class="hs-accordion" id="projects-accordion">
-              <button
-    
-                type="button"
+              <button type="button"
                 class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                aria-expanded="true"
-                aria-controls="projects-accordion"
-               @click="toBoardsList()"
-              >
-                <svg
-                  class="size-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="#000000"
-                    d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2M5 13h4v2H5z"
-                  />
+                aria-expanded="true" aria-controls="projects-accordion" @click="toBoardsList()">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <path fill="#000000"
+                    d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2M5 13h4v2H5z" />
                 </svg>
                 All boards
                 <svg
                   class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                  xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </button>
 
-              <div
-                id="projects-accordion"
+              <div id="projects-accordion"
                 class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                role="region"
-                aria-labelledby="projects-accordion"
-              >
+                role="region" aria-labelledby="projects-accordion">
                 <ul class="pt-2 ps-2">
                   <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
+                    <a class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#">
                       Link 1
                     </a>
                   </li>
                   <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
+                    <a class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#">
                       Link 2
                     </a>
                   </li>
                   <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
+                    <a class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+                      href="#">
                       Link 3
                     </a>
                   </li>
@@ -319,25 +282,19 @@ const toBoardsList = () => {
           </ul>
         </nav>
 
-        <div
-          class="mt-auto p-4 bg-gray-100 dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700"
-        >
+        <div class="mt-auto p-4 bg-gray-100 dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <!-- User Icon -->
               <div class="avatar placeholder">
-                <div
-                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full"
-                ></div>
+                <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full"></div>
               </div>
               <!-- User Info -->
               <div>
                 <p class="text-xs text-gray-500 dark:text-neutral-400">
                   Welcome,
                 </p>
-                <p
-                  class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white"
-                >
+                <p class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white">
                   {{ userName }}
                 </p>
               </div>
@@ -345,22 +302,13 @@ const toBoardsList = () => {
             <!-- Log out -->
             <div>
               <button>
-                <svg
-                  @click="clearToken()"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="#ff6161"
-                    d="m21.207 11.293l-3-3a1 1 0 1 0-1.414 1.415L18.086 11H12.5a1 1 0 0 0 0 2h5.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.415Z"
-                  />
-                  <path
-                    fill="#ff6161"
+                <svg @click="clearToken()" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                  viewBox="0 0 24 24">
+                  <path fill="#ff6161"
+                    d="m21.207 11.293l-3-3a1 1 0 1 0-1.414 1.415L18.086 11H12.5a1 1 0 0 0 0 2h5.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.415Z" />
+                  <path fill="#ff6161"
                     d="M12.5 13a1 1 0 0 1 0-2h4V5a3.003 3.003 0 0 0-3-3h-8a3.003 3.003 0 0 0-3 3v14a3.003 3.003 0 0 0 3 3h8a3.003 3.003 0 0 0 3-3v-6Z"
-                    opacity=".5"
-                  />
+                    opacity=".5" />
                 </svg>
               </button>
             </div>
@@ -372,44 +320,22 @@ const toBoardsList = () => {
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <nav
-          class="bg-white shadow px-4 py-6 flex justify-center items-center"
-          style="background-color: #d8f1f1"
-        >
-          <div
-            class="text-2xl font-bold tracking-tight"
-            style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
-          >
+        <nav class="bg-white shadow px-4 py-6 flex justify-center items-center" style="background-color: #d8f1f1">
+          <div class="text-2xl font-bold tracking-tight" style="color: #9391e4; text-shadow: 0 0 5px #ffffff">
             IT-Bangmod Kradan Kanban
           </div>
         </nav>
 
         <div class="flex mt-9 px-6">
           <!-- LIMIT -->
-          <button
-            class="itbkk-status-setting btn mr-2 mt-1"
-            style="border-radius: 30px; background-color: #aff3c9"
-            onclick="my_modal_limit.showModal()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 14 14"
-            >
-              <path
-                fill="white"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z"
-              />
+          <button class="itbkk-status-setting btn mr-2 mt-1" style="border-radius: 30px; background-color: #aff3c9"
+            onclick="my_modal_limit.showModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
+              <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z" />
             </svg>
           </button>
-          <dialog
-            id="my_modal_limit"
-            class="modal modal-bottom sm:modal-middle"
-          >
+          <dialog id="my_modal_limit" class="modal modal-bottom sm:modal-middle">
             <div class="modal-box" style="max-width: 400px">
               <h3 class="font-bold text-lg" style="color: #9391e4">
                 Status Settings
@@ -417,53 +343,30 @@ const toBoardsList = () => {
               <p class="py-4">
                 User can limit the number of tasks in status by setting the
                 Maximum task in each status
-                <br /><span style="color: #eb4343"
-                  >( except "No Status" and "Done" statuses )</span
-                >
+                <br /><span style="color: #eb4343">( except "No Status" and "Done" statuses )</span>
               </p>
               <div class="flex items-center mt-4">
                 <span class="mr-2">Limit tasks in this status</span>
 
-                <input
-                  type="checkbox"
-                  class="toggle"
-                  v-model="limitStore.getLimit().isLimit"
-                />
+                <input type="checkbox" class="toggle" v-model="limitStore.getLimit().isLimit" />
               </div>
 
-              <div
-                v-if="limitStore.getLimit().isLimit"
-                class="mt-4 flex flex-col items-center"
-              >
+              <div v-if="limitStore.getLimit().isLimit" class="mt-4 flex flex-col items-center">
                 <div class="flex items-center justify-center">
-                  <label for="status-limit" class="mr-2"
-                    >Set maximum tasks</label
-                  >
+                  <label for="status-limit" class="mr-2">Set maximum tasks</label>
                 </div>
 
-                <input
-                  type="number"
-                  id="status-limit"
-                  class="input input-bordered input-centered"
-                  v-model.number="limitStore.getLimit().maximumTask"
-                  max="10"
-                  min="1"
-                />
+                <input type="number" id="status-limit" class="input input-bordered input-centered"
+                  v-model.number="limitStore.getLimit().maximumTask" max="10" min="1" />
               </div>
 
               <div class="modal-action">
                 <form method="dialog">
-                  <button
-                    class="btn mr-2 bg-green-400 text-w"
-                    @click="UpdateLimit"
-                  >
+                  <button class="btn mr-2 bg-green-400 text-w" @click="UpdateLimit">
                     Confirm
                   </button>
 
-                  <button
-                    class="btn mr-2 bg-grey-400 text-w"
-                    @click="closeLimit()"
-                  >
+                  <button class="btn mr-2 bg-grey-400 text-w" @click="closeLimit()">
                     Close
                   </button>
                 </form>
@@ -472,23 +375,10 @@ const toBoardsList = () => {
           </dialog>
           <!-- FILTER -->
           <details class="dropdown">
-            <summary
-              class="itbkk-status-filter m-1 btn"
-              style="border-radius: 30px"
-            >
+            <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
               <button>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <g
-                    fill="#9FC3E9"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
+                  <g fill="#9FC3E9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="2" cy="2" r="1.5" />
                     <path d="M3.5 2h10" />
                     <circle cx="7" cy="7" r="1.5" />
@@ -501,23 +391,10 @@ const toBoardsList = () => {
               Filter
             </summary>
 
-            <ul
-              class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
-            >
-              <li
-                v-for="status in statusList"
-                :key="status.name"
-                class="flex items-center"
-              >
-                <label
-                  class="itbkk-status-choice flex items-center space-x-2 w-full"
-                >
-                  <input
-                    type="checkbox"
-                    :value="status.name"
-                    v-model="filter"
-                    class="mr-2"
-                  />
+            <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
+              <li v-for="status in statusList" :key="status.name" class="flex items-center">
+                <label class="itbkk-status-choice flex items-center space-x-2 w-full">
+                  <input type="checkbox" :value="status.name" v-model="filter" class="mr-2" />
                   <span class="itbkk-status-choice">{{ status.name }}</span>
                 </label>
               </li>
@@ -525,17 +402,11 @@ const toBoardsList = () => {
           </details>
 
           <div class="selected-filters flex flex-wrap mt-2">
-            <div
-              v-for="status in filter"
-              :key="status"
+            <div v-for="status in filter" :key="status"
               class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
-              style="background-color: rgb(247, 133, 177)"
-            >
+              style="background-color: rgb(247, 133, 177)">
               <span>{{ status }}</span>
-              <button
-                @click="removeStatus(status)"
-                class="ml-2 text-gray-900 hover:text-white"
-              >
+              <button @click="removeStatus(status)" class="ml-2 text-gray-900 hover:text-white">
                 &times;
               </button>
             </div>
@@ -548,31 +419,16 @@ const toBoardsList = () => {
                 <!-- ADD BUTTON -->
                 <AddTask />
                 <!-- MANAGE STATUS -->
-                <button
-                  class="itbkk-manage-status btn bg-gray-200"
-                  style="
+                <button class="itbkk-manage-status btn bg-gray-200" style="
                     color: white;
                     background-color: #f785b1;
                     border-radius: 30px;
-                  "
-                  @click="openNewStatus()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
-                    <g
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                    >
+                  " @click="openNewStatus()">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2">
                       <path
-                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
-                      />
+                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1" />
                       <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
                     </g>
                   </svg>
@@ -590,106 +446,66 @@ const toBoardsList = () => {
                 <!-- TABLE -->
                 <thead>
                   <tr class="bg-base-200 mt-4 md:mt-0">
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       No.
                     </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       Title
                     </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
+                      ">
                       Assignees
                     </th>
 
                     <!-- STATUS SORT -->
 
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      "
-                    >
-                      <button
-                        class="itbkk-status-sort"
-                        style="display: flex; align-items: center"
-                        @click="sortByStatus(), toggleIcon()"
-                      >
+                      ">
+                      <button class="itbkk-status-sort" style="display: flex; align-items: center"
+                        @click="sortByStatus(), toggleIcon()">
                         <div class="mr-2">Status</div>
                         <!-- Default -->
-                        <svg
-                          v-if="showIcon === 'default'"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-if="showIcon === 'default'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                          viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="currentColor"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
-                            />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                            <path fill="currentColor"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
                           </g>
                         </svg>
                         <!-- Asc -->
-                        <svg
-                          v-else-if="showIcon === 'asc'"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-else-if="showIcon === 'asc'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                          viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="#eb4343"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
-                            />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+                            <path fill="#eb4343"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
                           </g>
                         </svg>
 
                         <!-- Des -->
-                        <svg
-                          v-else
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
-                            />
-                            <path
-                              fill="#4361ee"
-                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z"
-                            />
+                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
+                            <path fill="#4361ee"
+                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z" />
                           </g>
                         </svg>
                       </button>
@@ -697,16 +513,13 @@ const toBoardsList = () => {
 
                     <!-- STATUS SORT -->
 
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
+                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
                         text-align: center;
                         vertical-align: middle;
-                      "
-                    >
+                      ">
                       Action
                     </th>
                   </tr>
@@ -714,88 +527,53 @@ const toBoardsList = () => {
                 <tbody>
                   <!-- Iterate over todoList -->
                   <TaskDetail :todo-id="selectedTodoId" />
-                  <tr
-                    class="itbkk-item"
-                    v-for="(item, index) in filteredTasks"
-                    :key="index"
-                  >
-                    <td
-                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
+                  <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
+                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
                       {{ index + 1 }}
                     </td>
-                    <td
-                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <label
-                        for="my_modal_6"
-                        @click="selectTodo(item.id)"
-                        style="display: block; width: 100%; height: 100%"
-                      >
+                    <td class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                      <label for="my_modal_6" @click="selectTodo(item.id)"
+                        style="display: block; width: 100%; height: 100%">
                         {{ item.title }}
                       </label>
                     </td>
-                    <td
-                      class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                      :class="{
-                        italic: !item.assignees || item.assignees.length === 0
-                      }"
-                    >
+                    <td class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700" :class="{
+                  italic: !item.assignees || item.assignees.length === 0
+                }">
                       {{
-                        !item.assignees || item.assignees.length === 0
-                          ? 'Unassigned'
-                          : item.assignees
-                      }}
+                  !item.assignees || item.assignees.length === 0
+                    ? 'Unassigned'
+                    : item.assignees
+                }}
                     </td>
-                    <td
-                      class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <span
-                        :class="{
-                          'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                          'border-blue-500 text-blue-500':
-                            item.status === 'No Status',
-                          'border-red-500 text-red-500':
-                            item.status === 'To Do',
-                          'border-yellow-500 text-yellow-500':
-                            item.status === 'Doing',
-                          'border-green-500 text-green-500':
-                            item.status === 'Done'
-                        }"
-                      >
+                    <td class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                      <span :class="{
+                    'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+                    'border-blue-500 text-blue-500':
+                      item.status === 'No Status',
+                    'border-red-500 text-red-500':
+                      item.status === 'To Do',
+                    'border-yellow-500 text-yellow-500':
+                      item.status === 'Doing',
+                    'border-green-500 text-green-500':
+                      item.status === 'Done'
+                  }">
                         {{ item.status }}
                       </span>
                     </td>
 
                     <div class="itbkk-button-action">
                       <td style="display: flex; justify-content: center">
-                        <div
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2"
-                        >
-                          <div
-                            v-if="index !== 0 && index !== 1"
-                            class="dropdown dropdown-top dropdown-end"
-                          >
+                        <div class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2">
+                          <div v-if="index !== 0 && index !== 1" class="dropdown dropdown-top dropdown-end">
                             <div tabindex="0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="28"
-                                height="28"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01"
-                                />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
+                                  d="M12 6h.01M12 12h.01M12 18h.01" />
                               </svg>
                             </div>
-                            <ul
-                              tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                            >
+                            <ul tabindex="0"
+                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                               <!-- EDIT -->
                               <li>
                                 <a>
@@ -806,11 +584,8 @@ const toBoardsList = () => {
                               <!-- Delete -->
 
                               <li>
-                                <a
-                                  style="width: 150px; margin-left: 17px"
-                                  class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id, index)"
-                                  >Delete
+                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
+                                  @click="openModalToDelete(item.id, index)">Delete
                                 </a>
                               </li>
                             </ul>
@@ -818,31 +593,17 @@ const toBoardsList = () => {
                         </div>
 
                         <!-- Dropdown  -->
-                        <div
-                          v-if="index === 0 || index === 1"
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8"
-                        >
+                        <div v-if="index === 0 || index === 1"
+                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8">
                           <div class="dropdown dropdown-end">
                             <div tabindex="0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="28"
-                                height="28"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01"
-                                />
+                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
+                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
+                                  d="M12 6h.01M12 12h.01M12 18h.01" />
                               </svg>
                             </div>
-                            <ul
-                              tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-                            >
+                            <ul tabindex="0"
+                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                               <!-- EDIT -->
                               <li>
                                 <a>
@@ -852,12 +613,8 @@ const toBoardsList = () => {
 
                               <!-- Delete -->
                               <li>
-                                <a
-                                  style="width: 150px; margin-left: 17px"
-                                  class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id)"
-                                  >Delete</a
-                                >
+                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
+                                  @click="openModalToDelete(item.id)">Delete</a>
                               </li>
                             </ul>
                           </div>
@@ -866,28 +623,19 @@ const toBoardsList = () => {
                         <dialog id="my_modal_delete" class="modal">
                           <div class="modal-box" style="max-width: 500px">
                             <h3 class="font-bold text-lg">Delete a Task</h3>
-                            <p
-                              class="itbkk-message py-4 font-medium"
-                              style="word-wrap: break-word"
-                            >
+                            <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
                               Do you want to delete the task number
                               {{ selectedItemIdToDelete }} - "{{
-                                filterAndLogTitleById(selectedItemIdToDelete)
-                              }}"?
+                  filterAndLogTitleById(selectedItemIdToDelete)
+                }}"?
                             </p>
                             <form method="dialog">
                               <div class="modal-action">
-                                <button
-                                  class="itbkk-button-cancel btn"
-                                  style="color: #eb4343"
-                                >
+                                <button class="itbkk-button-cancel btn" style="color: #eb4343">
                                   Cancel
                                 </button>
-                                <button
-                                  class="itbkk-button-confirm btn bg-green-400"
-                                  style="color: #fff"
-                                  @click="confirmDelete()"
-                                >
+                                <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff"
+                                  @click="confirmDelete()">
                                   Confirm
                                 </button>
                               </div>
@@ -899,10 +647,7 @@ const toBoardsList = () => {
                       </td>
                     </div>
                   </tr>
-                  <tr
-                    class="bg-base-100 mt-4 md:mt-0"
-                    v-if="filteredTasks?.length === 0"
-                  >
+                  <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0">
                     <td colspan="5" class="text-center py-4 text-gray-400">
                       No task
                     </td>
@@ -912,11 +657,7 @@ const toBoardsList = () => {
             </div>
             <!-- DELETE COMPLETE -->
 
-            <div
-              role="alert"
-              class="alert shadow-lg"
-              v-show="deleteComplete"
-              style="
+            <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
                 position: fixed;
                 top: 20px;
                 left: 50%;
@@ -925,20 +666,11 @@ const toBoardsList = () => {
                 width: 500px;
                 color: rgb(74 222 128 / var(--tw-text-opacity));
                 animation: fadeInOut 1.5s infinite;
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              ">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
                 <h2 class="itbkk-message font-bold text-green-400">

@@ -1,13 +1,17 @@
 <script setup>
 import { getItemById } from "@/libs/fetchUtils"
 import { ref, watch } from "vue"
-
+import { useUsers } from "@/stores/storeUser"
 import { toDate } from "../libs/toDate"
 import router from "@/router";
+
+const userStore = useUsers()
 
 const props = defineProps({
   todoId: Number
 })
+
+
 
 const todo = ref({
   id: "",
@@ -22,13 +26,12 @@ const todo = ref({
 watch(
   () => props.todoId,
   async (newValue) => {
-      const {item, responsed} = await getItemById(newValue)
-    if (responsed === 200) {
-      todo.value = item
-    }
+    // const boardId = localStorage.getItem()
+    const { item, responsed } = await getItemById(newValue, userStore.getBoard())
+    todo.value = item
   }
 )
-
+console.log(userStore.getBoard())
 const closeModal = () => {
   router.go(-1)
 }
@@ -39,7 +42,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 <template>
   <!-- Modal window -->
   <input type="checkbox" id="my_modal_6" class="modal-toggle hidden" />
-  <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center" >
+  <div class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center">
     <div
       class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
       <div class="flex justify-between w-full h-full"
@@ -59,11 +62,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             </div>
             <textarea id="description" class="itbkk-description textarea textarea-bordered h-3/4 mb-8" maxlength="500"
               rows="4" :class="{
-    'italic text-gray-500':
-      todo.description?.length === 0 ||
-      todo.description?.trim() === '' ||
-      todo.description === null
-  }" placeholder="No Description Provided" style="height: 400px">{{ todo.description }}</textarea>
+              'italic text-gray-500':
+                todo.description?.length === 0 ||
+                todo.description?.trim() === '' ||
+                todo.description === null
+            }" placeholder="No Description Provided" style="height: 400px">{{ todo.description }}</textarea>
           </label>
         </div>
 
@@ -73,11 +76,11 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Assignees</span>
             <textarea id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" maxlength="30"
               rows="4" :class="{
-    'italic text-gray-500':
-      todo.assignees?.length === 0 ||
-      todo.assignees?.trim() === '' ||
-      todo.assignees === null
-  }" placeholder="Unassigned">{{ todo.assignees }}</textarea>
+              'italic text-gray-500':
+                todo.assignees?.length === 0 ||
+                todo.assignees?.trim() === '' ||
+                todo.assignees === null
+            }" placeholder="Unassigned">{{ todo.assignees }}</textarea>
           </div>
 
           <!-- Status -->

@@ -85,7 +85,11 @@ export const routes = [
     name: "BoardList",
     component: BoardList,
   },
-
+  {
+    path: "/board/home",
+    name: "Boardhome",
+    component: Board,
+  },
   
 ];
 

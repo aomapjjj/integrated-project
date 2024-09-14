@@ -1,5 +1,5 @@
 // Utility function to get the token from localStorage
-const baseUrlTask = `${import.meta.env.VITE_BASE_URL_MAIN}/tasks`
+const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
   return localStorage.getItem("access_token");
 }
@@ -19,21 +19,28 @@ async function getItems(url) {
   }
 }
 
-async function getItemById(id) {
+async function getItemById(taskId, boardId) {
+  console.log(taskId)
   const token = getToken();
-  if (id > 0) {
+  if (boardId && taskId) {
     try {
-      const response = await fetch(`${baseUrlTask}/${id}`, {
+      const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
       });
+      console.log(response)
+      
       const item = await response.json();
-      const responsed = response.status
-      return {item, responsed}
+      console.log(item)
+      const responsed = response.status;
+      return { item, responsed };
+      
     } catch (error) {
       console.log(`error: ${error}`);
     }
+  } else {
+    console.log('Invalid boardId or taskId');
   }
 }
 
