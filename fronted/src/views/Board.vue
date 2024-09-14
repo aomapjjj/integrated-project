@@ -70,6 +70,12 @@ const cancelAction = () => {
   clearForm()
   openModalName.value = false
 }
+
+const clearToken = () => {
+  localStorage.removeItem("token");
+  router.push({ name: 'Login' });
+}
+
 </script>
 
 <template>
