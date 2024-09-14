@@ -12,6 +12,7 @@ import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
+import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
@@ -36,7 +37,11 @@ public class BoardService {
     private ListMapper listMapper;
 
     private String generateUniqueBoardId() {
-        return NanoId.generate(10);
+        String boardId;
+        do {
+            boardId = NanoId.generate(10);
+        } while (boardRepository.existsById(boardId)); // ตรวจสอบว่ามี id นี้ในฐานข้อมูลแล้วหรือยัง
+        return boardId;
     }
 
     // Get board IDs by owner
@@ -65,9 +70,13 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + id));
 
-        BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // Check if the user is the owner of the board
+        if (!board.getOwnerId().equals(currentUser.getOid())) {
+            throw new UnauthorizedException("User is not authorized to access this board");
+        }
 
+        BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
         BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
         ownerDTO.setOid(currentUser.getOid());
         ownerDTO.setName(currentUser.getName());
@@ -78,18 +87,25 @@ public class BoardService {
 
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
-        // Check if user is authenticated
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            throw new UnauthorizedException("User is not authorized");
+        if (boardRequest.getName() == null || boardRequest.getName().isEmpty()) {
+            throw new ValidationException("Board name is required");
+        }
+        // Check if board name length exceeds 120 characters
+        if (boardRequest.getName().length() > 120) {
+            throw new ValidationException("Board name must not exceed 120 characters");
         }
 
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         if (currentUser == null) {
-            throw new UnauthorizedException("User not found or not authenticated");
+            throw new UnauthorizedException("User not authenticated");
         }
 
         String oid = currentUser.getOid();
+
+        // Check if the user already owns a board
+        if (boardRepository.existsByOwnerId(oid)) {
+            throw new ValidationException("User already owns a board");
+        }
 
         Board board = new Board();
         board.setId(generateUniqueBoardId());

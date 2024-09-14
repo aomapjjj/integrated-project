@@ -3,19 +3,24 @@ package sit.int221.servicetasksj3.services;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.StatusDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.StatusDTOTwo;
+import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
+import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
+import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
+import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +35,8 @@ public class StatusService {
     private TaskRepository taskRepository;
     @Autowired
     private LimitRepository limitRepository;
+    @Autowired
+    private BoardRepository boardRepository;
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -55,6 +62,15 @@ public class StatusService {
     // ADD NEW STATUS
     @Transactional
     public StatusDTO createNewStatuses(String boardId, StatusDTO statusDTO) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของ board หรือไม่
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!board.getOwnerId().equals(currentUser.getOid())) {
+            throw new UnauthorizedException("You are not the owner of this board");
+        }
+
         if (statusDTO.getName() != null) {
             statusDTO.setName(statusDTO.getName().trim());
         }

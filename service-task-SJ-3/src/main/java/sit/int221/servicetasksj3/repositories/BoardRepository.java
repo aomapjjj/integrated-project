@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, String> {
     List<Board> findByOwnerId(String ownerId);
+
+    // Method to check if a user already owns a board
+    boolean existsByOwnerId(String ownerId);
 }
