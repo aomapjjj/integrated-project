@@ -84,7 +84,7 @@ onMounted(async () => {
   const statusId = route.params.id
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
-    if (response.status === 404 || response.status === 400) {
+    if (status === 404 || status === 400) {
       router.push('/status');
       notFound.value = true;
       setTimeout(() => {
@@ -133,6 +133,7 @@ const closeModalAdd = () => {
   clearForm()
   const modal = document.getElementById("my_modal_4")
   modal.close()
+  router.go(-1);
 }
 
 // ----------------------- Add -----------------------
@@ -190,13 +191,13 @@ const openModalToEdit = (statusId) => {
   originalStatus.value = { ...statusToEdit }
   const modal = document.getElementById("my_modal_edit")
   modal.showModal()
-  router.push({ name: "EditStatus", params: { id: statusId } })
+  router.push({ name: "EditStatus", params: { statusid: statusId } })
 }
 
 const closeModalEdit = () => {
   const modal = document.getElementById('my_modal_edit');
   modal.close();
-  router.go(-1);
+  router.go(-1)
   clearForm();
 };
 
@@ -230,6 +231,11 @@ const getNameById = (id) => {
     return null
   }
 }
+
+const openAdd = () =>{
+  router.push({ name: "AddStatus" })
+}
+
 
 const selectedItemIdToDelete = ref(0)
 
@@ -421,7 +427,7 @@ const isFormValid = computed(() => {
 
 
         <div class="ml-auto">
-          <button onclick="my_modal_4.showModal()" class="itbkk-button-add btn ml-4" style="
+          <button onclick="my_modal_4.showModal() " @click="openAdd()" class="itbkk-button-add btn ml-4" style="
               position: relative;
               border-radius: 30px;
               background-color: #f785b1;

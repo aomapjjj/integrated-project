@@ -1,12 +1,13 @@
 package sit.int221.servicetasksj3.dtos.boardsDTO;
 
 import lombok.*;
+import sit.int221.servicetasksj3.entities.Board;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardResponseDTO {
+public class BoardResponseDTO{
     private String id;
     private String name;
     private OwnerDTO owner;

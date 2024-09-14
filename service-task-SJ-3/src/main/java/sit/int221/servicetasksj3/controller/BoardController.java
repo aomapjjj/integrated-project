@@ -17,6 +17,7 @@ import sit.int221.servicetasksj3.dtos.tasksDTO.SimpleTaskDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTOTwo;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskNewDTO;
+import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
@@ -58,6 +59,12 @@ public class BoardController {
         BoardResponseDTO boardResponse = boardService.createNewBoard(boardRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponse);
     }
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<Board> removeBoard(@PathVariable String boardId) {
+        Board deleted = boardService.removeBoard(boardId);
+        return ResponseEntity.ok().body(deleted);
+    }
+
 
     // Task of board
     @GetMapping("/{boardId}/tasks")

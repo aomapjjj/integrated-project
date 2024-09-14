@@ -10,6 +10,7 @@ import Board from "@/views/Board.vue";
 import BoardList from "@/views/BoardList.vue";
 import { useUsers } from "@/stores/storeUser";
 
+
 export const routes = [
   {
     path: "/",
@@ -22,17 +23,17 @@ export const routes = [
     props: true,
     children: [
       {
-        path: "/board/:id/task/add",
+        path: "task/add",
         name: "AddTask",
         component: AddTask,
       },
       {
-        path: "/task/:id",
+        path: "task/:taskid",
         name: "TaskDetail",
         component: TaskDetail,
       },
       {
-        path: "/board/:id/task/:task-id/edit",
+        path: "task/:taskid/edit",
         name: "TaskEdit",
         component: EditTask,
       },
@@ -53,8 +54,13 @@ export const routes = [
     component: StatusesList,
     children: [
       {
-        path: "/status/:id/edit",
+        path: ":statusid/edit",
         name: "EditStatus",
+        component: StatusesList,
+      },
+      {
+        path: "add",
+        name: "AddStatus",
         component: StatusesList,
       },
     ],
@@ -70,10 +76,17 @@ export const routes = [
     component: Board,
   },
   {
+    path: "/board/add",
+    name: "BoardAdd",
+    component: Board,
+  },
+  {
     path: "/board/:id",
     name: "BoardList",
     component: BoardList,
   },
+
+  
 ];
 
 const router = createRouter({
