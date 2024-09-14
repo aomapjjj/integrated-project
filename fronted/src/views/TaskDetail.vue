@@ -40,8 +40,6 @@ watch(
   }
 )
 
-
-console.log(boardId)
 const closeModal = () => {
   router.go(-1)
 }
