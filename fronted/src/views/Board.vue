@@ -247,63 +247,57 @@ const cancelAction = () => {
         <div class="bg-gray-200 w-auto h-auto">
           <button @click="openModalName = !openModalName">
             <router-link to="/board/add">
-            <div
-              class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
-            >
-              <div class="flex flex-col items-center relative">
-                <svg
-                  class="-mt-2"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <defs>
-                    <mask id="letsIconsAddSquareDuotoneLine0">
-                      <g fill="none">
-                        <path
-                          stroke="silver"
-                          stroke-opacity=".25"
-                          d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
-                        />
-                        <path
-                          stroke="#fff"
-                          stroke-linejoin="round"
-                          d="M12 8v8m4-4H8"
-                        />
-                      </g>
-                    </mask>
-                  </defs>
-                  <path
-                    fill="#000000"
-                    d="M0 0h24v24H0z"
-                    mask="url(#letsIconsAddSquareDuotoneLine0)"
-                  />
-                </svg>
-                <span class="itbkk-button-create mt-1 text-sm"
-                  >Create Board</span
-                >
+              <div
+                class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
+              >
+                <div class="flex flex-col items-center relative">
+                  <svg
+                    class="-mt-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                  >
+                    <defs>
+                      <mask id="letsIconsAddSquareDuotoneLine0">
+                        <g fill="none">
+                          <path
+                            stroke="silver"
+                            stroke-opacity=".25"
+                            d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
+                          />
+                          <path
+                            stroke="#fff"
+                            stroke-linejoin="round"
+                            d="M12 8v8m4-4H8"
+                          />
+                        </g>
+                      </mask>
+                    </defs>
+                    <path
+                      fill="#000000"
+                      d="M0 0h24v24H0z"
+                      mask="url(#letsIconsAddSquareDuotoneLine0)"
+                    />
+                  </svg>
+                  <span class="itbkk-button-create mt-1 text-sm"
+                    >Create Board</span
+                  >
+                </div>
               </div>
-            </div>
-          </router-link>
+            </router-link>
           </button>
         </div>
 
-
-
-        
-          <div class="p-6">
-            <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
-            <div class="grid grid-cols-4 gap-6">
-              <div v-for="(item, index) in BoardsList" :key="index">
+        <div class="p-6">
+          <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
+          <div class="grid grid-cols-4 gap-6">
+            <div v-for="(item, index) in BoardsList" :key="index">
               <div class="bg-white rounded-lg shadow p-4">
                 <div class="relative">
                   <div
                     class="bg-gray-100 h-32 w-full rounded-md mb-4 flex items-center justify-center"
-                  >
-                  
-                  </div>
-                 
+                  ></div>
 
                   <div
                     class="dropdown absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -345,35 +339,66 @@ const cancelAction = () => {
                   </p>
                 </div>
               </div>
-              
-              <!-- delete -->
-              <div v-show="openModalToDelete" class="flex justify-center">
-                <form method="dialog">
-                  <button
-                    type="submit"
-                    class="itbkk-button-ok btn flex-3 mr-2 bg-customPink"
-                    @click="deletBoard(item.id)"
-                  >
-                    Save
-                  </button>
-                </form>
-                <button
-                  class="itbkk-button-cancel btn"
-                  @click="openModalToDelete = false"
-                >
-                  Cancel
-                </button>
-              </div>
 
-             
-            </div>
-          </div>
-        </div>
-        
+
+
+
+ <!-- delete modal for the selected item only -->
+
+ 
+ <!-- delete modal for the selected item only -->
+
+ <div v-if="openModalToDelete && selectedItemIdToDelete === item.id" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+  <div
+    class="w-full max-w-lg p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white"
+  >
+    <div>
+      <div
+        class="text-center p-3 flex-auto justify-center leading-6"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-16 h-16 flex items-center customRed mx-auto"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            clip-rule="evenodd"
+          />
+        </svg>
+        <h2 class="text-2xl font-bold py-4">Are you sure?</h2>
+        <p class="text-md text-gray-500 px-8">
+          Do you really want to Delete your Board?
+        </p>
+      </div>
+      <div class="p-3 mt-2 text-center space-x-4 md:block">
+        <button
+          class="itbkk-button-ok customRed mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-md hover:shadow-lg hover:bg-gray-100"
+          @click="confirmDelete()"
+        >
+          Delete
+        </button>
+        <button
+          @click="openModalToDelete = false"
+          class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500  px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+</div>
+
 
         <!------------------------- Modal ------------------------->
         <div
-          v-show="openModalName"
+          v-if="openModalName"
           class="fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
         >
           <div
