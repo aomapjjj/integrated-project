@@ -47,13 +47,11 @@ public class BoardController {
         List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
         return ResponseEntity.ok(boardIds);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String id) {
         BoardResponseDTO boardResponse = boardService.getBoardById(id);
         return ResponseEntity.ok(boardResponse);
     }
-
     @PostMapping("")
     public ResponseEntity<BoardResponseDTO> createNewBoards(@Valid @RequestBody BoardRequestDTO boardRequest) {
         BoardResponseDTO boardResponse = boardService.createNewBoard(boardRequest);
@@ -64,7 +62,6 @@ public class BoardController {
         Board deleted = boardService.removeBoard(boardId);
         return ResponseEntity.ok().body(deleted);
     }
-
 
     // Task of board
     @GetMapping("/{boardId}/tasks")
