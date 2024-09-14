@@ -3,10 +3,10 @@ import { getItemById } from "@/libs/fetchUtils"
 import { ref, watch } from "vue"
 import { useUsers } from "@/stores/storeUser"
 import { toDate } from "../libs/toDate"
-import router from "@/router";
+import { useRoute, useRouter } from "vue-router"
 
 const userStore = useUsers()
-
+const route = useRoute()
 const props = defineProps({
   todoId: Number
 })
@@ -22,16 +22,26 @@ const todo = ref({
   createdOn: "",
   updatedOn: ""
 })
-
+const boardId = ref()
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
 watch(
   () => props.todoId,
   async (newValue) => {
     // const boardId = localStorage.getItem()
-    const { item, responsed } = await getItemById(newValue, userStore.getBoard())
+    const { item, responsed } = await getItemById(newValue, boardId.value)
     todo.value = item
+    
   }
 )
-console.log(userStore.getBoard())
+
+
+console.log(boardId)
 const closeModal = () => {
   router.go(-1)
 }
