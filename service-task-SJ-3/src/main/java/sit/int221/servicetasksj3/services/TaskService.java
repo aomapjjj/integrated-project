@@ -14,6 +14,7 @@ import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
+import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
@@ -78,9 +79,16 @@ public class TaskService {
     public Task createNewTasks(String boardId, TaskNewDTO task){
         Task task1 = modelMapper.map(task, Task.class);
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new InternalServerErrorException("Invalid board"));
+                () -> new ItemNotFoundException("Board not found with ID: " + boardId));
         task1.setBoard(board);
         TaskStatus status;
+
+        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของ board หรือไม่
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!board.getOwnerId().equals(currentUser.getOid())) {
+            throw new UnauthorizedException("You are not the owner of this board");
+        }
+
         try {
             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
                     () -> new InternalServerErrorException("Invalid status ID"));

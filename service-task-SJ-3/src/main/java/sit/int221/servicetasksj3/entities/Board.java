@@ -14,11 +14,11 @@ public class Board {
     @Column(name = "boardId", length = 10)
     private String id;
 
-    @Column(name = "boardname", length = 50, nullable = false)
+    @Column(name = "boardname", length = 120, nullable = false)
     private String name;
 
     @JsonIgnore
-    @Column(name = "userId", length = 50, nullable = false)
+    @Column(name = "userId", length = 36, nullable = false)
     private String ownerId;
 
 //    @ManyToOne
