@@ -43,10 +43,11 @@ const isValidName = computed(() => {
 })
 
 const submitForm = async () => {
-  await addBoard(baseUrlBoard, userBoard.value)
-  router.go()
-  clearForm()
+  const newBoard = await addBoard(baseUrlBoard, userBoard.value)
+  toBoardsList(newBoard.id)
+  clearForm() 
 }
+
 
 const deletBoard = async (boardId) => {
   await deleteItemById(baseUrlBoard, boardId)
