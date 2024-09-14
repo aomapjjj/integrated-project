@@ -111,9 +111,9 @@ public class BoardService {
         String oid = currentUser.getOid();
 
         // Check if the user already owns a board
-        if (boardRepository.existsByOwnerId(oid)) {
-            throw new ValidationException("User already owns a board");
-        }
+//        if (boardRepository.existsByOwnerId(oid)) {
+//            throw new ValidationException("User already owns a board");
+//        }
 
         Board board = new Board();
         board.setId(generateUniqueBoardId());
@@ -146,14 +146,22 @@ public class BoardService {
 
         return boardResponse;
     }
+
+    // Delete
     @Transactional
     public Board removeBoard(String boardId){
         Board board = boardRepository.findById(boardId).orElseThrow(
-                () -> new ItemNotFoundException("NOT FOUND"));
-        Board deleted = modelMapper.map(board, Board.class);
-        boardRepository.delete(board);
-        return deleted;
+                () -> new ValidationException("Board not found with ID: " + boardId));
+        try {
+            boardRepository.delete(board);
+            return board;
+        } catch (Exception e) {
+            throw new ValidationException("Error occurred while deleting the board: " + e.getMessage());
+        }
     }
+
+    // Edit
+
 }
 
 
