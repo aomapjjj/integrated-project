@@ -111,7 +111,7 @@ const onFileChange = (event) => {
         aria-label="Sidebar"
       >
         <div class="px-6">
-          <img src="/src/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
+          <img src="/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
         </div>
 
         <nav
