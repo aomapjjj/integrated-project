@@ -95,14 +95,6 @@ public class BoardService {
 
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
-        if (boardRequest.getName() == null || boardRequest.getName().isEmpty()) {
-            throw new ValidationException("Board name is required");
-        }
-        // Check if board name length exceeds 120 characters
-        if (boardRequest.getName().length() > 120) {
-            throw new ValidationException("Board name must not exceed 120 characters");
-        }
-
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (currentUser == null) {
             throw new UnauthorizedException("User not authenticated");
