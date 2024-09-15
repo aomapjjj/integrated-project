@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router"
-import { ref, computed, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
-import { getItems, addBoard, deleteItemById } from "../libs/fetchUtils.js"
+import { useRouter, useRoute } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
+import { getItems, addBoard, deleteItemById } from '../libs/fetchUtils.js'
 
 const BoardsList = ref([])
 const openModalName = ref(false)
@@ -17,7 +17,7 @@ const userName = userStore.getUser().username
 const userBoard = ref({ name: userName + ' personal Board' })
 // const userID = userStore.getUser()
 
-console.log("userStore.getUser()", userStore.getUser())
+console.log('userStore.getUser()', userStore.getUser())
 
 const router = useRouter()
 
@@ -31,7 +31,7 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } })
+    router.push({ name: 'TaskList', params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -45,9 +45,8 @@ const isValidName = computed(() => {
 const submitForm = async () => {
   const newBoard = await addBoard(baseUrlBoard, userBoard.value)
   toBoardsList(newBoard.id)
-  clearForm() 
+  clearForm()
 }
-
 
 const deletBoard = async (boardId) => {
   await deleteItemById(baseUrlBoard, boardId)
@@ -64,7 +63,7 @@ const confirmDelete = () => {
 }
 
 const clearForm = () => {
-  userBoard.value.name = ""
+  userBoard.value.name = ''
 }
 
 const cancelAction = () => {
@@ -73,10 +72,14 @@ const cancelAction = () => {
 }
 
 const clearToken = () => {
-  localStorage.removeItem("token");
-  router.push({ name: 'Login' });
+  localStorage.removeItem('access_token')
+  router.push({ name: 'Login' })
 }
 
+const goToAllBoards = () => {
+  router.push({ name: 'Board' })
+  router.go()
+}
 </script>
 
 <template>
@@ -99,13 +102,13 @@ const clearToken = () => {
                   <path fill="#9391E4"
                     d="m21.743 12.331l-9-10c-.379-.422-1.107-.422-1.486 0l-9 10a1 1 0 0 0-.17 1.076c.16.361.518.593.913.593h2v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7h2a.998.998 0 0 0 .743-1.669" />
                 </svg>
-                <router-link to="/board/home"><span class="itbkk-home">Home</span></router-link>
+                <span class="itbkk-home">Home</span>
               </a>
             </li>
             <li class="hs-accordion" id="projects-accordion">
               <button type="button"
                 class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                aria-expanded="true" aria-controls="projects-accordion">
+                @click="goToAllBoards">
                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <path fill="#9391E4"
                     d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2M5 13h4v2H5z" />
@@ -166,15 +169,13 @@ const clearToken = () => {
               </div>
             </div>
             <!-- Log out -->
-            <div>
-              <button>
+            <div class="mt-2">
+              <button class="group">
                 <svg @click="clearToken()" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                   viewBox="0 0 24 24">
-                  <path fill="#ff6161"
-                    d="m21.207 11.293l-3-3a1 1 0 1 0-1.414 1.415L18.086 11H12.5a1 1 0 0 0 0 2h5.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.415Z" />
-                  <path fill="#ff6161"
-                    d="M12.5 13a1 1 0 0 1 0-2h4V5a3.003 3.003 0 0 0-3-3h-8a3.003 3.003 0 0 0-3 3v14a3.003 3.003 0 0 0 3 3h8a3.003 3.003 0 0 0 3-3v-6Z"
-                    opacity=".5" />
+                  <path fill="none" stroke="#eb4343" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M15 17.625c-.074 1.852-1.617 3.424-3.684 3.374c-.481-.012-1.076-.18-2.265-.515c-2.861-.807-5.345-2.164-5.941-5.203C3 14.724 3 14.095 3 12.837v-1.674c0-1.257 0-1.886.11-2.445c.596-3.038 3.08-4.395 5.941-5.202c1.19-.335 1.784-.503 2.265-.515c2.067-.05 3.61 1.522 3.684 3.374M21 12H10m11 0c0-.7-1.994-2.008-2.5-2.5M21 12c0 .7-1.994 2.008-2.5 2.5"
+                    class="group-hover:stroke-red-400" />
                 </svg>
               </button>
             </div>
@@ -251,11 +252,7 @@ const clearToken = () => {
                 </div>
               </div>
 
-
-
-
               <!-- delete modal for the selected item only -->
-
 
               <!-- delete modal for the selected item only -->
 
@@ -282,18 +279,16 @@ const clearToken = () => {
                         Delete
                       </button>
                       <button @click="openModalToDelete = false"
-                        class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500  px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600">
+                        class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600">
                         Close
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
-
 
         <!------------------------- Modal ------------------------->
         <div v-if="openModalName"
@@ -311,7 +306,8 @@ const clearToken = () => {
                     </div>
 
                     <label class="input input-bordered flex items-center gap-2 font-bold ml-4">
-                      <input type="text" class="itbkk-board-name grow" placeholder="Board Name" v-model="userBoard.name" />
+                      <input type="text" class="itbkk-board-name grow" placeholder="Board Name"
+                        v-model="userBoard.name" />
                     </label>
                     <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ status.name?.length }}/50
