@@ -244,7 +244,7 @@ public class StatusService {
 
         // Check the task limit
         if (!"No Status".equalsIgnoreCase(newStatus.getName()) && !"Done".equalsIgnoreCase(newStatus.getName())) {
-            TaskLimit taskLimit = limitRepository.findById(1).orElseThrow(() -> new ItemNotFoundException("Task limit configuration not found"));
+            TaskLimit taskLimit = limitRepository.findByBoardId(boardId).orElseThrow(() -> new ItemNotFoundException("Task limit configuration not found"));
             if (taskLimit.getIsLimit()) {
                 List<Task> newStatusTasks = taskRepository.findByStatus(newStatus);
                 List<Task> oldStatusTasks = taskRepository.findByStatus(oldStatus);

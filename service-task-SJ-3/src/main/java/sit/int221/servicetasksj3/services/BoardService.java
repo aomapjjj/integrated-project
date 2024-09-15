@@ -119,7 +119,7 @@ public class BoardService {
         board.setId(generateUniqueBoardId());
         board.setOwnerId(oid);
         board.setName(boardRequest.getName());
-
+//
         Board newBoard = boardRepository.save(board);
 
         // Add default statuses
