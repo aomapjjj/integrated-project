@@ -224,7 +224,7 @@ const toBoardsList = () => {
   router.push({ name: 'Board' })
   .then(() => {
         router.go()
-      })
+  })
 }
 </script>
 
