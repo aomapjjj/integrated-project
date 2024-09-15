@@ -45,7 +45,6 @@ const submitForm = async () => {
   const newBoard = await addBoard(baseUrlBoard, userBoard.value)
   toBoardsList(newBoard.id)
   clearForm()
-  router.go()
 }
 
 
