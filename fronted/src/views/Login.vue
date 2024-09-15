@@ -138,7 +138,7 @@ const submitForm = async () => {
         <div class="text-focus-in text-center lg:text-left max-w-md">
           <div class="flex justify-center lg:justify-start">
             <img
-              src="../image/logo2.png"
+              src="/image/logo2.png"
               class="h-40 w-40 lg:h-48 lg:w-48"
               alt="Kradan Kanban Logo"
             />
