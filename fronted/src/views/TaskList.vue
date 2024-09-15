@@ -4,7 +4,8 @@ import {
   getItemById,
   getItems,
   deleteItemById,
-  editLimit
+  editLimit,
+  getBoardById
 } from '../libs/fetchUtils.js'
 import TaskDetail from '../views/TaskDetail.vue'
 import AddTask from '../views/AddTask.vue'
@@ -43,6 +44,7 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 const userName = userStore.getUser().username
 const token = localStorage.getItem('access_token')
+const boardName = ref('')
 
 let items = []
 
@@ -52,6 +54,10 @@ onMounted(async () => {
     items = await getItems(baseUrlTask)
     taskStore.addTasks(await items)
   }
+
+  const Board =  await getBoardById(boardId.value)
+
+  boardName.value =  Board.item.name
   todoList.value = items
 
   const itemsStatus = await getItems(baseUrlStatus)
@@ -373,7 +379,7 @@ const triggerFileInput = () => {
             class="text-2xl font-bold tracking-tight"
             style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
           >
-            IT-Bangmod Kradan Kanban
+                {{ boardName }}
           </div>
         </nav>
 

@@ -43,6 +43,30 @@ async function getItemById(taskId, boardId) {
     console.log('Invalid boardId or taskId');
   }
 }
+async function getBoardById(boardId) {
+  
+  const token = getToken();
+  if (boardId) {
+    try {
+      const response = await fetch(`${baseUrlBoards}/${boardId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      
+      const item = await response.json();
+     
+      const responsed = response.status;
+      return { item, responsed };
+      
+    } catch (error) {
+      console.log(`error: ${error}`);
+    }
+  } else {
+    console.log('Invalid boardId or taskId');
+  }
+}
 
 async function deleteItemById(url, id) {
   const token = getToken();
@@ -158,5 +182,6 @@ export {
   editItem,
   deleteItemAndTransfer,
   editLimit,
-  addBoard
+  addBoard,
+  getBoardById
 }
