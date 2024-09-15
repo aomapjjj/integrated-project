@@ -315,7 +315,7 @@ const triggerFileInput = () => {
                     </svg>
                   </span>
                   <img
-                    :src="imageSrc || '/src/image/profile.png'"
+                    :src="imageSrc || '/image/profile.png'"
                     alt="profile"
                     class="w-24 h-24 mx-auto rounded-full border-1 border-black"
                   />
