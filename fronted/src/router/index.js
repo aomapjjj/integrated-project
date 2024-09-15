@@ -7,8 +7,7 @@ import TaskDetail from "@/views/TaskDetail.vue"
 import EditTask from "@/views/EditTask.vue"
 import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
-import BoardList from "@/views/BoardList.vue"
-import { useUsers } from "@/stores/storeUser"
+
 function getToken() {
   return localStorage.getItem("access_token")
 }
@@ -102,6 +101,10 @@ export const routes = [
     path: "/board/add",
     name: "BoardAdd",
     component: Board
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: { name: "ErrorPage" }
   }
 ]
 
