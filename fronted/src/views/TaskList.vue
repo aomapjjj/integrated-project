@@ -95,11 +95,11 @@ const selectTodo = (todoId) => {
 
 const selectedItemIdToDelete = ref(0)
 
-const deleteTodo = async (todoId) => {
+const deleteTodo = async (todoId, index) => {
   try {
     const status = await deleteItemById(baseUrlTask, todoId)
     if (status === 200) {
-      todoList.value = todoList.value.filter((todo) => todo.id !== todoId)
+      todoList.value.splice(index, 1) 
     } else {
       console.error(`Failed to delete item with ID ${todoId}`)
     }
@@ -107,6 +107,8 @@ const deleteTodo = async (todoId) => {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
 }
+
+
 
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
@@ -116,14 +118,13 @@ const openModalToDelete = (itemId, index) => {
 }
 
 const confirmDelete = () => {
-  taskStore.removeTask(selectTodo.id)
-  deleteTodo(selectedItemIdToDelete.value)
+  taskStore.removeTask(selectedItemIdToDelete.value)
+  deleteTodo(selectedItemIdToDelete.value, indexDelete.value) 
   deleteComplete.value = true
   setTimeout(() => {
     deleteComplete.value = false
   }, 2300)
 }
-
 // ----------------------- Delete -----------------------
 
 // ----------------------- filterAndLogTitleById -----------------------
