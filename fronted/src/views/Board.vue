@@ -35,18 +35,20 @@ const toBoardsList = (boardId) => {
     userStore.setBoard(boardId)
   }
 }
-
 // ----------------------- Validate -----------------------
 
 const isValidName = computed(() => {
-  return userBoard.value.name.length > 0 && userBoard.value.name.length <= 50
+  return userBoard.value.name.trim().length > 0 && userBoard.value.name.trim().length <= 120
 })
 
 const submitForm = async () => {
   const newBoard = await addBoard(baseUrlBoard, userBoard.value)
   toBoardsList(newBoard.id)
   clearForm()
+  router.go()
 }
+
+
 
 const deletBoard = async (boardId) => {
   await deleteItemById(baseUrlBoard, boardId)
@@ -479,6 +481,7 @@ const goToAllBoards = () => {
                         class="itbkk-board-name grow"
                         placeholder="Board Name"
                         v-model="userBoard.name"
+                        maxlength=120
                       />
                     </label>
                     <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
