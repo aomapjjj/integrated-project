@@ -115,7 +115,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem("access_token")
-  console.log("Token on Navigation:", token)
+ 
 
   if (!token && to.name !== "Login") {
     next({ name: "Login" })
