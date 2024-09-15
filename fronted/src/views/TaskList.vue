@@ -566,60 +566,25 @@ const toBoardsList = () => {
                     <div class="itbkk-button-action">
                       <td style="display: flex; justify-content: center">
                         <div class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2">
-                          <div v-if="index !== 0 && index !== 1" class="dropdown dropdown-top dropdown-end">
-                            <div tabindex="0">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
-                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01" />
-                              </svg>
-                            </div>
-                            <ul tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                            <!-- pearmai Edit BUTTON here -->
+                
+                            
                               <!-- EDIT -->
-                              <li>
-                                <a>
+                             
                                   <EditTask :todo-id="item.id" />
-                                </a>
-                              </li>
+                               
 
                               <!-- Delete -->
 
-                              <li>
-                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id, index)">Delete
+                              
+                                <a style=" margin-left: 17px" class="itbkk-button-delete btn"
+                                  @click="openModalToDelete(item.id, index)"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="#0d0d0d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
                                 </a>
-                              </li>
-                            </ul>
-                          </div>
+                             
+                         
                         </div>
 
-                        <!-- Dropdown  -->
-                        <div v-if="index === 0 || index === 1"
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2 mr-8">
-                          <div class="dropdown dropdown-end">
-                            <div tabindex="0">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
-                                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="3"
-                                  d="M12 6h.01M12 12h.01M12 18h.01" />
-                              </svg>
-                            </div>
-                            <ul tabindex="0"
-                              class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                              <!-- EDIT -->
-                              <li>
-                                <a>
-                                  <EditTask :todo-id="item.id" />
-                                </a>
-                              </li>
-
-                              <!-- Delete -->
-                              <li>
-                                <a style="width: 150px; margin-left: 17px" class="itbkk-button-delete btn"
-                                  @click="openModalToDelete(item.id)">Delete</a>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
+                        
 
                         <dialog id="my_modal_delete" class="modal">
                           <div class="modal-box" style="max-width: 500px">

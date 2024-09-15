@@ -182,10 +182,10 @@ const isLimitReached = computed(() => {
 </script>
 
 <template>
-  <!-- BUTTON -->
-  <label @click="openModal" class="itbkk-button-edit btn" style="width: 150px">
-    Edit
-  </label>
+  <!-- pearmai Edit BUTTON here -->
+  <button @click="openModal" class="itbkk-button-edit btn" >
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="#0d0d0d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></g></svg>
+  </button>
   <!-- Modal window -->
   <dialog ref="myModal" class="itbkk-modal-task modal fixed w-full h-full flex">
     <div
