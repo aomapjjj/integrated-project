@@ -230,12 +230,12 @@ const toBoardsList = () => {
   })
 }
 
-const imageSrc = ref(null)
-const fileInput = ref(null)
+// const imageSrc = ref(null)
+// const fileInput = ref(null)
 
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
+// const triggerFileInput = () => {
+//   fileInput.value.click()
+// }
 </script>
 
 <template>
@@ -292,7 +292,6 @@ const triggerFileInput = () => {
               <!-- User Icon -->
               <div
                 class="avatar placeholder relative group"
-                @click="triggerFileInput"
               >
                 <div
                   class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
@@ -315,10 +314,15 @@ const triggerFileInput = () => {
                     </svg>
                   </span>
                   <img
-                    :src="imageSrc || '/image/profile.png'"
+                    src="/image/profile.png"
                     alt="profile"
                     class="w-24 h-24 mx-auto rounded-full border-1 border-black"
                   />
+                  <!-- <img
+                    :src="imageSrc || '/image/profile.png'"
+                    alt="profile"
+                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
+                  /> -->
                 </div>
                 <!-- Hidden File Input -->
                 <input

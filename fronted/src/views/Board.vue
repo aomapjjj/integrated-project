@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '@/stores/storeUser'
-import { getItems, addBoard, deleteItemById } from '../libs/fetchUtils.js'
+import { useRouter, useRoute } from "vue-router"
+import { ref, computed, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
+import { getItems, addBoard, deleteItemById } from "../libs/fetchUtils.js"
 
 const BoardsList = ref([])
 const openModalName = ref(false)
@@ -14,7 +14,7 @@ const toggleSidebar = () => {
 }
 const userStore = useUsers()
 const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + ' personal Board' })
+const userBoard = ref({ name: userName + " personal Board" })
 // const userID = userStore.getUser()
 
 const router = useRouter()
@@ -28,7 +28,7 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -62,7 +62,7 @@ const confirmDelete = () => {
 }
 
 const clearForm = () => {
-  userBoard.value.name = ''
+  userBoard.value.name = ""
 }
 
 const cancelAction = () => {
@@ -71,21 +71,21 @@ const cancelAction = () => {
 }
 
 const clearToken = () => {
-  localStorage.removeItem('access_token')
-  router.push({ name: 'Login' })
+  localStorage.removeItem("access_token")
+  router.push({ name: "Login" })
 }
 
 const goToAllBoards = () => {
-  router.push({ name: 'Board' })
+  router.push({ name: "Board" })
   router.go()
 }
 
-const imageSrc = ref(null)
-const fileInput = ref(null)
+// const imageSrc = ref(null)
+// const fileInput = ref(null)
 
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
+// const triggerFileInput = () => {
+//   fileInput.value.click()
+// }
 
 const onFileChange = (event) => {
   const file = event.target.files[0]
@@ -189,22 +189,58 @@ const onFileChange = (event) => {
                 </svg>
               </button>
 
-               <div id="users-accordion" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden" role="region" aria-labelledby="users-accordion">
-              <ul class="hs-accordion-group ps-3 pt-2" data-hs-accordion-always-open>
-                <li class="hs-accordion" id="users-accordion-sub-1">
-                  <button type="button" class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300" aria-expanded="true" aria-controls="users-accordion-sub-1">
-                    Sub Menu 1
+              <div
+                id="users-accordion"
+                class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
+                role="region"
+                aria-labelledby="users-accordion"
+              >
+                <ul
+                  class="hs-accordion-group ps-3 pt-2"
+                  data-hs-accordion-always-open
+                >
+                  <li class="hs-accordion" id="users-accordion-sub-1">
+                    <button
+                      type="button"
+                      class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
+                      aria-expanded="true"
+                      aria-controls="users-accordion-sub-1"
+                    >
+                      Sub Menu 1
 
-                    <svg class="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                      <svg
+                        class="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m18 15-6-6-6 6" />
+                      </svg>
 
-                    <svg class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                  </button>
-
-
-                </li>
-
-              </ul>
-               </div>
+                      <svg
+                        class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
 
@@ -243,10 +279,7 @@ const onFileChange = (event) => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <!-- User Icon -->
-              <div
-                class="avatar placeholder relative group"
-                @click="triggerFileInput"
-              >
+              <div class="avatar placeholder relative group">
                 <div
                   class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
                 >
@@ -268,19 +301,24 @@ const onFileChange = (event) => {
                     </svg>
                   </span>
                   <img
-                    :src="imageSrc || '/image/profile.png'"
+                    src="/image/profile.png"
                     alt="profile"
                     class="w-24 h-24 mx-auto rounded-full border-1 border-black"
                   />
+                  <!-- <img
+                    :src="imageSrc || '/image/profile.png'"
+                    alt="profile"
+                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
+                  /> -->
                 </div>
                 <!-- Hidden File Input -->
-                <input
+                <!-- <input
                   type="file"
                   ref="fileInput"
                   accept="image/*"
                   @change="onFileChange"
                   class="hidden"
-                />
+                /> -->
               </div>
               <!-- User Info -->
               <div>
