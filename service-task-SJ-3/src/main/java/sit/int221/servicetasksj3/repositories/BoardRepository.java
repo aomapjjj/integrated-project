@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, String> {
     List<Board> findByOwnerId(String ownerId);
  
-    boolean existsByOwnerId(String ownerId);
+//    boolean existsByOwnerId(String ownerId);
 
     Optional<Board> findById(String id);
 }
