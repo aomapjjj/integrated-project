@@ -17,7 +17,7 @@ const userName = userStore.getUser().username
 const userBoard = ref({ name: userName + ' personal Board' })
 // const userID = userStore.getUser()
 
-console.log('userStore.getUser()', userStore.getUser())
+
 
 const router = useRouter()
 
@@ -26,7 +26,7 @@ const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 onMounted(async () => {
   const itemsBoards = await getItems(baseUrlBoard)
   BoardsList.value = itemsBoards
-  console.log(BoardsList)
+
 })
 
 const toBoardsList = (boardId) => {
