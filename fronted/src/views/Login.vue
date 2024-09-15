@@ -305,7 +305,9 @@ const submitForm = async () => {
               <div class="flex flex-col mt-4 items-center">
                 <!-- <p class="text-gray-500">or sign up</p> -->
                 <div class="items-center justify-center">
-                  <button class="flex w-72 py-2 justify-center rounded-md border border-gray-400">
+                  <button
+                    class="flex w-72 py-2 justify-center rounded-md border border-gray-400"
+                  >
                     <svg
                       aria-hidden="true"
                       viewBox="0 0 21 21"
@@ -317,11 +319,10 @@ const submitForm = async () => {
                       <path fill="#7fba00" d="M11 1h9v9h-9z"></path>
                       <path fill="#ffb900" d="M11 11h9v9h-9z"></path>
                     </svg>
-                    <p class="text-black ml-2 ">Sign in with Microsoft</p>
+                    <p class="text-black ml-2">Sign in with Microsoft</p>
                   </button>
                 </div>
               </div>
-
             </form>
           </div>
         </div>
