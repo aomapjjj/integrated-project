@@ -50,6 +50,16 @@ public class AuthenticationService {
         String token = jwtTokenUtil.generateToken(userDetails);
         String oid = ((AuthUser) userDetails).getOid();
 
+        // Check if the user has a board, but don't create a default board if not.
+//        if (boardRepository.findByOwnerId(oid).isEmpty()) {
+//            throw new InternalServerErrorException("User does not have an assigned board.");
+//        }
+
+//        catch (Exception e) {
+//            // Handle the exception by passing the message back to the frontend.
+//            throw new InternalServerErrorException("Error during login: " + e.getMessage());
+//        }
+
 //        try {
 //            if (boardRepository.findByOwnerId(oid).isEmpty()) {
 //                Board board = new Board();
@@ -78,4 +88,5 @@ public class AuthenticationService {
         return token;
     }
 }
+
 

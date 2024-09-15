@@ -99,7 +99,7 @@ const deleteTodo = async (todoId, index) => {
   try {
     const status = await deleteItemById(baseUrlTask, todoId)
     if (status === 200) {
-      todoList.value.splice(index, 1) 
+      todoList.value.splice(index, 1)
     } else {
       console.error(`Failed to delete item with ID ${todoId}`)
     }
@@ -107,8 +107,6 @@ const deleteTodo = async (todoId, index) => {
     console.error(`Error deleting item with ID ${todoId}:`, error)
   }
 }
-
-
 
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
@@ -119,7 +117,7 @@ const openModalToDelete = (itemId, index) => {
 
 const confirmDelete = () => {
   taskStore.removeTask(selectedItemIdToDelete.value)
-  deleteTodo(selectedItemIdToDelete.value, indexDelete.value) 
+  deleteTodo(selectedItemIdToDelete.value, indexDelete.value)
   deleteComplete.value = true
   setTimeout(() => {
     deleteComplete.value = false
@@ -221,10 +219,16 @@ const toggleSidebar = () => {
 }
 
 const toBoardsList = () => {
-  router.push({ name: 'Board' })
-  .then(() => {
-        router.go()
+  router.push({ name: 'Board' }).then(() => {
+    router.go()
   })
+}
+
+const imageSrc = ref(null)
+const fileInput = ref(null)
+
+const triggerFileInput = () => {
+  fileInput.value.click()
 }
 </script>
 
@@ -264,60 +268,12 @@ const toBoardsList = () => {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    fill="#000000"
-                    d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2M5 13h4v2H5z"
+                    fill="#9391E4"
+                    d="m21.743 12.331l-9-10c-.379-.422-1.107-.422-1.486 0l-9 10a1 1 0 0 0-.17 1.076c.16.361.518.593.913.593h2v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7h2a.998.998 0 0 0 .743-1.669"
                   />
                 </svg>
-                All boards
-                <svg
-                  class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
+                <span class="itbkk-home">Home</span>
               </button>
-
-              <div
-                id="projects-accordion"
-                class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                role="region"
-                aria-labelledby="projects-accordion"
-              >
-                <ul class="pt-2 ps-2">
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 1
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 2
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 3
-                    </a>
-                  </li>
-                </ul>
-              </div>
             </li>
           </ul>
         </nav>
@@ -328,10 +284,44 @@ const toBoardsList = () => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <!-- User Icon -->
-              <div class="avatar placeholder">
+              <div
+                class="avatar placeholder relative group"
+                @click="triggerFileInput"
+              >
                 <div
-                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full"
-                ></div>
+                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
+                >
+                  <!-- Add profile -->
+                  <span
+                    class="absolute inset-0 flex justify-center items-center text-2xl text-black opacity-0 group-hover:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="#ffffff"
+                        fill-rule="evenodd"
+                        d="M11.25 11.25V3.5h1.5v7.75h7.75v1.5h-7.75v7.75h-1.5v-7.75H3.5v-1.5z"
+                      />
+                    </svg>
+                  </span>
+                  <img
+                    :src="imageSrc || '/src/image/profile.png'"
+                    alt="profile"
+                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
+                  />
+                </div>
+                <!-- Hidden File Input -->
+                <input
+                  type="file"
+                  ref="fileInput"
+                  accept="image/*"
+                  @change="onFileChange"
+                  class="hidden"
+                />
               </div>
               <!-- User Info -->
               <div>
@@ -346,8 +336,8 @@ const toBoardsList = () => {
               </div>
             </div>
             <!-- Log out -->
-            <div>
-              <button>
+            <div class="mt-2">
+              <button class="group">
                 <svg
                   @click="clearToken()"
                   xmlns="http://www.w3.org/2000/svg"
@@ -356,13 +346,13 @@ const toBoardsList = () => {
                   viewBox="0 0 24 24"
                 >
                   <path
-                    fill="#ff6161"
-                    d="m21.207 11.293l-3-3a1 1 0 1 0-1.414 1.415L18.086 11H12.5a1 1 0 0 0 0 2h5.586l-1.293 1.293a1 1 0 1 0 1.414 1.414l3-3a1 1 0 0 0 0-1.415Z"
-                  />
-                  <path
-                    fill="#ff6161"
-                    d="M12.5 13a1 1 0 0 1 0-2h4V5a3.003 3.003 0 0 0-3-3h-8a3.003 3.003 0 0 0-3 3v14a3.003 3.003 0 0 0 3 3h8a3.003 3.003 0 0 0 3-3v-6Z"
-                    opacity=".5"
+                    fill="none"
+                    stroke="#eb4343"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M15 17.625c-.074 1.852-1.617 3.424-3.684 3.374c-.481-.012-1.076-.18-2.265-.515c-2.861-.807-5.345-2.164-5.941-5.203C3 14.724 3 14.095 3 12.837v-1.674c0-1.257 0-1.886.11-2.445c.596-3.038 3.08-4.395 5.941-5.202c1.19-.335 1.784-.503 2.265-.515c2.067-.05 3.61 1.522 3.684 3.374M21 12H10m11 0c0-.7-1.994-2.008-2.5-2.5M21 12c0 .7-1.994 2.008-2.5 2.5"
+                    class="group-hover:stroke-red-400"
                   />
                 </svg>
               </button>

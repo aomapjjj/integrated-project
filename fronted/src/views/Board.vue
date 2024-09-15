@@ -17,8 +17,6 @@ const userName = userStore.getUser().username
 const userBoard = ref({ name: userName + ' personal Board' })
 // const userID = userStore.getUser()
 
-
-
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
@@ -26,7 +24,6 @@ const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 onMounted(async () => {
   const itemsBoards = await getItems(baseUrlBoard)
   BoardsList.value = itemsBoards
-
 })
 
 const toBoardsList = (boardId) => {
@@ -38,17 +35,17 @@ const toBoardsList = (boardId) => {
 // ----------------------- Validate -----------------------
 
 const isValidName = computed(() => {
-  return userBoard.value.name.trim().length > 0 && userBoard.value.name.trim().length <= 120
+  return (
+    userBoard.value.name.trim().length > 0 &&
+    userBoard.value.name.trim().length <= 120
+  )
 })
 
 const submitForm = async () => {
   const newBoard = await addBoard(baseUrlBoard, userBoard.value)
   toBoardsList(newBoard.id)
   clearForm()
-  router.go()
 }
-
-
 
 const deletBoard = async (boardId) => {
   await deleteItemById(baseUrlBoard, boardId)
@@ -81,6 +78,24 @@ const clearToken = () => {
 const goToAllBoards = () => {
   router.push({ name: 'Board' })
   router.go()
+}
+
+const imageSrc = ref(null)
+const fileInput = ref(null)
+
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+const onFileChange = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imageSrc.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
 }
 </script>
 
@@ -124,6 +139,7 @@ const goToAllBoards = () => {
                 <span class="itbkk-home">Home</span>
               </a>
             </li>
+
             <li class="hs-accordion" id="projects-accordion">
               <button
                 type="button"
@@ -144,6 +160,20 @@ const goToAllBoards = () => {
                 </svg>
                 All boards
                 <svg
+                  class="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m18 15-6-6-6 6" />
+                </svg>
+                <svg
                   class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -159,41 +189,26 @@ const goToAllBoards = () => {
                 </svg>
               </button>
 
-              <div
-                id="projects-accordion"
-                class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                role="region"
-                aria-labelledby="projects-accordion"
-              >
-                <ul class="pt-2 ps-2">
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 1
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 2
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
-                      href="#"
-                    >
-                      Link 3
-                    </a>
-                  </li>
-                </ul>
-              </div>
+               <div id="users-accordion" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden" role="region" aria-labelledby="users-accordion">
+              <ul class="hs-accordion-group ps-3 pt-2" data-hs-accordion-always-open>
+                <li class="hs-accordion" id="users-accordion-sub-1">
+                  <button type="button" class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300" aria-expanded="true" aria-controls="users-accordion-sub-1">
+                    Sub Menu 1
+
+                    <svg class="hs-accordion-active:block ms-auto hidden size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+
+                    <svg class="hs-accordion-active:hidden ms-auto block size-4 text-gray-600 group-hover:text-gray-500 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
+
+
+                </li>
+
+              </ul>
+               </div>
             </li>
           </ul>
+
+          <!-- Tutorials & Help -->
           <ul
             class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700"
           >
@@ -228,19 +243,44 @@ const goToAllBoards = () => {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <!-- User Icon -->
-              <!-- <img src="/path/to/user-icon.png" alt="User Avatar" class="w-10 h-10 rounded-full"> -->
-              <div class="avatar placeholder">
+              <div
+                class="avatar placeholder relative group"
+                @click="triggerFileInput"
+              >
                 <div
-                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full"
+                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
                 >
-                  <!-- <img
-                    src="https://via.placeholder.com/100"
-                    alt="Profile Picture"
-                    class="w-24 h-24 rounded-full border-4 border-gray-600"
-                  /> -->
-                            <img src="/src/image/profile.jpg" alt="profile" class="w-24 h-24 mx-auto rounded-full border-1 border-black" />
-
+                  <!-- Add profile -->
+                  <span
+                    class="absolute inset-0 flex justify-center items-center text-2xl text-black opacity-0 group-hover:opacity-100"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="#ffffff"
+                        fill-rule="evenodd"
+                        d="M11.25 11.25V3.5h1.5v7.75h7.75v1.5h-7.75v7.75h-1.5v-7.75H3.5v-1.5z"
+                      />
+                    </svg>
+                  </span>
+                  <img
+                    :src="imageSrc || '/src/image/profile.png'"
+                    alt="profile"
+                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
+                  />
                 </div>
+                <!-- Hidden File Input -->
+                <input
+                  type="file"
+                  ref="fileInput"
+                  accept="image/*"
+                  @change="onFileChange"
+                  class="hidden"
+                />
               </div>
               <!-- User Info -->
               <div>
@@ -465,7 +505,7 @@ const goToAllBoards = () => {
                         class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
                         >Title<span style="color: red"> *</span>
                       </span>
-                                  <!-- <p
+                      <!-- <p
               class="text-sm text-gray-400 mb-2 mt-2"
               style="text-align: right"
             >
@@ -481,7 +521,7 @@ const goToAllBoards = () => {
                         class="itbkk-board-name grow"
                         placeholder="Board Name"
                         v-model="userBoard.name"
-                        maxlength=120
+                        maxlength="120"
                       />
                     </label>
                     <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
