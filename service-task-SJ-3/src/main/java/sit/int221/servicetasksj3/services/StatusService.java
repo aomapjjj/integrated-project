@@ -43,6 +43,9 @@ public class StatusService {
     private ListMapper listMapper;
 
     // GET ALL STATUSES
+    public List<StatusDTOTwo> getAllStatusesV2() {
+        return listMapper.mapList(repository.findAll(), StatusDTOTwo.class, modelMapper);
+    }
     public List<StatusDTOTwo> getAllStatuses(String boardId) {
         return listMapper.mapList(repository.findByBoardId(boardId), StatusDTOTwo.class, modelMapper);
     }

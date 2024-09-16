@@ -42,6 +42,37 @@ public class TaskService {
 
     //GET ALL TASKS
     @Transactional
+    public List<TaskNewDTO> getAllTasksFilteredV2(String sortBy) {
+        Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
+        try {
+            List<Task> tasks;
+            tasks = repository.findAll(sort);
+//            if (filterStatuses != null && filterStatuses.length > 0) {
+//                tasks = repository.findTasksByStatus(filterStatuses, sort);
+//            } else {
+//               tasks = repository.findAll(sort);
+//            }
+            // sort ตามชื่อ status
+            if ("status".equals(sortBy)) {
+                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
+            }
+            // แปลง task เป็น TaskNewDTO และกำหนดค่า status
+            return tasks.stream()
+                    .map(task -> {
+                        TaskNewDTO taskNewDTO = modelMapper.map(task, TaskNewDTO.class);
+                        taskNewDTO.setStatus(task.getStatus().getName());
+                        return taskNewDTO;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception exception) {
+            throw new InternalServerErrorException("Failed to sortBy: " + exception.getMessage());
+        }
+    }
+
+
+
+    //GET ALL TASKS
+    @Transactional
     public List<TaskNewDTO> getAllTasksFiltered(String boardId, String sortBy, String[] filterStatuses) {
         Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -246,4 +277,6 @@ public class TaskService {
         task1.setId(id);
         return repository.save(task1);
     }
+
+
 }

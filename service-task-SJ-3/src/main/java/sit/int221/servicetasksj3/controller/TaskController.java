@@ -17,22 +17,21 @@ import sit.int221.servicetasksj3.services.TaskService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/v2/tasks")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
 
 public class TaskController {
-//    @Autowired
-//    private TaskService service;
-//    @Autowired
-//    private ModelMapper modelMapper;
+    @Autowired
+    private TaskService service;
+    @Autowired
+    private ModelMapper modelMapper;
 
-//    @GetMapping("")
-//    public List<TaskNewDTO> getAllTasksFiltered(
-//            @RequestParam(required = false, defaultValue = "id") String sortBy,
-//            @RequestParam(required = false) String[] filterStatuses
-//    ) {
-//        return service.getAllTasksFiltered(sortBy, filterStatuses);
-//    }
+    @GetMapping("")
+    public List<TaskNewDTO> getAllTasksFilteredV2(
+            @RequestParam(required = false, defaultValue = "id") String sortBy
+    ) {
+        return service.getAllTasksFilteredV2(sortBy);
+    }
 //
 //    @GetMapping("/{id}")
 //    public SimpleTaskDTO getTaskById(@PathVariable Integer id) {
