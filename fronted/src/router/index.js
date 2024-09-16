@@ -122,7 +122,8 @@ router.beforeEach(async (to, from, next) => {
   } else if (token) {
     try {
       const validateResponse = await fetch(
-        `${import.meta.env.VITE_BASE_URL_MAIN}/validate-token`,
+        `${import.meta.env.
+          VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
         {
           method: "GET",
           headers: {
