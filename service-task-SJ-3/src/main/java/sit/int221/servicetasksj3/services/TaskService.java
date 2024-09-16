@@ -40,23 +40,20 @@ public class TaskService {
     @Autowired
     private ModelMapper modelMapper;
 
-    //GET ALL TASKS
+    //GET ALL TASKS V.2
     @Transactional
-    public List<TaskNewDTO> getAllTasksFilteredV2(String sortBy) {
+    public List<TaskNewDTO> getAllTasksFilteredV2(String sortBy, String[] filterStatuses) {
         Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
         try {
             List<Task> tasks;
-            tasks = repository.findAll(sort);
-//            if (filterStatuses != null && filterStatuses.length > 0) {
-//                tasks = repository.findTasksByStatus(filterStatuses, sort);
-//            } else {
-//               tasks = repository.findAll(sort);
-//            }
-            // sort ตามชื่อ status
+            if (filterStatuses != null && filterStatuses.length > 0) {
+                tasks = repository.findTasksByStatusOnly(filterStatuses, sort);
+            } else {
+                tasks = repository.findAll(sort);
+            }
             if ("status".equals(sortBy)) {
                 tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
             }
-            // แปลง task เป็น TaskNewDTO และกำหนดค่า status
             return tasks.stream()
                     .map(task -> {
                         TaskNewDTO taskNewDTO = modelMapper.map(task, TaskNewDTO.class);
@@ -68,8 +65,6 @@ public class TaskService {
             throw new InternalServerErrorException("Failed to sortBy: " + exception.getMessage());
         }
     }
-
-
 
     //GET ALL TASKS
     @Transactional
@@ -102,12 +97,12 @@ public class TaskService {
     //GET ALL BY ID
     public Task findByID(String boardId, Integer id) {
         return repository.findByBoard_IdAndId(boardId, id).orElseThrow(
-                () -> new ItemNotFoundException("Task id "+ id + " does not exist !!!"));
+                () -> new ItemNotFoundException("Task id " + id + " does not exist !!!"));
     }
 
     // ADD
     @Transactional
-    public Task createNewTasks(String boardId, TaskNewDTO task){
+    public Task createNewTasks(String boardId, TaskNewDTO task) {
         Task task1 = modelMapper.map(task, Task.class);
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new ItemNotFoundException("Board not found with ID: " + boardId));
@@ -196,7 +191,7 @@ public class TaskService {
 
     // DELETE
     @Transactional
-    public TaskDTO removeTasks(String boardId, Integer id){
+    public TaskDTO removeTasks(String boardId, Integer id) {
         Task task = repository.findByBoard_IdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
         TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
@@ -271,7 +266,8 @@ public class TaskService {
                     status.setTasks(tasks);
                 }
                 if (tasks.size() >= taskLimit.getMaximumTask()) {
-                    validationError.addValidationError("status", "the status has reached the limit");                }
+                    validationError.addValidationError("status", "the status has reached the limit");
+                }
             }
         }
         task1.setId(id);
