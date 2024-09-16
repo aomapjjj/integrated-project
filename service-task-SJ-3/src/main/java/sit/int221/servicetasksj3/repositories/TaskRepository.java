@@ -23,6 +23,10 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("SELECT t FROM Task t WHERE t.board.id = :boardId AND t.board.ownerId = :ownerId AND t.status.name IN :filterStatuses")
     List<Task> findTasksByStatus(String boardId, String ownerId, @Param("filterStatuses") String[] filterStatuses, Sort sort);
 
+    //GET ALL TASKS V.2
+    @Query("SELECT t FROM Task t WHERE t.status.name IN :filterStatuses")
+    List<Task> findTasksByStatusOnly(@Param("filterStatuses") String[] filterStatuses, Sort sort);
+
     @Query("SELECT t FROM Task t WHERE t.board.id=:boardID AND t.board.ownerId = :oid")
     List<Task> findAllByBoardIdAndOid(@Param("boardID") String boardID, @Param("oid") String oid,Sort sort);
 

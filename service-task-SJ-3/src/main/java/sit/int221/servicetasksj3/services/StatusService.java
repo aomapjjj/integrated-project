@@ -22,10 +22,7 @@ import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Integer.parseInt;
 
 @Service
 public class StatusService {
@@ -42,10 +39,11 @@ public class StatusService {
     @Autowired
     private ListMapper listMapper;
 
-    // GET ALL STATUSES
+    // GET ALL STATUSES V.2
     public List<StatusDTOTwo> getAllStatusesV2() {
         return listMapper.mapList(repository.findAll(), StatusDTOTwo.class, modelMapper);
     }
+    // GET ALL STATUSES
     public List<StatusDTOTwo> getAllStatuses(String boardId) {
         return listMapper.mapList(repository.findByBoardId(boardId), StatusDTOTwo.class, modelMapper);
     }

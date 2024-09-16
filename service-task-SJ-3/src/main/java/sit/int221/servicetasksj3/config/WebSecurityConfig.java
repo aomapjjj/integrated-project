@@ -13,6 +13,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sit.int221.servicetasksj3.controller.CustomAuthenticationEntryPoint;
 import sit.int221.servicetasksj3.sharedatabase.filters.JwtAuthFilter;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
 
@@ -23,9 +24,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class WebSecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
-
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -36,7 +38,8 @@ public class WebSecurityConfig {
 //                                .requestMatchers("/tasks/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(withDefaults());
+                .httpBasic(withDefaults())
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(customAuthenticationEntryPoint));
         return httpSecurity.build();
     }
 
