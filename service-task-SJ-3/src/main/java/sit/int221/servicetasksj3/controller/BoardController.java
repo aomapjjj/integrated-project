@@ -28,7 +28,7 @@ import sit.int221.servicetasksj3.services.TaskService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/v3/boards")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
 
 public class BoardController {

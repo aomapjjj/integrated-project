@@ -17,16 +17,16 @@ import sit.int221.servicetasksj3.services.StatusService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/statuses")
+@RequestMapping("/v2/statuses")
 @CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
 public class StatusController {
-//    @Autowired
-//    private StatusService statusService;
-//
-//    @GetMapping("")
-//    public List<StatusDTOTwo> getAllStatuses() {
-//        return statusService.getAllStatuses();
-//    }
+    @Autowired
+    private StatusService statusService;
+
+    @GetMapping("")
+    public List<StatusDTOTwo> getAllStatusesV2() {
+        return statusService.getAllStatusesV2();
+    }
 //
 //    @GetMapping("/{id}")
 //    public TaskStatus getStatusesById(@PathVariable Integer id){
