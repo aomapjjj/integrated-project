@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 import { useUsers } from '../stores/storeUser'
 import Board from '../views/Board.vue'
 
-const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN}/login`
+const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/login`
 
 const router = useRouter()
 const alertLogin = ref(false)
