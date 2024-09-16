@@ -49,32 +49,40 @@ public class AuthenticationService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenUtil.generateToken(userDetails);
         String oid = ((AuthUser) userDetails).getOid();
-        
+
         try {
-            if (boardRepository.findByOwnerId(oid).isEmpty()) {
-                Board board = new Board();
-                board.setId(NanoId.generate(10));  // สร้าง id โดยใช้ NanoId
-                board.setOwnerId(oid);
-                board.setName("Default Board Name"); // ตั้งชื่อบอร์ดค่าเริ่มต้น (สามารถเปลี่ยนได้ในภายหลัง)
+            if (boardRepository.findByOwnerId(oid).isEmpty()){
 
-                Board newBoard = boardRepository.save(board);
-                List<TaskStatus> statuses = new ArrayList<>();
-                TaskStatus status1 = new TaskStatus("No Status","A status has not been assigned", newBoard.getId());
-                TaskStatus status2 = new TaskStatus("To Do","The task is included in the project", newBoard.getId());
-                TaskStatus status3 = new TaskStatus("In Progress","The task is being worked on", newBoard.getId());
-                TaskStatus status4 = new TaskStatus("Done","The task has been completed", newBoard.getId());
-                statuses.add(status1);
-                statuses.add(status2);
-                statuses.add(status3);
-                statuses.add(status4);
-                statusRepository.saveAll(statuses);
-
-                TaskLimit limit = new TaskLimit(10,false, newBoard.getId());
-                limitRepository.save(limit);
             }
         } catch (Exception e) {
             throw new InternalServerErrorException("Cannot create user: " + e.getMessage());
         }
+
+//        try {
+//            if (boardRepository.findByOwnerId(oid).isEmpty()) {
+//                Board board = new Board();
+//                board.setId(NanoId.generate(10));  // สร้าง id โดยใช้ NanoId
+//                board.setOwnerId(oid);
+//                board.setName("Default Board Name"); // ตั้งชื่อบอร์ดค่าเริ่มต้น (สามารถเปลี่ยนได้ในภายหลัง)
+//
+//                Board newBoard = boardRepository.save(board);
+//                List<TaskStatus> statuses = new ArrayList<>();
+//                TaskStatus status1 = new TaskStatus("No Status","A status has not been assigned", newBoard.getId());
+//                TaskStatus status2 = new TaskStatus("To Do","The task is included in the project", newBoard.getId());
+//                TaskStatus status3 = new TaskStatus("In Progress","The task is being worked on", newBoard.getId());
+//                TaskStatus status4 = new TaskStatus("Done","The task has been completed", newBoard.getId());
+//                statuses.add(status1);
+//                statuses.add(status2);
+//                statuses.add(status3);
+//                statuses.add(status4);
+//                statusRepository.saveAll(statuses);
+//
+//                TaskLimit limit = new TaskLimit(10,false, newBoard.getId());
+//                limitRepository.save(limit);
+//            }
+//        } catch (Exception e) {
+//            throw new InternalServerErrorException("Cannot create user: " + e.getMessage());
+//        }
         return token;
     }
 }
