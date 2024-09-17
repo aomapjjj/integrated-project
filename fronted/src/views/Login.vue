@@ -66,6 +66,7 @@ const submitForm = async () => {
       const decoded = jwtDecode(data.access_token)
       userStore.setToken(data.access_token)
       nameJWT.value = decoded.name
+      localStorage.removeItem('token') // ลบ token ที่ไม่ต้องการ
       localStorage.setItem('access_token', data.access_token) // ต้องบันทึก token อย่างถูกต้อง
       openHomePage()
 

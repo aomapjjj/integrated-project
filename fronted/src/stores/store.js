@@ -11,16 +11,19 @@ const useTasks = defineStore('tasks', () => {
 
   //actions
   const addTasks = (newTasks) => {
-    newTasks?.forEach((newTask) =>
-      addTask(  newTask.id,
-                newTask.title, 
-                newTask.description, 
-                newTask.assignees,
-                newTask.status,
-                newTask.createdOn,
-                newTask.updateOn,
-            )
-    )
+    if (newTasks !== null || newTasks !== undefined) {
+      newTasks?.forEach((newTask) =>
+        addTask(  newTask.id,
+                  newTask.title, 
+                  newTask.description, 
+                  newTask.assignees,
+                  newTask.status,
+                  newTask.createdOn,
+                  newTask.updateOn,
+              )
+      )
+    }
+
   }
   const addTask = (id, title, description, assignees, status, createdOn, updateOn) => {
     tasks.value.push({
