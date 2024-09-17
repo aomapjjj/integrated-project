@@ -41,30 +41,30 @@ public class TaskService {
     private ModelMapper modelMapper;
 
     //GET ALL TASKS V.2
-//    @Transactional
-//    public List<TaskNewDTO> getAllTasksFilteredV2(String sortBy, String[] filterStatuses) {
-//        Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
-//        try {
-//            List<Task> tasks;
-//            if (filterStatuses != null && filterStatuses.length > 0) {
-//                tasks = repository.findTasksByStatusOnly(filterStatuses, sort);
-//            } else {
-//                tasks = repository.findAll(sort);
-//            }
-//            if ("status".equals(sortBy)) {
-//                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
-//            }
-//            return tasks.stream()
-//                    .map(task -> {
-//                        TaskNewDTO taskNewDTO = modelMapper.map(task, TaskNewDTO.class);
-//                        taskNewDTO.setStatus(task.getStatus().getName());
-//                        return taskNewDTO;
-//                    })
-//                    .collect(Collectors.toList());
-//        } catch (Exception exception) {
-//            throw new InternalServerErrorException("Failed to sortBy: " + exception.getMessage());
-//        }
-//    }
+    @Transactional
+    public List<TaskNewDTO> getAllTasksFilteredV2(String sortBy, String[] filterStatuses) {
+        Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
+        try {
+            List<Task> tasks;
+            if (filterStatuses != null && filterStatuses.length > 0) {
+                tasks = repository.findTasksByStatusOnly(filterStatuses, sort);
+            } else {
+                tasks = repository.findAll(sort);
+            }
+            if ("status".equals(sortBy)) {
+                tasks.sort(Comparator.comparing(task -> task.getStatus().getName()));
+            }
+            return tasks.stream()
+                    .map(task -> {
+                        TaskNewDTO taskNewDTO = modelMapper.map(task, TaskNewDTO.class);
+                        taskNewDTO.setStatus(task.getStatus().getName());
+                        return taskNewDTO;
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception exception) {
+            throw new InternalServerErrorException("Failed to sortBy: " + exception.getMessage());
+        }
+    }
 
     //GET ALL TASKS
     @Transactional
