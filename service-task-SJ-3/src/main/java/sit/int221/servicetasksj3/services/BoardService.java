@@ -118,7 +118,7 @@ public class BoardService {
         List<TaskStatus> statuses = new ArrayList<>();
         TaskStatus status1 = new TaskStatus("No Status","A status has not been assigned", newBoard.getId());
         TaskStatus status2 = new TaskStatus("To Do","The task is included in the project", newBoard.getId());
-        TaskStatus status3 = new TaskStatus("In Progress","The task is being worked on", newBoard.getId());
+        TaskStatus status3 = new TaskStatus("Doing","The task is being worked on", newBoard.getId());
         TaskStatus status4 = new TaskStatus("Done","The task has been completed", newBoard.getId());
         statuses.add(status1);
         statuses.add(status2);

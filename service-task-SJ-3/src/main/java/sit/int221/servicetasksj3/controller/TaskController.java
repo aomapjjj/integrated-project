@@ -27,13 +27,13 @@ public class TaskController {
     private ModelMapper modelMapper;
 
     //GET ALL TASKS V.2
-    @GetMapping("")
-    public List<TaskNewDTO> getAllTasksFilteredV2(
-            @RequestParam(required = false, defaultValue = "id") String sortBy,
-            @RequestParam(required = false) String[] filterStatuses
-    ) {
-        return service.getAllTasksFilteredV2(sortBy, filterStatuses);
-    }
+//    @GetMapping("")
+//    public List<TaskNewDTO> getAllTasksFilteredV2(
+//            @RequestParam(required = false, defaultValue = "id") String sortBy,
+//            @RequestParam(required = false) String[] filterStatuses
+//    ) {
+//        return service.getAllTasksFilteredV2(sortBy, filterStatuses);
+//    }
 //
 //    @GetMapping("/{id}")
 //    public SimpleTaskDTO getTaskById(@PathVariable Integer id) {
