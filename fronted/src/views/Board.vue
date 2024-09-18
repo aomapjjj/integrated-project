@@ -134,7 +134,9 @@ const cancelAction = () => {
           </button>
         </div>
 
-        <div class="bg-gray-50 p-8 overflow-y-auto h-[33rem]">
+        <div
+          class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
+        >
           <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="(item, index) in BoardsList" :key="index">
