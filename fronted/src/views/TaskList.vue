@@ -14,6 +14,7 @@ import { useLimitStore } from '../stores/storeLimit'
 import { useUsers } from '@/stores/storeUser'
 import { useTasks } from '../stores/store'
 import { useRoute, useRouter } from 'vue-router'
+import SideBar from './SideBar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,9 +56,9 @@ onMounted(async () => {
     taskStore.addTasks(await items)
   }
 
-  const Board =  await getBoardById(boardId.value)
+  const Board = await getBoardById(boardId.value)
 
-  boardName.value =  Board.item.name
+  boardName.value = Board.item.name
   todoList.value = items
 
   const itemsStatus = await getItems(baseUrlStatus)
@@ -219,157 +220,13 @@ const updateLimitText = () => {
 const closeLimit = () => {
   my_modal_limit.close()
 }
-
-const toggleSidebar = () => {
-  sidebarTasks.value = !sidebarTasks.value
-}
-
-const toBoardsList = () => {
-  router.push({ name: 'Board' }).then(() => {
-    router.go()
-  })
-}
-
-// const imageSrc = ref(null)
-// const fileInput = ref(null)
-
-// const triggerFileInput = () => {
-//   fileInput.value.click()
-// }
 </script>
 
 <template>
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <div
-        id="sidebar"
-        class="hs-overlay fixed top-0 left-0 bottom-0 z-40 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
-        role="dialog"
-        tabindex="-1"
-        aria-label="Sidebar"
-      >
-        <div class="px-6">
-          <img src="/image/sj3.png" alt="LOGO" class="w-24 h-24 mx-auto" />
-        </div>
-
-        <nav
-          class="hs-accordion-group p-6 w-full flex-grow overflow-y-auto"
-          data-hs-accordion-always-open
-        >
-          <ul class="space-y-1.5">
-            <li class="hs-accordion" id="projects-accordion">
-              <button
-                type="button"
-                class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                aria-expanded="true"
-                aria-controls="projects-accordion"
-                @click="toBoardsList()"
-              >
-                <svg
-                  class="size-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="#9391E4"
-                    d="m21.743 12.331l-9-10c-.379-.422-1.107-.422-1.486 0l-9 10a1 1 0 0 0-.17 1.076c.16.361.518.593.913.593h2v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7h2a.998.998 0 0 0 .743-1.669"
-                  />
-                </svg>
-                <span class="itbkk-home">Home</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
-
-        <div
-          class="mt-auto p-4 bg-gray-100 dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <!-- User Icon -->
-              <div
-                class="avatar placeholder relative group"
-              >
-                <div
-                  class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
-                >
-                  <!-- Add profile -->
-                  <span
-                    class="absolute inset-0 flex justify-center items-center text-2xl text-black opacity-0 group-hover:opacity-100"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="#ffffff"
-                        fill-rule="evenodd"
-                        d="M11.25 11.25V3.5h1.5v7.75h7.75v1.5h-7.75v7.75h-1.5v-7.75H3.5v-1.5z"
-                      />
-                    </svg>
-                  </span>
-                  <img
-                    src="/image/profile.png"
-                    alt="profile"
-                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
-                  />
-                  <!-- <img
-                    :src="imageSrc || '/image/profile.png'"
-                    alt="profile"
-                    class="w-24 h-24 mx-auto rounded-full border-1 border-black"
-                  /> -->
-                </div>
-                <!-- Hidden File Input -->
-                <input
-                  type="file"
-                  ref="fileInput"
-                  accept="image/*"
-                  @change="onFileChange"
-                  class="hidden"
-                />
-              </div>
-              <!-- User Info -->
-              <div>
-                <p class="text-xs text-gray-500 dark:text-neutral-400">
-                  Welcome,
-                </p>
-                <p
-                  class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white"
-                >
-                  {{ userName }}
-                </p>
-              </div>
-            </div>
-            <!-- Log out -->
-            <div class="mt-2">
-              <button class="group">
-                <svg
-                  @click="clearToken()"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="none"
-                    stroke="#eb4343"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M15 17.625c-.074 1.852-1.617 3.424-3.684 3.374c-.481-.012-1.076-.18-2.265-.515c-2.861-.807-5.345-2.164-5.941-5.203C3 14.724 3 14.095 3 12.837v-1.674c0-1.257 0-1.886.11-2.445c.596-3.038 3.08-4.395 5.941-5.202c1.19-.335 1.784-.503 2.265-.515c2.067-.05 3.61 1.522 3.684 3.374M21 12H10m11 0c0-.7-1.994-2.008-2.5-2.5M21 12c0 .7-1.994 2.008-2.5 2.5"
-                    class="group-hover:stroke-red-400"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SideBar />
       <!-- End Sidebar -->
 
       <!-- Main Content -->
@@ -383,7 +240,7 @@ const toBoardsList = () => {
             class="text-2xl font-bold tracking-tight"
             style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
           >
-                {{ boardName }}
+            {{ boardName }}
           </div>
         </nav>
 
