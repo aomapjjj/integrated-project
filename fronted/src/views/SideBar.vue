@@ -172,7 +172,7 @@ const goToAllBoards = () => {
                   aria-expanded="true"
                   aria-controls="users-accordion-sub-2"
                 >
-                  Board 1
+                 <slot></slot>
                 </button>
               </li>
             </ul>

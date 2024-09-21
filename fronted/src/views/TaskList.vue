@@ -226,7 +226,9 @@ const closeLimit = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
+      <RouterLink to="/board">
       <SideBar />
+      </RouterLink>
       <!-- End Sidebar -->
 
       <!-- Main Content -->
