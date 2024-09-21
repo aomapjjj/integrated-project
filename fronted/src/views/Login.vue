@@ -6,7 +6,6 @@ import { useUsers } from '../stores/storeUser'
 import Board from '../views/Board.vue'
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/login`
-const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
 const router = useRouter()
 const alertLogin = ref(false)
@@ -15,7 +14,6 @@ const passwordInput = ref('')
 const userStore = useUsers()
 const nameJWT = ref('')
 const isPasswordVisible = ref(false)
-const boardId = ref()
 
 const isValidUsername = computed(() => {
   return (
@@ -37,19 +35,10 @@ const isFormValid = computed(() => {
   return isValidPassword.value && isValidUsername.value
 })
 
-const openHomePage = async () => {
-  try {
-    userStore.setUser(nameJWT.value)
-    console.log(userStore.getUser())
-    const itemsBoards = await getItems(baseUrlboards)
-    const boardIds = itemsBoards.map((board) => board.id)
-    boardId.value = boardIds
-    console.log(boardId.value[0])
-    router.push({ name: "TaskList", params: { id: boardId.value[0] } })
-    userStore.setBoard(boardId.value)
-  } catch (error) {
-    router.push({ name: "Board" })
-  }
+const openHomePage = () => {
+  userStore.setUser(nameJWT.value)
+  console.log(userStore.getUser())
+  router.push({ name: 'Board' })
 }
 
 const showAlert = () => {
