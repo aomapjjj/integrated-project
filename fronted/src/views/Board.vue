@@ -376,12 +376,12 @@ const onFileChange = (event) => {
         <!------------------------- Modal ------------------------->
         <div v-if="openModalName"
           class="itbkk-modal-new fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10">
-          <div class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
+          <div class=" max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
             <div class="w-full">
               <div class="m-8 my-20 max-w-[400px] mx-auto">
                 <div class="mb-8">
                   <span class="block text-2xl font-bold leading-6 mb-1 customPurple text-center">New Board</span>
-                  <div class="modal-content py-4 text-left px-6 flex-grow">
+                  <div class=" modal-content py-4 text-left px-6 flex-grow">
                     <div class="label">
                       <span class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4">Title<span
                           style="color: red"> *</span>

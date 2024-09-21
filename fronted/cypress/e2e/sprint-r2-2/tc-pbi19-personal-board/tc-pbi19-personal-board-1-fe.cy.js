@@ -62,6 +62,7 @@ describe(`TC-PBI19-PERSIONAL-BOARD-1-FE\n
 
     it('[Step 6] Open /board page and redirect to /login',()=>{
         // let apiUrl = Cypress.env('apiUrl')
+        //http://localhost:8080/v3/boards
         cy.intercept('GET','http://localhost:8080/v3/boards',{
             statusCode: 401
         }).as('mockAPI')
