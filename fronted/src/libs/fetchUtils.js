@@ -174,6 +174,30 @@ async function addBoard(url, newBoard) {
   }
 }
 
+async function boardVis(url, Patch) {
+  const token = getToken();
+  try {
+    const response = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const editedItem = await response.json();
+    return editedItem;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+}
+
+
+
 export {
   getItems,
   getItemById,
