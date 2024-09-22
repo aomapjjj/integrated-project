@@ -18,6 +18,72 @@ export const routes = [
     redirect: { name: "Login" }
   },
   {
+    path: "/board/:id/status/:statusid/edit",
+    name: "EditStatus",
+    component: StatusesList,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      const statusId = to.params.statusid
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/statuses/${statusId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next()
+        } else if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    }
+  },
+  {
+    path: "/board/:id/task/:taskid/edit",
+    name: "TaskEdit",
+    component: EditTask,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      const taskId = to.params.taskid
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/tasks/${taskId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next({ name: "EditTask" })
+        } else if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    }
+  },
+  {
     path: "/board/:id",
     name: "TaskList",
     component: TaskList,
@@ -37,14 +103,12 @@ export const routes = [
 
         if (response.ok) {
           next()
-        } else if(response.status === 404) {
+        } else if (response.status === 404) {
           next({ name: "ErrorPage" })
-        }
-        else if (response.status === 401){
+        } else if (response.status === 401) {
           next({ name: "Login" })
         }
       } catch (error) {
-        
         console.error("Error checking board id:", error)
         next({ name: "ErrorPage" })
       }
@@ -59,44 +123,7 @@ export const routes = [
         path: "task/:taskid",
         name: "TaskDetail",
         component: TaskDetail
-      },
-      {
-        path: "task/:taskid/edit",
-        name: "TaskEdit",
-        component: EditTask,
-        props: true,
-        beforeEnter: async (to, from, next) => {
-          const boardId = to.params.id
-          const taskId = to.params.taskid
-          try {
-            const token = getToken()
-            const response = await fetch(
-              `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/tasks/${taskId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            )
-      
-            console.log("Response status:", response.status);  // Debug จุดนี้
-      
-            if (response.ok) {
-              next()
-            } else if (response.status === 404) {
-              next({ name: "ErrorPage" })
-            } else if (response.status === 401) {
-              next({ name: "Login" })
-            } else {
-              next({ name: "ErrorPage" })
-            }
-          } catch (error) {
-            console.error("Error checking task id:", error)
-            next({ name: "ErrorPage" })
-          }
-        }
       }
-      
     ]
   },
   {
@@ -104,6 +131,7 @@ export const routes = [
     name: "ErrorPage",
     component: ErrorPage
   },
+
   {
     path: "/board/:id/status",
     name: "StatusesList",
@@ -124,56 +152,17 @@ export const routes = [
 
         if (response.ok) {
           next()
-        } else if(response.status === 404) {
+        } else if (response.status === 404) {
           next({ name: "ErrorPage" })
-        }
-        else if (response.status === 401){
+        } else if (response.status === 401) {
           next({ name: "Login" })
         }
       } catch (error) {
-        
         console.error("Error checking board id:", error)
         next({ name: "ErrorPage" })
       }
     },
     children: [
-      {
-        path: ":statusid/edit",
-        name: "EditStatus",
-        component: StatusesList,
-        props: true,
-        beforeEnter: async (to, from, next) => {
-          const boardId = to.params.id
-          const statusId = to.params.statusid
-          try {
-            const token = getToken()
-            const response = await fetch(
-              `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses/${statusId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            )
-      
-            console.log("Response status:", response.status);  // Debug จุดนี้
-      
-            if (response.ok) {
-              next()
-            } else if (response.status === 404) {
-              next({ name: "ErrorPage" })
-            } else if (response.status === 401) {
-              next({ name: "Login" })
-            } else {
-              next({ name: "ErrorPage" })
-            }
-          } catch (error) {
-            console.error("Error checking status id:", error)
-            next({ name: "ErrorPage" })
-          }
-        }
-      }
-      ,
       {
         path: "add",
         name: "AddStatus",
@@ -209,15 +198,13 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const token = sessionStorage.getItem("access_token")
- 
 
   if (!token && to.name !== "Login") {
     next({ name: "Login" })
   } else if (token) {
     try {
       const validateResponse = await fetch(
-        `${import.meta.env.
-          VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
+        `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
         {
           method: "GET",
           headers: {
