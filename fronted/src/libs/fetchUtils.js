@@ -163,17 +163,21 @@ async function addBoard(url, newBoard) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify(newBoard) // ส่ง newItem เป็น string โดยตรง
+      body: JSON.stringify(newBoard),
     });
-    const addedBoard = await response.json();
-    return addedBoard;
+
+    const data = await response.json();
+    // Return both status code and data
+    console.log(data)
+    return { status: response.status, data };
+    
   } catch (error) {
     console.log(`error: ${error}`);
+    return { status: 401, data: null }; // Handle the error by returning a 500 status
   }
 }
-
 export {
   getItems,
   getItemById,
