@@ -9,7 +9,7 @@ import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return sessionStorage.getItem("access_token")
 }
 
 export const routes = [
@@ -208,7 +208,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const token = localStorage.getItem("access_token")
+  const token = sessionStorage.getItem("access_token")
  
 
   if (!token && to.name !== "Login") {
@@ -232,7 +232,7 @@ router.beforeEach(async (to, from, next) => {
       if (validateResponse.status === 200) {
         next()
       } else if (validateResponse.status === 401) {
-        localStorage.removeItem("access_token")
+        sessionStorage.removeItem("access_token")
         next({ name: "Login" })
       } else {
         next({ name: "Login" })
