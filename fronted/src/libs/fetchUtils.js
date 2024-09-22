@@ -1,7 +1,7 @@
 // Utility function to get the token from localStorage
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return localStorage.getItem("access_token");
+  return sessionStorage.getItem("access_token");
 }
 
 async function getItems(url) {

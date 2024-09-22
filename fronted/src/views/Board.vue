@@ -245,7 +245,7 @@ const cancelAction = () => {
         <!------------------------- Modal ------------------------->
         <div
           v-if="openModalName"
-          class="fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
+          class="itbkk-modal-new fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
         >
           <div
             class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"

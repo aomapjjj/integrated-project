@@ -80,7 +80,7 @@ const submitForm = async () => {
       const decoded = jwtDecode(data.access_token)
       userStore.setToken(data.access_token)
       nameJWT.value = decoded.name
-      localStorage.setItem("access_token", data.access_token) // ต้องบันทึก token อย่างถูกต้อง
+      sessionStorage.setItem("access_token", data.access_token)
       openHomePage()
 
       // if (validateResponse.status === 200) {
