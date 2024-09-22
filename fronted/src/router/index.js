@@ -79,12 +79,16 @@ export const routes = [
               }
             )
       
+            console.log("Response status:", response.status);  // Debug จุดนี้
+      
             if (response.ok) {
               next()
             } else if (response.status === 404) {
               next({ name: "ErrorPage" })
             } else if (response.status === 401) {
               next({ name: "Login" })
+            } else {
+              next({ name: "ErrorPage" })
             }
           } catch (error) {
             console.error("Error checking task id:", error)
@@ -92,6 +96,7 @@ export const routes = [
           }
         }
       }
+      
     ]
   },
   {
@@ -135,8 +140,40 @@ export const routes = [
       {
         path: ":statusid/edit",
         name: "EditStatus",
-        component: StatusesList
-      },
+        component: StatusesList,
+        props: true,
+        beforeEnter: async (to, from, next) => {
+          const boardId = to.params.id
+          const statusId = to.params.statusid
+          try {
+            const token = getToken()
+            const response = await fetch(
+              `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses/${statusId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            )
+      
+            console.log("Response status:", response.status);  // Debug จุดนี้
+      
+            if (response.ok) {
+              next()
+            } else if (response.status === 404) {
+              next({ name: "ErrorPage" })
+            } else if (response.status === 401) {
+              next({ name: "Login" })
+            } else {
+              next({ name: "ErrorPage" })
+            }
+          } catch (error) {
+            console.error("Error checking status id:", error)
+            next({ name: "ErrorPage" })
+          }
+        }
+      }
+      ,
       {
         path: "add",
         name: "AddStatus",
