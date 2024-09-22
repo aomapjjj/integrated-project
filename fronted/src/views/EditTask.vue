@@ -70,7 +70,7 @@ const openModal = () => {
 
 const closeModal = () => {
   myModal.value.close()
-  router.go(-1)
+  
 }
 
 const UpdateTask = async () => {
