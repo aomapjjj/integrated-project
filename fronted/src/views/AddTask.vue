@@ -233,17 +233,17 @@ const isLimitReached = computed(() => {
               {{ todo.assignees?.length }}/30
             </p>
             <!-- Status -->
-            <div class="itbkk-status mb-4 mt-2">
+            <div class="mb-4 mt-2">
               <span
                 class="block text-lg font-bold leading-6 text-gray-900 mb-2"
                 style="color: #9391e4"
                 >Status</span
               >
               <select
-                class="select select-bordered w-full max-w-xs mt-1"
+                class="itbkk-status select select-bordered w-full max-w-xs mt-1"
                 v-model="todo.status"
               >
-                <option v-for="status in statusList" :value="status.name">
+                <option v-for="status in statusList" :value="status.name  ">
                   {{ status.name }}
                 </option>
               </select>

@@ -233,6 +233,7 @@ router.beforeEach(async (to, from, next) => {
         next()
       } else if (validateResponse.status === 401) {
         sessionStorage.removeItem("access_token")
+        sessionStorage.removeItem("access_token")
         next({ name: "Login" })
       } else {
         next({ name: "Login" })

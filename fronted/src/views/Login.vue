@@ -65,9 +65,9 @@ const showAlert = () => {
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         userName: userInput.value,
@@ -80,7 +80,10 @@ const submitForm = async () => {
       const decoded = jwtDecode(data.access_token)
       userStore.setToken(data.access_token)
       nameJWT.value = decoded.name
-      sessionStorage.setItem("access_token", data.access_token)
+     
+      sessionStorage.removeItem('token') 
+     
+      sessionStorage.setItem('access_token', data.access_token) 
       openHomePage()
 
       // if (validateResponse.status === 200) {
