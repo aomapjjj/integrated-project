@@ -52,6 +52,12 @@ public class BoardService {
         return boardId;
     }
 
+    public void validateBoardExists(String boardId) {
+        if (!boardRepository.existsById(boardId)) {
+            throw new ItemNotFoundException("Board not found with ID: " + boardId);
+        }
+    }
+
     // Get board IDs by owner
     public List<BoardResponseDTO> getBoardIdByOwner() {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

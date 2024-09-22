@@ -36,13 +36,15 @@ export const routes = [
         )
 
         if (response.ok) {
-          // ถ้า id ถูกต้อง ให้ทำการโหลดเส้นทางต่อไป
           next()
-        } else {
+        } else if(response.status === 404) {
           next({ name: "ErrorPage" })
         }
+        else if (response.status === 401){
+          next({ name: "Login" })
+        }
       } catch (error) {
-        // ถ้ามีข้อผิดพลาดในการ fetch (เช่น API ล่ม)
+        
         console.error("Error checking board id:", error)
         next({ name: "ErrorPage" })
       }
@@ -61,7 +63,34 @@ export const routes = [
       {
         path: "task/:taskid/edit",
         name: "TaskEdit",
-        component: EditTask
+        component: EditTask,
+        props: true,
+        beforeEnter: async (to, from, next) => {
+          const boardId = to.params.id
+          const taskId = to.params.taskid
+          try {
+            const token = getToken()
+            const response = await fetch(
+              `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/tasks/${taskId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            )
+      
+            if (response.ok) {
+              next()
+            } else if (response.status === 404) {
+              next({ name: "ErrorPage" })
+            } else if (response.status === 401) {
+              next({ name: "Login" })
+            }
+          } catch (error) {
+            console.error("Error checking task id:", error)
+            next({ name: "ErrorPage" })
+          }
+        }
       }
     ]
   },
@@ -74,6 +103,34 @@ export const routes = [
     path: "/board/:id/status",
     name: "StatusesList",
     component: StatusesList,
+    props: true,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next()
+        } else if(response.status === 404) {
+          next({ name: "ErrorPage" })
+        }
+        else if (response.status === 401){
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    },
     children: [
       {
         path: ":statusid/edit",

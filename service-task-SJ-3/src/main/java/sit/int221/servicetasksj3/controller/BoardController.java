@@ -70,6 +70,7 @@ public class BoardController {
             @RequestParam(required = false, defaultValue = "id") String sortBy,
             @RequestParam(required = false) String[] filterStatuses
     ) {
+        boardService.validateBoardExists(boardId);
         return taskService.getAllTasksFiltered(boardId, sortBy, filterStatuses);
     }
     @GetMapping("/{boardId}/tasks/{taskId}")
@@ -99,6 +100,7 @@ public class BoardController {
     // Statuses of board
     @GetMapping("/{boardId}/statuses")
     public List<StatusDTOTwo> getAllStatuses(@PathVariable String boardId) {
+        boardService.validateBoardExists(boardId);
         return statusService.getAllStatuses(boardId);
     }
     @GetMapping("/{boardId}/statuses/{statusId}")

@@ -1,15 +1,11 @@
 package sit.int221.servicetasksj3.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import sit.int221.servicetasksj3.exceptions.*;
 
@@ -37,6 +33,12 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Username or password is incorrect", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
+    // 403 - ForbiddenException "User is not board owner"
+//    @ExceptionHandler(ForbiddenException.class)
+//    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception, WebRequest request) {
+//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), request.getDescription(false).replace("uri=", ""));
+//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+//    }
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception, WebRequest request) {
@@ -66,10 +68,10 @@ public class GlobalExceptionHandler {
     // Helper method for creating validation error responses (ErrorDetails)
     private ResponseEntity<ErrorDetails> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request, List<ErrorDetails.ValidationError> errors) {
         ErrorDetails errorDetails = new ErrorDetails();
-            errorDetails.setStatus(httpStatus.value());
-            errorDetails.setMessage(message);
-            errorDetails.setInstance(request.getDescription(false));
-            errorDetails.setErrors(errors);
+        errorDetails.setStatus(httpStatus.value());
+        errorDetails.setMessage(message);
+        errorDetails.setInstance(request.getDescription(false));
+        errorDetails.setErrors(errors);
         return ResponseEntity.status(httpStatus).body(errorDetails);
     }
 }
