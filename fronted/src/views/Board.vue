@@ -73,7 +73,9 @@ const cancelAction = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <SideBar />
+      <SideBar>
+        {{ userBoard.name }}
+      </SideBar>
       <!-- End Sidebar -->
 
       <!-- Main Content -->

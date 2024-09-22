@@ -6,18 +6,18 @@ const countdown = ref(3);
 const router = useRouter();
 
 onMounted(() => {
-  startCountdown();
+  // startCountdown();
 });
 
-const startCountdown = () => {
-  let interval = setInterval(() => {
-    countdown.value--;
-    if (countdown.value <= 0) {
-      clearInterval(interval);
-      router.push({ name: 'Board' });
-    }
-  }, 1000);
-};
+// const startCountdown = () => {
+//   let interval = setInterval(() => {
+//     countdown.value--;
+//     if (countdown.value <= 0) {
+//       clearInterval(interval);
+//       router.push({ name: 'Board' });
+//     }
+//   }, 1000);
+// };
 
 const goBackHome = () => {
   router.push({ name: 'Board' });
@@ -34,9 +34,9 @@ const goBackHome = () => {
     <div class="mt-10 flex items-center justify-center gap-x-6">
       <button @click="goBackHome" class="rounded-button rounded-md bg-error px-3.5 py-2.5 text-sm font-semibold text-white">Go back home</button>
     </div>
-    <div class="mt-10 flex items-center justify-center gap-x-6">
+    <!-- <div class="mt-10 flex items-center justify-center gap-x-6">
       <p class="error-title">{{ countdown }}</p>
-    </div>
+    </div> -->
   </div>
 </template>
 
