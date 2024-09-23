@@ -2,7 +2,7 @@ FROM mysql/mysql-server
 
 ENV MYSQL_RANDOM_ROOT_PASSWORD=true
 ENV MYSQL_USER=dev
-ENV MYSQL_PASSWORD=mysql
+ENV MYSQL_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
 ENV MYSQL_DATABASE=kanbanIT
 
 COPY scripts/ /docker-entrypoint-initdb.d/
