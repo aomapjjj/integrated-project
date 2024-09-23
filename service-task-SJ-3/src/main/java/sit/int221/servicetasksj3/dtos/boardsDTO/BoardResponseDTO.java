@@ -2,6 +2,7 @@ package sit.int221.servicetasksj3.dtos.boardsDTO;
 
 import lombok.*;
 import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.Visibility;
 
 @Getter
 @Setter
@@ -10,6 +11,7 @@ import sit.int221.servicetasksj3.entities.Board;
 public class BoardResponseDTO{
     private String id;
     private String name;
+    private Visibility visibility;
     private OwnerDTO owner;
 
     // Inner class for Owner

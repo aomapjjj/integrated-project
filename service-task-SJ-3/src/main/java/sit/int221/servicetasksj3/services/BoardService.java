@@ -1,28 +1,17 @@
 package sit.int221.servicetasksj3.services;
 
-
 import io.viascom.nanoid.NanoId;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.boardsDTO.BoardRequestDTO;
-import sit.int221.servicetasksj3.dtos.boardsDTO.BoardResponseDTO;
-import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
-import sit.int221.servicetasksj3.entities.Board;
-import sit.int221.servicetasksj3.entities.Task;
-import sit.int221.servicetasksj3.entities.TaskLimit;
-import sit.int221.servicetasksj3.entities.TaskStatus;
-import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
-import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
-import sit.int221.servicetasksj3.exceptions.ValidationException;
-import sit.int221.servicetasksj3.repositories.BoardRepository;
-import sit.int221.servicetasksj3.repositories.LimitRepository;
-import sit.int221.servicetasksj3.repositories.StatusRepository;
-import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
-import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
-
+import sit.int221.servicetasksj3.dtos.boardsDTO.*;
+import sit.int221.servicetasksj3.entities.*;
+import sit.int221.servicetasksj3.exceptions.*;
+import sit.int221.servicetasksj3.repositories.*;
+import sit.int221.servicetasksj3.sharedatabase.entities.*;
+import sit.int221.servicetasksj3.sharedatabase.repositories.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +39,45 @@ public class BoardService {
             boardId = NanoId.generate(10);
         } while (boardRepository.existsById(boardId)); // ตรวจสอบว่ามี id นี้ในฐานข้อมูลแล้วหรือยัง
         return boardId;
+    }
+
+//    public void validateBoardExists(String boardId) {
+//        if (!boardRepository.existsById(boardId)) {  // ตรวจสอบว่า board ที่มี boardId นั้นมีอยู่จริงในฐานข้อมูลหรือไม่
+//            throw new ItemNotFoundException("Board not found with ID: " + boardId);
+//        }
+//    }
+
+    public void checkAuthorization(String boardId, boolean isWriteOperation) {
+        // ค้นหา Board ตาม ID
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        // ดึงข้อมูลผู้ใช้ปัจจุบันจาก Security Context
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // ตรวจสอบความเป็นเจ้าของ (Owner) และการเป็นบอร์ดสาธารณะ (Public)
+        boolean isOwner = board.getOwnerId().equals(currentUser.getOid());
+        boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
+
+        if (currentUser == null) { //ตรวจสอบว่า currentUser เป็น null หรือไม่ (ซึ่งไม่ควรเป็นไปได้ในสถานการณ์นี้ ถ้ามีการตรวจสอบการเข้าสู่ระบบเรียบร้อยแล้ว)
+            if (isPublic) { //ถ้าผู้ใช้ไม่ใช่เจ้าของบอร์ดและบอร์ดเป็นสาธารณะ
+                if (isWriteOperation) { // ถ้าเป็นการกระทำแบบเขียน (isWriteOperation) ให้โยน UnauthorizedException
+                    throw new UnauthorizedException("User not authenticated and board is public");
+                }
+            } else { // ถ้าไม่ใช่บอร์ดสาธารณะ ให้โยน ForbiddenException
+                throw new ForbiddenException("User not authenticated and board is private");
+            }
+        } else {
+            //ตรวจสอบกรณีที่ผู้ใช้ไม่ใช่เจ้าของ
+            if (!isOwner) { // ถ้าผู้ใช้ไม่ใช่เจ้าของ
+                if (isPublic) { //ถ้าบอร์ดเป็นสาธารณะ
+                    if (isWriteOperation) { //ถ้าเป็นการกระทำแบบเขียน ให้โยน ForbiddenException
+                        throw new ForbiddenException("User is not the owner and board is public");
+                    }
+                } else { //ถ้าบอร์ดไม่ใช่สาธารณะ ให้โยน ForbiddenException ทุกกรณี
+                    throw new ForbiddenException("User is not the owner and board is private");
+                }
+            }
+        }
     }
 
     // Get board IDs by owner
@@ -80,15 +108,14 @@ public class BoardService {
 
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // Check if the user is the owner of the board
-        if (!board.getOwnerId().equals(currentUser.getOid())) {
-            throw new UnauthorizedException("User is not authorized to access this board");
-        }
+//        if (!board.getOwnerId().equals(currentUser.getOid()) && board.getVisibility() == Visibility.PRIVATE) {
+//            throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
+//        }
 
         BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
         BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
         ownerDTO.setOid(currentUser.getOid());
         ownerDTO.setName(currentUser.getName());
-
         boardResponse.setOwner(ownerDTO);
         return boardResponse;
     }
@@ -96,16 +123,11 @@ public class BoardService {
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (currentUser == null) {
-            throw new UnauthorizedException("User not authenticated");
-        }
+//        if (currentUser == null) {
+//            throw new UnauthorizedException("User not authenticated");
+//        }
 
         String oid = currentUser.getOid();
-
-        // Check if the user already owns a board
-//        if (boardRepository.existsByOwnerId(oid)) {
-//            throw new ValidationException("User already owns a board");
-//        }
 
         Board board = new Board();
         board.setId(generateUniqueBoardId());
@@ -153,7 +175,49 @@ public class BoardService {
     }
 
     // Edit
+    @Transactional
+    public BoardResponseDTO editBoard(String boardId, BoardRequestDTO boardRequest) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Check if the user is the owner of the board
+//        if (!board.getOwnerId().equals(currentUser.getOid())) {
+//            throw new ForbiddenException("User is not authorized to edit this board");
+//        }
+
+        board.setName(boardRequest.getName());
+//        board.setVisibility(boardRequest.getVisibility());
+
+        Board updatedBoard = boardRepository.save(board);
+
+        BoardResponseDTO boardResponse = modelMapper.map(updatedBoard, BoardResponseDTO.class);
+        BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
+        ownerDTO.setOid(currentUser.getOid());
+        ownerDTO.setName(currentUser.getName());
+        boardResponse.setOwner(ownerDTO);
+
+        return boardResponse;
+    }
+
+    // Edit visibility
+    @Transactional
+    public VisibilityDTO editBoardVisibility(String boardId, VisibilityDTO visibility) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // ตรวจสอบว่า user เป็นเจ้าของ board หรือไม่
+//        if (!board.getOwnerId().equals(currentUser.getOid())) {
+//            throw new ForbiddenException("User is not authorized to edit this board");
+//        }
+
+        board.setVisibility(visibility.getVisibility());
+        boardRepository.save(board);
+
+        return visibility;
+    }
 }
 
 
