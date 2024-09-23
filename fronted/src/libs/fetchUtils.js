@@ -1,7 +1,7 @@
 // Utility function to get the token from localStorage
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return localStorage.getItem("access_token");
+  return sessionStorage.getItem("access_token");
 }
 
 async function getItems(url) {
@@ -163,14 +163,42 @@ async function addBoard(url, newBoard) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}`,
       },
-      body: JSON.stringify(newBoard) // ส่ง newItem เป็น string โดยตรง
+      body: JSON.stringify(newBoard),
     });
-    const addedBoard = await response.json();
-    return addedBoard;
+
+    const data = await response.json();
+    // Return both status code and data
+    console.log(data)
+    return { status: response.status, data };
+    
   } catch (error) {
     console.log(`error: ${error}`);
+    return { status: 401, data: null }; // Handle the error by returning a 500 status
+  }
+}
+
+
+async function boardVis(url, Patch) {
+  const token = getToken();
+  try {
+    const response = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const editedItem = await response.json();
+    return editedItem;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
   }
 }
 

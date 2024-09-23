@@ -24,7 +24,7 @@ const userName = userStore.getUser().username
 
 // Log out
 const clearToken = () => {
-  localStorage.removeItem('access_token')
+  sessionStorage.removeItem('access_token')
   router.push({ name: 'Login' })
 }
 
@@ -172,7 +172,7 @@ const goToAllBoards = () => {
                   aria-expanded="true"
                   aria-controls="users-accordion-sub-2"
                 >
-                  Board 1
+                 <slot></slot>
                 </button>
               </li>
             </ul>

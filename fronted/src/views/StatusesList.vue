@@ -41,7 +41,7 @@ const errorTrans = ref(false)
 const myStatuses = useStatuses()
 const limitStore = useLimitStore()
 const taskStore = useTasks()
-const token = localStorage.getItem('access_token')
+const token = sessionStorage.getItem('access_token')
 
 const boardId = ref()
 watch(

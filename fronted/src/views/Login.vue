@@ -1,18 +1,23 @@
 <script setup>
-import { jwtDecode } from 'jwt-decode'
-import { useRouter, useRoute } from 'vue-router'
-import { ref, computed } from 'vue'
-import { useUsers } from '../stores/storeUser'
-import Board from '../views/Board.vue'
+import { jwtDecode } from "jwt-decode"
+import { useRouter, useRoute } from "vue-router"
+import { ref, computed, watch } from "vue"
+import { useUsers } from "../stores/storeUser"
+import Board from "../views/Board.vue"
+import { getItems, getBoardById } from "../libs/fetchUtils.js"
+
+const boardId = ref()
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/login`
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 
 const router = useRouter()
 const alertLogin = ref(false)
-const userInput = ref('')
-const passwordInput = ref('')
+const userInput = ref("")
+const passwordInput = ref("")
 const userStore = useUsers()
-const nameJWT = ref('')
+const nameJWT = ref("")
 const isPasswordVisible = ref(false)
 
 const isValidUsername = computed(() => {
@@ -35,10 +40,19 @@ const isFormValid = computed(() => {
   return isValidPassword.value && isValidUsername.value
 })
 
-const openHomePage = () => {
-  userStore.setUser(nameJWT.value)
-  console.log(userStore.getUser())
-  router.push({ name: 'Board' })
+const openHomePage = async () => {
+  try {
+    userStore.setUser(nameJWT.value)
+    console.log(userStore.getUser())
+    const itemsBoards = await getItems(baseUrlboards)
+    const boardIds = itemsBoards.map((board) => board.id)
+    boardId.value = boardIds
+    console.log(boardId.value[0])
+    router.push({ name: "TaskList", params: { id: boardId.value[0] } })
+    userStore.setBoard(boardId.value)
+  } catch (error) {
+    router.push({ name: "Board" })
+  }
 }
 
 const showAlert = () => {
@@ -66,7 +80,10 @@ const submitForm = async () => {
       const decoded = jwtDecode(data.access_token)
       userStore.setToken(data.access_token)
       nameJWT.value = decoded.name
-      localStorage.setItem('access_token', data.access_token) // ต้องบันทึก token อย่างถูกต้อง
+     
+      sessionStorage.removeItem('token') 
+     
+      sessionStorage.setItem('access_token', data.access_token) 
       openHomePage()
 
       // if (validateResponse.status === 200) {

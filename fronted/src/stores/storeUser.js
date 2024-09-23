@@ -7,32 +7,32 @@ const useUsers = defineStore("users", () => {
   const token = ref("");
   const boardId = ref("");
 
-  // บันทึก token ใน localStorage
+  // บันทึก token ใน sessionStorage
   const setToken = (newToken) => {
     token.value = newToken;
-    localStorage.setItem("token", token.value);
+    sessionStorage.setItem("token", token.value);
   };
 
-  // ดึง token จาก localStorage
+  // ดึง token จาก sessionStorage
   const getToken = () => {
-    return token.value || localStorage.getItem("token");
+    return token.value || sessionStorage.getItem("token");
   };
 
-  // ดึงข้อมูลจาก localStorage ทันทีที่ store ถูกสร้างขึ้น
-  if (localStorage.getItem("user")) {
-    user.value = JSON.parse(localStorage.getItem("user"));
+  // ดึงข้อมูลจาก sessionStorage ทันทีที่ store ถูกสร้างขึ้น
+  if (sessionStorage.getItem("user")) {
+    user.value = JSON.parse(sessionStorage.getItem("user"));
   }
-  if (localStorage.getItem("token")) {
-    token.value = localStorage.getItem("token");
+  if (sessionStorage.getItem("token")) {
+    token.value = sessionStorage.getItem("token");
   }
-  if (localStorage.getItem("boardId")) {
-    boardId.value = localStorage.getItem("boardId");
+  if (sessionStorage.getItem("boardId")) {
+    boardId.value = sessionStorage.getItem("boardId");
   }
 
-  // บันทึก user ใน localStorage
+  // บันทึก user ใน sessionStorage
   const setUser = (userName) => {
     user.value = { username: userName };
-    localStorage.setItem("user", JSON.stringify(user.value));
+    sessionStorage.setItem("user", JSON.stringify(user.value));
   };
 
   const getUser = () => {
@@ -41,21 +41,21 @@ const useUsers = defineStore("users", () => {
 
   const setBoard = (newboard) => {
     boardId.value = newboard;
-    localStorage.setItem("boardId", boardId.value);
+    sessionStorage.setItem("boardId", boardId.value);
   };
 
   const getBoard = () => {
     return boardId.value
   }
 
-  // บันทึก boardId ใน localStorage
+  // บันทึก boardId ใน sessionStorage
   // const setID = (id) => {
   //   boardId.value = id;
-  //   localStorage.setItem("boardId", boardId.value);
+  //   sessionStorage.setItem("boardId", boardId.value);
   // };
 
   // const getID = () => {
-  //   return boardId.value || localStorage.getItem("boardId");
+  //   return boardId.value || sessionStorage.getItem("boardId");
   // };
 
   const removeUser = (removeId) => {

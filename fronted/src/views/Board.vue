@@ -1,9 +1,9 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '@/stores/storeUser'
-import { getItems, addBoard, deleteItemById } from '../libs/fetchUtils.js'
-import SideBar from './SideBar.vue'
+import { useRouter, useRoute } from "vue-router"
+import { ref, computed, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
+import { getItems, addBoard, deleteItemById } from "../libs/fetchUtils.js"
+import SideBar from "./SideBar.vue"
 
 const BoardsList = ref([])
 const openModalName = ref(false)
@@ -12,21 +12,37 @@ const selectedItemIdToDelete = ref()
 
 const userStore = useUsers()
 const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + ' personal Board' })
+const userBoard = ref({ name: userName + " personal board" })
 // const userID = userStore.getUser()
 
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
+function getToken() {
+  return sessionStorage.getItem("access_token")
+}
 onMounted(async () => {
   const itemsBoards = await getItems(baseUrlBoard)
   BoardsList.value = itemsBoards
+
+  const token = getToken()
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (response.status === 404) {
+    router.push({ name: "ErrorPage" });
+  } else if (response.status === 401) {
+    router.push({ name: "Login" }); 
+  }
 })
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -40,9 +56,17 @@ const isValidName = computed(() => {
 })
 
 const submitForm = async () => {
-  const newBoard = await addBoard(baseUrlBoard, userBoard.value)
-  toBoardsList(newBoard.id)
-  clearForm()
+  const result = await addBoard(baseUrlBoard, userBoard.value)
+
+  console.log(result.status)
+
+  if (result.status === 401) {
+    sessionStorage.removeItem("access_token")
+    router.push({ name: "Login" })
+  } else {
+    toBoardsList(result.data.id)
+    clearForm()
+  }
 }
 
 const deletBoard = async (boardId) => {
@@ -60,7 +84,7 @@ const confirmDelete = () => {
 }
 
 const clearForm = () => {
-  userBoard.value.name = ''
+  userBoard.value.name = ""
 }
 
 const cancelAction = () => {
@@ -73,7 +97,9 @@ const cancelAction = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <SideBar />
+      <SideBar>
+        {{ userBoard.name }}
+      </SideBar>
       <!-- End Sidebar -->
 
       <!-- Main Content -->
@@ -243,7 +269,7 @@ const cancelAction = () => {
         <!------------------------- Modal ------------------------->
         <div
           v-if="openModalName"
-          class="fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
+          class="itbkk-modal-new fixed left-32 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10"
         >
           <div
             class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
