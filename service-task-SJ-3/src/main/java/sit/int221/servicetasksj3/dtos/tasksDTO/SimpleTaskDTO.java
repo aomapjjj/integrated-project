@@ -2,6 +2,7 @@ package sit.int221.servicetasksj3.dtos.tasksDTO;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.*;
 import sit.int221.servicetasksj3.entities.TaskStatus;

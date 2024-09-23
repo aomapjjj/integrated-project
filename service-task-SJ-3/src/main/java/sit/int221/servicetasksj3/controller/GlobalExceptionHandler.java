@@ -34,11 +34,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
     // 403 - ForbiddenException "User is not board owner"
-//    @ExceptionHandler(ForbiddenException.class)
-//    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception, WebRequest request) {
-//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), request.getDescription(false).replace("uri=", ""));
-//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
-//    }
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), request.getDescription(false).replace("uri=", ""));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception, WebRequest request) {
@@ -68,10 +68,10 @@ public class GlobalExceptionHandler {
     // Helper method for creating validation error responses (ErrorDetails)
     private ResponseEntity<ErrorDetails> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request, List<ErrorDetails.ValidationError> errors) {
         ErrorDetails errorDetails = new ErrorDetails();
-        errorDetails.setStatus(httpStatus.value());
-        errorDetails.setMessage(message);
-        errorDetails.setInstance(request.getDescription(false));
-        errorDetails.setErrors(errors);
+            errorDetails.setStatus(httpStatus.value());
+            errorDetails.setMessage(message);
+            errorDetails.setInstance(request.getDescription(false));
+            errorDetails.setErrors(errors);
         return ResponseEntity.status(httpStatus).body(errorDetails);
     }
 }

@@ -21,10 +21,7 @@ public class Board {
     @Column(name = "userId", length = 36, nullable = false)
     private String ownerId;
 
-//    @ManyToOne
-//    @JoinColumn(name = "userId", nullable = false)
-//    private Users owner;
-
-//    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-//    private List<TaskStatus> statuses;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility")
+    private Visibility visibility = Visibility.PRIVATE;
 }
