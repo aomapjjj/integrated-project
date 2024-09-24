@@ -175,30 +175,50 @@ async function addBoard(url, newBoard) {
     
   } catch (error) {
     console.log(`error: ${error}`);
-    return { status: 401, data: null }; // Handle the error by returning a 500 status
+    return { status: 401, data: null }; 
   }
 }
 
-
-async function boardVis(url, Patch) {
+async function boardVis(boardId, currentVisibility) {
   const token = getToken();
+
+  // Calculate new visibility mode
+  const newVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+
   try {
-    const response = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+      
+      const response = await fetch(`${baseUrlBoards}/${boardId}`, {
+          method: "PATCH",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ visibility: newVisibility })
+          
+      });
+      
+
+      // Handle different response statuses
+      if (response.status === 200) {
+          const editedItem = await response.json();
+          console.log(`Visibility changed to: ${editedItem.visibility}`);
+          return editedItem; // return the updated board item
+      } else if (response.status === 401) {
+          // Handle unauthorized - reset authentication state and redirect to login
+          resetAuthentication();
+          redirectToLogin();
+          return null; // or handle it as needed in your application
+      } else if (response.status === 403) {
+          alert("You do not have permission to change board visibility mode.");
+          return null; // or handle it as needed
+      } else {
+          alert("There is a problem. Please try again later.");
+          return null; // or handle it as needed
       }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const editedItem = await response.json();
-    return editedItem;
   } catch (error) {
-    console.log(`Error: ${error.message}`);
+      console.log(`Error: ${error.message}`);
+      alert("There is a problem. Please try again later.");
+      return null; // or handle it as needed
   }
 }
 
@@ -211,5 +231,6 @@ export {
   deleteItemAndTransfer,
   editLimit,
   addBoard,
-  getBoardById
+  getBoardById,
+  boardVis
 }
