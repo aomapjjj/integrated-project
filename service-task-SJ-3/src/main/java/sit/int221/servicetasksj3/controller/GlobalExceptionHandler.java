@@ -10,6 +10,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import sit.int221.servicetasksj3.exceptions.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     // 404 - ItemNotFoundException
@@ -45,12 +47,12 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Resource not found", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Request body is missing. Please provide the necessary data to create a board for the temporary user.", request.getDescription(false).replace("uri=", ""));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
+//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Request body is missing. Please provide the necessary data to create a board for the temporary user.", request.getDescription(false).replace("uri=", ""));
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+//    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorDetails> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
@@ -60,6 +62,29 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest().body(errorDetails);
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorDetails> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
+        List<ErrorDetails.ValidationError> errors = extractValidationErrors(exception);
+        return createErrorResponse("Request body contains invalid data. Please check the 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
+    }
+    private List<ErrorDetails.ValidationError> extractValidationErrors(HttpMessageNotReadableException exception) {
+        Throwable cause = exception.getCause();
+        // ตรวจสอบว่า cause เป็น InvalidFormatException หรือไม่
+        if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException) {
+            com.fasterxml.jackson.databind.exc.InvalidFormatException invalidFormatException =
+                    (com.fasterxml.jackson.databind.exc.InvalidFormatException) cause;
+            String fieldName = invalidFormatException.getPath().stream()
+                    .map(ref -> ref.getFieldName())
+                    .collect(Collectors.joining("."));
+            String errorMessage = String.format("Cannot deserialize value of type '%s' from String '%s': not one of the accepted values",
+                    invalidFormatException.getTargetType().getSimpleName(),
+                    invalidFormatException.getValue());
+            return List.of(new ErrorDetails.ValidationError(fieldName, errorMessage));
+        }
+        // สำหรับข้อผิดพลาดอื่นๆ ที่ไม่ใช่ InvalidFormatException
+        return List.of(new ErrorDetails.ValidationError("message", cause != null ? cause.getMessage() : "Unknown error"));
+    }
+
     // Helper method for creating standard error responses (ErrorResponse)
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message, request.getDescription(false).replace("uri=", ""));

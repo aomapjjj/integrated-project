@@ -20,6 +20,9 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     @Value("#{${jwt.max-token-interval-minutes}*60*1000}")
     private long JWT_TOKEN_VALIDITY;
+//    @Value("#{${24*60*60*1000}")
+    @Value("${jwt.refresh-token-validity}")
+    private long JWT_REFRESH_TOKEN_VALIDITY;
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject); }
@@ -34,7 +37,7 @@ public class JwtTokenUtil implements Serializable {
         Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
         return claims;
     }
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -53,11 +56,32 @@ public class JwtTokenUtil implements Serializable {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuer("https://intproj23.sit.kmutt.ac.th/sj3/")
-                .setIssuedAt(new Date(System.currentTimeMillis())) // Set iat (issued at)
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY)) // Set exp (expiration)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(signatureAlgorithm, SECRET_KEY)
                 .compact();
     }
+    public String generateRefreshToken(UserDetails userDetails) {
+        AuthUser authUser = (AuthUser) userDetails;
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("name", authUser.getName());
+        claims.put("oid", authUser.getOid());
+        claims.put("email", authUser.getEmail());
+        claims.put("role", authUser.getRole().name());
+        return doGenerateRefreshToken(claims, userDetails.getUsername());
+    }
+    private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuer("https://intproj23.sit.kmutt.ac.th/sj3/")
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_TOKEN_VALIDITY))
+                .signWith(signatureAlgorithm, SECRET_KEY)
+                .compact();
+    }
+
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
