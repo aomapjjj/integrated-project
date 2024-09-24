@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.services.AuthenticationService;
@@ -29,8 +30,34 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseTokenDTO> login(@Valid @RequestBody JwtRequestUser jwtRequestUser) {
-        String token = authenticationService.login(jwtRequestUser);
-        return ResponseEntity.ok(new JwtResponseTokenDTO(token));
+//        String accessToken = authenticationService.login(jwtRequestUser);
+//        String refreshToken = jwtTokenUtil.doGenerateRefreshToken(jwtRequestUser.getUserName());
+//        return ResponseEntity.ok(new JwtResponseTokenDTO(accessToken, refreshToken));
+        JwtResponseTokenDTO tokens = authenticationService.login(jwtRequestUser);
+        return ResponseEntity.ok(tokens);
+    }
+
+    @PostMapping("/token")
+    public ResponseEntity<JwtResponseTokenDTO> refreshAccessToken(@RequestHeader("Authorization") String requestTokenHeader) {
+        String refreshToken = null;
+
+        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+            refreshToken = requestTokenHeader.substring(7);
+        } else {
+            throw new UnauthorizedException("Refresh token does not begin with Bearer String");
+        }
+
+        // ตรวจสอบ refresh token ว่าหมดอายุหรือยัง
+        if (jwtTokenUtil.isTokenExpired(refreshToken)) {
+            throw new UnauthorizedException("Refresh token has expired");
+        }
+
+        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
+        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+
+        // สร้าง access token ใหม่
+        String newAccessToken = jwtTokenUtil.generateToken(userDetails);
+        return ResponseEntity.ok(new JwtResponseTokenDTO(newAccessToken, null)); // คืนเฉพาะ access token
     }
 
     @GetMapping("/validate-token")

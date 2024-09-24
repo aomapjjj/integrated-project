@@ -33,11 +33,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
-//                                .requestMatchers("/v2/tasks/**").authenticated()
-//                                .requestMatchers("/v2/statuses/**").authenticated()
-//                                .requestMatchers("/v3/boards/**").authenticated()
-//                                .requestMatchers("/v3/boards/{id}/tasks/**").authenticated()
-//                                .requestMatchers("/v3/boards/{id}/statuses/**").authenticated()
+                                .requestMatchers("/v2/tasks/**").authenticated()
+                                .requestMatchers("/v2/statuses/**").authenticated()
+                                .requestMatchers("/v3/boards/**").authenticated()
+                                .requestMatchers("/v3/boards/{id}/tasks/**").authenticated()
+                                .requestMatchers("/v3/boards/{id}/statuses/**").authenticated()
 //                                .requestMatchers("/validate-token").permitAll()
 //                                .requestMatchers("/statuses/**").permitAll()
 //                                .requestMatchers("/tasks/**").permitAll()

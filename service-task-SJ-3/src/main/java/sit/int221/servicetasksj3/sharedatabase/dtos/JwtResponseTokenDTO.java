@@ -1,9 +1,8 @@
 package sit.int221.servicetasksj3.sharedatabase.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 
 @Getter
 @Setter
@@ -11,4 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class JwtResponseTokenDTO {
     private String access_token;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String refresh_token;
 }
