@@ -44,7 +44,7 @@ const baseUrlLimit = `${baseUrlboards}/${boardId.value}/statuses/limit`
 const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 const userName = userStore.getUser().username
-const token = localStorage.getItem('access_token')
+const token = sessionStorage.getItem('access_token')
 const boardName = ref('')
 
 let items = []
@@ -59,6 +59,7 @@ onMounted(async () => {
   const Board = await getBoardById(boardId.value)
 
   boardName.value = Board.item.name
+  console.log(Board.item.name)
   todoList.value = items
 
   const itemsStatus = await getItems(baseUrlStatus)
@@ -200,7 +201,7 @@ const openNewStatus = () => {
 
 const clearToken = () => {
   router.push({ name: 'Login' })
-  localStorage.removeItem('access_token') // หรือ sessionStorage.removeItem("access_token");
+  sessionStorage.removeItem('access_token') // หรือ sessionStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
@@ -226,7 +227,9 @@ const closeLimit = () => {
   <div class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
+      <RouterLink to="/board">
       <SideBar />
+      </RouterLink>
       <!-- End Sidebar -->
 
       <!-- Main Content -->
@@ -240,7 +243,7 @@ const closeLimit = () => {
             class="text-2xl font-bold tracking-tight"
             style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
           >
-            {{ boardName }}
+            {{ boardName }}  
           </div>
         </nav>
 

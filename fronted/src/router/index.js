@@ -9,13 +9,79 @@ import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return sessionStorage.getItem("access_token")
 }
 
 export const routes = [
   {
     path: "/",
     redirect: { name: "Login" }
+  },
+  {
+    path: "/board/:id/status/:statusid/edit",
+    name: "EditStatus",
+    component: StatusesList,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      const statusId = to.params.statusid
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/statuses/${statusId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next()
+        } else if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    }
+  },
+  {
+    path: "/board/:id/task/:taskid/edit",
+    name: "TaskEdit",
+    component: EditTask,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      const taskId = to.params.taskid
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/tasks/${taskId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next({ name: "EditTask" })
+        } else if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    }
   },
   {
     path: "/board/:id",
@@ -36,13 +102,13 @@ export const routes = [
         )
 
         if (response.ok) {
-          // ถ้า id ถูกต้อง ให้ทำการโหลดเส้นทางต่อไป
           next()
-        } else {
+        } else if (response.status === 404) {
           next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
         }
       } catch (error) {
-        // ถ้ามีข้อผิดพลาดในการ fetch (เช่น API ล่ม)
         console.error("Error checking board id:", error)
         next({ name: "ErrorPage" })
       }
@@ -57,11 +123,6 @@ export const routes = [
         path: "task/:taskid",
         name: "TaskDetail",
         component: TaskDetail
-      },
-      {
-        path: "task/:taskid/edit",
-        name: "TaskEdit",
-        component: EditTask
       }
     ]
   },
@@ -70,16 +131,38 @@ export const routes = [
     name: "ErrorPage",
     component: ErrorPage
   },
+
   {
     path: "/board/:id/status",
     name: "StatusesList",
     component: StatusesList,
+    props: true,
+    beforeEnter: async (to, from, next) => {
+      const boardId = to.params.id
+      try {
+        const token = getToken()
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        )
+
+        if (response.ok) {
+          next()
+        } else if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.status === 401) {
+          next({ name: "Login" })
+        }
+      } catch (error) {
+        console.error("Error checking board id:", error)
+        next({ name: "ErrorPage" })
+      }
+    },
     children: [
-      {
-        path: ":statusid/edit",
-        name: "EditStatus",
-        component: StatusesList
-      },
       {
         path: "add",
         name: "AddStatus",
@@ -114,16 +197,14 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const token = localStorage.getItem("access_token")
- 
+  const token = sessionStorage.getItem("access_token")
 
   if (!token && to.name !== "Login") {
     next({ name: "Login" })
   } else if (token) {
     try {
       const validateResponse = await fetch(
-        `${import.meta.env.
-          VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
+        `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
         {
           method: "GET",
           headers: {
@@ -138,7 +219,8 @@ router.beforeEach(async (to, from, next) => {
       if (validateResponse.status === 200) {
         next()
       } else if (validateResponse.status === 401) {
-        localStorage.removeItem("access_token")
+        sessionStorage.removeItem("access_token")
+        sessionStorage.removeItem("access_token")
         next({ name: "Login" })
       } else {
         next({ name: "Login" })
