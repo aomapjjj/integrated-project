@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v3/boards")
-@CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th" } )
+@CrossOrigin(origins = { "http://localhost:5173/", "http://ip23sj3.sit.kmutt.ac.th", "http://intproj23.sit.kmutt.ac.th","https://intproj23.sit.kmutt.ac.th" } )
 
 public class BoardController {
     @Autowired
