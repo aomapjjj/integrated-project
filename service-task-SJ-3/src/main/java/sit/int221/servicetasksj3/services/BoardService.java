@@ -41,41 +41,29 @@ public class BoardService {
         return boardId;
     }
 
-//    public void validateBoardExists(String boardId) {
-//        if (!boardRepository.existsById(boardId)) {  // ตรวจสอบว่า board ที่มี boardId นั้นมีอยู่จริงในฐานข้อมูลหรือไม่
-//            throw new ItemNotFoundException("Board not found with ID: " + boardId);
-//        }
-//    }
-
-    public void checkAuthorization(String boardId, boolean isWriteOperation) {
+    public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod) {
         // ค้นหา Board ตาม ID
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-        // ดึงข้อมูลผู้ใช้ปัจจุบันจาก Security Context
-        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // ตรวจสอบความเป็นเจ้าของ (Owner) และการเป็นบอร์ดสาธารณะ (Public)
-        boolean isOwner = board.getOwnerId().equals(currentUser.getOid());
+        // ตรวจสอบความเป็นเจ้าของ (Owner)
+        boolean isOwner = board.getOwnerId().equals(userId);
         boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
+        boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
 
-        if (currentUser == null) { //ตรวจสอบว่า currentUser เป็น null หรือไม่ (ซึ่งไม่ควรเป็นไปได้ในสถานการณ์นี้ ถ้ามีการตรวจสอบการเข้าสู่ระบบเรียบร้อยแล้ว)
-            if (isPublic) { //ถ้าผู้ใช้ไม่ใช่เจ้าของบอร์ดและบอร์ดเป็นสาธารณะ
-                if (isWriteOperation) { // ถ้าเป็นการกระทำแบบเขียน (isWriteOperation) ให้โยน UnauthorizedException
-                    throw new UnauthorizedException("User not authenticated and board is public");
-                }
-            } else { // ถ้าไม่ใช่บอร์ดสาธารณะ ให้โยน ForbiddenException
-                throw new ForbiddenException("User not authenticated and board is private");
+        if (userId != null) {
+            // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น private
+            if (!isOwner && isPrivate) {
+                throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
+            }
+            // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น public แต่ทำการกระทำที่ไม่ใช่ GET
+            if (!isOwner && isPublic && !requestMethod.equals("GET")) {
+                throw new ForbiddenException("The board exists, but the user is not the owner and the board is public.");
             }
         } else {
-            //ตรวจสอบกรณีที่ผู้ใช้ไม่ใช่เจ้าของ
-            if (!isOwner) { // ถ้าผู้ใช้ไม่ใช่เจ้าของ
-                if (isPublic) { //ถ้าบอร์ดเป็นสาธารณะ
-                    if (isWriteOperation) { //ถ้าเป็นการกระทำแบบเขียน ให้โยน ForbiddenException
-                        throw new ForbiddenException("User is not the owner and board is public");
-                    }
-                } else { //ถ้าบอร์ดไม่ใช่สาธารณะ ให้โยน ForbiddenException ทุกกรณี
-                    throw new ForbiddenException("User is not the owner and board is private");
-                }
+            // ผู้ใช้ไม่เข้าสู่ระบบและพยายามเข้าถึงบอร์ดส่วนตัว
+            if (requestMethod.equals("GET") && isPrivate) {
+                throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
             }
         }
     }

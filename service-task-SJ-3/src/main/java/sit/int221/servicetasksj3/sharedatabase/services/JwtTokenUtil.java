@@ -82,8 +82,15 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
+    // ตรวจสอบความถูกต้องของ token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    // ตรวจสอบว่า token ที่ส่งมาเป็น refresh token หรือไม่
+//    public Boolean isRefreshToken(String token) {
+//        Claims claims = getAllClaimsFromToken(token);
+//        Date expiration = claims.getExpiration();
+//        return expiration.getTime() - new Date().getTime() <= JWT_REFRESH_TOKEN_VALIDITY;
+//    }
 }
