@@ -6,16 +6,17 @@ import {
   deleteItemById,
   editLimit,
   getBoardById,
-  boardVis
 } from '../libs/fetchUtils.js'
 import TaskDetail from '../views/TaskDetail.vue'
 import AddTask from '../views/AddTask.vue'
 import EditTask from '../views/EditTask.vue'
+import { boardVisibility } from '../libs/fetchUtils.js'
 import { useLimitStore } from '../stores/storeLimit'
 import { useUsers } from '@/stores/storeUser'
 import { useTasks } from '../stores/store'
 import { useRoute, useRouter } from 'vue-router'
 import SideBar from './SideBar.vue'
+import Modal from '../component/Modal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -47,8 +48,9 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 const userName = userStore.getUser().username
 const token = sessionStorage.getItem('access_token')
 const boardName = ref('')
-const visibility = ref("PRIVATE")
-
+const isModalVisible = ref(false);
+const visibility = ref("")
+const tempVisibility = ref('');
 let items = []
 
 onMounted(async () => {
@@ -59,8 +61,9 @@ onMounted(async () => {
   }
 
   const Board = await getBoardById(boardId.value)
-
+  console.log("Board data", Board)
   boardName.value = Board.item.name
+  visibility.value = Board.item.visibility
   console.log(Board.item.name)
   todoList.value = items
 
@@ -224,26 +227,56 @@ const closeLimit = () => {
   my_modal_limit.close()
 }
 
+
+
+// const handleToggleClick = () => {
+//   isModalVisible.value = !isModalVisible.value
+//   visibility.value = "PRIVATE" ? 'PUBLIC' : 'PRIVATE'; 
+// };
+
+// Handle when the toggle is clicked to open the modal
+const handleToggleClick = () => {
+  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'; // Set the opposite value temporarily
+  isModalVisible.value = true; // Show the modal
+};
+
+// Confirm the visibility change in the modal
+const confirmChangeVisibility = async () => {
+  visibility.value = tempVisibility.value; // Update visibility after confirmation
+  isModalVisible.value = false; // Close the modal
+  await changeVisibility()
+};
+
+
+const cancelChange = () => {
+  isModalVisible.value = false; 
+};
+
 const changeVisibility = async () => {
-  const currentVisibility = visibility.value
-  
-  const updatedBoard = await boardVis(boardId.value, currentVisibility);
+
+  const updatedBoard = await boardVisibility(boardId.value, visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC");
+  console.log("update" ,updatedBoard.visibility)
   if (updatedBoard) {
-    visibility.value = updatedBoard.visibility; 
+      visibility.value = updatedBoard.visibility;
+      console.log("Visibility chceck",visibility)
   } else {
-    console.error('Failed to update visibility.');
+      console.error('Failed to update visibility.');
   }
-}
+};
 
 </script>
 
 <template>
+
   <div class="min-h-full max-h-fit">
+    <!-- Modal -->
+
     <div class="min-h-screen flex">
       <!-- Sidebar -->
       <RouterLink to="/board">
         <SideBar />
       </RouterLink>
+
       <!-- End Sidebar -->
 
       <!-- Main Content -->
@@ -329,12 +362,6 @@ const changeVisibility = async () => {
               </li>
             </ul>
           </details>
-          <div class="form-control ml-4 w-50">
-            <label class="label cursor-pointer">
-              <span class="label-text">PRIVATE</span>
-              <input type="checkbox" class="toggle toggle-accent" checked="checked" @click="changeVisibility()"/>
-            </label>
-          </div>
 
           <div class="selected-filters flex flex-wrap mt-2">
             <div v-for="status in filter" :key="status"
@@ -346,7 +373,7 @@ const changeVisibility = async () => {
               </button>
             </div>
           </div>
-
+          
 
           <div class="flex-grow flex justify-end items-center">
             <div class="hidden md:block">
@@ -376,6 +403,28 @@ const changeVisibility = async () => {
         </div>
 
         <div class="flex flex-col items-center mt-9 h-[60vh] max-sm:h-[50vh]">
+          <div class="flex">
+            <div class="absolute pl-12 w-1/12 h-11 z-10 bg-transparent" @click="handleToggleClick" >
+            </div>
+            <div class="form-control ml-4 w-50 mb-2">
+              <label class="label cursor-pointer">
+                <span class="label-text mr-2 ">{{ visibility === "PUBLIC" ? "PUBLIC" : "PRIVATE" }}</span>
+                <input type="checkbox"
+                      :checked="visibility === 'PUBLIC'"
+                      class="itbkk-board-visibility toggle toggle-accent"
+                      />
+              </label>
+            </div>
+          </div>
+
+          
+            <Modal :isOpen="isModalVisible"  
+              :tempVisibility="tempVisibility"
+              @confirm="confirmChangeVisibility"
+              @cancel="cancelChange"
+            />
+        
+
           <div class="overflow-x-auto max-h-96 w-min-full">
             <div class="min-w-full">
               <table class="table-auto" style="table-layout: fixed">
@@ -582,6 +631,7 @@ const changeVisibility = async () => {
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- <nav class="bg-white shadow" style="background-color: #d8f1f1">
@@ -617,6 +667,8 @@ const changeVisibility = async () => {
       <p style="color: #f785b1">Thank you for choosing Kradan Kanban!</p>
     </aside>
   </footer> -->
+
+
 </template>
 
 <style scoped>
@@ -678,5 +730,25 @@ thead th {
 .toggle:checked {
   --tw-text-opacity: 1;
   color: rgb(74 222 128 / var(--tw-text-opacity));
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
 }
 </style>
