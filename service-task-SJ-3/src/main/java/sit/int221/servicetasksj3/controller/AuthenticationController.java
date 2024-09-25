@@ -30,34 +30,14 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseTokenDTO> login(@Valid @RequestBody JwtRequestUser jwtRequestUser) {
-//        String accessToken = authenticationService.login(jwtRequestUser);
-//        String refreshToken = jwtTokenUtil.doGenerateRefreshToken(jwtRequestUser.getUserName());
-//        return ResponseEntity.ok(new JwtResponseTokenDTO(accessToken, refreshToken));
         JwtResponseTokenDTO tokens = authenticationService.login(jwtRequestUser);
         return ResponseEntity.ok(tokens);
     }
 
     @PostMapping("/token")
     public ResponseEntity<JwtResponseTokenDTO> refreshAccessToken(@RequestHeader("Authorization") String requestTokenHeader) {
-        String refreshToken = null;
-
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            refreshToken = requestTokenHeader.substring(7);
-        } else {
-            throw new UnauthorizedException("Refresh token does not begin with Bearer String");
-        }
-
-        // ตรวจสอบ refresh token ว่าหมดอายุหรือยัง
-        if (jwtTokenUtil.isTokenExpired(refreshToken)) {
-            throw new UnauthorizedException("Refresh token has expired");
-        }
-
-        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
-
-        // สร้าง access token ใหม่
-        String newAccessToken = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponseTokenDTO(newAccessToken, null)); // คืนเฉพาะ access token
+        JwtResponseTokenDTO tokens = authenticationService.refreshAccessToken(requestTokenHeader);
+        return ResponseEntity.ok(tokens);
     }
 
     @GetMapping("/validate-token")

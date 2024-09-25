@@ -12,6 +12,7 @@ public interface StatusRepository extends JpaRepository<TaskStatus, Integer> {
 
     TaskStatus findByNameAndBoardId(String name, String boardId);
 
+
     List<TaskStatus> findByBoardId(String boardId);
 
     Optional<TaskStatus> findByBoardIdAndId(String boardId, Integer id);
