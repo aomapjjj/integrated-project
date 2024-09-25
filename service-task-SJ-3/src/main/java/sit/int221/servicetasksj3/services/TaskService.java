@@ -208,7 +208,11 @@ public class TaskService {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new InternalServerErrorException("Invalid board"));
 
+
         TaskStatus status = statusRepository.findByNameAndBoardId(task.getStatus(), boardId);
+//        if (status == null) {
+//            throw new ValidationException("status does not exist");
+//        }
 
         Task task1 = modelMapper.map(task, Task.class);
         task1.setBoard(board);
@@ -249,9 +253,6 @@ public class TaskService {
         }
         if (task.getAssignees() != null && task.getAssignees().trim().length() > 30) {
             throw new InternalServerErrorException("Assignees cannot exceed 30 characters");
-        }
-        if (status == null) {
-            throw new ValidationException("status does not exist");
         }
 
         // ดึงค่า Limit

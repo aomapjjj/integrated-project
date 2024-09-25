@@ -3,6 +3,7 @@ package sit.int221.servicetasksj3.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,11 +34,12 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
-                                .requestMatchers("/v2/tasks/**").authenticated()
-                                .requestMatchers("/v2/statuses/**").authenticated()
-                                .requestMatchers("/v3/boards/**").authenticated()
-                                .requestMatchers("/v3/boards/{id}/tasks/**").authenticated()
-                                .requestMatchers("/v3/boards/{id}/statuses/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/v3/boards/**").permitAll()
+//                                .requestMatchers("/v2/tasks/**").authenticated()
+//                                .requestMatchers("/v2/statuses/**").authenticated()
+//                                .requestMatchers("/v3/boards/**").authenticated()
+//                                .requestMatchers("/v3/boards/{id}/tasks/**").authenticated()
+//                                .requestMatchers("/v3/boards/{id}/statuses/**").authenticated()
 //                                .requestMatchers("/validate-token").permitAll()
 //                                .requestMatchers("/statuses/**").permitAll()
 //                                .requestMatchers("/tasks/**").permitAll()

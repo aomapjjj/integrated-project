@@ -166,7 +166,7 @@ public class StatusService {
             }
         }
 
-        // Check if the status is unique
+//         Check if the status is unique
 //        TaskStatus existingStatus = repository.findByName(task.getName().trim());
 //        if (existingStatus != null && !existingStatus.getId().equals(id)) {
 //            validationError.addValidationError("name", "must be unique");
@@ -255,9 +255,6 @@ public class StatusService {
                 }
             }
         }
-
-//        TaskStatus existingStatus = repository.findById(id).orElseThrow();
-//        Integer newStatuses = repository.findById(newId).orElseThrow().getId();
 
         try {
             taskRepository.updateStatusId(oldStatus.getId(), newStatus.getId());
