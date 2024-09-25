@@ -179,10 +179,9 @@ async function addBoard(url, newBoard) {
   }
 }
 
-async function boardVis(boardId, currentVisibility) {
+async function boardVisibility(boardId, currentVisibility) {
   const token = getToken();
 
-  // Calculate new visibility mode
   const newVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
 
   try {
@@ -197,28 +196,25 @@ async function boardVis(boardId, currentVisibility) {
           
       });
       
-
-      // Handle different response statuses
       if (response.status === 200) {
           const editedItem = await response.json();
           console.log(`Visibility changed to: ${editedItem.visibility}`);
-          return editedItem; // return the updated board item
+          return editedItem; 
       } else if (response.status === 401) {
-          // Handle unauthorized - reset authentication state and redirect to login
           resetAuthentication();
           redirectToLogin();
-          return null; // or handle it as needed in your application
+          return null; 
       } else if (response.status === 403) {
           alert("You do not have permission to change board visibility mode.");
-          return null; // or handle it as needed
+          return null; 
       } else {
           alert("There is a problem. Please try again later.");
-          return null; // or handle it as needed
+          return null; 
       }
   } catch (error) {
       console.log(`Error: ${error.message}`);
       alert("There is a problem. Please try again later.");
-      return null; // or handle it as needed
+      return null; 
   }
 }
 
@@ -232,5 +228,5 @@ export {
   editLimit,
   addBoard,
   getBoardById,
-  boardVis
+  boardVisibility
 }
