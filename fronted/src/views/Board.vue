@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router"
+import { useRouter } from "vue-router"
 import { ref, computed, onMounted } from "vue"
 import { useUsers } from "@/stores/storeUser"
 import { getItems, addBoard, deleteItemById } from "../libs/fetchUtils.js"
