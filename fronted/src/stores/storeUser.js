@@ -5,31 +5,40 @@ const useUsers = defineStore("users", () => {
   const users = ref([]);
   const user = ref({ username: "" });
   const token = ref("");
+  const refreshToken = ref(""); 
   const boardId = ref("");
 
-  // บันทึก token ใน sessionStorage
   const setToken = (newToken) => {
     token.value = newToken;
     sessionStorage.setItem("token", token.value);
   };
 
-  // ดึง token จาก sessionStorage
   const getToken = () => {
     return token.value || sessionStorage.getItem("token");
   };
 
-  // ดึงข้อมูลจาก sessionStorage ทันทีที่ store ถูกสร้างขึ้น
+  const setRefreshToken = (newRefreshToken) => {
+    refreshToken.value = newRefreshToken;
+    sessionStorage.setItem("refresh_token", refreshToken.value);
+  };
+
+  const getRefreshToken = () => {
+    return refreshToken.value || sessionStorage.getItem("refresh_token");
+  };
+
   if (sessionStorage.getItem("user")) {
     user.value = JSON.parse(sessionStorage.getItem("user"));
   }
   if (sessionStorage.getItem("token")) {
     token.value = sessionStorage.getItem("token");
   }
+  if (sessionStorage.getItem("refresh_token")) {
+    refreshToken.value = sessionStorage.getItem("refresh_token");
+  }
   if (sessionStorage.getItem("boardId")) {
     boardId.value = sessionStorage.getItem("boardId");
   }
 
-  // บันทึก user ใน sessionStorage
   const setUser = (userName) => {
     user.value = { username: userName };
     sessionStorage.setItem("user", JSON.stringify(user.value));
@@ -39,24 +48,14 @@ const useUsers = defineStore("users", () => {
     return user.value;
   };
 
-  const setBoard = (newboard) => {
-    boardId.value = newboard;
+  const setBoard = (newBoard) => {
+    boardId.value = newBoard;
     sessionStorage.setItem("boardId", boardId.value);
   };
 
   const getBoard = () => {
-    return boardId.value
-  }
-
-  // บันทึก boardId ใน sessionStorage
-  // const setID = (id) => {
-  //   boardId.value = id;
-  //   sessionStorage.setItem("boardId", boardId.value);
-  // };
-
-  // const getID = () => {
-  //   return boardId.value || sessionStorage.getItem("boardId");
-  // };
+    return boardId.value;
+  };
 
   const removeUser = (removeId) => {
     users.value.splice(
@@ -71,6 +70,8 @@ const useUsers = defineStore("users", () => {
     getUser,
     setToken,
     getToken,
+    setRefreshToken,
+    getRefreshToken,
     setBoard,
     getBoard
   };

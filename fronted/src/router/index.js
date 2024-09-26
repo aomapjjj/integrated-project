@@ -197,11 +197,12 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const token = sessionStorage.getItem("access_token")
+  const accessToken = sessionStorage.getItem("access_token")
+  const refreshToken = sessionStorage.getItem("refresh_token")
 
-  if (!token && to.name !== "Login") {
+  if (!accessToken && to.name !== "Login") {
     next({ name: "Login" })
-  } else if (token) {
+  } else if (accessToken) {
     try {
       const validateResponse = await fetch(
         `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
@@ -209,7 +210,7 @@ router.beforeEach(async (to, from, next) => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${accessToken}`
           }
         }
       )
@@ -217,12 +218,40 @@ router.beforeEach(async (to, from, next) => {
       console.log("Validate Response:", validateResponse.status)
 
       if (validateResponse.status === 200) {
-        next()
-      } else if (validateResponse.status === 401) {
-        sessionStorage.removeItem("access_token")
-        sessionStorage.removeItem("access_token")
-        next({ name: "Login" })
+        next() 
+      } else if (validateResponse.status === 401 && refreshToken) {
+        try {
+          const refreshValidateResponse = await fetch(
+            `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${refreshToken}`
+              }
+            }
+          )
+
+          if (refreshValidateResponse.status === 200) {
+            const refreshData = await refreshValidateResponse.json()
+
+            sessionStorage.setItem("access_token", refreshData.access_token)
+            sessionStorage.setItem("refresh_token", refreshData.refresh_token)
+            next()
+          } else {
+            sessionStorage.removeItem("access_token")
+            sessionStorage.removeItem("refresh_token")
+            next({ name: "Login" })
+          }
+        } catch (refreshError) {
+          console.error("Error validating refresh token:", refreshError)
+          sessionStorage.removeItem("access_token")
+          sessionStorage.removeItem("refresh_token")
+          next({ name: "Login" })
+        }
       } else {
+        sessionStorage.removeItem("access_token")
+        sessionStorage.removeItem("refresh_token")
         next({ name: "Login" })
       }
     } catch (error) {
