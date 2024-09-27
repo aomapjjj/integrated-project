@@ -50,14 +50,13 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 const userName = userStore.getUser().username
 
-
-console.log('userName' , userName )
+console.log("userName", userName)
 const token = sessionStorage.getItem("access_token")
 const boardName = ref("")
 const isModalVisible = ref(false)
 const visibility = ref("")
 const tempVisibility = ref("")
-const disabledWhenUserNotOwner = ref(false)
+
 let items = []
 
 onMounted(async () => {
@@ -70,14 +69,12 @@ onMounted(async () => {
   const Board = await getBoardById(boardId.value)
   console.log("Board data", Board.item.owner.name)
 
-  if(Board.item.owner.name !== userName){
+  if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log('ไม่ตรงกันนะจ๊า')
-  }else{
-    console.log('ตรงกันนะจ๊า')
+    console.log("ไม่ตรงกันนะจ๊า")
+  } else {
+    console.log("ตรงกันนะจ๊า")
   }
-
-
 
   boardName.value = Board.item.name
   visibility.value = Board.item.visibility
@@ -250,7 +247,12 @@ const closeLimit = () => {
 // };
 
 // Handle when the toggle is clicked to open the modal
+
+
 const handleToggleClick = () => {
+  if (disabledButtonWhileOpenPublic.value) {
+    return
+  }
   tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC" // Set the opposite value temporarily
   isModalVisible.value = true // Show the modal
 }
@@ -281,8 +283,8 @@ const changeVisibility = async () => {
     alertEnabled.value = false
     console.log("alertEnabled", alertEnabled)
   } else {
-    // Handle the error message if the operation failed
-    messageAlert.value = updatedBoard.message // Corrected to use updatedBoard.message
+
+    messageAlert.value = updatedBoard.message 
     alertEnabled.value = true
   }
 }
@@ -530,6 +532,7 @@ const changeVisibility = async () => {
                   type="checkbox"
                   :checked="visibility === 'PUBLIC'"
                   class="itbkk-board-visibility toggle toggle-accent"
+                  :disabled="disabledButtonWhileOpenPublic"
                 />
               </label>
             </div>
@@ -736,13 +739,23 @@ const changeVisibility = async () => {
                         >
                           <!-- EDIT -->
 
-                          <EditTask :todo-id="item.id" />
+                          <EditTask :todo-id="item.id" :disabledBtn="disabledButtonWhileOpenPublic" />
 
                           <!-- Delete -->
 
-                          <a
-                            style="margin-left: 10px"
-                            class="itbkk-button-delete btn bg-red-400 rounded-full"
+                          <button
+                            :disabled="disabledButtonWhileOpenPublic"
+                            :class="[
+                              'itbkk-button-delete ml-2',
+                              'btn',
+                              'rounded-full',
+                              { 'btn-disabled': disabledButtonWhileOpenPublic }
+                            ]"
+                            :style="{
+                              backgroundColor: disabledButtonWhileOpenPublic
+                                ? '#d3d3d3'
+                                : '#f87171'
+                            }"
                             @click="openModalToDelete(item.id, index)"
                           >
                             <svg
@@ -761,7 +774,7 @@ const changeVisibility = async () => {
                                 />
                               </g>
                             </svg>
-                          </a>
+                          </button>
                         </div>
 
                         <dialog id="my_modal_delete" class="modal">

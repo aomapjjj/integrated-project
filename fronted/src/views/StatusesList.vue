@@ -1,18 +1,19 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
   addItem,
   editItem,
   deleteItemById,
-  deleteItemAndTransfer
-} from '../libs/fetchUtils.js'
-import { useStatuses } from '../stores/storeStatus'
-import { useRoute, useRouter } from 'vue-router'
-import { useLimitStore } from '../stores/storeLimit'
-import { useTasks } from '../stores/store'
-import { useUsers } from '@/stores/storeUser'
+  deleteItemAndTransfer,
+  getBoardById
+} from "../libs/fetchUtils.js"
+import { useStatuses } from "../stores/storeStatus"
+import { useRoute, useRouter } from "vue-router"
+import { useLimitStore } from "../stores/storeLimit"
+import { useTasks } from "../stores/store"
+import { useUsers } from "@/stores/storeUser"
 const userStore = useUsers()
 
 const route = useRoute()
@@ -20,8 +21,8 @@ const router = useRouter()
 const statusList = ref([])
 const selectedStatusId = ref(0)
 const notFound = ref(false)
-const errorAdd = ref('')
-const errorEdit = ref('')
+const errorAdd = ref("")
+const errorEdit = ref("")
 
 const notAdd = ref(false)
 const notEdit = ref(false)
@@ -35,14 +36,16 @@ const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
 const limitAlert = ref(false)
-const errorLimit = ref('')
+const errorLimit = ref("")
 const errorTrans = ref(false)
 
 const myStatuses = useStatuses()
 const limitStore = useLimitStore()
 const taskStore = useTasks()
-const token = sessionStorage.getItem('access_token')
+const token = sessionStorage.getItem("access_token")
 
+const userName = userStore.getUser().username
+const disabledButtonWhileOpenPublic = ref(false)
 const boardId = ref()
 watch(
   () => route.params.id,
@@ -58,18 +61,18 @@ const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 // ------------------------------
 
 const status = ref({
-  id: '',
-  name: '',
-  description: '',
-  createdOn: '',
-  updatedOn: ''
+  id: "",
+  name: "",
+  description: "",
+  createdOn: "",
+  updatedOn: ""
 })
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status'
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
 })
 
 onMounted(async () => {
@@ -83,12 +86,22 @@ onMounted(async () => {
   if (statusId !== undefined) {
     const response = await getItemById(statusId)
     if (status === 404 || status === 400) {
-      router.push('/status')
+      router.push("/status")
       notFound.value = true
       setTimeout(() => {
         notFound.value = false
       }, 1800)
     }
+  }
+
+  const Board = await getBoardById(boardId.value)
+  console.log("Board data", Board.item.owner.name)
+
+  if (Board.item.owner.name !== userName) {
+    disabledButtonWhileOpenPublic.value = true
+    console.log("ไม่ตรงกันนะจ๊า")
+  } else {
+    console.log("ตรงกันนะจ๊า")
   }
 })
 
@@ -106,7 +119,7 @@ const submitForm = async () => {
       notAdd.value = false
     }, 1800)
     notAdd.value = true
-    return (errorAdd.value = 'Status name already exists')
+    return (errorAdd.value = "Status name already exists")
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -123,13 +136,13 @@ const submitForm = async () => {
 }
 
 const clearForm = () => {
-  status.value.name = ''
-  status.value.description = ''
+  status.value.name = ""
+  status.value.description = ""
 }
 
 const closeModalAdd = () => {
   clearForm()
-  const modal = document.getElementById('my_modal_4')
+  const modal = document.getElementById("my_modal_4")
   modal.close()
   router.go(-1)
 }
@@ -158,7 +171,7 @@ const UpdateStatus = async () => {
       notEdit.value = false
     }, 1800)
     notEdit.value = true
-    return (errorEdit.value = 'Status name already exists')
+    return (errorEdit.value = "Status name already exists")
   }
 
   myStatuses.updateStatus(
@@ -187,13 +200,13 @@ const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.showModal()
-  router.push({ name: 'EditStatus', params: { statusid: statusId } })
+  router.push({ name: "EditStatus", params: { statusid: statusId } })
 }
 
 const closeModalEdit = () => {
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.close()
   router.go(-1)
   clearForm()
@@ -230,7 +243,7 @@ const getNameById = (id) => {
 }
 
 const openAdd = () => {
-  router.push({ name: 'AddStatus' })
+  router.push({ name: "AddStatus" })
 }
 
 const selectedItemIdToDelete = ref(0)
@@ -265,12 +278,12 @@ const deleteStatus = async (statusId) => {
 
 const openModalToDelete = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_delete')
+  const modal3 = document.getElementById("my_modal_delete")
   modal3?.showModal()
 }
 
 const closeModal = () => {
-  const modal3 = document.getElementById('my_modal_delete')
+  const modal3 = document.getElementById("my_modal_delete")
   modal3?.close()
 }
 
@@ -281,12 +294,12 @@ const confirmDelete = () => {
 
 const openModalToDeleteTrans = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.showModal()
 }
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.close()
 }
 const confirmDeleteTrans = (statusId) => {
@@ -327,7 +340,7 @@ const deleteandtrans = async (statusId, newID) => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === 'No Status' || status === 'Done') {
+  if (status === "No Status" || status === "Done") {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -427,11 +440,7 @@ const isFormValid = computed(() => {
     <nav class="bg-white shadow" style="background-color: #d8f1f1">
       <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
         <a href="#" class="flex items-center gap-4">
-          <img
-            src="/image/sj3.png"
-            alt="LOGO"
-            class="w-[100px] h-[100px]"
-          />
+          <img src="/image/sj3.png" alt="LOGO" class="w-[100px] h-[100px]" />
           <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
             <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
             <h1
@@ -449,15 +458,23 @@ const isFormValid = computed(() => {
 
         <div class="ml-auto">
           <button
+            :disabled="disabledButtonWhileOpenPublic"
+            :class="[
+              'itbkk-button-add',
+              'btn',
+              { 'btn-disabled': disabledButtonWhileOpenPublic }
+            ]"
+            :style="{
+              backgroundColor: disabledButtonWhileOpenPublic
+                ? '#d3d3d3'
+                : '#9391e4',
+              color: disabledButtonWhileOpenPublic ? '#f785b1' : 'white',
+              borderRadius: '30px',
+              position: 'relative'
+            }"
             onclick="my_modal_4.showModal() "
             @click="openAdd()"
             class="itbkk-button-add btn ml-4"
-            style="
-              position: relative;
-              border-radius: 30px;
-              background-color: #f785b1;
-              color: white;
-            "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -836,7 +853,7 @@ const isFormValid = computed(() => {
                 >
                   {{
                     !item.description || item.description.length === 0
-                      ? 'No description is provided'
+                      ? "No description is provided"
                       : item.description
                   }}
                 </label>
@@ -848,6 +865,8 @@ const isFormValid = computed(() => {
                 class="px-4 py-2 text-center md:text-left text-sm text-gray-700 itbkk-status"
               >
                 <button
+                  :disabled="disabledButtonWhileOpenPublic"
+                  :class="{ 'bg-gray-400 cursor-not-allowed': disabledButtonWhileOpenPublic }"
                   class="itbkk-button-edit btn rounded-full"
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
@@ -868,7 +887,6 @@ const isFormValid = computed(() => {
                       />
                     </g>
                   </svg>
-                 
                 </button>
 
                 <dialog id="my_modal_edit" class="modal">
@@ -971,6 +989,18 @@ const isFormValid = computed(() => {
                 <!-- Delete Modal -->
 
                 <button
+                  :disabled="disabledButtonWhileOpenPublic"
+                  :class="[
+                    'itbkk-button-delete ml-2',
+                    'btn',
+                    'rounded-full',
+                    { 'btn-disabled': disabledButtonWhileOpenPublic }
+                  ]"
+                  :style="{
+                    backgroundColor: disabledButtonWhileOpenPublic
+                      ? '#d3d3d3'
+                      : '#f87171'
+                  }"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"
                   class="itbkk-button-delete btn bg-red-400 rounded-full"
                   style="margin-left: 10px"
@@ -992,7 +1022,6 @@ const isFormValid = computed(() => {
                       />
                     </g>
                   </svg>
-                 
                 </button>
                 <dialog id="my_modal_delete" class="modal">
                   <div class="modal-box" style="max-width: 500px">

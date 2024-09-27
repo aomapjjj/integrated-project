@@ -50,39 +50,39 @@ export const routes = [
       }
     }
   },
-  {
-    path: "/board/:id/task/:taskid/edit",
-    name: "TaskEdit",
-    component: EditTask,
-    beforeEnter: async (to, from, next) => {
-      const boardId = to.params.id
-      const taskId = to.params.taskid
-      try {
-        const token = getToken()
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_BASE_URL_MAIN
-          }/boards/${boardId}/tasks/${taskId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        )
+  // {
+  //   path: "/board/:id/task/:taskid/edit",
+  //   name: "TaskEdit",
+  //   component: EditTask,
+    // beforeEnter: async (to, from, next) => {
+    //   const boardId = to.params.id
+    //   const taskId = to.params.taskid
+    //   try {
+    //     const token = getToken()
+    //     const response = await fetch(
+    //       `${
+    //         import.meta.env.VITE_BASE_URL_MAIN
+    //       }/boards/${boardId}/tasks/${taskId}`,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${token}`
+    //         }
+    //       }
+    //     )
 
-        if (response.ok) {
-          next({ name: "EditTask" })
-        } else if (response.status === 404) {
-          next({ name: "ErrorPage" })
-        } else if (response.status === 401) {
-          next({ name: "Login" })
-        }
-      } catch (error) {
-        console.error("Error checking board id:", error)
-        next({ name: "ErrorPage" })
-      }
-    }
-  },
+    //     if (response.ok) {
+    //       next({ name: "EditTask" })
+    //     } else if (response.status === 404) {
+    //       next({ name: "ErrorPage" })
+    //     } else if (response.status === 401) {
+    //       next({ name: "Login" })
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking board id:", error)
+    //     next({ name: "ErrorPage" })
+    //   }
+    // }
+  // },
   {
     path: "/board/:id",
     name: "TaskList",
@@ -123,6 +123,11 @@ export const routes = [
         path: "task/:taskid",
         name: "TaskDetail",
         component: TaskDetail
+      },
+      {
+        path: "task/:taskid/edit",
+        name: "TaskEdit",
+        component: EditTask
       }
     ]
   },

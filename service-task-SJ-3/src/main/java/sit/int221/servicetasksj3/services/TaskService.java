@@ -18,9 +18,11 @@ import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
+import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 import sit.int221.servicetasksj3.repositories.StatusRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +41,9 @@ public class TaskService {
     private LimitRepository limitRepository;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private UserRepository userRepository;
+
 
     //GET ALL TASKS V.2
     @Transactional
@@ -70,8 +75,13 @@ public class TaskService {
     @Transactional
     public List<TaskNewDTO> getAllTasksFiltered(String boardId, String sortBy, String[] filterStatuses) {
         Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        Users owner = userRepository.findById(board.getOwnerId())
+                .orElseThrow(() -> new ItemNotFoundException("Owner not found with ID: " + board.getOwnerId()));
+
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String oid = currentUser.getOid();
+        String oid = owner.getOid();
         try {
             List<Task> tasks;
             if (filterStatuses != null && filterStatuses.length > 0) {
