@@ -93,8 +93,12 @@ public class BoardService {
     public BoardResponseDTO getBoardById(String id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + id));
+        Users owner = userRepository.findById(board.getOwnerId())
+                .orElseThrow(() -> new ItemNotFoundException("Owner not found with ID: " + board.getOwnerId()));
 
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
         // Check if the user is the owner of the board
 //        if (!board.getOwnerId().equals(currentUser.getOid()) && board.getVisibility() == Visibility.PRIVATE) {
 //            throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
@@ -102,8 +106,8 @@ public class BoardService {
 
         BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
         BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
-        ownerDTO.setOid(currentUser.getOid());
-        ownerDTO.setName(currentUser.getName());
+        ownerDTO.setOid(board.getOwnerId());
+        ownerDTO.setName(owner.getName());
         boardResponse.setOwner(ownerDTO);
         return boardResponse;
     }
