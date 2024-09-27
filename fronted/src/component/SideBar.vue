@@ -1,10 +1,34 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
-import { ref } from 'vue'
-import { useUsers } from '@/stores/storeUser'
+import { useRouter, useRoute } from "vue-router"
+import { ref, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
+import { getItems } from "../libs/fetchUtils.js"
 
 const route = useRoute()
 const router = useRouter()
+const BoardsList = ref()
+
+const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+function getToken() {
+  return sessionStorage.getItem("access_token")
+}
+onMounted(async () => {
+  const itemsBoards = await getItems(baseUrlBoard)
+  BoardsList.value = itemsBoards
+  console.log("Side Bar", BoardsList.value)
+  const token = getToken()
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  if (response.status === 404) {
+    router.push({ name: "ErrorPage" })
+  } else if (response.status === 401) {
+    router.push({ name: "Login" })
+  }
+})
 
 const sidebarOpen = ref(false)
 
@@ -24,17 +48,22 @@ const userName = userStore.getUser().username
 
 // Log out
 const clearToken = () => {
-  sessionStorage.removeItem('access_token')
-  router.push({ name: 'Login' })
+  sessionStorage.removeItem("access_token")
+  router.push({ name: "Login" })
 }
 
-const toBoardsList = () => {
-  router.push({ name: 'Board' }).then(() => {})
-  console.log('fdlmdl')
+const toBoardsList = (boardId) => {
+  if (boardId !== null) {
+    router.push({ name: "TaskList", params: { id: boardId } }).then(() => { router.go()})
+    console.log(boardId)
+    userStore.setBoard(boardId) 
+  }
+ 
+  
 }
 
 const goToAllBoards = () => {
-  router.push({ name: 'Board' })
+  router.push({ name: "Board" })
   router.go()
 }
 
@@ -85,7 +114,6 @@ const goToAllBoards = () => {
             href="#"
           >
             <svg
-              @click="toBoardsList()"
               class="size-4"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -97,7 +125,9 @@ const goToAllBoards = () => {
                 d="m21.743 12.331l-9-10c-.379-.422-1.107-.422-1.486 0l-9 10a1 1 0 0 0-.17 1.076c.16.361.518.593.913.593h2v7a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-4h4v4a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-7h2a.998.998 0 0 0 .743-1.669"
               />
             </svg>
+            <RouterLink to="/board">
             <span class="itbkk-home">Home</span>
+            </RouterLink>
           </a>
         </li>
 
@@ -121,7 +151,7 @@ const goToAllBoards = () => {
             </svg>
             All boards
             <!-- Count boards -->
-            <div class="badge badge-sm text-xxs">1</div>
+            <div class="badge badge-sm text-xxs">{{  BoardsList?.length }}</div>
             <!-- Icon when expanded -->
             <svg
               v-if="isExpanded"
@@ -165,14 +195,20 @@ const goToAllBoards = () => {
               class="hs-accordion-group ps-3 pt-2"
               data-hs-accordion-always-open
             >
-              <li class="hs-accordion" id="users-accordion-sub-1">
+              <li
+                v-for="(board, index) in BoardsList"
+                :key="index"
+                class="hs-accordion"
+                :id="'users-accordion-sub-' + (index + 1)"
+              >
                 <button
+                  @click="toBoardsList(board.id)"
                   type="button"
                   class="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 dark:hs-accordion-active:text-white dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
-                  aria-expanded="true"
-                  aria-controls="users-accordion-sub-2"
+                  :aria-expanded="board.isExpanded"
+                  :aria-controls="'users-accordion-sub-' + (index + 1)"
                 >
-                 <slot></slot>
+                  {{ board.name }}
                 </button>
               </li>
             </ul>
