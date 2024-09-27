@@ -1,7 +1,7 @@
 <script setup>
 import { getItems, addItem } from "../libs/fetchUtils.js"
-import { ref, onMounted, computed, watch  } from "vue"
-import { useRouter , useRoute } from "vue-router"
+import { ref, onMounted, computed, watch } from "vue"
+import { useRouter, useRoute } from "vue-router"
 import { useTasks } from "../stores/store.js"
 import { useLimitStore } from "../stores/storeLimit"
 import { useUsers } from "@/stores/storeUser"
@@ -14,6 +14,10 @@ const alertLimitAdd = ref(false)
 const error = ref("")
 
 const userStore = useUsers()
+
+const props = defineProps({
+  disabledBtn: Boolean
+})
 
 const boardId = ref()
 watch(
@@ -46,7 +50,7 @@ const submitForm = async () => {
   const trimmedTitle = todo.value.title?.trim()
   const trimmedDescription = todo.value.description?.trim()
   const trimmedAssignees = todo.value.assignees?.trim()
-  
+
   try {
     const itemAdd = await addItem(baseUrlTask, {
       title: trimmedTitle,
@@ -101,42 +105,43 @@ const isFormValid = computed(() => {
   )
 })
 
-
 const isLimitReached = computed(() => {
-  const status = todo.value.status;
+  const status = todo.value.status
   if (status === "No Status" || status === "Done") {
-    return false;
+    return false
   }
 
   if (limitStore.getLimit().isLimit) {
-    const tasksInStatus = taskStore.getTasks()
-      .filter((task) => task.status === status);
+    const tasksInStatus = taskStore
+      .getTasks()
+      .filter((task) => task.status === status)
     if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
       setTimeout(() => {
-        alertLimitAdd.value = false;
-      }, 1800);
-      alertLimitAdd.value = true;
-       return (error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`);
+        alertLimitAdd.value = false
+      }, 1800)
+      alertLimitAdd.value = true
+      return (error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`)
     }
   }
 
-  return false;
-});
-
+  return false
+})
 </script>
 
 <template>
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
     <button
+      :disabled="disabledBtn"
+      :class="['itbkk-button-add', 'btn', { 'btn-disabled': disabledBtn }]"
+      :style="{
+        backgroundColor: disabledBtn ? '#d3d3d3' : '#9391e4',
+        color: disabledBtn ? '#a9a9a9' : 'white',
+        borderRadius: '30px',
+        position: 'relative'
+      }"
       onclick="my_modal_1.showModal()"
       class="itbkk-button-add btn ml-4"
-      style="
-        position: relative;
-        border-radius: 30px;
-        background-color: #9391e4;
-        color: white;
-      "
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -243,7 +248,7 @@ const isLimitReached = computed(() => {
                 class="itbkk-status select select-bordered w-full max-w-xs mt-1"
                 v-model="todo.status"
               >
-                <option v-for="status in statusList" :value="status.name  ">
+                <option v-for="status in statusList" :value="status.name">
                   {{ status.name }}
                 </option>
               </select>
