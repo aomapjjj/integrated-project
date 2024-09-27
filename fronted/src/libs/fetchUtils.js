@@ -19,6 +19,23 @@ async function getItems(url) {
   }
 }
 
+async function getResponseItems(url) {
+  const token = getToken();
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    const items = await response.json();
+    return { response, items }; 
+  } catch (error) {
+    console.log(`error: ${error}`);
+    return { error }
+  }
+}
+
+
 async function getItemById(taskId, boardId) {
 
   const token = getToken();
@@ -241,5 +258,6 @@ export {
   editLimit,
   addBoard,
   getBoardById,
-  boardVisibility
+  boardVisibility,
+  getResponseItems
 }

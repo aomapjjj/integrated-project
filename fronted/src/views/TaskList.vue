@@ -5,7 +5,8 @@ import {
   getItems,
   deleteItemById,
   editLimit,
-  getBoardById
+  getBoardById,
+  getResponseItems
 } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
@@ -68,6 +69,7 @@ onMounted(async () => {
 
   const Board = await getBoardById(boardId.value)
   console.log("Board data", Board.item.owner.name)
+  
 
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
@@ -97,6 +99,7 @@ onMounted(async () => {
 
   return items
 })
+
 
 const UpdateLimit = async () => {
   const updatedLimit = await editLimit(

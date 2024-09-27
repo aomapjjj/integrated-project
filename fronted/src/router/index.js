@@ -7,6 +7,8 @@ import TaskDetail from "@/views/TaskDetail.vue";
 import EditTask from "@/views/EditTask.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
+import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
+
 
 const getToken = () => sessionStorage.getItem("access_token");
 const getRefreshToken = () => sessionStorage.getItem("refresh_token");
@@ -43,10 +45,18 @@ const routes = [
       try {
         const token = getToken();
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/tasks`,
           { headers: { Authorization: `Bearer ${token}` } }
+           
         );
 
+        console.log(response.status)
+        if (response.status === 403) {
+          next({ name: "ErrorPagePermission" });
+        }
+        if (response.status === 404) {
+          next({ name: "ErrorPage" });
+        }
         response.ok ? next() : next({ name: "ErrorPage" });
       } catch (error) {
         console.error("Error checking board id:", error);
@@ -74,6 +84,11 @@ const routes = [
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
+        console.log(response.status)
+        if (response.status === 403) {
+          next({ name: "ErrorPagePermission" });
+        }
+
         response.ok ? next() : next({ name: "ErrorPage" });
       } catch (error) {
         console.error("Error checking board id:", error);
@@ -85,7 +100,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
+  { path: "/error403", name: "ErrorPagePermission", component: ErrorPagePermission },
 ];
 
 const router = createRouter({
