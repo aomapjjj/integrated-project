@@ -72,7 +72,7 @@ const openModal = () => {
 
 const closeModal = () => {
   myModal.value.close()
-  
+  router.push({ name: "TaskList", params: { id: boardId.value } })
 }
 
 const UpdateTask = async () => {
