@@ -16,8 +16,10 @@ const myTasks = useTasks()
 const oldValue = ref({})
 
 const props = defineProps({
-  todoId: Number
+  todoId: Number,
+  disabledBtn: Boolean
 })
+
 
 const boardId = ref()
 
@@ -175,7 +177,10 @@ const isLimitReached = computed(() => {
 
 <template>
   <!-- Edit Button -->
-  <button @click="openModal" class="itbkk-button-edit btn rounded-full">
+  <button @click="openModal" class="itbkk-button-edit btn rounded-full"
+  :disabled="disabledBtn"
+    :class="{'bg-gray-400 cursor-not-allowed': disabledBtn}" 
+  >
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="18"

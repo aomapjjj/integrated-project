@@ -1,25 +1,23 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
   deleteItemById,
   editLimit,
-  getBoardById,
-} from '../libs/fetchUtils.js'
-import TaskDetail from '../views/TaskDetail.vue'
-import AddTask from '../views/AddTask.vue'
-import EditTask from '../views/EditTask.vue'
-import { boardVisibility } from '../libs/fetchUtils.js'
-import { useLimitStore } from '../stores/storeLimit'
-import { useUsers } from '@/stores/storeUser'
-import { useTasks } from '../stores/store'
-import { useRoute, useRouter } from 'vue-router'
-import SideBar from './SideBar.vue'
-import Modal from '../component/Modal.vue'
-import Alert from '@/component/Alert.vue'
-
-
+  getBoardById
+} from "../libs/fetchUtils.js"
+import TaskDetail from "../views/TaskDetail.vue"
+import AddTask from "../views/AddTask.vue"
+import EditTask from "../views/EditTask.vue"
+import { boardVisibility } from "../libs/fetchUtils.js"
+import { useLimitStore } from "../stores/storeLimit"
+import { useUsers } from "@/stores/storeUser"
+import { useTasks } from "../stores/store"
+import { useRoute, useRouter } from "vue-router"
+import SideBar from "./SideBar.vue"
+import Modal from "../component/Modal.vue"
+import Alert from "@/component/Alert.vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -34,6 +32,8 @@ const taskStore = useTasks()
 const limitStore = useLimitStore()
 const userStore = useUsers()
 const boardId = ref()
+const disabledButtonWhileOpenPublic = ref(false)
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -49,11 +49,14 @@ const baseUrlLimit = `${baseUrlboards}/${boardId.value}/statuses/limit`
 const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 const userName = userStore.getUser().username
-const token = sessionStorage.getItem('access_token')
-const boardName = ref('')
-const isModalVisible = ref(false);
+
+console.log("userName", userName)
+const token = sessionStorage.getItem("access_token")
+const boardName = ref("")
+const isModalVisible = ref(false)
 const visibility = ref("")
-const tempVisibility = ref('');
+const tempVisibility = ref("")
+
 let items = []
 
 onMounted(async () => {
@@ -64,7 +67,15 @@ onMounted(async () => {
   }
 
   const Board = await getBoardById(boardId.value)
-  console.log("Board data", Board)
+  console.log("Board data", Board.item.owner.name)
+
+  if (Board.item.owner.name !== userName) {
+    disabledButtonWhileOpenPublic.value = true
+    console.log("ไม่ตรงกันนะจ๊า")
+  } else {
+    console.log("ตรงกันนะจ๊า")
+  }
+
   boardName.value = Board.item.name
   visibility.value = Board.item.visibility
   console.log(Board.item.name)
@@ -80,7 +91,7 @@ onMounted(async () => {
   if (taskId !== undefined) {
     const response = await getItemById(taskId)
     if (response && (response.status === 404 || response.status === 400)) {
-      router.push('/error')
+      router.push("/error")
     }
   }
 
@@ -103,7 +114,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
+    router.push({ name: "TaskDetail", params: { taskid: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -127,7 +138,7 @@ const deleteTodo = async (todoId, index) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById('my_modal_delete')
+  const modal = document.getElementById("my_modal_delete")
   modal.showModal()
 }
 
@@ -148,33 +159,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ''
+    return ""
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default')
-const statusSortOrder = ref('default')
+const showIcon = ref("default")
+const statusSortOrder = ref("default")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc'
-    statusSortOrder.value = 'asc'
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc'
-    statusSortOrder.value = 'desc'
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'default'
-    statusSortOrder.value = 'default'
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === 'asc') {
+  if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === 'desc') {
+  } else if (currentSortOrder === "desc") {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -204,12 +215,12 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' })
+  router.push({ name: "StatusesList" })
 }
 
 const clearToken = () => {
-  router.push({ name: 'Login' })
-  sessionStorage.removeItem('access_token') // หรือ sessionStorage.removeItem("access_token");
+  router.push({ name: "Login" })
+  sessionStorage.removeItem("access_token") // หรือ sessionStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
@@ -217,12 +228,12 @@ const clearToken = () => {
 const updateLimitText = () => {
   if (limitStore.getLimit().isLimit) {
     return (
-      'The Kanban board now limits ' +
+      "The Kanban board now limits " +
       limitStore.getLimit().maximumTask +
-      ' tasks in each status'
+      " tasks in each status"
     )
   } else {
-    return 'The Kanban board has disabled the task limit in each status.'
+    return "The Kanban board has disabled the task limit in each status."
   }
 }
 
@@ -230,54 +241,56 @@ const closeLimit = () => {
   my_modal_limit.close()
 }
 
-
-
 // const handleToggleClick = () => {
 //   isModalVisible.value = !isModalVisible.value
-//   visibility.value = "PRIVATE" ? 'PUBLIC' : 'PRIVATE'; 
+//   visibility.value = "PRIVATE" ? 'PUBLIC' : 'PRIVATE';
 // };
 
 // Handle when the toggle is clicked to open the modal
+
+
 const handleToggleClick = () => {
-  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'; // Set the opposite value temporarily
-  isModalVisible.value = true; // Show the modal
-};
+  if (disabledButtonWhileOpenPublic.value) {
+    return
+  }
+  tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC" // Set the opposite value temporarily
+  isModalVisible.value = true // Show the modal
+}
 
 // Confirm the visibility change in the modal
 const confirmChangeVisibility = async () => {
-  visibility.value = tempVisibility.value; // Update visibility after confirmation
-  isModalVisible.value = false; // Close the modal
+  visibility.value = tempVisibility.value // Update visibility after confirmation
+  isModalVisible.value = false // Close the modal
   await changeVisibility()
-};
-
+}
 
 const cancelChange = () => {
-  isModalVisible.value = false; 
-};
-
+  isModalVisible.value = false
+}
 
 const alertEnabled = ref(false)
 const messageAlert = ref()
 
 const changeVisibility = async () => {
-  const updatedBoard = await boardVisibility(boardId.value, visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC");
+  const updatedBoard = await boardVisibility(
+    boardId.value,
+    visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
+  )
 
   if (updatedBoard && updatedBoard.success) {
-    visibility.value = updatedBoard.visibility;
-    messageAlert.value = "Visibility updated to:", updatedBoard.visibility 
+    visibility.value = updatedBoard.visibility
+    ;(messageAlert.value = "Visibility updated to:"), updatedBoard.visibility
     alertEnabled.value = false
-    console.log('alertEnabled' , alertEnabled)
+    console.log("alertEnabled", alertEnabled)
   } else {
-    // Handle the error message if the operation failed
-    messageAlert.value = updatedBoard.message;  // Corrected to use updatedBoard.message
-    alertEnabled.value = true;
-  }
-};
 
+    messageAlert.value = updatedBoard.message 
+    alertEnabled.value = true
+  }
+}
 </script>
 
 <template>
-
   <div class="min-h-full max-h-fit">
     <!-- Modal -->
 
@@ -292,22 +305,44 @@ const changeVisibility = async () => {
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <nav class="bg-white shadow px-4 py-6 flex justify-center items-center" style="background-color: #d8f1f1">
-          <div class="text-2xl font-bold tracking-tight" style="color: #9391e4; text-shadow: 0 0 5px #ffffff">
+        <nav
+          class="bg-white shadow px-4 py-6 flex justify-center items-center"
+          style="background-color: #d8f1f1"
+        >
+          <div
+            class="text-2xl font-bold tracking-tight"
+            style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
+          >
             {{ boardName }}
           </div>
         </nav>
 
         <div class="flex mt-9 px-6">
           <!-- LIMIT -->
-          <button class="itbkk-status-setting btn mr-2 mt-1" style="border-radius: 30px; background-color: #aff3c9"
-            onclick="my_modal_limit.showModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
-              <path fill="white" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z" />
+          <button
+            class="itbkk-status-setting btn mr-2 mt-1"
+            style="border-radius: 30px; background-color: #aff3c9"
+            onclick="my_modal_limit.showModal()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 14 14"
+            >
+              <path
+                fill="white"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M13.43 3.59a.76.76 0 0 0-.35-.51l-2 2a1 1 0 0 1-1.44 0l-.76-.68a1 1 0 0 1 0-1.4l2-2a.76.76 0 0 0-.48-.43A3.8 3.8 0 0 0 6.26 6L.8 11.41a1 1 0 0 0 0 1.43l.36.36a1 1 0 0 0 1.43 0l5.46-5.45a3.81 3.81 0 0 0 5.38-4.16Z"
+              />
             </svg>
           </button>
-          <dialog id="my_modal_limit" class="modal modal-bottom sm:modal-middle">
+          <dialog
+            id="my_modal_limit"
+            class="modal modal-bottom sm:modal-middle"
+          >
             <div class="modal-box" style="max-width: 400px">
               <h3 class="font-bold text-lg" style="color: #9391e4">
                 Status Settings
@@ -315,30 +350,53 @@ const changeVisibility = async () => {
               <p class="py-4">
                 User can limit the number of tasks in status by setting the
                 Maximum task in each status
-                <br /><span style="color: #eb4343">( except "No Status" and "Done" statuses )</span>
+                <br /><span style="color: #eb4343"
+                  >( except "No Status" and "Done" statuses )</span
+                >
               </p>
               <div class="flex items-center mt-4">
                 <span class="mr-2">Limit tasks in this status</span>
 
-                <input type="checkbox" class="toggle" v-model="limitStore.getLimit().isLimit" />
+                <input
+                  type="checkbox"
+                  class="toggle"
+                  v-model="limitStore.getLimit().isLimit"
+                />
               </div>
 
-              <div v-if="limitStore.getLimit().isLimit" class="mt-4 flex flex-col items-center">
+              <div
+                v-if="limitStore.getLimit().isLimit"
+                class="mt-4 flex flex-col items-center"
+              >
                 <div class="flex items-center justify-center">
-                  <label for="status-limit" class="mr-2">Set maximum tasks</label>
+                  <label for="status-limit" class="mr-2"
+                    >Set maximum tasks</label
+                  >
                 </div>
 
-                <input type="number" id="status-limit" class="input input-bordered input-centered"
-                  v-model.number="limitStore.getLimit().maximumTask" max="10" min="1" />
+                <input
+                  type="number"
+                  id="status-limit"
+                  class="input input-bordered input-centered"
+                  v-model.number="limitStore.getLimit().maximumTask"
+                  max="10"
+                  min="1"
+                />
               </div>
 
               <div class="modal-action">
                 <form method="dialog">
-                  <button class="btn mr-2 bg-green-400 text-w" @click="UpdateLimit">
+                  <button
+                    class="btn mr-2 bg-green-400 text-w"
+                    @click="UpdateLimit"
+                  >
                     Confirm
                   </button>
 
-                  <button class="btn mr-2 bg-grey-400 text-w" @click="closeLimit()">
+                  <button
+                    class="btn mr-2 bg-grey-400 text-w"
+                    @click="closeLimit()"
+                  >
                     Close
                   </button>
                 </form>
@@ -347,10 +405,23 @@ const changeVisibility = async () => {
           </dialog>
           <!-- FILTER -->
           <details class="dropdown">
-            <summary class="itbkk-status-filter m-1 btn" style="border-radius: 30px">
+            <summary
+              class="itbkk-status-filter m-1 btn"
+              style="border-radius: 30px"
+            >
               <button>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 14 14">
-                  <g fill="#9FC3E9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <g
+                    fill="#9FC3E9"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <circle cx="2" cy="2" r="1.5" />
                     <path d="M3.5 2h10" />
                     <circle cx="7" cy="7" r="1.5" />
@@ -363,10 +434,23 @@ const changeVisibility = async () => {
               Filter
             </summary>
 
-            <ul class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-              <li v-for="status in statusList" :key="status.name" class="flex items-center">
-                <label class="itbkk-status-choice flex items-center space-x-2 w-full">
-                  <input type="checkbox" :value="status.name" v-model="filter" class="mr-2" />
+            <ul
+              class="itbkk-status-filter p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+            >
+              <li
+                v-for="status in statusList"
+                :key="status.name"
+                class="flex items-center"
+              >
+                <label
+                  class="itbkk-status-choice flex items-center space-x-2 w-full"
+                >
+                  <input
+                    type="checkbox"
+                    :value="status.name"
+                    v-model="filter"
+                    class="mr-2"
+                  />
                   <span class="itbkk-status-choice">{{ status.name }}</span>
                 </label>
               </li>
@@ -374,34 +458,55 @@ const changeVisibility = async () => {
           </details>
 
           <div class="selected-filters flex flex-wrap mt-2">
-            <div v-for="status in filter" :key="status"
+            <div
+              v-for="status in filter"
+              :key="status"
               class="selected-filter text-gray-900 rounded-full px-4 py-2 ml-4 mb-3 flex items-center"
-              style="background-color: rgb(247, 133, 177)">
+              style="background-color: rgb(247, 133, 177)"
+            >
               <span>{{ status }}</span>
-              <button @click="removeStatus(status)" class="ml-2 text-gray-900 hover:text-white">
+              <button
+                @click="removeStatus(status)"
+                class="ml-2 text-gray-900 hover:text-white"
+              >
                 &times;
               </button>
             </div>
           </div>
-          
 
           <div class="flex-grow flex justify-end items-center">
             <div class="hidden md:block">
               <!-- Limit Notice -->
               <div class="flex space-x-1">
                 <!-- ADD BUTTON -->
-                <AddTask />
+
+                <AddTask :disabledBtn="disabledButtonWhileOpenPublic" />
                 <!-- MANAGE STATUS -->
-                <button class="itbkk-manage-status btn bg-gray-200" style="
+                <button
+                  class="itbkk-manage-status btn bg-gray-200"
+                  style="
                     color: white;
                     background-color: #f785b1;
                     border-radius: 30px;
-                  " @click="openNewStatus()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                      stroke-width="2">
+                  "
+                  @click="openNewStatus()"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                    >
                       <path
-                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1" />
+                        d="M21 13v-2a1 1 0 0 0-1-1h-.757l-.707-1.707l.535-.536a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0l-.536.535L14 4.757V4a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v.757l-1.707.707l-.536-.535a1 1 0 0 0-1.414 0L4.929 6.343a1 1 0 0 0 0 1.414l.536.536L4.757 10H4a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h.757l.707 1.707l-.535.536a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l.536-.535l1.707.707V20a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-.757l1.707-.708l.536.536a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-.535-.536l.707-1.707H20a1 1 0 0 0 1-1"
+                      />
                       <path d="M12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6" />
                     </g>
                   </svg>
@@ -414,30 +519,35 @@ const changeVisibility = async () => {
 
         <div class="flex flex-col items-center mt-9 h-[60vh] max-sm:h-[50vh]">
           <div class="flex">
-            <div class="absolute pl-12 w-1/12 h-11 z-10 bg-transparent" @click="handleToggleClick" >
-            </div>
+            <div
+              class="absolute pl-12 w-1/12 h-11 z-10 bg-transparent"
+              @click="handleToggleClick"
+            ></div>
             <div class="form-control ml-4 w-50 mb-2">
               <label class="label cursor-pointer">
-                <span class="label-text mr-2 ">{{ visibility === "PUBLIC" ? "Public" : "Private" }}</span>
-                <input type="checkbox"
-                      :checked="visibility === 'PUBLIC'"
-                      class="itbkk-board-visibility toggle toggle-accent"
-                      />
+                <span class="label-text mr-2">{{
+                  visibility === "PUBLIC" ? "Public" : "Private"
+                }}</span>
+                <input
+                  type="checkbox"
+                  :checked="visibility === 'PUBLIC'"
+                  class="itbkk-board-visibility toggle toggle-accent"
+                  :disabled="disabledButtonWhileOpenPublic"
+                />
               </label>
             </div>
           </div>
 
-         <Alert :isAlert="alertEnabled">
-          {{ messageAlert }}
-        </Alert>
+          <Alert :isAlert="alertEnabled">
+            {{ messageAlert }}
+          </Alert>
 
-
-            <Modal :isOpen="isModalVisible"  
-              :tempVisibility="tempVisibility"
-              @confirm="confirmChangeVisibility"
-              @cancel="cancelChange"
-            />
-        
+          <Modal
+            :isOpen="isModalVisible"
+            :tempVisibility="tempVisibility"
+            @confirm="confirmChangeVisibility"
+            @cancel="cancelChange"
+          />
 
           <div class="overflow-x-auto max-h-96 w-min-full">
             <div class="min-w-full">
@@ -445,66 +555,106 @@ const changeVisibility = async () => {
                 <!-- TABLE -->
                 <thead>
                   <tr class="bg-base-200 mt-4 md:mt-0">
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      ">
+                      "
+                    >
                       No.
                     </th>
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      ">
+                      "
+                    >
                       Title
                     </th>
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      ">
+                      "
+                    >
                       Assignees
                     </th>
 
                     <!-- STATUS SORT -->
 
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
-                      ">
-                      <button class="itbkk-status-sort" style="display: flex; align-items: center"
-                        @click="sortByStatus(), toggleIcon()">
+                      "
+                    >
+                      <button
+                        class="itbkk-status-sort"
+                        style="display: flex; align-items: center"
+                        @click="sortByStatus(), toggleIcon()"
+                      >
                         <div class="mr-2">Status</div>
                         <!-- Default -->
-                        <svg v-if="showIcon === 'default'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                          viewBox="0 0 24 24">
+                        <svg
+                          v-if="showIcon === 'default'"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                        >
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                            <path fill="currentColor"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                            />
+                            <path
+                              fill="currentColor"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
+                            />
                           </g>
                         </svg>
                         <!-- Asc -->
-                        <svg v-else-if="showIcon === 'asc'" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                          viewBox="0 0 24 24">
+                        <svg
+                          v-else-if="showIcon === 'asc'"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                        >
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
-                            <path fill="#eb4343"
-                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z" />
+                              d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                            />
+                            <path
+                              fill="#eb4343"
+                              d="M10.759 13c.94 0 1.43 1.092.855 1.792l-.078.086L7.414 19H11a1 1 0 0 1 .117 1.993L11 21H5.241c-.94 0-1.43-1.092-.855-1.792l.078-.086L8.586 15H5a1 1 0 0 1-.117-1.993L5 13zM17 4a1 1 0 0 1 1 1v12.414l1.121-1.121a1 1 0 0 1 1.415 1.414l-2.829 2.828a1 1 0 0 1-1.414 0l-2.828-2.828a1 1 0 0 1 1.414-1.414L16 17.414V5a1 1 0 0 1 1-1M8 3c.674 0 1.28.396 1.556 1.002l.054.133l2.332 6.529a1 1 0 0 1-1.838.78l-.046-.108L9.581 10H6.419l-.477 1.336a1 1 0 0 1-1.917-.56l.033-.112l2.332-6.53A1.71 1.71 0 0 1 8 3m0 2.573L7.133 8h1.734z"
+                            />
                           </g>
                         </svg>
 
                         <!-- Des -->
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                        <svg
+                          v-else
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                        >
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
-                            <path fill="#4361ee"
-                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z" />
+                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
+                            />
+                            <path
+                              fill="#4361ee"
+                              d="M4.664 11.942a1 1 0 0 0 1.278-.606L6.419 10h3.162l.477 1.336a1 1 0 0 0 1.884-.672L9.61 4.134a1.71 1.71 0 0 0-3.22 0l-2.332 6.53a1 1 0 0 0 .606 1.278M8 5.573L8.867 8H7.133zm8.293-1.28a1 1 0 0 1 1.414 0l2.829 2.828a1 1 0 0 1-1.415 1.415L18 7.414V20a1 1 0 1 1-2 0V7.414l-1.121 1.122a1 1 0 1 1-1.415-1.415zM5 13a1 1 0 1 0 0 2h3.586l-4.122 4.122C3.77 19.815 4.26 21 5.24 21H11a1 1 0 1 0 0-2H7.414l4.122-4.122c.693-.693.203-1.878-.777-1.878z"
+                            />
                           </g>
                         </svg>
                       </button>
@@ -512,13 +662,16 @@ const changeVisibility = async () => {
 
                     <!-- STATUS SORT -->
 
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9fc3e9;
                         border-bottom: 2px solid #9fc3e9;
                         color: #fff;
                         text-align: center;
                         vertical-align: middle;
-                      ">
+                      "
+                    >
                       Action
                     </th>
                   </tr>
@@ -526,67 +679,111 @@ const changeVisibility = async () => {
                 <tbody>
                   <!-- Iterate over todoList -->
                   <TaskDetail :todo-id="selectedTodoId" />
-                  <tr class="itbkk-item" v-for="(item, index) in filteredTasks" :key="index">
-                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                  <tr
+                    class="itbkk-item"
+                    v-for="(item, index) in filteredTasks"
+                    :key="index"
+                  >
+                    <td
+                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
                       {{ index + 1 }}
                     </td>
-                    <td class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      <label for="my_modal_6" @click="selectTodo(item.id)"
-                        style="display: block; width: 100%; height: 100%">
+                    <td
+                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      <label
+                        for="my_modal_6"
+                        @click="selectTodo(item.id)"
+                        style="display: block; width: 100%; height: 100%"
+                      >
                         {{ item.title }}
                       </label>
                     </td>
-                    <td class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700" :class="{
-                      italic: !item.assignees || item.assignees.length === 0
-                    }">
+                    <td
+                      class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                      :class="{
+                        italic: !item.assignees || item.assignees.length === 0
+                      }"
+                    >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? 'Unassigned'
+                          ? "Unassigned"
                           : item.assignees
                       }}
                     </td>
-                    <td class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      <span :class="{
-                        'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
-                        'border-blue-500 text-blue-500':
-                          item.status === 'No Status',
-                        'border-red-500 text-red-500':
-                          item.status === 'To Do',
-                        'border-yellow-500 text-yellow-500':
-                          item.status === 'Doing',
-                        'border-green-500 text-green-500':
-                          item.status === 'Done'
-                      }">
+                    <td
+                      class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      <span
+                        :class="{
+                          'badge badge-outline border border-solid w-20 text-xs px-2 py-1': true,
+                          'border-blue-500 text-blue-500':
+                            item.status === 'No Status',
+                          'border-red-500 text-red-500':
+                            item.status === 'To Do',
+                          'border-yellow-500 text-yellow-500':
+                            item.status === 'Doing',
+                          'border-green-500 text-green-500':
+                            item.status === 'Done'
+                        }"
+                      >
                         {{ item.status }}
                       </span>
                     </td>
 
                     <div class="itbkk-button-action">
                       <td style="display: flex; justify-content: center">
-                        <div class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2">
+                        <div
+                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2"
+                        >
                           <!-- EDIT -->
 
-                          <EditTask :todo-id="item.id" />
+                          <EditTask :todo-id="item.id" :disabledBtn="disabledButtonWhileOpenPublic" />
 
                           <!-- Delete -->
 
-                          <a style="margin-left: 10px" class="itbkk-button-delete btn bg-red-400 rounded-full"
-                            @click="openModalToDelete(item.id, index)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                          <button
+                            :disabled="disabledButtonWhileOpenPublic"
+                            :class="[
+                              'itbkk-button-delete ml-2',
+                              'btn',
+                              'rounded-full',
+                              { 'btn-disabled': disabledButtonWhileOpenPublic }
+                            ]"
+                            :style="{
+                              backgroundColor: disabledButtonWhileOpenPublic
+                                ? '#d3d3d3'
+                                : '#f87171'
+                            }"
+                            @click="openModalToDelete(item.id, index)"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                            >
                               <g fill="none" fill-rule="evenodd">
                                 <path
-                                  d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
-                                <path fill="white"
-                                  d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z" />
+                                  d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
+                                />
+                                <path
+                                  fill="white"
+                                  d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
+                                />
                               </g>
                             </svg>
-                          </a>
+                          </button>
                         </div>
 
                         <dialog id="my_modal_delete" class="modal">
                           <div class="modal-box" style="max-width: 500px">
                             <h3 class="font-bold text-lg">Delete a Task</h3>
-                            <p class="itbkk-message py-4 font-medium" style="word-wrap: break-word">
+                            <p
+                              class="itbkk-message py-4 font-medium"
+                              style="word-wrap: break-word"
+                            >
                               Do you want to delete the task number
                               {{ selectedItemIdToDelete }} - "{{
                                 filterAndLogTitleById(selectedItemIdToDelete)
@@ -594,11 +791,17 @@ const changeVisibility = async () => {
                             </p>
                             <form method="dialog">
                               <div class="modal-action">
-                                <button class="itbkk-button-cancel btn" style="color: #eb4343">
+                                <button
+                                  class="itbkk-button-cancel btn"
+                                  style="color: #eb4343"
+                                >
                                   Cancel
                                 </button>
-                                <button class="itbkk-button-confirm btn bg-green-400" style="color: #fff"
-                                  @click="confirmDelete()">
+                                <button
+                                  class="itbkk-button-confirm btn bg-green-400"
+                                  style="color: #fff"
+                                  @click="confirmDelete()"
+                                >
                                   Confirm
                                 </button>
                               </div>
@@ -610,7 +813,10 @@ const changeVisibility = async () => {
                       </td>
                     </div>
                   </tr>
-                  <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredTasks?.length === 0">
+                  <tr
+                    class="bg-base-100 mt-4 md:mt-0"
+                    v-if="filteredTasks?.length === 0"
+                  >
                     <td colspan="5" class="text-center py-4 text-gray-400">
                       No task
                     </td>
@@ -620,7 +826,11 @@ const changeVisibility = async () => {
             </div>
             <!-- DELETE COMPLETE -->
 
-            <div role="alert" class="alert shadow-lg" v-show="deleteComplete" style="
+            <div
+              role="alert"
+              class="alert shadow-lg"
+              v-show="deleteComplete"
+              style="
                 position: fixed;
                 top: 20px;
                 left: 50%;
@@ -629,11 +839,20 @@ const changeVisibility = async () => {
                 width: 500px;
                 color: rgb(74 222 128 / var(--tw-text-opacity));
                 animation: fadeInOut 1.5s infinite;
-              ">
-              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              "
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <div>
                 <h2 class="itbkk-message font-bold text-green-400">
@@ -645,7 +864,6 @@ const changeVisibility = async () => {
         </div>
       </div>
     </div>
-
   </div>
 
   <!-- <nav class="bg-white shadow" style="background-color: #d8f1f1">
@@ -681,8 +899,6 @@ const changeVisibility = async () => {
       <p style="color: #f785b1">Thank you for choosing Kradan Kanban!</p>
     </aside>
   </footer> -->
-
-
 </template>
 
 <style scoped>

@@ -20,6 +20,7 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     @Value("#{${jwt.max-token-interval-minutes}*60*1000}")
     private long JWT_TOKEN_VALIDITY;
+
     @Value("#{${jwt.refresh-token-validity}*60*60*1000}")
     private long JWT_REFRESH_TOKEN_VALIDITY;
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
