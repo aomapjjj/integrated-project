@@ -3,7 +3,7 @@ import { useRouter } from "vue-router"
 import { ref, computed, onMounted } from "vue"
 import { useUsers } from "@/stores/storeUser"
 import { getItems, addBoard, deleteItemById } from "../libs/fetchUtils.js"
-import SideBar from "./SideBar.vue"
+import SideBar from "../component/SideBar.vue"
 
 const BoardsList = ref([])
 const openModalName = ref(false)
