@@ -17,6 +17,9 @@ import { useTasks } from '../stores/store'
 import { useRoute, useRouter } from 'vue-router'
 import SideBar from './SideBar.vue'
 import Modal from '../component/Modal.vue'
+import Alert from '@/component/Alert.vue'
+
+
 
 const route = useRoute()
 const router = useRouter()
@@ -252,15 +255,22 @@ const cancelChange = () => {
   isModalVisible.value = false; 
 };
 
-const changeVisibility = async () => {
 
+const alertEnabled = ref(false)
+const messageAlert = ref()
+
+const changeVisibility = async () => {
   const updatedBoard = await boardVisibility(boardId.value, visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC");
-  console.log("update" ,updatedBoard.visibility)
-  if (updatedBoard) {
-      visibility.value = updatedBoard.visibility;
-      console.log("Visibility chceck",visibility)
+
+  if (updatedBoard && updatedBoard.success) {
+    visibility.value = updatedBoard.visibility;
+    messageAlert.value = "Visibility updated to:", updatedBoard.visibility 
+    alertEnabled.value = false
+    console.log('alertEnabled' , alertEnabled)
   } else {
-      console.error('Failed to update visibility.');
+    // Handle the error message if the operation failed
+    messageAlert.value = updatedBoard.message;  // Corrected to use updatedBoard.message
+    alertEnabled.value = true;
   }
 };
 
@@ -408,7 +418,7 @@ const changeVisibility = async () => {
             </div>
             <div class="form-control ml-4 w-50 mb-2">
               <label class="label cursor-pointer">
-                <span class="label-text mr-2 ">{{ visibility === "PUBLIC" ? "PUBLIC" : "PRIVATE" }}</span>
+                <span class="label-text mr-2 ">{{ visibility === "PUBLIC" ? "Public" : "Private" }}</span>
                 <input type="checkbox"
                       :checked="visibility === 'PUBLIC'"
                       class="itbkk-board-visibility toggle toggle-accent"
@@ -417,7 +427,11 @@ const changeVisibility = async () => {
             </div>
           </div>
 
-          
+         <Alert :isAlert="alertEnabled">
+          {{ messageAlert }}
+        </Alert>
+
+
             <Modal :isOpen="isModalVisible"  
               :tempVisibility="tempVisibility"
               @confirm="confirmChangeVisibility"

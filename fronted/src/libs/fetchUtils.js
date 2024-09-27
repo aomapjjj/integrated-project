@@ -199,22 +199,35 @@ async function boardVisibility(boardId, currentVisibility) {
       if (response.status === 200) {
           const editedItem = await response.json();
           console.log(`Visibility changed to: ${editedItem.visibility}`);
-          return editedItem; 
+          return {
+            success: true,
+            visibility: editedItem.visibility,
+            message: `Visibility changed to: ${editedItem.visibility}`,
+          }
       } else if (response.status === 401) {
           resetAuthentication();
           redirectToLogin();
           return null; 
-      } else if (response.status === 403) {
-          alert("You do not have permission to change board visibility mode.");
-          return null; 
+        } else if (response.status === 403) {
+          const message = "You do not have permission to change board visibility mode."
+          return {
+            success: false,
+            message: message
+          }
       } else {
-          alert("There is a problem. Please try again later.");
-          return null; 
+           const message = "There is a problem. Please try again later."
+          return {
+            success: false,
+            message: message
+          }
       }
   } catch (error) {
       console.log(`Error: ${error.message}`);
-      alert("There is a problem. Please try again later.");
-      return null; 
+      const message = ("There is a problem. Please try again later.");
+      return {
+        success: false,
+        message: message
+      }
   }
 }
 

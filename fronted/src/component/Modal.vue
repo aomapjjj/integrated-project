@@ -1,24 +1,25 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-const boardId = ref()
-const route = useRoute()
-const emit = defineEmits(['close']);
+const boardId = ref();
+const route = useRoute();
+
+// Declare the events 'close', 'cancel', and 'confirm'
+const emit = defineEmits(['close', 'cancel', 'confirm']);
 
 const props = defineProps({
     isOpen: Boolean,
-		tempVisibility: String
-})
+    tempVisibility: String
+});
 
 watch(
     () => route.params.id,
     (newId) => {
-        boardId.value = newId
+        boardId.value = newId;
     },
     { immediate: true }
-)
-
+);
 </script>
 
 <template>
