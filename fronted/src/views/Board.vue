@@ -57,7 +57,6 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
-
   console.log(result.status)
 
   if (result.status === 401) {
