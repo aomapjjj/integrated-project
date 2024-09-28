@@ -26,10 +26,16 @@ const routes = [
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        response.ok ? next() : next({ name: "ErrorPage" });
+        if (response.status === 404) {
+          next({ name: "ErrorPage" });
+        } else if (response.ok) {
+          next(); 
+        } if (response.status === 401) {
+          next({ name: "Login" });
+        }
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "ErrorPage" });
+        next({ name: "Login" });
       }
     }
   },
@@ -46,11 +52,16 @@ const routes = [
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        response.ok ? next() : next({ name: "ErrorPage" });
+        if (response.status === 404) {
+          next({ name: "ErrorPage" });
+        } else if (response.ok) {
+          next(); 
+        } if (response.status === 401) {
+          next({ name: "Login" });
+        }
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "ErrorPage" });
+        next({ name: "Login" });
       }
     },
     children: [
@@ -131,7 +142,6 @@ router.beforeEach(async (to, from, next) => {
 const handleTokenRefresh = async (refreshToken, next) => {
   try {
     const refreshResponse = await refreshAccessToken(refreshToken);
-
     if (refreshResponse.status === 200) {
       const refreshData = await refreshResponse.json();
       sessionStorage.setItem("access_token", refreshData.access_token);
