@@ -7,7 +7,8 @@ import {
   editItem,
   deleteItemById,
   deleteItemAndTransfer,
-  getBoardById
+  getBoardById,
+  getResponseItems
 } from "../libs/fetchUtils.js"
 import { useStatuses } from "../stores/storeStatus"
 import { useRoute, useRouter } from "vue-router"
@@ -83,16 +84,8 @@ onMounted(async () => {
   }
   statusList.value = myStatuses.getStatuses()
   const statusId = route.params.id
-  if (statusId !== undefined) {
-    const response = await getItemById(statusId)
-    if (status === 404 || status === 400) {
-      router.push("/status")
-      notFound.value = true
-      setTimeout(() => {
-        notFound.value = false
-      }, 1800)
-    }
-  }
+
+ 
 
   const Board = await getBoardById(boardId.value)
   console.log("Board data", Board.item.owner.name)
@@ -866,7 +859,10 @@ const isFormValid = computed(() => {
               >
                 <button
                   :disabled="disabledButtonWhileOpenPublic"
-                  :class="{ 'bg-gray-400 cursor-not-allowed': disabledButtonWhileOpenPublic }"
+                  :class="{
+                    'bg-gray-400 cursor-not-allowed':
+                      disabledButtonWhileOpenPublic
+                  }"
                   class="itbkk-button-edit btn rounded-full"
                   @click="openModalToEdit(item.id)"
                   v-if="item.name !== 'No Status' && item.name !== 'Done'"

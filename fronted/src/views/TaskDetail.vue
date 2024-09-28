@@ -36,6 +36,9 @@ watch(
   async (newValue) => {
     // const boardId = localStorage.getItem()
     const { item, responsed } = await getItemById(newValue, boardId.value)
+    if(responsed === 403){
+      router.push({ name: "ErrorPagePermission" });
+    }
     todo.value = item
     
   }

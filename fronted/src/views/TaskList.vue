@@ -5,7 +5,8 @@ import {
   getItems,
   deleteItemById,
   editLimit,
-  getBoardById
+  getBoardById,
+  getResponseItems
 } from "../libs/fetchUtils.js"
 import TaskDetail from "../views/TaskDetail.vue"
 import AddTask from "../views/AddTask.vue"
@@ -15,7 +16,7 @@ import { useLimitStore } from "../stores/storeLimit"
 import { useUsers } from "@/stores/storeUser"
 import { useTasks } from "../stores/store"
 import { useRoute, useRouter } from "vue-router"
-import SideBar from "./SideBar.vue"
+import SideBar from "../component/SideBar.vue"
 import Modal from "../component/Modal.vue"
 import Alert from "@/component/Alert.vue"
 
@@ -68,6 +69,7 @@ onMounted(async () => {
 
   const Board = await getBoardById(boardId.value)
   console.log("Board data", Board.item.owner.name)
+  
 
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
@@ -97,6 +99,7 @@ onMounted(async () => {
 
   return items
 })
+
 
 const UpdateLimit = async () => {
   const updatedLimit = await editLimit(
@@ -248,7 +251,6 @@ const closeLimit = () => {
 
 // Handle when the toggle is clicked to open the modal
 
-
 const handleToggleClick = () => {
   if (disabledButtonWhileOpenPublic.value) {
     return
@@ -283,8 +285,7 @@ const changeVisibility = async () => {
     alertEnabled.value = false
     console.log("alertEnabled", alertEnabled)
   } else {
-
-    messageAlert.value = updatedBoard.message 
+    messageAlert.value = updatedBoard.message
     alertEnabled.value = true
   }
 }
@@ -296,9 +297,9 @@ const changeVisibility = async () => {
 
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <RouterLink to="/board">
+    
         <SideBar />
-      </RouterLink>
+     
 
       <!-- End Sidebar -->
 
@@ -739,7 +740,10 @@ const changeVisibility = async () => {
                         >
                           <!-- EDIT -->
 
-                          <EditTask :todo-id="item.id" :disabledBtn="disabledButtonWhileOpenPublic" />
+                          <EditTask
+                            :todo-id="item.id"
+                            :disabledBtn="disabledButtonWhileOpenPublic"
+                          />
 
                           <!-- Delete -->
 
