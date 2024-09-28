@@ -7,8 +7,6 @@ import TaskDetail from "@/views/TaskDetail.vue";
 import EditTask from "@/views/EditTask.vue";
 import Login from "@/views/Login.vue";
 import Board from "@/views/Board.vue";
-import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
-
 
 const getToken = () => sessionStorage.getItem("access_token");
 const getRefreshToken = () => sessionStorage.getItem("refresh_token");
@@ -28,10 +26,16 @@ const routes = [
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        response.ok ? next() : next({ name: "ErrorPage" });
+        if (response.status === 404) {
+          next({ name: "ErrorPage" });
+        } else if (response.ok) {
+          next(); 
+        } if (response.status === 401) {
+          next({ name: "Login" });
+        }
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "ErrorPage" });
+        next({ name: "Login" });
       }
     }
   },
@@ -45,22 +49,19 @@ const routes = [
       try {
         const token = getToken();
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/tasks`,
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           { headers: { Authorization: `Bearer ${token}` } }
-           
         );
-
-        console.log(response.status)
-        if (response.status === 403) {
-          next({ name: "ErrorPagePermission" });
-        }
         if (response.status === 404) {
           next({ name: "ErrorPage" });
+        } else if (response.ok) {
+          next(); 
+        } if (response.status === 401) {
+          next({ name: "Login" });
         }
-        response.ok ? next() : next({ name: "ErrorPage" });
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "ErrorPage" });
+        next({ name: "Login" });
       }
     },
     children: [
@@ -84,11 +85,6 @@ const routes = [
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        console.log(response.status)
-        if (response.status === 403) {
-          next({ name: "ErrorPagePermission" });
-        }
-
         response.ok ? next() : next({ name: "ErrorPage" });
       } catch (error) {
         console.error("Error checking board id:", error);
@@ -100,7 +96,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/error403", name: "ErrorPagePermission", component: ErrorPagePermission },
+  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
 ];
 
 const router = createRouter({
@@ -146,7 +142,6 @@ router.beforeEach(async (to, from, next) => {
 const handleTokenRefresh = async (refreshToken, next) => {
   try {
     const refreshResponse = await refreshAccessToken(refreshToken);
-
     if (refreshResponse.status === 200) {
       const refreshData = await refreshResponse.json();
       sessionStorage.setItem("access_token", refreshData.access_token);
