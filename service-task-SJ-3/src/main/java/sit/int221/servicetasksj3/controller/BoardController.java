@@ -59,7 +59,9 @@ public class BoardController {
         return ResponseEntity.ok(boardIds);
     }
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId) {
+    public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod());
         BoardResponseDTO boardResponse = boardService.getBoardById(boardId);
         return ResponseEntity.ok(boardResponse);
     }
@@ -69,12 +71,16 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(boardResponse);
     }
     @DeleteMapping("/{boardId}")
-    public ResponseEntity<Board> removeBoard(@PathVariable String boardId) {
+    public ResponseEntity<Board> removeBoard(@PathVariable String boardId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod());
         Board deleted = boardService.removeBoard(boardId);
         return ResponseEntity.ok().body(deleted);
     }
     @PutMapping("/{boardId}")
-    public ResponseEntity<BoardResponseDTO> editBoard(@PathVariable String boardId, @Valid @RequestBody BoardRequestDTO boardRequest) {
+    public ResponseEntity<BoardResponseDTO> editBoard(@PathVariable String boardId, @Valid @RequestBody BoardRequestDTO boardRequest, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod());
         BoardResponseDTO updatedBoard = boardService.editBoard(boardId, boardRequest);
         return ResponseEntity.ok(updatedBoard);
     }

@@ -80,7 +80,6 @@ public class TaskService {
         Users owner = userRepository.findById(board.getOwnerId())
                 .orElseThrow(() -> new ItemNotFoundException("Owner not found with ID: " + board.getOwnerId()));
 
-        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String oid = owner.getOid();
         try {
             List<Task> tasks;
