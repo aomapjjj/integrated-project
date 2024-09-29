@@ -52,7 +52,7 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 const userName = userStore.getUser().username
 
 console.log('userName', userName)
-const token = sessionStorage.getItem('access_token')
+const token = localStorage.getItem('access_token')
 const boardName = ref('')
 const isModalVisible = ref(false)
 const visibility = ref('')
@@ -221,7 +221,7 @@ const openNewStatus = () => {
 
 const clearToken = () => {
   router.push({ name: 'Login' })
-  sessionStorage.removeItem('access_token') // หรือ sessionStorage.removeItem("access_token");
+  localStorage.removeItem('access_token') // หรือ localStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
