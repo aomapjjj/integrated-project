@@ -20,7 +20,7 @@ const router = useRouter()
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
 function getToken() {
-  return sessionStorage.getItem('access_token')
+  return localStorage.getItem('access_token')
 }
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
@@ -60,7 +60,7 @@ const submitForm = async () => {
   console.log(result.status)
 
   if (result.status === 401) {
-    sessionStorage.removeItem('access_token')
+    localStorage.removeItem('access_token')
     router.push({ name: 'Login' })
   } else {
     toBoardsList(result.data.id)

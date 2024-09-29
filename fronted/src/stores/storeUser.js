@@ -11,11 +11,11 @@ const useUsers = defineStore("users", () => {
 
   const setToken = (newToken) => {
     token.value = newToken;
-    sessionStorage.setItem("token", token.value);
+    localStorage.setItem("token", token.value);
   };
 
   const getToken = () => {
-    return token.value || sessionStorage.getItem("token");
+    return token.value || localStorage.getItem("token");
   };
 
   const setLoginSuccess = (statusLogin) => {
@@ -28,32 +28,32 @@ const useUsers = defineStore("users", () => {
 
   const setRefreshToken = (newRefreshToken) => {
     refreshToken.value = newRefreshToken;
-    sessionStorage.setItem("refresh_token", refreshToken.value);
+    localStorage.setItem("refresh_token", refreshToken.value);
   };
 
   const getRefreshToken = () => {
-    return refreshToken.value || sessionStorage.getItem("refresh_token");
+    return refreshToken.value || localStorage.getItem("refresh_token");
   };
 
-  if (sessionStorage.getItem("user")) {
-    user.value = JSON.parse(sessionStorage.getItem("user"));
+  if (localStorage.getItem("user")) {
+    user.value = JSON.parse(localStorage.getItem("user"));
   }
 
 
   
-  if (sessionStorage.getItem("token")) {
-    token.value = sessionStorage.getItem("token");
+  if (localStorage.getItem("token")) {
+    token.value = localStorage.getItem("token");
   }
-  if (sessionStorage.getItem("refresh_token")) {
-    refreshToken.value = sessionStorage.getItem("refresh_token");
+  if (localStorage.getItem("refresh_token")) {
+    refreshToken.value = localStorage.getItem("refresh_token");
   }
-  if (sessionStorage.getItem("boardId")) {
-    boardId.value = sessionStorage.getItem("boardId");
+  if (localStorage.getItem("boardId")) {
+    boardId.value = localStorage.getItem("boardId");
   }
 
   const setUser = (userName) => {
     user.value = { username: userName };
-    sessionStorage.setItem("user", JSON.stringify(user.value));
+    localStorage.setItem("user", JSON.stringify(user.value));
   };
 
   const getUser = () => {
@@ -62,7 +62,7 @@ const useUsers = defineStore("users", () => {
 
   const setBoard = (newBoard) => {
     boardId.value = newBoard;
-    sessionStorage.setItem("boardId", boardId.value);
+    localStorage.setItem("boardId", boardId.value);
   };
 
   const getBoard = () => {

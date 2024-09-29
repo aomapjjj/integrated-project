@@ -85,8 +85,8 @@ const submitForm = async () => {
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)
 
-      sessionStorage.setItem('access_token', data.access_token)
-      sessionStorage.setItem('refresh_token', data.refresh_token)
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('refresh_token', data.refresh_token)
 
       openHomePage()
     } else if (response.status === 401) {

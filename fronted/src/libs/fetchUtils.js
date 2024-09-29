@@ -2,7 +2,7 @@ import router from "@/router";
 
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return sessionStorage.getItem("access_token");
+  return localStorage.getItem("access_token");
 }
 
 async function getItems(url) {

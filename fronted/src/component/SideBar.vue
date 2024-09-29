@@ -10,7 +10,7 @@ const BoardsList = ref()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return sessionStorage.getItem('access_token')
+  return localStorage.getItem('access_token')
 }
 
 
@@ -50,7 +50,8 @@ const userName = userStore.getUser().username
 
 // Log out
 const clearToken = () => {
-  sessionStorage.removeItem('access_token')
+  localStorage.clear();
+  localStorage.removeItem('access_token')
   router.push({ name: 'Login' })
 }
 

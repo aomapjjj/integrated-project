@@ -43,7 +43,7 @@ const errorTrans = ref(false)
 const myStatuses = useStatuses()
 const limitStore = useLimitStore()
 const taskStore = useTasks()
-const token = sessionStorage.getItem("access_token")
+const token = localStorage.getItem("access_token")
 
 const userName = userStore.getUser().username
 const disabledButtonWhileOpenPublic = ref(false)

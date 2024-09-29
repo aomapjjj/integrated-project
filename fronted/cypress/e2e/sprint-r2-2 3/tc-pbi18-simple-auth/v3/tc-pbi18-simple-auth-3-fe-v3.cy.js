@@ -50,8 +50,8 @@ describe(`TC-PBI18-PERSIONAL-BOARD-3-FE-v3\n
    
 
     it('[Step 3.4] Should get statusCode 401 when opening the /board/1/status page and redirect to /login', () => {
-        // cy.intercept('GET','https://intproj23.sit.kmutt.ac.th/sj3/api/v3/**',{
-        cy.intercept('GET','http://localhost:8080/v3/**',{
+        cy.intercept('GET','https://intproj23.sit.kmutt.ac.th/sj3/api/v3/**',{
+        // cy.intercept('GET','http://localhost:8080/v3/**',{
             statusCode: 401
         }).as('request')
 
@@ -66,8 +66,8 @@ describe(`TC-PBI18-PERSIONAL-BOARD-3-FE-v3\n
     })
 
     it('[Step 3.6] Should get statusCode 401 when opening the /board/1/status/1/edit page and redirect to /login', () => {
-        // cy.intercept('GET','https://intproj23.sit.kmutt.ac.th/sj3/api/v3/**',{
-        cy.intercept('GET','http://localhost:8080/v3/**',{
+        cy.intercept('GET','https://intproj23.sit.kmutt.ac.th/sj3/api/v3/**',{
+        // cy.intercept('GET','http://localhost:8080/v3/**',{
             statusCode: 401
         }).as('request')
 

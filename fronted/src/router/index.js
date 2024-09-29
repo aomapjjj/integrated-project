@@ -9,8 +9,8 @@ import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
 import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
 import { getBoardById } from "../libs/fetchUtils.js"
-const getToken = () => sessionStorage.getItem("access_token")
-const getRefreshToken = () => sessionStorage.getItem("refresh_token")
+const getToken = () => localStorage.getItem("access_token")
+const getRefreshToken = () => localStorage.getItem("refresh_token")
 
 
 
@@ -62,8 +62,8 @@ const routes = [
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
-      const userNameString = sessionStorage?.getItem("user")
-      console.log('sessionStorage?.getItem("user")', userNameString)
+      const userNameString = localStorage?.getItem("user")
+      console.log('localStorage?.getItem("user")', userNameString)
 
    
       const userName = userNameString ? JSON.parse(userNameString) : null
@@ -206,8 +206,8 @@ const routes = [
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
-      const userNameString = sessionStorage?.getItem("user")
-      console.log('sessionStorage?.getItem("user")', userNameString)
+      const userNameString = localStorage?.getItem("user")
+      console.log('localStorage?.getItem("user")', userNameString)
 
    
       const userName = userNameString ? JSON.parse(userNameString) : null
@@ -381,7 +381,7 @@ const handleTokenRefresh = async (refreshToken, next) => {
     const refreshResponse = await refreshAccessToken(refreshToken)
     if (refreshResponse.status === 200) {
       const refreshData = await refreshResponse.json()
-      sessionStorage.setItem("access_token", refreshData.access_token)
+      localStorage.setItem("access_token", refreshData.access_token)
       return next()
     }
     handleInvalidTokens(next)
@@ -392,7 +392,7 @@ const handleTokenRefresh = async (refreshToken, next) => {
 }
 
 const handleInvalidTokens = (next) => {
-  sessionStorage.removeItem("access_token")
+  localStorage.removeItem("access_token")
   next({ name: "Login" })
 }
 
