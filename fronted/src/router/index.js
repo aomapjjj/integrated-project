@@ -1,15 +1,34 @@
-import { createRouter, createWebHistory } from "vue-router";
-import TaskList from "@/views/TaskList.vue";
-import ErrorPage from "@/views/ErrorPage.vue";
-import AddTask from "@/views/AddTask.vue";
-import StatusesList from "@/views/StatusesList.vue";
-import TaskDetail from "@/views/TaskDetail.vue";
-import EditTask from "@/views/EditTask.vue";
-import Login from "@/views/Login.vue";
-import Board from "@/views/Board.vue";
+import { createRouter, createWebHistory } from "vue-router"
+import TaskList from "@/views/TaskList.vue"
+import ErrorPage from "@/views/ErrorPage.vue"
+import AddTask from "@/views/AddTask.vue"
+import StatusesList from "@/views/StatusesList.vue"
+import TaskDetail from "@/views/TaskDetail.vue"
+import EditTask from "@/views/EditTask.vue"
+import Login from "@/views/Login.vue"
+import Board from "@/views/Board.vue"
+import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
+import { getBoardById } from "../libs/fetchUtils.js"
+const getToken = () => sessionStorage.getItem("access_token")
+const getRefreshToken = () => sessionStorage.getItem("refresh_token")
 
-const getToken = () => sessionStorage.getItem("access_token");
-const getRefreshToken = () => sessionStorage.getItem("refresh_token");
+const userNameString = sessionStorage?.getItem("user")
+console.log('sessionStorage?.getItem("user")', userNameString)
+
+// แปลง JSON string เป็น object
+const userName = userNameString ? JSON.parse(userNameString) : null
+
+// เข้าถึง username
+
+const loginUsername = () => {
+  if (userName) {
+    return userName.username // แสดงค่า username
+  } else {
+    return null
+  }
+}
+
+console.log(loginUsername())
 
 const routes = [
   { path: "/", redirect: { name: "Login" } },
@@ -18,24 +37,27 @@ const routes = [
     name: "EditStatus",
     component: StatusesList,
     beforeEnter: async (to, from, next) => {
-      const { id: boardId, statusid: statusId } = to.params;
+      const { id: boardId, statusid: statusId } = to.params
       try {
-        const token = getToken();
+        const token = getToken()
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses/${statusId}`,
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/statuses/${statusId}`,
           { headers: { Authorization: `Bearer ${token}` } }
-        );
+        )
 
         if (response.status === 404) {
-          next({ name: "ErrorPage" });
+          next({ name: "ErrorPage" })
         } else if (response.ok) {
-          next(); 
-        } if (response.status === 401) {
-          next({ name: "Login" });
+          next()
+        }
+        if (response.status === 401) {
+          next({ name: "Login" })
         }
       } catch (error) {
-        console.error("Error checking board id:", error);
-        next({ name: "Login" });
+        console.error("Error checking board id:", error)
+        next({ name: "Login" })
       }
     }
   },
@@ -46,22 +68,72 @@ const routes = [
     props: true,
     beforeEnter: async (to, from, next) => {
       const { id: boardId } = to.params;
+  
+      const userNameBoard = await getBoardById(boardId);
+  
+      // ตรวจสอบการมีข้อมูลจาก userNameBoard
+      if (!userNameBoard || !userNameBoard.item) {
+        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
+      }
+  
+      const currentUsername = loginUsername();
+  
+      // ตรวจสอบความเป็นเจ้าของบอร์ด
+      if (userNameBoard.item.owner.name !== currentUsername) {
+        // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
+        if (userNameBoard.item.visibility === "PRIVATE") {
+          return next({ name: "ErrorPagePermission" });
+        }
+      } else {
+        console.log("ตรงกันนะจ๊า");
+        return next();
+      }
+  
       try {
-        const token = getToken();
-        const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        let response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         );
+  
         if (response.status === 404) {
-          next({ name: "ErrorPage" });
-        } else if (response.ok) {
-          next(); 
-        } if (response.status === 401) {
-          next({ name: "Login" });
+          return next({ name: "ErrorPage" });
+        }
+  
+        if (response.status === 403) {
+          return next({ name: "ErrorPagePermission" });
+        }
+  
+        const board = await response.json();
+  
+        // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
+        if (board.visibility === "PUBLIC") {
+          return next();
+        }
+  
+        const token = getToken();
+        if (!token) {
+          return next({ name: "Login" });
+        }
+  
+        response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+  
+        if (response.status === 401) {
+          return next({ name: "Login" });
+        }
+        if (response.status === 403) {
+          return next({ name: "ErrorPagePermission" });
+        }
+  
+        if (response.ok) {
+          return next();
         }
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "Login" });
+        return next({ name: "ErrorPagePermission" });
       }
     },
     children: [
@@ -71,6 +143,7 @@ const routes = [
     ]
   },
   { path: "/error", name: "ErrorPage", component: ErrorPage },
+  { path: "/errorPermission", name: "ErrorPagePermission", component: ErrorPagePermission },
   {
     path: "/board/:id/status",
     name: "StatusesList",
@@ -78,42 +151,143 @@ const routes = [
     props: true,
     beforeEnter: async (to, from, next) => {
       const { id: boardId } = to.params;
+  
+      const userNameBoard = await getBoardById(boardId);
+  
+      // ตรวจสอบการมีข้อมูลจาก userNameBoard
+      if (!userNameBoard || !userNameBoard.item) {
+        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
+      }
+  
+      const currentUsername = loginUsername();
+  
+      // ตรวจสอบความเป็นเจ้าของบอร์ด
+      if (userNameBoard.item.owner.name !== currentUsername) {
+        // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
+        if (userNameBoard.item.visibility === "PRIVATE") {
+          return next({ name: "ErrorPagePermission" });
+        }
+      } else {
+        console.log("ตรงกันนะจ๊า");
+        return next();
+      }
+  
       try {
-        const token = getToken();
-        const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        let response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         );
-
-        response.ok ? next() : next({ name: "ErrorPage" });
+  
+        if (response.status === 404) {
+          return next({ name: "ErrorPage" });
+        }
+  
+        if (response.status === 403) {
+          return next({ name: "ErrorPagePermission" });
+        }
+  
+        const board = await response.json();
+  
+        // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
+        if (board.visibility === "PUBLIC") {
+          return next();
+        }
+  
+        const token = getToken();
+        if (!token) {
+          return next({ name: "Login" });
+        }
+  
+        response = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+  
+        if (response.status === 401) {
+          return next({ name: "Login" });
+        }
+        if (response.status === 403) {
+          return next({ name: "ErrorPagePermission" });
+        }
+  
+        if (response.ok) {
+          return next();
+        }
       } catch (error) {
         console.error("Error checking board id:", error);
-        next({ name: "ErrorPage" });
+        return next({ name: "ErrorPagePermission" });
       }
     },
+
     children: [{ path: "add", name: "AddStatus", component: StatusesList }]
   },
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
-];
+  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } },
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
-});
+})
 
 router.beforeEach(async (to, from, next) => {
   const accessToken = getToken();
   const refreshToken = getRefreshToken();
 
+  // Refresh the page every 30 minutes
   setInterval(() => {
-    router.go(0) 
+    router.go(0);
   }, 30 * 60 * 1000);
 
-  if (!accessToken && to.name !== "Login") {
-    return next({ name: "Login" });
+  // Handle routes with a board ID (public/private access)
+  if (to.name === "board" && to.params.id) {
+    const boardId = to.params.id;
+
+    try {
+      // Fetch the board without authorization header first
+      const boardResponse = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`);
+      const board = await boardResponse.json();
+
+      if (boardResponse.status === 404) {
+        console.error("Board not found.");
+        return next({ name: "ErrorPage" });
+      }
+
+      // If the board is private, check for access token
+      if (board.visibility === "PRIVATE") {
+        if (!accessToken) {
+          return next({ name: "ErrorPagePermission" });
+        }
+
+        // Fetch the private board with authorization
+        const privateResponse = await fetch(
+          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
+          {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          }
+        );
+
+        if (privateResponse.status === 401 && refreshToken) {
+          // Attempt to refresh the token if unauthorized
+          return handleTokenRefresh(refreshToken, next);
+        }
+
+        if (privateResponse.status === 401) {
+          return handleInvalidTokens(next);
+        }
+
+        return next();
+      }
+
+      // If the board is public, allow access
+      return next();
+    } catch (error) {
+      console.error("Error fetching board data:", error);
+      return next({ name: "Login" });
+    }
   }
 
   if (!accessToken) {
@@ -124,15 +298,14 @@ router.beforeEach(async (to, from, next) => {
     const validateResponse = await validateAccessToken(accessToken);
 
     if (validateResponse.status === 200) {
-      return next(); 
+      return next();
     }
 
     if (validateResponse.status === 401 && refreshToken) {
       return handleTokenRefresh(refreshToken, next);
     }
 
-    handleInvalidTokens(next);
-
+    return handleInvalidTokens(next);
   } catch (error) {
     console.error("Error validating token:", error);
     return handleInvalidTokens(next);
@@ -145,11 +318,11 @@ const handleTokenRefresh = async (refreshToken, next) => {
     if (refreshResponse.status === 200) {
       const refreshData = await refreshResponse.json();
       sessionStorage.setItem("access_token", refreshData.access_token);
-      return next(); 
+      return next();
     }
     handleInvalidTokens(next);
   } catch (error) {
-    console.error("Error validating refresh token:", error);
+    console.error("Error refreshing token:", error);
     handleInvalidTokens(next);
   }
 };
@@ -181,4 +354,4 @@ const refreshAccessToken = async (refreshToken) => {
   return response;
 };
 
-export default router;
+export default router
