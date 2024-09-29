@@ -42,7 +42,6 @@ const routes = [
         }
       } catch (error) {
         console.error("Error checking board id:", error)
-        next({ name: "Login" })
       }
     }
   },
@@ -56,6 +55,9 @@ const routes = [
 
       const userNameBoard = await getBoardById(boardId)
 
+      if (userNameBoard.status === 404) {
+        return next({ name: "ErrorPage" })
+      }
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
@@ -138,7 +140,32 @@ const routes = [
     children: [
       { path: "task/add", name: "AddTask", component: AddTask },
       { path: "task/:taskid", name: "TaskDetail", component: TaskDetail },
-      { path: "task/:taskid/edit", name: "TaskEdit", component: EditTask }
+      { path: "task/:taskid/edit", name: "TaskEdit", 
+        component: EditTask,
+        beforeEnter: async (to, from, next) => {
+          const { id: boardId, taskid: taskId } = to.params
+          try {
+            const token = getToken()
+            const response = await fetch(
+              `${
+                import.meta.env.VITE_BASE_URL_MAIN
+              }/boards/${boardId}/tasks/${taskId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+    
+            if (response.status === 404) {
+              next({ name: "ErrorPage" })
+            } else if (response.ok) {
+              next()
+            }
+            if (response.status === 401) {
+              next({ name: "Login" })
+            }
+          } catch (error) {
+            console.error("Error checking board id:", error)
+          }
+        }
+       }
     ]
   },
   { path: "/error", name: "ErrorPage", component: ErrorPage },
@@ -154,13 +181,36 @@ const routes = [
     props: true,
     beforeEnter: async (to, from, next) => {
       const { id: boardId } = to.params
+      try {
+        const token = getToken()
+        const response = await getResponseItems(
+          `${
+            import.meta.env.VITE_BASE_URL_MAIN
+          }/boards/${boardId}/statuses`
+        )
+
+        if (response.status === 404) {
+          next({ name: "ErrorPage" })
+        } else if (response.ok) {
+          next()
+        }
+      } catch (error) {
+        
+      }
 
       const userNameBoard = await getBoardById(boardId)
+
+
 
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
+      const userNameString = sessionStorage?.getItem("user")
+      console.log('sessionStorage?.getItem("user")', userNameString)
+
+   
+      const userName = userNameString ? JSON.parse(userNameString) : null
 
       const loginUsername = () => {
         if (userName) {
@@ -169,7 +219,6 @@ const routes = [
           return null
         }
       }
-
       const currentUsername = loginUsername()
 
       // ตรวจสอบความเป็นเจ้าของบอร์ด
@@ -187,6 +236,8 @@ const routes = [
         let response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         )
+
+
 
         if (response.status === 404) {
           return next({ name: "ErrorPage" })
