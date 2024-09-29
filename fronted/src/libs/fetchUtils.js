@@ -1,4 +1,5 @@
-// Utility function to get the token from localStorage
+import router from "@/router";
+
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
   return sessionStorage.getItem("access_token");
@@ -70,12 +71,18 @@ async function getItemById(taskId, boardId) {
 }
 
 async function getBoardById(boardId) {
-  const token = getToken()
+  const token = getToken();
   const headers = token ? { "Authorization": `Bearer ${token}` } : {};
-  
+
   if (boardId) {
     try {
       const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers });
+      
+      if (response.status === 403) {
+        router.push({ name: 'ErrorPagePermission' })
+        return;
+      }
+
       const item = await response.json();
       const responsed = response.status;
 

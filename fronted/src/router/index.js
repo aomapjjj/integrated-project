@@ -7,6 +7,7 @@ import TaskDetail from "@/views/TaskDetail.vue"
 import EditTask from "@/views/EditTask.vue"
 import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
+import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
 import { getBoardById } from "../libs/fetchUtils.js"
 const getToken = () => sessionStorage.getItem("access_token")
 const getRefreshToken = () => sessionStorage.getItem("refresh_token")
@@ -72,7 +73,7 @@ const routes = [
   
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPage" }); // ถ้าไม่สามารถดึงข้อมูลได้
+        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
       }
   
       const currentUsername = loginUsername();
@@ -92,8 +93,6 @@ const routes = [
         let response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         );
-
-
   
         if (response.status === 404) {
           return next({ name: "ErrorPage" });
@@ -144,6 +143,7 @@ const routes = [
     ]
   },
   { path: "/error", name: "ErrorPage", component: ErrorPage },
+  { path: "/errorPermission", name: "ErrorPagePermission", component: ErrorPagePermission },
   {
     path: "/board/:id/status",
     name: "StatusesList",
@@ -205,13 +205,14 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
+  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
+
 router.beforeEach(async (to, from, next) => {
   const accessToken = getToken()
   const refreshToken = getRefreshToken()
@@ -265,6 +266,21 @@ router.beforeEach(async (to, from, next) => {
   } else {
     // สำหรับ route อื่นๆ ให้ไปต่อได้เลย
     return next()
+  }
+  try {
+    const validateResponse = await validateAccessToken(accessToken);
+    if (validateResponse.status === 200) {
+      return next(); 
+    }
+
+    if (validateResponse.status === 401 && refreshToken) {
+      return handleTokenRefresh(refreshToken, next);
+    }
+
+    handleInvalidTokens(next);
+  } catch (error) {
+    console.error("Error validating token:", error);
+    return handleInvalidTokens(next);
   }
 })
 
