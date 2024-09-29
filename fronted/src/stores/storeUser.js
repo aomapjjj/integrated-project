@@ -38,8 +38,10 @@ const useUsers = defineStore('users', () => {
   if (sessionStorage.getItem('user')) {
     user.value = JSON.parse(sessionStorage.getItem('user'))
   }
-  if (sessionStorage.getItem('token')) {
-    token.value = sessionStorage.getItem('token')
+  
+  if (sessionStorage.getItem("token")) {
+    token.value = sessionStorage.getItem("token");
+    
   }
   if (sessionStorage.getItem('refresh_token')) {
     refreshToken.value = sessionStorage.getItem('refresh_token')

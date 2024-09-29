@@ -20,7 +20,7 @@ onMounted(() => {
 // };
 
 const goBackHome = () => {
-  router.push({ name: 'Board' })
+  router.push({ name: 'Login' })
 }
 </script>
 
@@ -179,7 +179,7 @@ const goBackHome = () => {
         @click="goBackHome"
         class="rounded-button rounded-md bg-error px-3.5 py-2.5 text-sm font-semibold text-white"
       >
-        <i class="mdi mdi-arrow-left mr-2"></i>Go back home
+        <i class="mdi mdi-arrow-left mr-2"></i>Go back to Login Page
       </button>
     </div>
     <!-- <div class="mt-10 flex items-center justify-center gap-x-6">

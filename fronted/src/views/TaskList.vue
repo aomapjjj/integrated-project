@@ -68,8 +68,8 @@ onMounted(async () => {
   }
 
   const Board = await getBoardById(boardId.value)
-  console.log('Board data', Board.item.owner.name)
-
+   
+  
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
     console.log('ไม่ตรงกันนะจ๊า')
@@ -313,8 +313,7 @@ const changeVisibility = async () => {
 
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-      <SideBar />
-
+      <SideBar   />
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
       <!-- Navbar -->

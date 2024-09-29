@@ -2,7 +2,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
-import { getItems } from '../libs/fetchUtils.js'
+import { getItems , getBoardItems } from '../libs/fetchUtils.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,22 +12,24 @@ const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
   return sessionStorage.getItem('access_token')
 }
+
+
 onMounted(async () => {
-  const itemsBoards = await getItems(baseUrlBoard)
+  const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
   console.log('Side Bar', BoardsList.value)
   const token = getToken()
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+  // const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`
+  //   }
+  // })
 
-  if (response.status === 404) {
-    router.push({ name: 'ErrorPage' })
-  } else if (response.status === 401) {
-    router.push({ name: 'Login' })
-  }
+  // if (response.status === 404) {
+  //   router.push({ name: 'ErrorPage' })
+  // } else if (response.status === 401) {
+  //   router.push({ name: 'Login' })
+  // }
 })
 
 const sidebarOpen = ref(false)
