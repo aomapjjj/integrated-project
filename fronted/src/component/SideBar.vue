@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router"
-import { ref, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
-import { getItems } from "../libs/fetchUtils.js"
+import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
+import { getItems } from '../libs/fetchUtils.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,12 +10,12 @@ const BoardsList = ref()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return sessionStorage.getItem("access_token")
+  return sessionStorage.getItem('access_token')
 }
 onMounted(async () => {
   const itemsBoards = await getItems(baseUrlBoard)
   BoardsList.value = itemsBoards
-  console.log("Side Bar", BoardsList.value)
+  console.log('Side Bar', BoardsList.value)
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -24,9 +24,9 @@ onMounted(async () => {
   })
 
   if (response.status === 404) {
-    router.push({ name: "ErrorPage" })
+    router.push({ name: 'ErrorPage' })
   } else if (response.status === 401) {
-    router.push({ name: "Login" })
+    router.push({ name: 'Login' })
   }
 })
 
@@ -48,22 +48,22 @@ const userName = userStore.getUser().username
 
 // Log out
 const clearToken = () => {
-  sessionStorage.removeItem("access_token")
-  router.push({ name: "Login" })
+  sessionStorage.removeItem('access_token')
+  router.push({ name: 'Login' })
 }
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } }).then(() => { router.go()})
+    router.push({ name: 'TaskList', params: { id: boardId } }).then(() => {
+      router.go()
+    })
     console.log(boardId)
-    userStore.setBoard(boardId) 
+    userStore.setBoard(boardId)
   }
- 
-  
 }
 
 const goToAllBoards = () => {
-  router.push({ name: "Board" })
+  router.push({ name: 'Board' })
   router.go()
 }
 
@@ -126,7 +126,7 @@ const goToAllBoards = () => {
               />
             </svg>
             <RouterLink to="/board">
-            <span class="itbkk-home">Home</span>
+              <span class="itbkk-home">Home</span>
             </RouterLink>
           </a>
         </li>
@@ -151,7 +151,7 @@ const goToAllBoards = () => {
             </svg>
             All boards
             <!-- Count boards -->
-            <div class="badge badge-sm text-xxs">{{  BoardsList?.length }}</div>
+            <div class="badge badge-sm text-xxs">{{ BoardsList?.length }}</div>
             <!-- Icon when expanded -->
             <svg
               v-if="isExpanded"
@@ -214,6 +214,27 @@ const goToAllBoards = () => {
             </ul>
           </div>
         </li>
+
+        <li>
+          <a
+            class="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100 dark:bg-neutral-700 dark:text-white"
+            href="#"
+          >
+            <svg
+            class="size-4"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="#9391E4"
+                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3s1.34 3 3 3m-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5S5 6.34 5 8s1.34 3 3 3m0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5m8 0c-.29 0-.62.02-.97.05c1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5"
+              />
+            </svg>
+            <span class="">Members</span>
+          </a>
+        </li>
       </ul>
 
       <!-- Tutorials & Help -->
@@ -246,9 +267,11 @@ const goToAllBoards = () => {
     </nav>
     <!-- Footer with User Info -->
     <div
-      class="mt-auto p-4 bg-gray-100 dark:bg-neutral-800 border-t border-gray-200 dark:border-neutral-700 fixed bottom-0 left-0 w-full lg:relative lg:mt-auto"
+      class="mt-auto p-4 fixed bottom-0 left-0 w-full lg:relative lg:mt-auto"
     >
-      <div class="flex items-center justify-between">
+      <div
+        class="flex items-center justify-between border border-gray-100 p-3 rounded-full shadow-lg max-w-xs mx-auto"
+      >
         <div class="flex items-center gap-2">
           <!-- User Icon -->
           <div class="avatar placeholder relative group">
@@ -303,10 +326,10 @@ const goToAllBoards = () => {
           </div>
         </div>
         <!-- Log out -->
-        <div class="mt-2">
-          <button class="group">
+        <div class="mt-3">
+          <button class="itbkk-sign-out group" @click="clearToken()">
             <svg
-              @click="clearToken()"
+              class="size-5"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"

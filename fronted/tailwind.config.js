@@ -6,7 +6,8 @@ export default {
       colors: {
         customPink: '#F785B1',
         customBlue: '#9FC3E9',
-        customPurple: '#9391E4'
+        customPurple: '#9391E4',
+        customRed: '#eb4343'
       }
     }
   },
