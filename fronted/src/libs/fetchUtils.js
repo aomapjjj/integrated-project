@@ -6,12 +6,9 @@ function getToken() {
 
 async function getItems(url) {
   const token = getToken();
+  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
   try {
-    const response = await fetch(url, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await fetch(url, { headers });
     const items = await response.json();
     return items;
   } catch (error) {
@@ -19,40 +16,51 @@ async function getItems(url) {
   }
 }
 
+async function getBoardItems(url) {
+  const token = getToken();
+  
+  // Check if the token is present
+  if (!token) {
+    console.log("No token provided. Exiting function.");
+    return; // Exit the function if there is no token
+  }
+  
+  const headers = { "Authorization": `Bearer ${token}` }; // Set headers with the token
+  try {
+    const response = await fetch(url, { headers });
+    const items = await response.json();
+    return items;
+
+  } catch (error) {
+    console.log(`error: ${error}`);
+  }
+}
+
+
+
 async function getResponseItems(url) {
   const token = getToken();
+  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
   try {
-    const response = await fetch(url, {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    const response = await fetch(url, { headers });
     const items = await response.json();
     return { response, items }; 
   } catch (error) {
     console.log(`error: ${error}`);
-    return { error }
+    return { error };
   }
 }
-
 
 async function getItemById(taskId, boardId) {
-
   const token = getToken();
+  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+  
   if (boardId && taskId) {
     try {
-      const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      
-      
+      const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}`, { headers });
       const item = await response.json();
-     
       const responsed = response.status;
       return { item, responsed };
-      
     } catch (error) {
       console.log(`error: ${error}`);
     }
@@ -60,23 +68,18 @@ async function getItemById(taskId, boardId) {
     console.log('Invalid boardId or taskId');
   }
 }
+
 async function getBoardById(boardId) {
+  const token = getToken()
+  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
   
-  const token = getToken();
   if (boardId) {
     try {
-      const response = await fetch(`${baseUrlBoards}/${boardId}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      });
-      
-      
+      const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers });
       const item = await response.json();
-     
       const responsed = response.status;
+
       return { item, responsed };
-      
     } catch (error) {
       console.log(`error: ${error}`);
     }
@@ -84,6 +87,7 @@ async function getBoardById(boardId) {
     console.log('Invalid boardId or taskId');
   }
 }
+
 
 async function deleteItemById(url, id) {
   const token = getToken();
@@ -247,7 +251,30 @@ async function boardVisibility(boardId, currentVisibility) {
       }
   }
 }
+async function getItemPublic(boardId , path) {
+    try {
+      const response = await fetch(`${baseUrlBoards}/${boardId}/${path}`) 
+      const item = await response.json();
+     
+      const responsed = response.status;
+      return { item, responsed };
+      
+    } catch (error) {
+      console.log(`error: ${error}`);
+    }
+  
 
+}
+async function getItemsPublic(url) {
+  try {
+    const responsed = await fetch(url);
+    const items = await responsed.json();
+    return { responsed, items }; 
+  } catch (error) {
+    console.log(`error: ${error}`);
+    return { error }
+  }
+}
 export {
   getItems,
   getItemById,
@@ -259,5 +286,8 @@ export {
   addBoard,
   getBoardById,
   boardVisibility,
-  getResponseItems
+  getResponseItems,
+  getItemPublic,
+  getItemsPublic,
+  getBoardItems
 }

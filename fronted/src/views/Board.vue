@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
-import { getItems, addBoard, deleteItemById } from '../libs/fetchUtils.js'
+import { getItems, addBoard, deleteItemById , getBoardItems} from '../libs/fetchUtils.js'
 import SideBar from '@/component/SideBar.vue'
 
 const BoardsList = ref([])
@@ -23,7 +23,7 @@ function getToken() {
   return sessionStorage.getItem('access_token')
 }
 onMounted(async () => {
-  const itemsBoards = await getItems(baseUrlBoard)
+  const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
 
   const token = getToken()
@@ -90,6 +90,12 @@ const cancelAction = () => {
   clearForm()
   openModalName.value = false
 }
+
+const openModalCreate  = () => {
+  openModalName.value = !openModalName.value
+  router.push({name : 'BoardAdd'}) 
+}
+
 </script>
 
 <template>
@@ -115,8 +121,7 @@ const cancelAction = () => {
 
         <!------------------------- Create Board ------------------------->
         <div class="bg-gray-200 w-auto h-auto">
-          <button @click="openModalName = !openModalName">
-            <router-link to="/board/add">
+          <button @click="openModalCreate">
               <div
                 class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
               >
@@ -155,7 +160,7 @@ const cancelAction = () => {
                   >
                 </div>
               </div>
-            </router-link>
+           
           </button>
         </div>
 
