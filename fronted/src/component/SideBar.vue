@@ -46,6 +46,8 @@ function toggleDropdown() {
 const userStore = useUsers()
 const userName = userStore.getUser().username
 
+
+
 // Log out
 const clearToken = () => {
   sessionStorage.removeItem('access_token')
@@ -221,7 +223,7 @@ const goToAllBoards = () => {
             href="#"
           >
             <svg
-            class="size-4"
+              class="size-4"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -317,12 +319,17 @@ const goToAllBoards = () => {
           </div>
           <!-- User Info -->
           <div>
-            <p class="text-xs text-gray-500 dark:text-neutral-400">Welcome,</p>
+            <!-- <p class="text-xs text-gray-500 dark:text-neutral-400">Welcome,</p> -->
             <p
               class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white"
             >
               {{ userName }}
             </p>
+            <!-- <p
+              class="itbkk-fullname text-xs font-medium text-gray-800 dark:text-white"
+            >
+              {{ userRole }}
+            </p> -->
           </div>
         </div>
         <!-- Log out -->
