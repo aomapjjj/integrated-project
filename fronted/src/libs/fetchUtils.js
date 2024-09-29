@@ -240,7 +240,7 @@ async function boardVisibility(boardId, currentVisibility) {
       }
   } catch (error) {
       console.log(`Error: ${error.message}`);
-      const message = ("There is a problem. Please try again later.");
+      const message = ("There is a problem, Please try again later.");
       return {
         success: false,
         message: message

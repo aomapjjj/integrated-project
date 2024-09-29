@@ -11,6 +11,8 @@ const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/login`
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 
+
+
 const router = useRouter()
 const alertLogin = ref(false)
 const userInput = ref("")
@@ -76,6 +78,7 @@ const submitForm = async () => {
 
     if (response.status === 200) {
       const data = await response.json()
+      userStore.setLoginSuccess(true)
       const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name
 

@@ -5,6 +5,7 @@ const useUsers = defineStore("users", () => {
   const users = ref([]);
   const user = ref({ username: "" });
   const token = ref("");
+  const LoginSuccess = ref(false)
   const refreshToken = ref(""); 
   const boardId = ref("");
 
@@ -16,6 +17,14 @@ const useUsers = defineStore("users", () => {
   const getToken = () => {
     return token.value || sessionStorage.getItem("token");
   };
+
+  const setLoginSuccess = (statusLogin) => {
+    LoginSuccess.value = statusLogin
+  };
+
+  const getLoginSuccess = () => {
+    return LoginSuccess.value 
+  }
 
   const setRefreshToken = (newRefreshToken) => {
     refreshToken.value = newRefreshToken;
@@ -73,8 +82,10 @@ const useUsers = defineStore("users", () => {
     setRefreshToken,
     getRefreshToken,
     setBoard,
-    getBoard
-  };
+    getBoard,
+    setLoginSuccess,
+    getLoginSuccess
+  }
 });
 
 export { useUsers };
