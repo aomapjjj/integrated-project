@@ -20,7 +20,6 @@ const props = defineProps({
   disabledBtn: Boolean
 })
 
-
 const boardId = ref()
 
 watch(
@@ -72,7 +71,7 @@ const openModal = () => {
 
 const closeModal = () => {
   myModal.value.close()
-  router.push({ name: "TaskList", params: { id: boardId.value } })
+  router.push({ name: 'TaskList', params: { id: boardId.value } })
 }
 
 const UpdateTask = async () => {
@@ -177,9 +176,24 @@ const isLimitReached = computed(() => {
 
 <template>
   <!-- Edit Button -->
-  <button @click="openModal" class="itbkk-button-edit btn rounded-full"
-  :disabled="disabledBtn"
-    :class="{'bg-gray-400 cursor-not-allowed': disabledBtn}" 
+  <button
+    @click="openModal"
+    class="itbkk-button-edit btn rounded-full"
+    :disabled="disabledBtn"
+    :class="[
+      'itbkk-button-edit ml-2',
+      'btn',
+      'rounded-full',
+      { 'btn-disabled': disabledBtn }
+    ]"
+    :style="{
+      backgroundColor: disabledBtn ? '#d3d3d3' : '#fae59d',
+      color: disabledBtn ? '#a9a9a9' : 'white',
+      borderRadius: '30px',
+      position: 'static',
+      cursor: disabledBtn ? 'not-allowed' : 'pointer',
+      opacity: disabledBtn ? 0.6 : 1
+    }"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
