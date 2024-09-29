@@ -12,23 +12,8 @@ import { getBoardById } from "../libs/fetchUtils.js"
 const getToken = () => sessionStorage.getItem("access_token")
 const getRefreshToken = () => sessionStorage.getItem("refresh_token")
 
-const userNameString = sessionStorage?.getItem("user")
-console.log('sessionStorage?.getItem("user")', userNameString)
 
-// แปลง JSON string เป็น object
-const userName = userNameString ? JSON.parse(userNameString) : null
 
-// เข้าถึง username
-
-const loginUsername = () => {
-  if (userName) {
-    return userName.username // แสดงค่า username
-  } else {
-    return null
-  }
-}
-
-console.log(loginUsername())
 
 const routes = [
   { path: "/", redirect: { name: "Login" } },
@@ -67,73 +52,87 @@ const routes = [
     component: TaskList,
     props: true,
     beforeEnter: async (to, from, next) => {
-      const { id: boardId } = to.params;
-  
-      const userNameBoard = await getBoardById(boardId);
-  
+      const { id: boardId } = to.params
+
+      const userNameBoard = await getBoardById(boardId)
+
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
+        return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
-  
-      const currentUsername = loginUsername();
-  
+      const userNameString = sessionStorage?.getItem("user")
+      console.log('sessionStorage?.getItem("user")', userNameString)
+
+   
+      const userName = userNameString ? JSON.parse(userNameString) : null
+
+      const loginUsername = () => {
+        if (userName) {
+          return userName.username // แสดงค่า username
+        } else {
+          return null
+        }
+      }
+
+
+      const currentUsername = loginUsername()
+
       // ตรวจสอบความเป็นเจ้าของบอร์ด
       if (userNameBoard.item.owner.name !== currentUsername) {
         // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
         if (userNameBoard.item.visibility === "PRIVATE") {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
       } else {
-        console.log("ตรงกันนะจ๊า");
-        return next();
+        console.log("ตรงกันนะจ๊า")
+        return next()
       }
-  
+
       try {
         let response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-        );
-  
+        )
+
         if (response.status === 404) {
-          return next({ name: "ErrorPage" });
+          return next({ name: "ErrorPage" })
         }
-  
+
         if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
-  
-        const board = await response.json();
-  
+
+        const board = await response.json()
+
         // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
         if (board.visibility === "PUBLIC") {
-          return next();
+          return next()
         }
-  
-        const token = getToken();
+
+        const token = getToken()
         if (!token) {
-          return next({ name: "Login" });
+          return next({ name: "Login" })
         }
-  
+
         response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}` }
           }
-        );
-  
+        )
+
         if (response.status === 401) {
-          return next({ name: "Login" });
+          return next({ name: "Login" })
         }
         if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
-  
+
         if (response.ok) {
-          return next();
+          return next()
         }
       } catch (error) {
-        console.error("Error checking board id:", error);
-        return next({ name: "ErrorPagePermission" });
+        console.error("Error checking board id:", error)
+        return next({ name: "ErrorPagePermission" })
       }
     },
     children: [
@@ -143,80 +142,92 @@ const routes = [
     ]
   },
   { path: "/error", name: "ErrorPage", component: ErrorPage },
-  { path: "/errorPermission", name: "ErrorPagePermission", component: ErrorPagePermission },
+  {
+    path: "/errorPermission",
+    name: "ErrorPagePermission",
+    component: ErrorPagePermission
+  },
   {
     path: "/board/:id/status",
     name: "StatusesList",
     component: StatusesList,
     props: true,
     beforeEnter: async (to, from, next) => {
-      const { id: boardId } = to.params;
-  
-      const userNameBoard = await getBoardById(boardId);
-  
+      const { id: boardId } = to.params
+
+      const userNameBoard = await getBoardById(boardId)
+
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
+        return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
-  
-      const currentUsername = loginUsername();
-  
+
+      const loginUsername = () => {
+        if (userName) {
+          return userName.username // แสดงค่า username
+        } else {
+          return null
+        }
+      }
+
+      const currentUsername = loginUsername()
+
       // ตรวจสอบความเป็นเจ้าของบอร์ด
       if (userNameBoard.item.owner.name !== currentUsername) {
         // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
         if (userNameBoard.item.visibility === "PRIVATE") {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
       } else {
-        console.log("ตรงกันนะจ๊า");
-        return next();
+        console.log("ตรงกันนะจ๊า")
+        return next()
       }
-  
+
       try {
         let response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-        );
-  
+        )
+
         if (response.status === 404) {
-          return next({ name: "ErrorPage" });
+          return next({ name: "ErrorPage" })
         }
-  
+
         if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
-  
-        const board = await response.json();
-  
+
+        const board = await response.json()
+
         // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
         if (board.visibility === "PUBLIC") {
-          return next();
+          return next()
         }
-  
-        const token = getToken();
+
+        const token = getToken()
         if (!token) {
-          return next({ name: "Login" });
+          return next({ name: "Login" })
         }
-  
+
         response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}` }
           }
-        );
-  
+        )
+
         if (response.status === 401) {
-          return next({ name: "Login" });
+          return next({ name: "Login" })
         }
         if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
-  
+
         if (response.ok) {
-          return next();
+          return next()
         }
       } catch (error) {
-        console.error("Error checking board id:", error);
-        return next({ name: "ErrorPagePermission" });
+        console.error("Error checking board id:", error)
+        return next({ name: "ErrorPagePermission" })
       }
     },
 
@@ -225,7 +236,7 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } },
+  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
 ]
 
 const router = createRouter({
@@ -234,32 +245,34 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const accessToken = getToken();
-  const refreshToken = getRefreshToken();
+  const accessToken = getToken()
+  const refreshToken = getRefreshToken()
 
   // Refresh the page every 30 minutes
   setInterval(() => {
-    router.go(0);
-  }, 30 * 60 * 1000);
+    router.go(0)
+  }, 30 * 60 * 1000)
 
   // Handle routes with a board ID (public/private access)
   if (to.name === "board" && to.params.id) {
-    const boardId = to.params.id;
+    const boardId = to.params.id
 
     try {
       // Fetch the board without authorization header first
-      const boardResponse = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`);
-      const board = await boardResponse.json();
+      const boardResponse = await fetch(
+        `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
+      )
+      const board = await boardResponse.json()
 
       if (boardResponse.status === 404) {
-        console.error("Board not found.");
-        return next({ name: "ErrorPage" });
+        console.error("Board not found.")
+        return next({ name: "ErrorPage" })
       }
 
       // If the board is private, check for access token
       if (board.visibility === "PRIVATE") {
         if (!accessToken) {
-          return next({ name: "ErrorPagePermission" });
+          return next({ name: "ErrorPagePermission" })
         }
 
         // Fetch the private board with authorization
@@ -268,90 +281,96 @@ router.beforeEach(async (to, from, next) => {
           {
             headers: { Authorization: `Bearer ${accessToken}` }
           }
-        );
+        )
 
         if (privateResponse.status === 401 && refreshToken) {
           // Attempt to refresh the token if unauthorized
-          return handleTokenRefresh(refreshToken, next);
+          return handleTokenRefresh(refreshToken, next)
         }
 
         if (privateResponse.status === 401) {
-          return handleInvalidTokens(next);
+          return handleInvalidTokens(next)
         }
 
-        return next();
+        return next()
       }
 
       // If the board is public, allow access
-      return next();
+      return next()
     } catch (error) {
-      console.error("Error fetching board data:", error);
-      return next({ name: "Login" });
+      console.error("Error fetching board data:", error)
+      return next({ name: "Login" })
     }
   }
 
   if (!accessToken) {
-    return next();
+    return next()
   }
 
   try {
-    const validateResponse = await validateAccessToken(accessToken);
+    const validateResponse = await validateAccessToken(accessToken)
 
     if (validateResponse.status === 200) {
-      return next();
+      return next()
     }
 
     if (validateResponse.status === 401 && refreshToken) {
-      return handleTokenRefresh(refreshToken, next);
+      return handleTokenRefresh(refreshToken, next)
     }
 
-    return handleInvalidTokens(next);
+    return handleInvalidTokens(next)
   } catch (error) {
-    console.error("Error validating token:", error);
-    return handleInvalidTokens(next);
+    console.error("Error validating token:", error)
+    return handleInvalidTokens(next)
   }
-});
+})
 
 const handleTokenRefresh = async (refreshToken, next) => {
   try {
-    const refreshResponse = await refreshAccessToken(refreshToken);
+    const refreshResponse = await refreshAccessToken(refreshToken)
     if (refreshResponse.status === 200) {
-      const refreshData = await refreshResponse.json();
-      sessionStorage.setItem("access_token", refreshData.access_token);
-      return next();
+      const refreshData = await refreshResponse.json()
+      sessionStorage.setItem("access_token", refreshData.access_token)
+      return next()
     }
-    handleInvalidTokens(next);
+    handleInvalidTokens(next)
   } catch (error) {
-    console.error("Error refreshing token:", error);
-    handleInvalidTokens(next);
+    console.error("Error refreshing token:", error)
+    handleInvalidTokens(next)
   }
-};
+}
 
 const handleInvalidTokens = (next) => {
-  sessionStorage.removeItem("access_token");
-  next({ name: "Login" });
-};
+  sessionStorage.removeItem("access_token")
+  next({ name: "Login" })
+}
 
 const validateAccessToken = async (token) => {
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
     }
-  });
-  return response;
-};
+  )
+  return response
+}
 
 const refreshAccessToken = async (refreshToken) => {
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${refreshToken}`
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${refreshToken}`
+      }
     }
-  });
-  return response;
-};
+  )
+  return response
+}
 
 export default router
