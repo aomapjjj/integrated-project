@@ -77,12 +77,16 @@ async function getBoardById(boardId) {
   if (boardId) {
     try {
       const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers });
-      
+      if (response.status === 404) {
+        router.push({ name: 'ErrorPage' })
+        return;
+      }
+
       if (response.status === 403) {
         router.push({ name: 'ErrorPagePermission' })
         return;
       }
-
+      
       const item = await response.json();
       const responsed = response.status;
 

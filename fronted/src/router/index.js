@@ -42,7 +42,6 @@ const routes = [
         }
       } catch (error) {
         console.error("Error checking board id:", error)
-        next({ name: "Login" })
       }
     }
   },
@@ -56,6 +55,9 @@ const routes = [
 
       const userNameBoard = await getBoardById(boardId)
 
+      if (userNameBoard.status === 404) {
+        return next({ name: "ErrorPage" })
+      }
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
@@ -154,13 +156,22 @@ const routes = [
     props: true,
     beforeEnter: async (to, from, next) => {
       const { id: boardId } = to.params
+    }
+
 
       const userNameBoard = await getBoardById(boardId)
+
+
 
       // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
         return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
       }
+      const userNameString = sessionStorage?.getItem("user")
+      console.log('sessionStorage?.getItem("user")', userNameString)
+
+   
+      const userName = userNameString ? JSON.parse(userNameString) : null
 
       const loginUsername = () => {
         if (userName) {
@@ -169,7 +180,6 @@ const routes = [
           return null
         }
       }
-
       const currentUsername = loginUsername()
 
       // ตรวจสอบความเป็นเจ้าของบอร์ด
@@ -187,6 +197,8 @@ const routes = [
         let response = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         )
+
+
 
         if (response.status === 404) {
           return next({ name: "ErrorPage" })
