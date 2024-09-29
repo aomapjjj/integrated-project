@@ -214,122 +214,124 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const accessToken = getToken()
-  const refreshToken = getRefreshToken()
+  const accessToken = getToken();
+  const refreshToken = getRefreshToken();
 
-  // เช็คว่า route เป็น board และมี id หรือไม่
+  // Refresh the page every 30 minutes
+  setInterval(() => {
+    router.go(0);
+  }, 30 * 60 * 1000);
+
+  // Handle routes with a board ID (public/private access)
   if (to.name === "board" && to.params.id) {
-    const boardId = to.params.id
+    const boardId = to.params.id;
 
     try {
-      const token = getToken()
+      // Fetch the board without authorization header first
+      const boardResponse = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`);
+      const board = await boardResponse.json();
 
-      // เรียก API เพื่อดึงข้อมูลบอร์ด โดยไม่ส่ง Authorization header ก่อน
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-      )
-
-      const board = await response.json()
-
-      if (response.status === 404) {
-        console.error("Board not found.")
-        return
+      if (boardResponse.status === 404) {
+        console.error("Board not found.");
+        return next({ name: "ErrorPage" });
       }
 
-      // ถ้า board เป็น Private และต้องการ token ให้เรียก API ใหม่พร้อมส่ง token
+      // If the board is private, check for access token
       if (board.visibility === "PRIVATE") {
-        if (!token) {
-          // ถ้าไม่มี token ให้ส่งไปที่หน้า login
-          return next({ name: "Login" })
+        if (!accessToken) {
+          return next({ name: "ErrorPagePermission" });
         }
 
+        // Fetch the private board with authorization
         const privateResponse = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${accessToken}` }
           }
-        )
+        );
 
-        if (privateResponse.status === 401) {
-          return next({ name: "Login" })
+        if (privateResponse.status === 401 && refreshToken) {
+          // Attempt to refresh the token if unauthorized
+          return handleTokenRefresh(refreshToken, next);
         }
 
-        return next()
+        if (privateResponse.status === 401) {
+          return handleInvalidTokens(next);
+        }
+
+        return next();
       }
 
-      // ถ้าเป็น Public ให้ไปต่อได้เลย
-      next()
+      // If the board is public, allow access
+      return next();
     } catch (error) {
-      console.error("Error fetching board data:", error)
-      return next({ name: "ErrorPagePermission" })
+      console.error("Error fetching board data:", error);
+      return next({ name: "Login" });
     }
-  } else {
-    // สำหรับ route อื่นๆ ให้ไปต่อได้เลย
-    return next()
   }
+
+  if (!accessToken) {
+    return next();
+  }
+
   try {
     const validateResponse = await validateAccessToken(accessToken);
+
     if (validateResponse.status === 200) {
-      return next(); 
+      return next();
     }
 
     if (validateResponse.status === 401 && refreshToken) {
       return handleTokenRefresh(refreshToken, next);
     }
 
-    handleInvalidTokens(next);
+    return handleInvalidTokens(next);
   } catch (error) {
     console.error("Error validating token:", error);
     return handleInvalidTokens(next);
   }
-})
+});
 
 const handleTokenRefresh = async (refreshToken, next) => {
   try {
-    const refreshResponse = await refreshAccessToken(refreshToken)
+    const refreshResponse = await refreshAccessToken(refreshToken);
     if (refreshResponse.status === 200) {
-      const refreshData = await refreshResponse.json()
-      sessionStorage.setItem("access_token", refreshData.access_token)
-      return next()
+      const refreshData = await refreshResponse.json();
+      sessionStorage.setItem("access_token", refreshData.access_token);
+      return next();
     }
-    handleInvalidTokens(next)
+    handleInvalidTokens(next);
   } catch (error) {
-    console.error("Error validating refresh token:", error)
-    handleInvalidTokens(next)
+    console.error("Error refreshing token:", error);
+    handleInvalidTokens(next);
   }
-}
+};
 
 const handleInvalidTokens = (next) => {
-  sessionStorage.removeItem("access_token")
-  next({ name: "Login" })
-}
+  sessionStorage.removeItem("access_token");
+  next({ name: "Login" });
+};
 
 const validateAccessToken = async (token) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
     }
-  )
-  return response
-}
+  });
+  return response;
+};
 
 const refreshAccessToken = async (refreshToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${refreshToken}`
-      }
+  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${refreshToken}`
     }
-  )
-  return response
-}
+  });
+  return response;
+};
 
 export default router
