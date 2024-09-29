@@ -4,6 +4,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import { getItems, addBoard, deleteItemById , getBoardItems} from '../libs/fetchUtils.js'
 import SideBar from '@/component/SideBar.vue'
+import Navbar from '@/component/Navbar.vue'
 
 const BoardsList = ref([])
 const openModalName = ref(false)
@@ -110,14 +111,11 @@ const openModalCreate  = () => {
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <nav class="bg-white shadow px-4 py-6 flex justify-center items-center">
-          <div
-            class="text-2xl font-bold tracking-tight"
-            style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
-          >
-            My Boards
-          </div>
-        </nav>
+        <Navbar>
+          My Boards
+        </Navbar>
+
+
 
         <!------------------------- Create Board ------------------------->
         <div class="bg-gray-200 w-auto h-auto">
@@ -228,7 +226,7 @@ const openModalCreate  = () => {
                       </button>
                       <button
                         @click="toBoardsList(item.id)"
-                        class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500"
+                        class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500 ml-10"
                       >
                         Show More
                       </button>
@@ -396,7 +394,6 @@ const openModalCreate  = () => {
 .customBgYellow {
   background-color: #fae59d;
 }
-
 
 .fourth {
   border-color: #b7b7b7;

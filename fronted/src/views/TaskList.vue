@@ -19,6 +19,7 @@ import { useRoute, useRouter } from 'vue-router'
 import SideBar from '../component/SideBar.vue'
 import Modal from '../component/Modal.vue'
 import Alert from '@/component/Alert.vue'
+import Navbar from '@/component/Navbar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -28,7 +29,6 @@ const deleteComplete = ref(false)
 const statusList = ref([])
 const showDetail = ref(false)
 const indexDelete = ref(0)
-const sidebarTasks = ref(true)
 const taskStore = useTasks()
 const limitStore = useLimitStore()
 const userStore = useUsers()
@@ -238,6 +238,8 @@ const updateLimitText = () => {
   }
 }
 
+// const isLimitEnabled = computed(() => limitStore.getLimit().isLimit)
+
 const closeLimit = () => {
   my_modal_limit.close()
 }
@@ -273,13 +275,13 @@ const alertEnabledSuc = ref(false)
 const messageAlert = ref()
 
 if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
-  alertEnabledSuc.value = true;
-  messageAlert.value = 'Welcome, You have logged in successfully';
-  
+  alertEnabledSuc.value = true
+  messageAlert.value = 'Welcome, You have logged in successfully'
+
   setTimeout(() => {
-    alertEnabledSuc.value = false;
-    userStore.setLoginSuccess(false);
-  }, 3000);
+    alertEnabledSuc.value = false
+    userStore.setLoginSuccess(false)
+  }, 3000)
 }
 
 const changeVisibility = async () => {
@@ -311,25 +313,13 @@ const changeVisibility = async () => {
 
     <div class="min-h-screen flex">
       <!-- Sidebar -->
-
       <SideBar   />
-
-      <!-- End Sidebar -->
-
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
-        <!-- Navbar -->
-        <nav
-          class="bg-white shadow px-4 py-6 flex justify-center items-center"
-          style="background-color: #d8f1f1"
-        >
-          <div
-            class="itbkk-board-name text-2xl font-bold tracking-tight"
-            style="color: #9391e4; text-shadow: 0 0 5px #ffffff"
-          >
-            {{ boardName }}
-          </div>
-        </nav>
+      <!-- Navbar -->
+        <Navbar>
+          {{ boardName }}
+        </Navbar>
 
         <div class="flex mt-9 px-6">
           <!-- LIMIT -->
@@ -357,7 +347,7 @@ const changeVisibility = async () => {
             id="my_modal_limit"
             class="modal modal-bottom sm:modal-middle"
           >
-            <div class="modal-box" style="max-width: 400px">
+            <div class="modal-box" style="max-width: 400px; width: 100%">
               <h3 class="font-bold text-lg" style="color: #9391e4">
                 Status Settings
               </h3>
@@ -368,7 +358,8 @@ const changeVisibility = async () => {
                   >( except "No Status" and "Done" statuses )</span
                 >
               </p>
-              <div class="flex items-center mt-4">
+              <hr />
+              <div class="flex items-center mt-4 justify-center">
                 <span class="mr-2">Limit tasks in this status</span>
 
                 <input
@@ -417,6 +408,12 @@ const changeVisibility = async () => {
               </div>
             </div>
           </dialog>
+
+          <!-- Limit alert -->
+          <Alert :isAlertSuccess="isLimitEnabled">
+            {{ updateLimitText }}
+          </Alert>
+
           <!-- FILTER -->
           <details class="dropdown">
             <summary
@@ -551,14 +548,6 @@ const changeVisibility = async () => {
                 <span> Public </span>
                 <span> Private </span>
               </div>
-              <!-- <div
-                id="tooltip-default"
-                role="tooltip"
-                class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
-              >
-                Only board owner can change this visibility.
-                <div class="tooltip-arrow" data-popper-arrow></div>
-              </div> -->
             </label>
           </div>
 
@@ -793,7 +782,16 @@ const changeVisibility = async () => {
                             :style="{
                               backgroundColor: disabledButtonWhileOpenPublic
                                 ? '#d3d3d3'
-                                : '#f87171'
+                                : '#f87171',
+                              color: disabledButtonWhileOpenPublic
+                                ? '#a9a9a9'
+                                : 'white',
+                              borderRadius: '30px',
+                              position: 'static',
+                              cursor: disabledButtonWhileOpenPublic
+                                ? 'not-allowed'
+                                : 'pointer',
+                              opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
                             }"
                             @click="openModalToDelete(item.id, index)"
                           >
@@ -905,26 +903,15 @@ const changeVisibility = async () => {
     </div>
   </div>
 
-  <!-- <nav class="bg-white shadow" style="background-color: #d8f1f1">
-      <div class="mx-auto max-w-7xl px-2 flex items-center justify-between">
-        <a href="#" class="flex items-center gap-4">
-          <img src="/src/image/sj3.png" alt="LOGO" class="w-[100px] h-[100px]" />
-          <div class="mx-auto max-w-7xl px-4 py-6 md:py-8 lg:py-10">
-            <h2 class="text-sm tracking-tight text-gray-800">Welcome,</h2>
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight flex flex-row" style="
-                color: #9391e4;
-                text-align: center;
-                text-shadow: 0 0 5px #ffffff, 0 0 5px #ffffff, 0 0 5px #ffffff;
-              ">
-              IT-Bangmod Kradan Kanban  Welcome,  <div class="itbkk-fullname">{{  userName  }}</div>
-            </h1>
-          </div>
-        </a>
-      </div>
-    </nav> -->
-  <!-- </div> -->
-
   <!-- <div class="flex justify-center space-x-20 mt-3 mb-3">
+  <div class="mt-2 bg-teal-500 text-sm text-white rounded-lg p-4" role="alert" tabindex="-1" aria-labelledby="hs-solid-color-success-label">
+    <span id="hs-solid-color-success-label" class="font-bold">Success</span> 
+    {{ updateLimitText() }}
+  </div>
+</div> -->
+
+  <!-- 
+  <div class="flex justify-center space-x-20 mt-3 mb-3">
     <button class="flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1024 1024">
         <path fill="#eb4343"

@@ -195,7 +195,7 @@ const routes = [
           next()
         }
       } catch (error) {
-        
+        next()
       }
 
       const userNameBoard = await getBoardById(boardId)
