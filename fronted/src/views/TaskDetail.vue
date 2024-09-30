@@ -72,13 +72,13 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
                 style="color: #9391e4">Description</span>
             </div>
-            <textarea id="description" class="itbkk-description textarea textarea-bordered h-3/4 mb-8" maxlength="500"
+            <textarea  disabled id="description" class="itbkk-description textarea textarea-bordered h-3/4 mb-8" maxlength="500"
               rows="4" :class="{
               'italic text-gray-500':
                 todo.description?.length === 0 ||
                 todo.description?.trim() === '' ||
                 todo.description === null
-            }" placeholder="No Description Provided" style="height: 400px">{{ todo.description }}</textarea>
+            }"  style="height: 400px">{{ todo.description || 'No Description Provided' }}</textarea>
           </label>
         </div>
 
@@ -86,13 +86,13 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           <!-- Assignees -->
           <div class="mt-10">
             <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Assignees</span>
-            <textarea id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" maxlength="30"
+            <textarea disabled id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" maxlength="30"
               rows="4" :class="{
               'italic text-gray-500':
                 todo.assignees?.length === 0 ||
                 todo.assignees?.trim() === '' ||
                 todo.assignees === null
-            }" placeholder="Unassigned">{{ todo.assignees }}</textarea>
+            }" >{{ todo.assignees || 'Unassigned' }}</textarea>
           </div>
 
           <!-- Status -->
