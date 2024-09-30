@@ -303,10 +303,10 @@ const isLimitReached = computed(() => {
             >Status</span
           >
           <select 
-            class="itbkk-status select select-bordered w-full max-w-xs mt-1"
+            class="select select-bordered w-full max-w-xs mt-1"
             v-model="todo.status"
           >
-            <option v-for="status in statusList" :value="status.name">
+            <option class="itbkk-status " v-for="status in statusList" :value="status.name">
               {{ status.name }}
             </option>
           </select>
