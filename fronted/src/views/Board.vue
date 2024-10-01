@@ -2,7 +2,12 @@
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
-import { getItems, addBoard, deleteItemById , getBoardItems} from '../libs/fetchUtils.js'
+import {
+  getItems,
+  addBoard,
+  deleteItemById,
+  getBoardItems
+} from '../libs/fetchUtils.js'
 import SideBar from '@/component/SideBar.vue'
 import Navbar from '@/component/Navbar.vue'
 
@@ -92,11 +97,10 @@ const cancelAction = () => {
   openModalName.value = false
 }
 
-const openModalCreate  = () => {
+const openModalCreate = () => {
   openModalName.value = !openModalName.value
-  router.push({name : 'BoardAdd'}) 
+  router.push({ name: 'BoardAdd' })
 }
-
 </script>
 
 <template>
@@ -111,61 +115,59 @@ const openModalCreate  = () => {
       <!-- Main Content -->
       <div class="flex-1 flex flex-col">
         <!-- Navbar -->
-        <Navbar>
-          My Boards
-        </Navbar>
-
-
+        <Navbar> My Boards </Navbar>
 
         <!------------------------- Create Board ------------------------->
         <div class="bg-gray-200 w-auto h-auto">
           <button @click="openModalCreate">
-              <div
-                class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
-              >
-                <div class="flex flex-col items-center relative">
-                  <svg
-                    class="-mt-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                  >
-                    <defs>
-                      <mask id="letsIconsAddSquareDuotoneLine0">
-                        <g fill="none">
-                          <path
-                            stroke="silver"
-                            stroke-opacity=".25"
-                            d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
-                          />
-                          <path
-                            stroke="#fff"
-                            stroke-linejoin="round"
-                            d="M12 8v8m4-4H8"
-                          />
-                        </g>
-                      </mask>
-                    </defs>
-                    <path
-                      fill="#000000"
-                      d="M0 0h24v24H0z"
-                      mask="url(#letsIconsAddSquareDuotoneLine0)"
-                    />
-                  </svg>
-                  <span class="itbkk-button-create mt-1 text-sm"
-                    >Create Board</span
-                  >
-                </div>
+            <div
+              class="w-30 h-20 p-6 bg-white border border-gray-200 rounded-md shadow-md max-w-[13rem] fourth ml-6 mt-6 mb-6"
+            >
+              <div class="flex flex-col items-center relative">
+                <svg
+                  class="-mt-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <defs>
+                    <mask id="letsIconsAddSquareDuotoneLine0">
+                      <g fill="none">
+                        <path
+                          stroke="silver"
+                          stroke-opacity=".25"
+                          d="M3.5 11c0-1.9.001-3.274.142-4.322c.139-1.034.406-1.675.883-2.153c.478-.477 1.119-.744 2.153-.883C7.726 3.502 9.1 3.5 11 3.5h2c1.9 0 3.274.001 4.323.142c1.033.139 1.674.406 2.152.883c.477.478.744 1.119.883 2.153c.14 1.048.142 2.422.142 4.322v2c0 1.9-.001 3.274-.142 4.323c-.139 1.033-.406 1.674-.883 2.152c-.478.477-1.119.744-2.152.883c-1.049.14-2.423.142-4.323.142h-2c-1.9 0-3.274-.001-4.322-.142c-1.034-.139-1.675-.406-2.153-.883c-.477-.478-.744-1.119-.883-2.152C3.502 16.274 3.5 14.9 3.5 13z"
+                        />
+                        <path
+                          stroke="#fff"
+                          stroke-linejoin="round"
+                          d="M12 8v8m4-4H8"
+                        />
+                      </g>
+                    </mask>
+                  </defs>
+                  <path
+                    fill="#000000"
+                    d="M0 0h24v24H0z"
+                    mask="url(#letsIconsAddSquareDuotoneLine0)"
+                  />
+                </svg>
+                <span class="itbkk-button-create mt-1 text-sm"
+                  >Create Board</span
+                >
               </div>
-           
+            </div>
           </button>
         </div>
 
         <div
           class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
         >
-          <!-- <h2 class="text-xl font-bold mb-4">Visited a while ago...</h2> -->
+          <!-- Personal Boards -->
+          <h2 class="text-xl font-bold mb-4 p-4 items-center justify-center">
+            Personal Boards
+          </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="(item, index) in BoardsList" :key="index">
               <div
@@ -229,6 +231,88 @@ const openModalCreate  = () => {
                         class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500 ml-10"
                       >
                         Show More
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- delete modal for the selected item only -->
+              <div
+                v-if="openModalToDelete && selectedItemIdToDelete === item.id"
+                class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+              >
+                <div
+                  class="w-full max-w-lg p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white"
+                >
+                  <div>
+                    <div
+                      class="text-center p-3 flex-auto justify-center leading-6"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-16 h-16 flex items-center customRed mx-auto"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      <h2 class="text-2xl font-bold py-4">Are you sure?</h2>
+                      <p class="text-md text-gray-500 px-8">
+                        Do you really want to Delete your Board?
+                      </p>
+                    </div>
+                    <div class="p-3 mt-2 text-center space-x-4 md:block">
+                      <button
+                        class="itbkk-button-ok customRed mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-md hover:shadow-lg hover:bg-gray-100"
+                        @click="confirmDelete()"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        @click="openModalToDelete = false"
+                        class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Collab Boards -->
+          <h2
+            class="text-xl font-bold mb-4 mt-4 p-4 items-center justify-center"
+          >
+            Collab Boards
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div v-for="(item, index) in BoardsList" :key="index">
+              <div
+                class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl"
+              >
+                <div class="max-w-md mx-auto space-y-6">
+                  <div
+                    class="animate-bounce absolute w-52 h-52 bg-teal-50 rounded-full -bottom-10 -right-10 -z-10"
+                  ></div>
+                  <div
+                    class="animate-bounce absolute w-32 h-32 bg-cyan-100 rounded-full -top-10 -left-10 -z-10"
+                  ></div>
+                  <p class="text-md font-semibold text-center">
+                    {{ item.name }}
+                  </p>
+                  <div class="flex justify-between items-center">
+                    <div class="flex gap-2">
+                      <button
+                        class="bg-red-400 px-4 py-2 text-sm rounded-md text-white hover:bg-red-500 ml-10"
+                      >
+                        Leave
                       </button>
                     </div>
                   </div>
