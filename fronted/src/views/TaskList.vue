@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from 'vue'
 import {
   getItemById,
   getItems,
@@ -7,19 +7,19 @@ import {
   editLimit,
   getBoardById,
   getResponseItems
-} from "../libs/fetchUtils.js"
-import TaskDetail from "../views/TaskDetail.vue"
-import AddTask from "../views/AddTask.vue"
-import EditTask from "../views/EditTask.vue"
-import { boardVisibility } from "../libs/fetchUtils.js"
-import { useLimitStore } from "../stores/storeLimit"
-import { useUsers } from "@/stores/storeUser"
-import { useTasks } from "../stores/store"
-import { useRoute, useRouter } from "vue-router"
-import SideBar from "../component/SideBar.vue"
-import Modal from "../component/Modal.vue"
-import Alert from "@/component/Alert.vue"
-import Navbar from "@/component/Navbar.vue"
+} from '../libs/fetchUtils.js'
+import TaskDetail from '../views/TaskDetail.vue'
+import AddTask from '../views/AddTask.vue'
+import EditTask from '../views/EditTask.vue'
+import { boardVisibility } from '../libs/fetchUtils.js'
+import { useLimitStore } from '../stores/storeLimit'
+import { useUsers } from '@/stores/storeUser'
+import { useTasks } from '../stores/store'
+import { useRoute, useRouter } from 'vue-router'
+import SideBar from '../component/SideBar.vue'
+import Modal from '../component/Modal.vue'
+import Alert from '@/component/Alert.vue'
+import Navbar from '@/component/Navbar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +35,7 @@ const userStore = useUsers()
 const boardId = ref()
 const disabledButtonWhileOpenPublic = ref(false)
 const alertLimit = ref(false)
-const messageLimit = ref("")
+const messageLimit = ref('')
 
 watch(
   () => route.params.id,
@@ -53,12 +53,12 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 const userName = userStore.getUser().username
 
-console.log("userName", userName)
-const token = localStorage.getItem("access_token")
-const boardName = ref("")
+console.log('userName', userName)
+const token = localStorage.getItem('access_token')
+const boardName = ref('')
 const isModalVisible = ref(false)
-const visibility = ref("")
-const tempVisibility = ref("")
+const visibility = ref('')
+const tempVisibility = ref('')
 
 let items = []
 
@@ -73,9 +73,9 @@ onMounted(async () => {
 
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log("ไม่ตรงกันนะจ๊า")
+    console.log('ไม่ตรงกันนะจ๊า')
   } else {
-    console.log("ตรงกันนะจ๊า")
+    console.log('ตรงกันนะจ๊า')
   }
 
   boardName.value = Board.item.name
@@ -93,7 +93,7 @@ onMounted(async () => {
   if (taskId !== undefined) {
     const response = await getItemById(taskId)
     if (response && (response.status === 404 || response.status === 400)) {
-      router.push("/error")
+      router.push('/error')
     }
   }
 
@@ -112,28 +112,25 @@ const UpdateLimit = async () => {
   )
   alertLimit.value = limitStore.getLimit().isLimit
 
-
   if (alertLimit.value) {
-  messageLimit.value = "The Kanban board now limits " + limitStore.getLimit().maximumTask
-  }
-  else{
+    messageLimit.value =
+      'The Kanban board now limits ' + limitStore.getLimit().maximumTask
+  } else {
     alertLimit.value = true
-     messageLimit.value = 'The Kanban board has disabled the task limit in each '
-  } setTimeout(() => {
+    messageLimit.value = 'The Kanban board has disabled the task limit in each '
+  }
+  setTimeout(() => {
     alertLimit.value = false
-    }, 3000)
-
+  }, 3000)
 }
 
-
-
-console.log( messageLimit.value)
+console.log(messageLimit.value)
 
 // ----------------------- Delete -----------------------
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: "TaskDetail", params: { taskid: todoId } })
+    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -157,7 +154,7 @@ const deleteTodo = async (todoId, index) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById("my_modal_delete")
+  const modal = document.getElementById('my_modal_delete')
   modal.showModal()
 }
 
@@ -178,33 +175,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ""
+    return ''
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref("default")
-const statusSortOrder = ref("default")
+const showIcon = ref('default')
+const statusSortOrder = ref('default')
 
 const toggleIcon = () => {
-  if (showIcon.value === "default") {
-    showIcon.value = "asc"
-    statusSortOrder.value = "asc"
-  } else if (showIcon.value === "asc") {
-    showIcon.value = "desc"
-    statusSortOrder.value = "desc"
+  if (showIcon.value === 'default') {
+    showIcon.value = 'asc'
+    statusSortOrder.value = 'asc'
+  } else if (showIcon.value === 'asc') {
+    showIcon.value = 'desc'
+    statusSortOrder.value = 'desc'
   } else {
-    showIcon.value = "default"
-    statusSortOrder.value = "default"
+    showIcon.value = 'default'
+    statusSortOrder.value = 'default'
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === "asc") {
+  if (currentSortOrder === 'asc') {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === "desc") {
+  } else if (currentSortOrder === 'desc') {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -234,12 +231,12 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
+  router.push({ name: 'StatusesList' })
 }
 
 const clearToken = () => {
-  router.push({ name: "Login" })
-  localStorage.removeItem("access_token") // หรือ localStorage.removeItem("access_token");
+  router.push({ name: 'Login' })
+  localStorage.removeItem('access_token') // หรือ localStorage.removeItem("access_token");
 }
 
 // ----------------------- Limit ---------------------------
@@ -259,7 +256,7 @@ const handleToggleClick = () => {
   if (disabledButtonWhileOpenPublic.value) {
     return
   }
-  tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC" // Set the opposite value temporarily
+  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC' // Set the opposite value temporarily
   isModalVisible.value = true // Show the modal
 }
 
@@ -280,7 +277,7 @@ const messageAlert = ref()
 
 if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
   alertEnabledSuc.value = true
-  messageAlert.value = "Welcome, You have logged in successfully"
+  messageAlert.value = 'Welcome, You have logged in successfully'
 
   setTimeout(() => {
     alertEnabledSuc.value = false
@@ -291,7 +288,7 @@ if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
 const changeVisibility = async () => {
   const updatedBoard = await boardVisibility(
     boardId.value,
-    visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
+    visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   )
 
   if (updatedBoard && updatedBoard.success) {
@@ -571,9 +568,9 @@ const changeVisibility = async () => {
             <template #headerName>Board visibility changed!</template>
             <template #messageName>
               {{
-                tempVisibility === "PUBLIC"
-                  ? "In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? "
-                  : "In private, only board owner can access / control board. Do you want to change the visibility to Private?"
+                tempVisibility === 'PUBLIC'
+                  ? 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? '
+                  : 'In private, only board owner can access / control board. Do you want to change the visibility to Private?'
               }}</template
             >
           </Modal>
@@ -737,7 +734,7 @@ const changeVisibility = async () => {
                     >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? "Unassigned"
+                          ? 'Unassigned'
                           : item.assignees
                       }}
                     </td>
