@@ -35,6 +35,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/v3/boards/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/v3/boards/{boardId}/collaborators").permitAll()
 //                                .requestMatchers("/v2/tasks/**").authenticated()
 //                                .requestMatchers("/v2/statuses/**").authenticated()
 //                                .requestMatchers("/v3/boards/**").authenticated()
