@@ -99,4 +99,8 @@ public class GlobalExceptionHandler {
             errorDetails.setErrors(errors);
         return ResponseEntity.status(httpStatus).body(errorDetails);
     }
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<?> handleConflictException(ConflictException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
 }

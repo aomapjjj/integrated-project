@@ -299,4 +299,5 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+
 }
