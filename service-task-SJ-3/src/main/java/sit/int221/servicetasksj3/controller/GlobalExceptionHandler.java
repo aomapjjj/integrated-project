@@ -101,6 +101,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<?> handleConflictException(ConflictException ex, WebRequest request) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT.value(), "Email is duplicate", request.getDescription(false).replace("uri=", ""));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }
