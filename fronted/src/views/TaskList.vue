@@ -235,12 +235,12 @@ const openNewStatus = () => {
 }
 
 const openCollaborator = () => {
-  router.push({ name: 'StatusesList' })
+  router.push({ name: 'Collab' })
 }
 
 const clearToken = () => {
   router.push({ name: 'Login' })
-  localStorage.removeItem('access_token') // หรือ localStorage.removeItem("access_token");
+  localStorage.removeItem('access_token') 
 }
 
 // ----------------------- Limit ---------------------------

@@ -15,7 +15,7 @@ const BoardsList = ref([])
 const openModalName = ref(false)
 const openModalToDelete = ref(false)
 const selectedItemIdToDelete = ref()
-
+const collaboratorInfo = ref()
 const userStore = useUsers()
 const userName = userStore.getUser().username
 const userBoard = ref({ name: userName + ' personal board' })
@@ -24,13 +24,17 @@ const userBoard = ref({ name: userName + ' personal board' })
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-
+const baseUrlCollaborator = `${baseUrlBoard}/${boardId.value}/collabs`
 function getToken() {
   return localStorage.getItem('access_token')
 }
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
+
+  const collaborator = await getItems(baseUrlCollaborator)
+  collaboratorInfo.value = collaborator
+  console.log(collaboratorInfo)
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -233,7 +237,7 @@ const openModalCreate = () => {
             Collab Boards
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="(item, index) in BoardsList" :key="index">
+            <div v-for="(item, index) in collaboratorInfo" :key="index">
               <div
                 class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl">
                 <div class="max-w-md mx-auto space-y-6">

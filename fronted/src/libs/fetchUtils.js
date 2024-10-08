@@ -19,14 +19,13 @@ async function getItems(url) {
 
 async function getBoardItems(url) {
   const token = getToken();
-  
-  // Check if the token is present
+
   if (!token) {
     console.log("No token provided. Exiting function.");
-    return; // Exit the function if there is no token
+    return; 
   }
   
-  const headers = { "Authorization": `Bearer ${token}` }; // Set headers with the token
+  const headers = { "Authorization": `Bearer ${token}` }; 
   try {
     const response = await fetch(url, { headers });
     const items = await response.json();
@@ -286,6 +285,31 @@ async function getItemsPublic(url) {
     return { error }
   }
 }
+
+async function addCollaborator(boardId, collaborator) {
+  const token = getToken();
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/collabs`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(collaborator)
+    });
+
+    const statusCode = response.status;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${statusCode}`);
+    }
+
+    const editedItem = await response.json();
+    return { statusCode, data: editedItem };
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    return parseInt(error.message) || null;
+  }
+}
 export {
   getItems,
   getItemById,
@@ -300,5 +324,6 @@ export {
   getResponseItems,
   getItemPublic,
   getItemsPublic,
-  getBoardItems
+  getBoardItems, 
+  addCollaborator
 }
