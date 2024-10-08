@@ -1,24 +1,31 @@
 package sit.int221.servicetasksj3.sharedatabase.filters;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sit.int221.servicetasksj3.exceptions.ErrorResponse;
+import sit.int221.servicetasksj3.exceptions.ForbiddenException;
+import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
+import sit.int221.servicetasksj3.services.BoardService;
+import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 
 @Component
@@ -27,42 +34,128 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtUserDetailsService jwtUserDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private BoardService boardService;
+//    @Autowired
+//    private CollabService collabService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        final String requestTokenHeader = request.getHeader("Authorization");
-        String username = null;
-        String jwtToken = null;
-        if (requestTokenHeader != null) {
+        try {
+            final String requestTokenHeader = request.getHeader("Authorization");
+            String username = null;
+            String jwtToken = null;
 
-            if (requestTokenHeader.startsWith("Bearer ")) {
-                jwtToken = requestTokenHeader.substring(7);
+            boolean isTokenValid = false;
+            String tokenError = null;
 
-                try {
-                    username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                } catch (ExpiredJwtException e) {
-                    throw new UnauthorizedException("JWT Token is expired"); //token expired
-                } catch (MalformedJwtException e) {
-                    throw new UnauthorizedException("JWT Token is not well-formed JWT"); //not well-formed JWT
-                } catch (SignatureException e) {
-                    throw new UnauthorizedException("JWT Token has been tampered with"); //token tampered with
-                } catch (IllegalArgumentException e) {
-                    throw new UnauthorizedException("Unable to get JWT Token"); //not authenticated
+            if (request.getRequestURI().equals("/token") || request.getRequestURI().equals("/login")) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            if (requestTokenHeader != null) {
+                if (requestTokenHeader.startsWith("Bearer ")) {
+                    jwtToken = requestTokenHeader.substring(7);
+                    try {
+                        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                        isTokenValid = true;
+                    } catch (IllegalArgumentException e) {
+                        tokenError = e.getMessage();
+                    } catch (ExpiredJwtException e) {
+                        tokenError = e.getMessage();
+                    }
+                } else {
+                    tokenError = "JWT Token does not begin with Bearer String";
+                }
+            }
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+                if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+            }
+
+            if (request.getRequestURI().startsWith("/v3/boards/")) {
+                handleRequest(request, isTokenValid, tokenError);
+            } else if (!isTokenValid && !request.getRequestURI().equals("/v3/boards")) {
+                throw new AuthenticationException("Invalid token");
+            }
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            handleException(response, e, request.getRequestURI());
+        }
+    }
+
+    private void handleRequest(HttpServletRequest request, boolean isTokenValid, String tokenError) {
+        String boardId = request.getRequestURI().split("/")[3];
+        String requestMethod = request.getMethod();
+        AuthUser currentUser = getCurrentUserDetails();
+        boolean isBoardExist = boardService.boardExists(boardId);
+
+        // ตรวจสอบว่าบอร์ดมีอยู่จริงหรือไม่
+        if (!isBoardExist) {
+            if (!isTokenValid && !requestMethod.equals("GET")) {
+                throw new UnauthorizedException("Access denied: Unauthorized attempt to modify a non-existent board with ID: " + boardId);
+            } else {
+                throw new ItemNotFoundException("Board with ID: " + boardId + " not found.");
+            }
+        }
+
+        boolean isPublic = boardService.isBoardPublic(boardId);
+
+        if (currentUser != null) {
+            boolean isOwner = boardService.isBoardOwner(boardId);
+            if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
+                throw new ForbiddenException("Access forbidden: User with ID: " + currentUser.getOid() + " is not authorized to access board with ID: " + boardId);
+            }
+        } else {
+            if (!isPublic) {
+                if (requestMethod.equals("GET")) {
+                    throw new ForbiddenException("Access forbidden: Anonymous users are not allowed to view private board with ID: " + boardId);
+                } else {
+                    throw new UnauthorizedException("Unauthorized: Authentication required for this action. Token error: " + tokenError);
                 }
             } else {
-                throw new UnauthorizedException("JWT Token is missing or does not begin with Bearer String");
+                if (!requestMethod.equals("GET")) {
+                    throw new UnauthorizedException("Unauthorized: Token required for modifying public board with ID: " + boardId + ". Token error: " + tokenError);
+                }
             }
+        }
+    }
+    public AuthUser getCurrentUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof AuthUser) {
+            return (AuthUser) authentication.getPrincipal();
+        }
+        return null;
+    }
+
+    public void handleException(HttpServletResponse response, Exception e, String uri) throws IOException {
+        HttpStatus status;
+        String message;
+
+        if (e instanceof UnauthorizedException) {
+            status = HttpStatus.UNAUTHORIZED;
+            message = e.getMessage();
+        } else if (e instanceof ItemNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+            message = e.getMessage();
+        } else if (e instanceof ForbiddenException) {
+            status = HttpStatus.FORBIDDEN;
+            message = e.getMessage();
+        } else {
+            status = HttpStatus.UNAUTHORIZED;
+            message = "An unexpected error occurred";
         }
 
-        // token correct
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
-        chain.doFilter(request, response);
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), message, uri);
+        response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));
     }
 }
+
