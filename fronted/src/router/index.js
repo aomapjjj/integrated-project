@@ -9,6 +9,7 @@ import Login from "@/views/Login.vue"
 import Board from "@/views/Board.vue"
 import ErrorPagePermission from "@/views/ErrorPagePermission.vue"
 import { getBoardById } from "../libs/fetchUtils.js"
+import CollabManagement from "@/views/CollabManagement.vue"
 const getToken = () => localStorage.getItem("access_token")
 const getRefreshToken = () => localStorage.getItem("refresh_token")
 
@@ -287,7 +288,9 @@ const routes = [
   { path: "/login", name: "Login", component: Login },
   { path: "/board", name: "Board", component: Board },
   { path: "/board/add", name: "BoardAdd", component: Board },
-  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } }
+  { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } },
+  { path: "/board/:id/collab", name: "Collab", component: CollabManagement },
+
 ]
 
 const router = createRouter({

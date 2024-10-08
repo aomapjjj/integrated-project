@@ -10,7 +10,7 @@ import {
 } from '../libs/fetchUtils.js'
 const BoardsList = ref([])
 const openModalName = ref(false)
-
+const collaboratorInfo = ref()
 const sidebarTasks = ref(true)
 const toggleSidebar = () => {
   sidebarTasks.value = !sidebarTasks.value
@@ -20,11 +20,15 @@ const userName = userStore.getUser().username
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
 
 onMounted(async () => {
   const itemsBoards = await getItems(baseUrlBoard)
   BoardsList.value = itemsBoards
   console.log(BoardsList)
+
+  const collaborator = await getItems(baseUrlCollaborator)
+  collaboratorInfo.value = collaborator
 })
 
 const toTasksList = () => {
