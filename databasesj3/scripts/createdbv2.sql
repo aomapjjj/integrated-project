@@ -8,15 +8,17 @@ USE `kanbanIT`;
 
 -- Create boards table
 CREATE TABLE IF NOT EXISTS `kanbanIT`.`boards` (
-  `boardId` CHAR(10) ,
+  `boardId` CHAR(10),
   `boardname` VARCHAR(120) NOT NULL,
-  `userId` VARCHAR(36) , 
+  `userId` VARCHAR(36),
+  `visibility` ENUM('PRIVATE', 'PUBLIC') NOT NULL DEFAULT 'PRIVATE',
   PRIMARY KEY (`boardId`),
   INDEX `userId_index` (`userId` ASC)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
 
 -- Create statustasks table
 CREATE TABLE IF NOT EXISTS `kanbanIT`.`statustasks` (
@@ -84,38 +86,29 @@ AUTO_INCREMENT = 121
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
+-- Create collaborators table
+CREATE TABLE IF NOT EXISTS `kanbanIT`.`collaborators` (
+  `collabsId` VARCHAR(36) NOT NULL,
+  `collabsName` VARCHAR(36) NOT NULL,
+  `collabsEmail` VARCHAR(36) NOT NULL,
+  `boardId` CHAR(10) NOT NULL,
+  `ownerId` VARCHAR(36) NOT NULL,
+  `accessLevel` ENUM('READ', 'WRITE') NOT NULL DEFAULT 'READ',
+  `addedOn` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`collabsId`),
+  UNIQUE INDEX `collaborator_board_unique` (`collabsId`, `boardId` ASC),
+  INDEX `boardId_index` (`boardId` ASC),
+  INDEX `ownerId_index` (`ownerId` ASC),
+  CONSTRAINT `fk_collaborators_boards`
+    FOREIGN KEY (`boardId`)
+    REFERENCES `kanbanIT`.`boards` (`boardId`)
+    ON DELETE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
 -- Re-enable checks
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
--- -----------------------------------------------------
--- Insert statustasks
--- -----------------------------------------------------
-INSERT INTO kanbanIT.statustasks (statusid, statusname, statusdescription) VALUES
-(1, 'No Status', 'A status has not been assigned'),
-(2, 'To Do', 'The task is included in the project'),
-(3, 'In Progress', 'The task is being worked on'),
-(4, 'Reviewing', 'The task is being reviewed'),
-(5, 'Testing', 'The task is being tested'),
-(6, 'Waiting', 'The task is waiting for a resource'),
-(7, 'Done', 'The task has been completed');
-COMMIT;
--- -----------------------------------------------------
--- Insert tasks
--- -----------------------------------------------------
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('NS10','1');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO02','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO03','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO04','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO05','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO06','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO07','7');
-INSERT INTO `kanbanIT`.`tasks` (`taskTitle`,`statusId`) VALUES ('DO08','7');
-
-COMMIT;
--- -----------------------------------------------------
--- Insert tasklimit
--- -----------------------------------------------------
-INSERT INTO `kanbanIT`.`tasklimit` (`maximumTask`) VALUES ('10');
-COMMIT;
