@@ -34,15 +34,6 @@ public class BoardController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-//    private String getUserId(HttpServletRequest request) {
-//        String jwtToken = request.getHeader("Authorization");
-//        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-//            jwtToken = jwtToken.substring(7);
-//            return jwtTokenUtil.getUsernameFromToken(jwtToken);
-//        }
-//        return null;
-//    }
-
     private String getUserId(HttpServletRequest request) {
         String userId = null;
         String jwtToken = request.getHeader("Authorization");

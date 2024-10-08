@@ -35,14 +35,6 @@ public class WebSecurityConfig {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/v3/boards/**").permitAll()
-//                                .requestMatchers("/v2/tasks/**").authenticated()
-//                                .requestMatchers("/v2/statuses/**").authenticated()
-//                                .requestMatchers("/v3/boards/**").authenticated()
-//                                .requestMatchers("/v3/boards/{id}/tasks/**").authenticated()
-//                                .requestMatchers("/v3/boards/{id}/statuses/**").authenticated()
-//                                .requestMatchers("/validate-token").permitAll()
-//                                .requestMatchers("/statuses/**").permitAll()
-//                                .requestMatchers("/tasks/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());
