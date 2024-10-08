@@ -42,31 +42,50 @@ public class BoardService {
     }
 
     public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod) {
-        // ค้นหา Board ตาม ID
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-        // ตรวจสอบความเป็นเจ้าของ (Owner)
         boolean isOwner = board.getOwnerId().equals(userId);
         boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
         boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
 
         if (userId != null) {
-            // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น private
             if (!isOwner && isPrivate) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
             }
-            // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น public แต่ทำการกระทำที่ไม่ใช่ GET
             if (!isOwner && isPublic && !requestMethod.equals("GET")) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is public.");
             }
         } else {
-            // ผู้ใช้ไม่เข้าสู่ระบบและพยายามเข้าถึงบอร์ดส่วนตัว
             if (requestMethod.equals("GET") && isPrivate) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
             }
         }
     }
+
+
+    public  Boolean isBoardPublic(String boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        return board.getVisibility().equals(Visibility.PUBLIC);
+    }
+    public Boolean isBoardOwner(String boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        return board.getOwnerId().equals(((AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getOid());
+    }
+
+    public boolean boardExists(String boardId) {
+        if (boardId == null) {
+            throw new ValidationException("Board ID is required");
+        }
+        return boardRepository.existsById(boardId);
+    }
+
+//    public boolean isCollaborator(String boardId, String oid) {
+//        return collabRepository.existsById(new CollabId(boardId, oid));
+//    }
+
 
     // Get board IDs by owner
     public List<BoardResponseDTO> getBoardIdByOwner() {
@@ -107,9 +126,6 @@ public class BoardService {
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (currentUser == null) {
-//            throw new UnauthorizedException("User not authenticated");
-//        }
 
         String oid = currentUser.getOid();
 
@@ -117,7 +133,7 @@ public class BoardService {
         board.setId(generateUniqueBoardId());
         board.setOwnerId(oid);
         board.setName(boardRequest.getName());
-//
+
         Board newBoard = boardRepository.save(board);
 
         // Add default statuses
@@ -166,13 +182,7 @@ public class BoardService {
 
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Check if the user is the owner of the board
-//        if (!board.getOwnerId().equals(currentUser.getOid())) {
-//            throw new ForbiddenException("User is not authorized to edit this board");
-//        }
-
         board.setName(boardRequest.getName());
-//        board.setVisibility(boardRequest.getVisibility());
 
         Board updatedBoard = boardRepository.save(board);
 
@@ -191,15 +201,8 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // ตรวจสอบว่า user เป็นเจ้าของ board หรือไม่
-//        if (!board.getOwnerId().equals(currentUser.getOid())) {
-//            throw new ForbiddenException("User is not authorized to edit this board");
-//        }
-
         board.setVisibility(visibility.getVisibility());
         boardRepository.save(board);
-
         return visibility;
     }
 }
