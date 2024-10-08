@@ -58,6 +58,7 @@ public class BoardService {
         boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
         boolean isCollaborator = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, collaboratorId);
 
+
         // กรณีที่ Board มีอยู่แล้ว (board($id).exists)
         if (board != null) {
             // ตรวจสอบว่าเป็นเจ้าของ, public, หรือ collaborator
@@ -100,9 +101,31 @@ public class BoardService {
             return; // การกระทำเป็น GET และบอร์ดเป็น public อนุญาตให้เข้าถึง
         }
 
+
         // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น private (ห้ามทุกการกระทำ)
         throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
     }
+    public  Boolean isBoardPublic(String boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        return board.getVisibility().equals(Visibility.PUBLIC);
+    }
+    public Boolean isBoardOwner(String boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        return board.getOwnerId().equals(((AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getOid());
+    }
+
+    public boolean boardExists(String boardId) {
+        if (boardId == null) {
+            throw new ValidationException("Board ID is required");
+        }
+        return boardRepository.existsById(boardId);
+    }
+
+//    public boolean isCollaborator(String boardId, String oid) {
+//        return collabRepository.existsById(new CollabId(boardId, oid));
+//    }
 
 
     // Get board IDs by owner

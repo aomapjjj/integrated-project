@@ -2,6 +2,7 @@ package sit.int221.servicetasksj3.controller;
 
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -35,24 +36,24 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Username or password is incorrect", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
-    // 403 - ForbiddenException "User is not board owner"
+    // 403 - ForbiddenException
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException exception, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), exception.getMessage(), request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException exception, WebRequest request) {
+//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access is denied", request.getDescription(false).replace("uri=", ""));
+//        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+//    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException exception, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Resource not found", request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-//    @ExceptionHandler(HttpMessageNotReadableException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
-//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Request body is missing. Please provide the necessary data to create a board for the temporary user.", request.getDescription(false).replace("uri=", ""));
-//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorDetails> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request) {
@@ -62,14 +63,20 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest().body(errorDetails);
     }
+    // 400 - HttpMessageNotReadableException: Bad Request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorDetails> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
         List<ErrorDetails.ValidationError> errors = extractValidationErrors(exception);
         return createErrorResponse("Request body contains invalid data. Please check the 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException exception, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access is denied", request.getDescription(false).replace("uri=", ""));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
     private List<ErrorDetails.ValidationError> extractValidationErrors(HttpMessageNotReadableException exception) {
         Throwable cause = exception.getCause();
-        // ตรวจสอบว่า cause เป็น InvalidFormatException หรือไม่
         if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException) {
             com.fasterxml.jackson.databind.exc.InvalidFormatException invalidFormatException =
                     (com.fasterxml.jackson.databind.exc.InvalidFormatException) cause;
@@ -81,16 +88,13 @@ public class GlobalExceptionHandler {
                     invalidFormatException.getValue());
             return List.of(new ErrorDetails.ValidationError(fieldName, errorMessage));
         }
-        // สำหรับข้อผิดพลาดอื่นๆ ที่ไม่ใช่ InvalidFormatException
         return List.of(new ErrorDetails.ValidationError("message", cause != null ? cause.getMessage() : "Unknown error"));
     }
 
-    // Helper method for creating standard error responses (ErrorResponse)
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message, request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(httpStatus).body(errorResponse);
     }
-    // Helper method for creating validation error responses (ErrorDetails)
     private ResponseEntity<ErrorDetails> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request, List<ErrorDetails.ValidationError> errors) {
         ErrorDetails errorDetails = new ErrorDetails();
             errorDetails.setStatus(httpStatus.value());
