@@ -44,6 +44,7 @@ public class AuthenticationController {
     public ResponseEntity<Object> validateToken(@RequestHeader("Authorization") String requestTokenHeader) {
         Claims claims = null;
         String jwtToken = null;
+
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
