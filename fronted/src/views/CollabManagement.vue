@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getBoardById, getItems, addCollaborator } from '../libs/fetchUtils.js'
+import { getBoardById, getItems, addCollaborator, deleteCollaborator } from '../libs/fetchUtils.js'
 import { useStatuses } from '../stores/storeStatus'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsers } from '@/stores/storeUser'
@@ -30,6 +30,8 @@ watch(
   },
   { immediate: true }
 )
+
+
 
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
@@ -65,7 +67,7 @@ const submitForm = async () => {
       });
       console.log(collaboratorAccess.value);
       console.log(collaboratorEmail.value);
-      
+
       console.log("Collaborator Added:", result);
       openModalAddCollab.value = false;
     } catch (error) {
@@ -75,6 +77,20 @@ const submitForm = async () => {
     console.error("Collaborator email and access right are required.");
   }
 }
+
+const removeCollaborator = async (oid) => {
+  try {
+    const status = await deleteCollaborator(boardId.value, oid);
+    if (status === 200) {
+      collaboratorInfo.value = collaboratorInfo.value.filter((collab) => collab.oid !== oid);
+      console.log("Collaborator removed successfully");
+    } else {
+      console.error("Failed to remove collaborator");
+    }
+  } catch (error) {
+    console.error("Error removing collaborator:", error);
+  }
+};
 </script>
 
 
@@ -190,7 +206,7 @@ const submitForm = async () => {
                       {{ index + 1 }}
                     </td>
                     <td class="">
-                      <label class="itbkk-status-name" for="my_modal_6" >
+                      <label class="itbkk-status-name" for="my_modal_6">
                         {{ item.name }}
                       </label>
                     </td>
@@ -200,13 +216,13 @@ const submitForm = async () => {
                     </td>
 
                     <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                        {{ item.accessRight }}
+                      {{ item.accessRight }}
                     </td>
 
-                    <!-- Edit modal-->
-
                     <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      Remove
+                      <button @click="removeCollaborator(item.oid)" class="btn bg-red-500 text-white">
+                        Remove
+                      </button>
                     </td>
                   </tr>
                 </tbody>
