@@ -31,8 +31,8 @@ public class AuthenticationService {
     private LimitRepository limitRepository;
 
     public JwtResponseTokenDTO login(JwtRequestUser user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword());
+        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
         if (!authentication.isAuthenticated()) {
             throw new UnauthorizedException("Username or Password is incorrect.");
