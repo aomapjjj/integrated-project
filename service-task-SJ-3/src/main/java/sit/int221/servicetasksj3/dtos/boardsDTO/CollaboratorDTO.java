@@ -9,17 +9,14 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 public class CollaboratorDTO {
-    private String oid;
+    private String id;
     private String name;
     private String email;
-    private AccessRight accessRight; // ใช้ Enum ที่นี่
+    private AccessRight accessRight;
     private Timestamp addedOn;
 
-    // Constructors
-    public CollaboratorDTO() {}
-
-    public CollaboratorDTO(String oid, String name, String email, AccessRight accessRight, Timestamp addedOn) {
-        this.oid = oid;
+    public CollaboratorDTO(String id, String name, String email, AccessRight accessRight, Timestamp addedOn) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.accessRight = accessRight;
