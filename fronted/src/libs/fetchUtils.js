@@ -299,9 +299,6 @@ async function addCollaborator(boardId, collaborator) {
     });
 
     const statusCode = response.status;
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${statusCode}`);
-    }
 
     const editedItem = await response.json();
     return { statusCode, data: editedItem };

@@ -6,14 +6,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUsers } from '@/stores/storeUser'
 import SideBar from '@/component/SideBar.vue'
 import Navbar from '@/component/Navbar.vue'
+import Alert from '@/component/Alert.vue'
 
 const userStore = useUsers()
 const route = useRoute()
 const router = useRouter()
 
-const myStatuses = useStatuses()
 const token = localStorage.getItem("access_token")
-const userName = userStore.getUser().username
 const disabledButtonWhileOpenPublic = ref(false)
 const boardId = ref()
 const boardName = ref('')
@@ -24,6 +23,10 @@ const statusList = ref([])
 const collaboratorInfo = ref([])
 const showConfirmModal = ref(false)
 const oidCollaboratorToRemove = ref(null)
+
+const isAlertFailure = ref(false);
+const isAlertSuccess = ref(false);
+const alertMessage = ref("");
 
 watch(
   () => route.params.id,
@@ -58,6 +61,7 @@ const openAdd = () => {
 
 const cancelAction = () => {
   openModalAddCollab.value = false
+  clearForm()
 }
 
 const submitForm = async () => {
@@ -67,18 +71,52 @@ const submitForm = async () => {
         email: collaboratorEmail.value,
         accessRight: collaboratorAccess.value
       });
-  
 
-      console.log("Collaborator Added:", result.data);
-     collaboratorInfo.value.push(result.data)
-      openModalAddCollab.value = false;
+      console.log(result.statusCode)
+      switch (result.statusCode) {
+        case 201:
+          isAlertSuccess.value = true;
+          alertMessage.value = "Collaborator added successfully!";
+          setTimeout(hideAlert, 3000);
+          cancelAction()
+          break;
+        case 401:
+          isAlertFailure.value = true;
+          alertMessage.value = "Unauthorized access. Please log in again.";
+          setTimeout(hideAlert, 3000);
+          break;
+        case 403:
+          isAlertFailure.value = true;
+          alertMessage.value = "You do not have permission to add a collaborator.";
+          setTimeout(hideAlert, 3000);
+          break;
+        case 404:
+          isAlertFailure.value = true;
+          alertMessage.value = "The user does not exist.";
+          setTimeout(hideAlert, 3000);
+          break;
+        case 409:
+          isAlertFailure.value = true;
+          alertMessage.value = "The user is already a collaborator.";
+          setTimeout(hideAlert, 3000);
+          break;
+        default:
+          isAlertFailure.value = true;
+          alertMessage.value = "There is a problem. Please try again later.";
+          setTimeout(hideAlert, 3000);
+      }
+
     } catch (error) {
-      console.error("Error adding collaborator:", error.message);
+      isAlertFailure.value = true;
+      alertMessage.value = "An error occurred: " + error.message;
+      setTimeout(hideAlert, 3000);
     }
   } else {
-    console.error("Collaborator email and access right are required.");
+    isAlertFailure.value = true;
+    alertMessage.value = "Collaborator email and access right are required.";
+    setTimeout(hideAlert, 3000);
   }
-}
+};
 
 const showRemoveModal = (oid) => {
   oidCollaboratorToRemove.value = oid
@@ -112,12 +150,24 @@ const updateAccessRight = async (item) => {
     console.error("Failed to update access right:", error);
   }
 }
+
+const hideAlert = () => {
+  isAlertFailure.value = false;
+  isAlertSuccess.value = false;
+};
+
+const clearForm = () => {
+  collaboratorEmail.value = ''
+}
 </script>
 
 
 <template>
   <div class="flex flex-col h-screen overflow-hidden">
     <div class="flex flex-1 overflow-hidden">
+      <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
+        {{ alertMessage }}
+      </Alert>
       <SideBar />
 
       <div class="flex flex-col flex-1">
@@ -128,7 +178,7 @@ const updateAccessRight = async (item) => {
             <ul>
               <li>
                 <a @click="$router.go(-1)">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="w-4 h-4 stroke-current mr-2">
+                  <svg xmlns="http://www.w3.org/3000/svg" viewBox="0 0 256 256" class="w-4 h-4 stroke-current mr-2">
                     <path fill="currentColor"
                       d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z" />
                   </svg>
@@ -137,7 +187,7 @@ const updateAccessRight = async (item) => {
               </li>
               <li>
                 <a>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                  <svg xmlns="http://www.w3.org/3000/svg" fill="none" viewBox="0 0 24 24"
                     class="w-4 h-4 stroke-current mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
@@ -157,7 +207,7 @@ const updateAccessRight = async (item) => {
             cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
             opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
           }" @click="openAdd" class="itbkk-button-add btn ml-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <svg xmlns="http://www.w3.org/3000/svg" width="24" height="24" viewBox="0 0 24 24">
               <path fill="currentColor"
                 d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
             </svg>
