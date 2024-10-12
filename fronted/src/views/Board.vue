@@ -24,7 +24,7 @@ const userBoard = ref({ name: userName + ' personal board' })
 const router = useRouter()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-const baseUrlCollaborator = `${baseUrlBoard}/${boardId.value}/collabs`
+// const baseUrlCollaborator = `${baseUrlBoard}/${boardId.value}/collabs`
 function getToken() {
   return localStorage.getItem('access_token')
 }
@@ -32,9 +32,9 @@ onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
 
-  const collaborator = await getItems(baseUrlCollaborator)
-  collaboratorInfo.value = collaborator
-  console.log(collaboratorInfo)
+  // const collaborator = await getItems(baseUrlCollaborator)
+  // collaboratorInfo.value = collaborator
+  // console.log(collaboratorInfo)
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {

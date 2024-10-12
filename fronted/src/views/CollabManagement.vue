@@ -22,6 +22,8 @@ const collaboratorEmail = ref('')
 const collaboratorAccess = ref('READ');
 const statusList = ref([])
 const collaboratorInfo = ref()
+const showConfirmModal = ref(false)
+const oidCollaboratorToRemove = ref(null)
 
 watch(
   () => route.params.id,
@@ -78,19 +80,29 @@ const submitForm = async () => {
   }
 }
 
-const removeCollaborator = async (oid) => {
-  try {
-    const status = await deleteCollaborator(boardId.value, oid);
-    if (status === 200) {
-      collaboratorInfo.value = collaboratorInfo.value.filter((collab) => collab.oid !== oid);
-      console.log("Collaborator removed successfully");
-    } else {
-      console.error("Failed to remove collaborator");
+const showRemoveModal = (oid) => {
+  oidCollaboratorToRemove.value = oid
+  showConfirmModal.value = true
+}
+
+const confirmRemove = async () => {
+  if (oidCollaboratorToRemove.value) {
+    try {
+      const status = await deleteCollaborator(boardId.value, oidCollaboratorToRemove.value)
+      if (status === 200) {
+        collaboratorInfo.value = collaboratorInfo.value.filter((collab) => collab.oid !== oidCollaboratorToRemove.value)
+        console.log("Collaborator removed successfully")
+      } else {
+        console.error("Failed to remove collaborator")
+      }
+    } catch (error) {
+      console.error("Error removing collaborator:", error)
+    } finally {
+      showConfirmModal.value = false
+      oidCollaboratorToRemove.value = null
     }
-  } catch (error) {
-    console.error("Error removing collaborator:", error);
   }
-};
+}
 </script>
 
 
@@ -220,10 +232,11 @@ const removeCollaborator = async (oid) => {
                     </td>
 
                     <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      <button @click="removeCollaborator(item.oid)" class="btn bg-red-500 text-white">
+                      <button @click="showRemoveModal(item.oid)" class="btn bg-red-500 text-white">
                         Remove
                       </button>
                     </td>
+                    .
                   </tr>
                 </tbody>
               </table>
@@ -250,6 +263,16 @@ const removeCollaborator = async (oid) => {
                   <button class="btn bg-gray-500 text-white mr-4" @click="cancelAction">Cancel</button>
                   <button class="btn bg-blue-500 text-white" @click="submitForm">Save</button>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="showConfirmModal"
+            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white p-6 rounded-md max-w-md w-full">
+              <h3 class="text-lg font-semibold text-center mb-4">Are you sure you want to remove this collaborator?</h3>
+              <div class="flex justify-end">
+                <button @click="showConfirmModal = false" class="btn bg-gray-500 text-white mr-4">Cancel</button>
+                <button @click="confirmRemove" class="btn bg-red-500 text-white">Confirm</button>
               </div>
             </div>
           </div>
