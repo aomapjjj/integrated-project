@@ -292,19 +292,18 @@ public class BoardController {
     @PatchMapping("/{boardId}/collabs/{collabId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
-            @PathVariable String collaboratorId,
+            @PathVariable String collabId,
             @Valid @RequestBody CollaboratorDTO collaboratorRequest,
             HttpServletRequest request) {
 
         String userId = getUserId(request);
 
+        // ใช้ collabId แทน collaboratorId
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
 
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-
+        // ใช้ collabId แทน collaboratorId
         Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(
-                boardId, collaboratorId, collaboratorRequest.getAccessRight().name());
-
+                boardId, collabId, collaboratorRequest.getAccessRight().name());
 
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
@@ -316,6 +315,7 @@ public class BoardController {
 
         return ResponseEntity.ok(responseDTO);
     }
+
 
     @DeleteMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> removeCollaborator(
