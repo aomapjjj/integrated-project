@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getBoardById, getItems, addCollaborator } from '../libs/fetchUtils.js'
+import { getBoardById, getItems, addCollaborator, deleteCollaborator, editAccessRight } from '../libs/fetchUtils.js'
 import { useStatuses } from '../stores/storeStatus'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsers } from '@/stores/storeUser'
@@ -22,6 +22,8 @@ const collaboratorEmail = ref('')
 const collaboratorAccess = ref('READ');
 const statusList = ref([])
 const collaboratorInfo = ref()
+const showConfirmModal = ref(false)
+const oidCollaboratorToRemove = ref(null)
 
 watch(
   () => route.params.id,
@@ -30,6 +32,8 @@ watch(
   },
   { immediate: true }
 )
+
+
 
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
@@ -65,7 +69,7 @@ const submitForm = async () => {
       });
       console.log(collaboratorAccess.value);
       console.log(collaboratorEmail.value);
-      
+
       console.log("Collaborator Added:", result);
       openModalAddCollab.value = false;
     } catch (error) {
@@ -73,6 +77,39 @@ const submitForm = async () => {
     }
   } else {
     console.error("Collaborator email and access right are required.");
+  }
+}
+
+const showRemoveModal = (oid) => {
+  oidCollaboratorToRemove.value = oid
+  showConfirmModal.value = true
+}
+
+const confirmRemove = async () => {
+  if (oidCollaboratorToRemove.value) {
+    try {
+      const status = await deleteCollaborator(boardId.value, oidCollaboratorToRemove.value)
+      if (status === 200) {
+        collaboratorInfo.value = collaboratorInfo.value.filter((collab) => collab.oid !== oidCollaboratorToRemove.value)
+        console.log("Collaborator removed successfully")
+      } else {
+        console.error("Failed to remove collaborator")
+      }
+    } catch (error) {
+      console.error("Error removing collaborator:", error)
+    } finally {
+      showConfirmModal.value = false
+      oidCollaboratorToRemove.value = null
+    }
+  }
+}
+
+const updateAccessRight = async (item) => {
+  try {
+    const result = await editAccessRight(boardId.value, item.accessRight, item.oid);
+    console.log("Access right updated:", result);
+  } catch (error) {
+    console.error("Failed to update access right:", error);
   }
 }
 </script>
@@ -190,7 +227,7 @@ const submitForm = async () => {
                       {{ index + 1 }}
                     </td>
                     <td class="">
-                      <label class="itbkk-status-name" for="my_modal_6" >
+                      <label class="itbkk-status-name" for="my_modal_6">
                         {{ item.name }}
                       </label>
                     </td>
@@ -200,14 +237,18 @@ const submitForm = async () => {
                     </td>
 
                     <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                        {{ item.accessRight }}
+                      <select v-model="item.accessRight" @change="updateAccessRight(item)">
+                        <option value="READ">READ</option>
+                        <option value="WRITE">WRITE</option>
+                      </select>
                     </td>
-
-                    <!-- Edit modal-->
 
                     <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      Remove
+                      <button @click="showRemoveModal(item.oid)" class="btn bg-red-500 text-white">
+                        Remove
+                      </button>
                     </td>
+                    .
                   </tr>
                 </tbody>
               </table>
@@ -234,6 +275,16 @@ const submitForm = async () => {
                   <button class="btn bg-gray-500 text-white mr-4" @click="cancelAction">Cancel</button>
                   <button class="btn bg-blue-500 text-white" @click="submitForm">Save</button>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="showConfirmModal"
+            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white p-6 rounded-md max-w-md w-full">
+              <h3 class="text-lg font-semibold text-center mb-4">Are you sure you want to remove this collaborator?</h3>
+              <div class="flex justify-end">
+                <button @click="showConfirmModal = false" class="btn bg-gray-500 text-white mr-4">Cancel</button>
+                <button @click="confirmRemove" class="btn bg-red-500 text-white">Confirm</button>
               </div>
             </div>
           </div>
