@@ -32,9 +32,6 @@ onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
 
-  // const collaborator = await getItems(baseUrlCollaborator)
-  // collaboratorInfo.value = collaborator
-  // console.log(collaboratorInfo)
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -49,6 +46,15 @@ onMounted(async () => {
     router.push({ name: 'Login' })
   }
 })
+
+
+const getBoardsByOwner = (boardsList , userName) => {
+    return boardsList.filter(board => board.owner.name === userName);
+}
+const getBoardsCollabsByOwner = (boardsList , userName) => {
+    return boardsList.filter(board => board.owner.name !== userName);
+}
+
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
@@ -151,7 +157,7 @@ const openModalCreate = () => {
             Personal Boards
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="(item, index) in BoardsList" :key="index">
+            <div v-for="(item, index) in getBoardsByOwner(BoardsList , userName )" :key="index">
               <div
                 class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl">
                 <div class="max-w-md mx-auto space-y-6">
@@ -237,7 +243,7 @@ const openModalCreate = () => {
             Collab Boards
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="(item, index) in collaboratorInfo" :key="index">
+            <div v-for="(item, index) in getBoardsCollabsByOwner(BoardsList , userName )" :key="index">
               <div
                 class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl">
                 <div class="max-w-md mx-auto space-y-6">
@@ -251,6 +257,10 @@ const openModalCreate = () => {
                     <div class="flex gap-2">
                       <button class="bg-red-400 px-4 py-2 text-sm rounded-md text-white hover:bg-red-500 ml-10">
                         Leave
+                      </button>
+                      <button @click="toBoardsList(item.id)"
+                        class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500 ml-10">
+                        Show More
                       </button>
                     </div>
                   </div>
