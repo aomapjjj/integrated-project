@@ -21,7 +21,7 @@ const openModalAddCollab = ref(false)
 const collaboratorEmail = ref('')
 const collaboratorAccess = ref('READ');
 const statusList = ref([])
-const collaboratorInfo = ref()
+const collaboratorInfo = ref([])
 const showConfirmModal = ref(false)
 const oidCollaboratorToRemove = ref(null)
 
@@ -42,7 +42,7 @@ onMounted(async () => {
   userStore.setToken(token)
   const collaborator = await getItems(baseUrlCollaborator)
   collaboratorInfo.value = collaborator
-  console.log(collaboratorInfo)
+  console.log('Get Items',collaboratorInfo.value)
 
   const Board = await getBoardById(boardId.value)
   console.log('Board data', Board.item.owner.name)
@@ -67,10 +67,10 @@ const submitForm = async () => {
         email: collaboratorEmail.value,
         accessRight: collaboratorAccess.value
       });
-      console.log(collaboratorAccess.value);
-      console.log(collaboratorEmail.value);
+  
 
-      console.log("Collaborator Added:", result);
+      console.log("Collaborator Added:", result.data);
+     collaboratorInfo.value.push(result.data)
       openModalAddCollab.value = false;
     } catch (error) {
       console.error("Error adding collaborator:", error.message);
