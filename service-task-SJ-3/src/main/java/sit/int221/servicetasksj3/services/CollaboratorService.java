@@ -70,8 +70,6 @@ public class CollaboratorService {
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
 
 
-
-
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
@@ -80,7 +78,6 @@ public class CollaboratorService {
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
         }
-
 
         Collaborator collaborator = new Collaborator();
         collaborator.setCollaboratorId(user.getOid());
