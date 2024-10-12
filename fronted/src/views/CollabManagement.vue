@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { getBoardById, getItems, addCollaborator, deleteCollaborator } from '../libs/fetchUtils.js'
+import { getBoardById, getItems, addCollaborator, deleteCollaborator, editAccessRight } from '../libs/fetchUtils.js'
 import { useStatuses } from '../stores/storeStatus'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsers } from '@/stores/storeUser'
@@ -101,6 +101,15 @@ const confirmRemove = async () => {
       showConfirmModal.value = false
       oidCollaboratorToRemove.value = null
     }
+  }
+}
+
+const updateAccessRight = async (item) => {
+  try {
+    const result = await editAccessRight(boardId.value, item.accessRight, item.oid);
+    console.log("Access right updated:", result);
+  } catch (error) {
+    console.error("Failed to update access right:", error);
   }
 }
 </script>
@@ -228,7 +237,10 @@ const confirmRemove = async () => {
                     </td>
 
                     <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700">
-                      {{ item.accessRight }}
+                      <select v-model="item.accessRight" @change="updateAccessRight(item)">
+                        <option value="READ">READ</option>
+                        <option value="WRITE">WRITE</option>
+                      </select>
                     </td>
 
                     <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
