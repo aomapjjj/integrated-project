@@ -207,6 +207,8 @@ const hideAlert = () => {
 const clearForm = () => {
   collaboratorEmail.value = ""
 }
+
+
 </script>
 
 <template>
@@ -223,8 +225,9 @@ const clearForm = () => {
         <div class="mt-9 px-10 flex justify-between items-center">
           <div class="text-sm breadcrumbs">
             <ul>
-              <li>
-                <a @click="$router.go(-1)">
+              <li >
+               
+              <router-link :to="{ name: 'TaskList', params: { id: boardId } }">
                   <svg
                     xmlns="http://www.w3.org/3000/svg"
                     viewBox="0 0 256 256"
@@ -236,7 +239,7 @@ const clearForm = () => {
                     />
                   </svg>
                   {{ boardName.toLowerCase() }}
-                </a>
+                </router-link>
               </li>
               <li>
                 <a>
