@@ -299,15 +299,52 @@ async function addCollaborator(boardId, collaborator) {
     });
 
     const statusCode = response.status;
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${statusCode}`);
-    }
 
     const editedItem = await response.json();
     return { statusCode, data: editedItem };
   } catch (error) {
     console.log(`Error: ${error.message}`);
     return parseInt(error.message) || null;
+  }
+}
+
+async function editAccessRight(boardId, access, oid) {
+  const token = getToken(); 
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        accessRight: access
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const editedItem = await response.json();
+    return editedItem;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+}
+
+async function deleteCollaborator(boardId, oid) {
+  const token = getToken();
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    return response.status;
+  } catch (error) {
+    console.log(`error: ${error}`);
   }
 }
 export {
@@ -325,5 +362,7 @@ export {
   getItemPublic,
   getItemsPublic,
   getBoardItems, 
-  addCollaborator
+  addCollaborator,
+  editAccessRight,
+  deleteCollaborator
 }
