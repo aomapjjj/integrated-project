@@ -134,17 +134,18 @@ public class BoardService {
         String oid = currentUser.getOid();
         System.out.println("Current User OID: " + oid);
 
-        List<Board> boards = boardRepository.findByOwnerId(oid);
+        List<Board> boards = boardRepository.findAllByUserIdOrCollaboratorId(oid);
         System.out.println("Boards found: " + boards.size());
+
 
         return boards.stream().map(board -> {
             BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
 
             BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
-            ownerDTO.setOid(currentUser.getOid());
-            ownerDTO.setName(currentUser.getName());
-
+            ownerDTO.setOid(board.getOwnerId());
+            ownerDTO.setName(userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("User not found with ID: " + board.getOwnerId())).getName());
             boardResponse.setOwner(ownerDTO);
+
             return boardResponse;
         }).collect(Collectors.toList());
     }

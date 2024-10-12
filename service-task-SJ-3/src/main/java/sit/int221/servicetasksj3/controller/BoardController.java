@@ -264,23 +264,16 @@ public class BoardController {
         return ResponseEntity.ok(responseDTO);
     }
 
-
     // Add a new collaborator to a board
     @PostMapping("/{boardId}/collabs")
-    public ResponseEntity<CollaboratorDTO> addCollaborator(
-            @PathVariable String boardId,
-            @Valid @RequestBody CollaboratorDTO collaboratorRequest,
-            HttpServletRequest request) {
+    public ResponseEntity<CollaboratorDTO> addCollaborator(@PathVariable String boardId, @Valid @RequestBody CollaboratorDTO collaboratorRequest, HttpServletRequest request) {
         String userId = getUserId(request);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
 
-        Collaborator collaborator = collaboratorService.addCollaboratorToBoard(
-                boardId, collaboratorRequest.getEmail(), collaboratorRequest.getAccessRight().name());
-
-        // สร้าง DTO เพื่อส่งกลับ
+        Collaborator collaborator = collaboratorService.addCollaboratorToBoard(boardId, collaboratorRequest.getEmail(), collaboratorRequest.getAccessRight().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
-                collaborator.getCollaboratorId(),
+                collaborator.getBoardId(),
                 collaborator.getCollaboratorName(),
                 collaborator.getCollaboratorEmail(),
                 collaborator.getAccessLevel(),

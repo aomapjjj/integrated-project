@@ -37,7 +37,7 @@ public class CollaboratorService {
         return usersRepository.findByEmail(email).isPresent();
     }
 
-    // ดึงรายชื่อ Collaborators ทั้งหมดของ Board
+
     public List<Collaborator> getCollaboratorsByBoardId(String boardId) {
 
         Board board = boardRepository.findById(boardId)
@@ -53,18 +53,8 @@ public class CollaboratorService {
 
 
     public Collaborator addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
-
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if(!board.getOwnerId().equals(currentUser.getOid())){
-            throw new ForbiddenException("Only the owner can add collaborators to this board");
-        }
-
-
-
 
         Users user = usersRepository.findByEmail(collaboratorEmail)
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
@@ -73,7 +63,6 @@ public class CollaboratorService {
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
-
 
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
@@ -87,7 +76,6 @@ public class CollaboratorService {
         collaborator.setCollaboratorEmail(collaboratorEmail);
         collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
         collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
-
         return collaboratorRepository.save(collaborator);
     }
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
@@ -97,12 +85,12 @@ public class CollaboratorService {
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
 
-        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
-        if (!board.getOwnerId().equals(currentUser.getOid())) {
-            throw new ForbiddenException("Only the owner can change collaborator access rights");
-        }
+//        if (!board.getOwnerId().equals(currentUser.getOid())) {
+//            throw new ForbiddenException("Only the owner can change collaborator access rights");
+//        }
 
 
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
@@ -129,16 +117,12 @@ public class CollaboratorService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Allow removal if the current user is either the owner or the collaborator themself
-        if (!board.getOwnerId().equals(currentUser.getOid()) && !currentUser.getOid().equals(collaboratorId)) {
-            throw new ForbiddenException("Only the owner or the collaborator can remove themselves from this board");
-        }
-
-        System.out.println("Current User ID: " + currentUser.getOid());
-        System.out.println("Board Owner ID: " + board.getOwnerId());
-        System.out.println("Collaborator ID: " + collaboratorId);
+//        if (!board.getOwnerId().equals(currentUser.getOid()) && !currentUser.getOid().equals(collaboratorId)) {
+//            throw new ForbiddenException("Only the owner or the collaborator can remove themselves from this board");
+//        }
 
         // Check if the collaborator exists
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
