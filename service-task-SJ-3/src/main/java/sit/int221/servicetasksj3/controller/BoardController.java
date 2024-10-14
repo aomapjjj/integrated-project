@@ -16,7 +16,7 @@ import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/v3/boards")
@@ -48,9 +48,20 @@ public class BoardController {
 
     // Board
     @GetMapping("")
-    public ResponseEntity<List<BoardResponseDTO>> getBoardIdByOwner() {
+    public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
         List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
-        return ResponseEntity.ok(boardIds);
+        Map<String, Object> response = new HashMap<>();
+        if (boardIds.isEmpty()) {
+//            response.put("collab", new ArrayList<>());
+            response.put("collaborators", new ArrayList<CollaboratorDTO>());
+            return ResponseEntity.ok(response);
+        }
+        for (BoardResponseDTO board : boardIds) {
+            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
+            board.setCollaborators(collaborators);
+        }
+        response.put("boards", boardIds);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{boardId}")
@@ -220,12 +231,13 @@ public class BoardController {
 
 
     @GetMapping("/{boardId}/collabs")
-    public ResponseEntity<List<CollaboratorDTO>> getCollaboratorsByBoardId(@PathVariable String boardId, HttpServletRequest request) {
+    public ResponseEntity<Map<String, List<CollaboratorDTO>>> getCollaboratorsByBoardId(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-        List<CollaboratorDTO> responseDTOs = collaboratorService.getCollaboratorsByBoardId(boardId);
-        return ResponseEntity.ok(responseDTOs);
+        List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(boardId);
+        Map<String, List<CollaboratorDTO>> response = Collections.singletonMap("collaborators", collaborators);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{boardId}/collabs/{collaboratorId}")
