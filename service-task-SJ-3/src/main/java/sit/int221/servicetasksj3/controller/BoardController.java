@@ -46,22 +46,10 @@ public class BoardController {
         return userId;
     }
 
-    // Board
     @GetMapping("")
-    public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
+    public ResponseEntity<List<BoardResponseDTO>> getBoardIdByOwner() {
         List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
-        Map<String, Object> response = new HashMap<>();
-        if (boardIds.isEmpty()) {
-//            response.put("collab", new ArrayList<>());
-            response.put("collaborators", new ArrayList<CollaboratorDTO>());
-            return ResponseEntity.ok(response);
-        }
-        for (BoardResponseDTO board : boardIds) {
-            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
-            board.setCollaborators(collaborators);
-        }
-        response.put("boards", boardIds);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(boardIds);
     }
 
     @GetMapping("/{boardId}")
