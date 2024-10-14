@@ -46,10 +46,21 @@ public class BoardController {
         return userId;
     }
 
+    // Board
     @GetMapping("")
-    public ResponseEntity<List<BoardResponseDTO>> getBoardIdByOwner() {
+    public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
         List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
-        return ResponseEntity.ok(boardIds);
+        Map<String, Object> response = new HashMap<>();
+        if (boardIds.isEmpty()) {
+            response.put("collaborators", new ArrayList<CollaboratorDTO>());
+            return ResponseEntity.ok(response);
+        }
+        for (BoardResponseDTO board : boardIds) {
+            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
+            board.setCollaborators(collaborators);
+        }
+        response.put("boards", boardIds);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{boardId}")
@@ -273,7 +284,6 @@ public class BoardController {
         return ResponseEntity.ok(responseDTO);
     }
 
-
     @DeleteMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> removeCollaborator(
             @PathVariable String boardId,
@@ -296,14 +306,4 @@ public class BoardController {
 
         return ResponseEntity.ok(responseDTO);
     }
-
-
-
-
-
-
 }
-
-
-
-
