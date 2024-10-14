@@ -187,8 +187,9 @@ const confirmChange = async () => {
       const result = await editAccessRight(
         boardId.value,
         pendingItem.value.accessRight,
-        pendingItem.value.oid
+        pendingItem.value.id
       )
+      console.log(pendingItem.value)
       alertMessage.value = "Access right updated: " + result.accessRight
       isAlertSuccess.value = true
       setTimeout(hideAlert, 3000)

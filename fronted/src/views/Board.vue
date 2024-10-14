@@ -47,16 +47,12 @@ onMounted(async () => {
   }
 })
 
-
 const getBoardsByOwner = (boardsList , userName) => {
     return boardsList.filter(board => board.owner.name === userName);
 }
 const getBoardsCollabsByOwner = (boardsList , userName) => {
     return boardsList.filter(board => board.owner.name !== userName);
 }
-
-
-
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
@@ -176,7 +172,7 @@ const openModalCreate = () => {
                   <div class="flex justify-between items-center">
                     <div class="flex gap-2">
                       <!-- Edit -->
-                      <button class="btn p-2 rounded-md customBgYellow">
+                      <button class="btn rounded-full customBgYellow">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                           <g fill="none">
                             <path
@@ -187,7 +183,7 @@ const openModalCreate = () => {
                         </svg>
                       </button>
                       <!-- Delete -->
-                      <button class="btn p-2 bg-red-400 rounded-md" @click="openModalToDeleteBoard(item.id)">
+                      <button class="btn bg-red-400 rounded-full" @click="openModalToDeleteBoard(item.id)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
@@ -198,7 +194,7 @@ const openModalCreate = () => {
                         </svg>
                       </button>
                       <button @click="toBoardsList(item.id)"
-                        class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500 ml-10">
+                        class="bg-teal-400 px-4 text-sm rounded-md text-white hover:bg-teal-500 ml-10">
                         Show More
                       </button>
                     </div>
