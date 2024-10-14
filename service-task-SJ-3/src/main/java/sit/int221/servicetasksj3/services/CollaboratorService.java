@@ -4,6 +4,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import sit.int221.servicetasksj3.dtos.boardsDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Collaborator;
@@ -19,50 +20,63 @@ import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CollaboratorService {
     @Autowired
     private CollaboratorRepository collaboratorRepository;
-
     @Autowired
     private BoardRepository boardRepository;
-
-
     @Autowired
     private UserRepository usersRepository;
 
-    public boolean isEmailInITBKKShared(String email) {
 
-        return usersRepository.findByEmail(email).isPresent();
+    public boolean isCollaborator(String boardId, String userId) {
+        return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
+    }
+
+    public List<CollaboratorDTO> getCollaboratorsByBoardId(String boardId) {
+        boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+        return collaboratorRepository.findByBoardId(boardId).stream()
+                .map(c -> new CollaboratorDTO(
+                        c.getCollaboratorId(),
+                        c.getCollaboratorName(),
+                        c.getCollaboratorEmail(),
+                        c.getAccessLevel(),
+                        c.getAddedOn()
+                ))
+                .toList();
+    }
+
+    public CollaboratorDTO getCollaboratorByBoardIdAndCollaboratorId(String boardId, String collaboratorId) {
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+        if (collaborator == null) {
+            throw new ItemNotFoundException("Collaborator not found");
+        }
+        return new CollaboratorDTO(
+                collaborator.getCollaboratorId(),
+                collaborator.getCollaboratorName(),
+                collaborator.getCollaboratorEmail(),
+                collaborator.getAccessLevel(),
+                collaborator.getAddedOn()
+        );
     }
 
 
-    public List<Collaborator> getCollaboratorsByBoardId(String boardId) {
-
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        return collaboratorRepository.findByBoardId(boardId);
-    }
-
-
-    public Collaborator getCollaboratorByBoardIdAndCollaboratorId(String boardId, String collaboratorId) {
-        return collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
-    }
-
-
-    public Collaborator addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
+    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
         Users user = usersRepository.findByEmail(collaboratorEmail)
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
 
+
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
 
+        // ตรวจสอบว่าผู้ใช้นี้เป็น collaborator ในบอร์ดนี้แล้วหรือไม่
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
         }
@@ -75,7 +89,15 @@ public class CollaboratorService {
         collaborator.setCollaboratorEmail(collaboratorEmail);
         collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
         collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
-        return collaboratorRepository.save(collaborator);
+        collaboratorRepository.save(collaborator);
+
+        return new CollaboratorDTO(
+                collaborator.getCollaboratorId(),
+                collaborator.getCollaboratorName(),
+                collaborator.getCollaboratorEmail(),
+                collaborator.getAccessLevel(),
+                collaborator.getAddedOn()
+        );
     }
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
 

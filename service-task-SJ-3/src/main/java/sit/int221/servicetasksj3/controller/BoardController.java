@@ -220,68 +220,32 @@ public class BoardController {
 
 
     @GetMapping("/{boardId}/collabs")
-    public ResponseEntity<List<CollaboratorDTO>> getCollaboratorsByBoardId(
-            @PathVariable String boardId, HttpServletRequest request) {
+    public ResponseEntity<List<CollaboratorDTO>> getCollaboratorsByBoardId(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        // ดึงรายการ collaborator
-        List<Collaborator> collaborators = collaboratorService.getCollaboratorsByBoardId(boardId);
-
-        // แปลงรายการ Collaborator เป็น CollaboratorResponseDTO
-        List<CollaboratorDTO> responseDTOs = collaborators.stream()
-                .map(collaborator -> new CollaboratorDTO(
-                        collaborator.getCollaboratorId(),
-                        collaborator.getCollaboratorName(),
-                        collaborator.getCollaboratorEmail(),
-                        collaborator.getAccessLevel(),
-                        collaborator.getAddedOn()
-                )).toList();
-
+        List<CollaboratorDTO> responseDTOs = collaboratorService.getCollaboratorsByBoardId(boardId);
         return ResponseEntity.ok(responseDTOs);
     }
 
-    // Get a specific collaborator by boardId and collaboratorId
     @GetMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> getCollaboratorById(
             @PathVariable String boardId, @PathVariable String collaboratorId, HttpServletRequest request) {
         String userId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        // ดึง collaborator หนึ่งคน
-        Collaborator collaborator = collaboratorService.getCollaboratorByBoardIdAndCollaboratorId(boardId, collaboratorId);
-
-        // แปลงเป็น CollaboratorResponseDTO
-        CollaboratorDTO responseDTO = new CollaboratorDTO(
-                collaborator.getCollaboratorId(),
-                collaborator.getCollaboratorName(),
-                collaborator.getCollaboratorEmail(),
-                collaborator.getAccessLevel(),
-                collaborator.getAddedOn()
-        );
-
+        CollaboratorDTO responseDTO = collaboratorService.getCollaboratorByBoardIdAndCollaboratorId(boardId, collaboratorId);
         return ResponseEntity.ok(responseDTO);
     }
 
-    // Add a new collaborator to a board
     @PostMapping("/{boardId}/collabs")
     public ResponseEntity<CollaboratorDTO> addCollaborator(@PathVariable String boardId, @Valid @RequestBody CollaboratorDTO collaboratorRequest, HttpServletRequest request) {
         String userId = getUserId(request);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        Collaborator collaborator = collaboratorService.addCollaboratorToBoard(boardId, collaboratorRequest.getEmail(), collaboratorRequest.getAccessRight().name());
-        CollaboratorDTO responseDTO = new CollaboratorDTO(
-                collaborator.getBoardId(),
-                collaborator.getCollaboratorName(),
-                collaborator.getCollaboratorEmail(),
-                collaborator.getAccessLevel(),
-                collaborator.getAddedOn()
-        );
-
+        CollaboratorDTO responseDTO = collaboratorService.addCollaboratorToBoard(boardId, collaboratorRequest.getEmail(), collaboratorRequest.getAccessRight().name());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
+
     @PatchMapping("/{boardId}/collabs/{collabId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
