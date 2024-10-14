@@ -21,6 +21,7 @@ import sit.int221.servicetasksj3.exceptions.ForbiddenException;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.services.BoardService;
+import sit.int221.servicetasksj3.services.CollaboratorService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
@@ -36,8 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private BoardService boardService;
-//    @Autowired
-//    private CollabService collabService;
+    @Autowired
+    private CollaboratorService collaboratorService;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -96,7 +98,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         AuthUser currentUser = getCurrentUserDetails();
         boolean isBoardExist = boardService.boardExists(boardId);
 
-        // ตรวจสอบว่าบอร์ดมีอยู่จริงหรือไม่
         if (!isBoardExist) {
             if (!isTokenValid && !requestMethod.equals("GET")) {
                 throw new UnauthorizedException("Access denied: Unauthorized attempt to modify a non-existent board with ID: " + boardId);
@@ -108,9 +109,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         boolean isPublic = boardService.isBoardPublic(boardId);
 
         if (currentUser != null) {
+            boolean isCollaborator = collaboratorService.isCollaborator(boardId, currentUser.getOid());
             boolean isOwner = boardService.isBoardOwner(boardId);
-            if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
-                throw new ForbiddenException("Access forbidden: User with ID: " + currentUser.getOid() + " is not authorized to access board with ID: " + boardId);
+
+            if (isCollaborator) {
+                if (!requestMethod.equals("GET")) {
+                    throw new ForbiddenException(
+                            "Access forbidden: Collaborators are only allowed to access GET methods on board with ID: " + boardId
+                    );
+                }
+            } else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
+                throw new ForbiddenException(
+                        "Access forbidden: User with ID: " + currentUser.getOid() + " is not authorized to access board with ID: " + boardId
+                );
             }
         } else {
             if (!isPublic) {
