@@ -129,9 +129,11 @@ const submitForm = async () => {
     setTimeout(hideAlert, 3000)
   }
 }
-
+console.log(collaboratorInfo.value)
 const showRemoveModal = (oid) => {
+  console.log(oid)
   oidCollaboratorToRemove.value = oid
+  console.log(oidCollaboratorToRemove.value)
   showConfirmModal.value = true
 }
 
@@ -144,7 +146,7 @@ const confirmRemove = async () => {
       )
       if (status === 200) {
         collaboratorInfo.value = collaboratorInfo.value.filter(
-          (collab) => collab.oid !== oidCollaboratorToRemove.value
+          (collab) => collab.id !== oidCollaboratorToRemove.value
         )
         isAlertSuccess.value = true
         alertMessage.value = "Collaborator removed successfully"
@@ -163,6 +165,8 @@ const confirmRemove = async () => {
     }
   }
 }
+
+
 const pendingItem = ref(null)
 
 const updateAccessRight = (item) => {
@@ -365,7 +369,7 @@ const clearForm = () => {
                 <tbody>
                   <tr
                     v-for="(item, index) in collaboratorInfo"
-                    :key="item.oid"
+                    :key="item.id"
                     class="itbkk-item"
                   >
                     <td
@@ -414,7 +418,7 @@ const clearForm = () => {
                       class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
                       <button
-                        @click="showRemoveModal(item.oid)"
+                        @click="showRemoveModal(item.id)"
                         class="btn bg-red-500 text-white"
                       >
                         Remove

@@ -31,7 +31,7 @@ function getToken() {
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
-
+  console.log( getBoardsCollabsByOwner(BoardsList.value ,userName ))
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -54,6 +54,8 @@ const getBoardsByOwner = (boardsList , userName) => {
 const getBoardsCollabsByOwner = (boardsList , userName) => {
     return boardsList.filter(board => board.owner.name !== userName);
 }
+
+
 
 
 const toBoardsList = (boardId) => {
