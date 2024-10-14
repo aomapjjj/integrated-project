@@ -83,9 +83,9 @@ const routes = [
       // ตรวจสอบความเป็นเจ้าของบอร์ด
       if (userNameBoard.item.owner.name !== currentUsername) {
         // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
-        if (userNameBoard.item.visibility === "PRIVATE") {
-          return next({ name: "ErrorPagePermission" })
-        }
+        // if (userNameBoard.item.visibility === "PRIVATE") {
+        //   return next({ name: "ErrorPagePermission" })
+        // }
       } else {
         console.log("ตรงกันนะจ๊า")
         return next()
@@ -96,13 +96,13 @@ const routes = [
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         )
 
-        if (response.status === 404) {
-          return next({ name: "ErrorPage" })
-        }
+        // if (response.status === 404) {
+        //   return next({ name: "ErrorPage" })
+        // }
 
-        if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" })
-        }
+        // if (response.status === 403) {
+        //   return next({ name: "ErrorPagePermission" })
+        // }
 
         const board = await response.json()
 
