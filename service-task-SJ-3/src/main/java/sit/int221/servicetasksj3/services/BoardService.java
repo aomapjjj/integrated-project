@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import sit.int221.servicetasksj3.sharedatabase.entities.*;
 import sit.int221.servicetasksj3.sharedatabase.repositories.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,10 +58,12 @@ public class BoardService {
             if (isPublic || isOwner || isCollaborator) {
                 return;
             } else {
+                if (!isCollaborator){
+                    throw new ItemNotFoundException("The board exists, but the user is not authorized to access this board.");
+                }
                 throw new ForbiddenException("The board exists, but the user is not authorized to access this board.");
             }
         }
-
         if (userId == null) {
             if (isPrivate) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
@@ -69,11 +73,9 @@ public class BoardService {
             }
             return;
         }
-
         if (isOwner) {
             return;
         }
-
         if (isPublic) {
             if (requestMethod.equals("POST")) {
                 return;
@@ -144,9 +146,6 @@ public class BoardService {
     // Create a new board
     public BoardResponseDTO createNewBoard(BoardRequestDTO boardRequest) {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (currentUser == null) {
-//            throw new UnauthorizedException("User not authenticated");
-//        }
 
         String oid = currentUser.getOid();
 
@@ -154,7 +153,7 @@ public class BoardService {
         board.setId(generateUniqueBoardId());
         board.setOwnerId(oid);
         board.setName(boardRequest.getName());
-//
+
         Board newBoard = boardRepository.save(board);
 
         // Add default statuses
@@ -203,13 +202,7 @@ public class BoardService {
 
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Check if the user is the owner of the board
-//        if (!board.getOwnerId().equals(currentUser.getOid())) {
-//            throw new ForbiddenException("User is not authorized to edit this board");
-//        }
-
         board.setName(boardRequest.getName());
-//        board.setVisibility(boardRequest.getVisibility());
 
         Board updatedBoard = boardRepository.save(board);
 
@@ -227,12 +220,6 @@ public class BoardService {
     public VisibilityDTO editBoardVisibility(String boardId, VisibilityDTO visibility) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // ตรวจสอบว่า user เป็นเจ้าของ board หรือไม่
-//        if (!board.getOwnerId().equals(currentUser.getOid())) {
-//            throw new ForbiddenException("User is not authorized to edit this board");
-//        }
 
         board.setVisibility(visibility.getVisibility());
         boardRepository.save(board);

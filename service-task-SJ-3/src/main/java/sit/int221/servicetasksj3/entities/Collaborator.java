@@ -19,7 +19,7 @@ public class Collaborator {
     @Column(name = "collabsName")
     private String collaboratorName;
 
-    @Column(name = "collabsEmail")
+    @Column(name = "collabsEmail", length = 255)
     private String collaboratorEmail;
 
     @Column(name = "boardId")

@@ -4,6 +4,8 @@ import lombok.*;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Visibility;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,4 +25,6 @@ public class BoardResponseDTO{
         private String oid;
         private String name;
     }
+
+    private List<CollaboratorDTO> collaborators;
 }
