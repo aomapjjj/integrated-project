@@ -16,7 +16,7 @@ function getToken() {
 
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
-  BoardsList.value = itemsBoards
+  BoardsList.value = itemsBoards.boards
   console.log('Side Bar', BoardsList.value)
   const token = getToken()
   // const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {

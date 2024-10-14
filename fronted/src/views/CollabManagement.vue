@@ -55,7 +55,7 @@ const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
 onMounted(async () => {
   userStore.setToken(token)
   const collaborator = await getItems(baseUrlCollaborator)
-  collaboratorInfo.value = collaborator
+  collaboratorInfo.value = collaborator.collaborators
   console.log("Get Items", collaboratorInfo.value)
 
   const Board = await getBoardById(boardId.value)
@@ -424,6 +424,11 @@ const clearForm = () => {
                       >
                         Remove
                       </button>
+                    </td>
+                  </tr>
+                  <tr class="bg-base-100 mt-4 md:mt-0" v-if="collaboratorInfo?.length === 0">
+                    <td colspan="5" class="text-center py-4 text-gray-400">
+                      No Collaboator
                     </td>
                   </tr>
                 </tbody>
