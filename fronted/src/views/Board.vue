@@ -31,7 +31,7 @@ function getToken() {
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   BoardsList.value = itemsBoards
-  console.log( getBoardsCollabsByOwner(BoardsList.value ,userName ))
+  console.log(getBoardsCollabsByOwner(BoardsList.value, userName))
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -47,11 +47,11 @@ onMounted(async () => {
   }
 })
 
-const getBoardsByOwner = (boardsList , userName) => {
-    return boardsList.filter(board => board.owner.name === userName);
+const getBoardsByOwner = (boardsList, userName) => {
+  return boardsList.filter(board => board.owner.name === userName);
 }
-const getBoardsCollabsByOwner = (boardsList , userName) => {
-    return boardsList.filter(board => board.owner.name !== userName);
+const getBoardsCollabsByOwner = (boardsList, userName) => {
+  return boardsList.filter(board => board.owner.name !== userName);
 }
 
 const toBoardsList = (boardId) => {
@@ -155,7 +155,7 @@ const openModalCreate = () => {
             Personal Boards
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="(item, index) in getBoardsByOwner(BoardsList , userName )" :key="index">
+            <div v-for="(item, index) in getBoardsByOwner(BoardsList, userName)" :key="index">
               <div
                 class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl">
                 <div class="max-w-md mx-auto space-y-6">
@@ -166,9 +166,10 @@ const openModalCreate = () => {
                     {{ item.name }}
                   </p>
                   <p class="text-md font-semibold text-center">
-                    Status: {{ item.visibility }}
+                    status: {{ item.visibility.charAt(0).toUpperCase() + item.visibility.slice(1).toLowerCase() }}
                   </p>
-                  
+
+
                   <div class="flex justify-between items-center">
                     <div class="flex gap-2">
                       <!-- Edit -->
@@ -241,7 +242,7 @@ const openModalCreate = () => {
             Collab Boards
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div v-for="(item, index) in getBoardsCollabsByOwner(BoardsList , userName )" :key="index">
+            <div v-for="(item, index) in getBoardsCollabsByOwner(BoardsList, userName)" :key="index">
               <div
                 class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl">
                 <div class="max-w-md mx-auto space-y-6">
