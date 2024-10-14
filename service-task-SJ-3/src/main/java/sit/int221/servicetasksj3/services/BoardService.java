@@ -30,11 +30,7 @@ public class BoardService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-    private ListMapper listMapper;
-
-    @Autowired
     private LimitRepository limitRepository;
-
     @Autowired
     private CollaboratorRepository collaboratorRepository;
 
@@ -43,68 +39,53 @@ public class BoardService {
         String boardId;
         do {
             boardId = NanoId.generate(10);
-        } while (boardRepository.existsById(boardId)); // ตรวจสอบว่ามี id นี้ในฐานข้อมูลแล้วหรือยัง
+        } while (boardRepository.existsById(boardId));
         return boardId;
     }
 
     public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod , String collaboratorId) {
-        // ค้นหา Board ตาม ID
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
 
         boolean isOwner = board.getOwnerId().equals(userId);
         boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
         boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
         boolean isCollaborator = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, collaboratorId);
 
-
-        // กรณีที่ Board มีอยู่แล้ว (board($id).exists)
         if (board != null) {
-            // ตรวจสอบว่าเป็นเจ้าของ, public, หรือ collaborator
             if (isPublic || isOwner || isCollaborator) {
-                return; // อนุญาตให้เข้าถึง
+                return;
             } else {
-                // ไม่ตรงตามเงื่อนไข public, owner, หรือ collaborator
                 throw new ForbiddenException("The board exists, but the user is not authorized to access this board.");
             }
         }
 
-        // กรณีที่ผู้ใช้ไม่เข้าสู่ระบบ
         if (userId == null) {
-            // ผู้ใช้ไม่เข้าสู่ระบบและพยายามเข้าถึงบอร์ดส่วนตัว
             if (isPrivate) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
             }
-            // ผู้ใช้ไม่เข้าสู่ระบบและเข้าถึงบอร์ด public (เฉพาะ GET)
             if (isPublic && !requestMethod.equals("GET")) {
                 throw new ForbiddenException("The board exists, but the user is not authorized for this action on a public board.");
             }
-            return; // อนุญาตให้เข้าถึง GET ในกรณีบอร์ด public
+            return;
         }
 
-        // กรณีที่ผู้ใช้เข้าสู่ระบบ
-        if (isOwner ) {
-            return; // ผู้ใช้เป็นเจ้าของ สามารถเข้าถึงได้ทุกกรณี
+        if (isOwner) {
+            return;
         }
 
-        // ผู้ใช้ไม่ใช่เจ้าของ
         if (isPublic) {
-            // บอร์ดเป็น public และการกระทำเป็น POST เพื่อเพิ่ม collaborator (อนุญาตได้)
             if (requestMethod.equals("POST")) {
                 return;
             }
-            // บอร์ดเป็น public และการกระทำเป็นอย่างอื่นที่ไม่ใช่ GET (ห้ามทำ)
             if (!requestMethod.equals("GET")) {
                 throw new ForbiddenException("The board exists, but the user is not the owner and the board is public.");
             }
-            return; // การกระทำเป็น GET และบอร์ดเป็น public อนุญาตให้เข้าถึง
+            return;
         }
-
-
-        // ผู้ใช้ไม่ใช่เจ้าของและบอร์ดเป็น private (ห้ามทุกการกระทำ)
         throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
     }
+
     public  Boolean isBoardPublic(String boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
@@ -122,11 +103,6 @@ public class BoardService {
         }
         return boardRepository.existsById(boardId);
     }
-
-//    public boolean isCollaborator(String boardId, String oid) {
-//        return collabRepository.existsById(new CollabId(boardId, oid));
-//    }
-
 
     // Get board IDs by owner
     public List<BoardResponseDTO> getBoardIdByOwner() {
