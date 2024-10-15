@@ -50,10 +50,10 @@ onMounted(async () => {
 })
 
 const getBoardsByOwner = (boardsList, userName) => {
-  return boardsList.filter(board => board.owner.name === userName);
+  return boardsList?.filter(board => board.owner.name === userName);
 }
 const getBoardsCollabsByOwner = (boardsList, userName) => {
-  return boardsList.filter(board => board.owner.name !== userName);
+  return boardsList?.filter(board => board.owner.name !== userName);
 }
 
 const toBoardsList = (boardId) => {
