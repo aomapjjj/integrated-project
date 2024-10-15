@@ -426,11 +426,7 @@ const changeVisibility = async () => {
                 <!-- ADD BUTTON -->
 
                 <AddTask :disabledBtn="disabledButtonWhileOpenPublic" />
-                <button class="itbkk-manage-Collaboator btn bg-gray-200" style="
-                    color: white;
-                    background-color: #f785b1;
-                    border-radius: 30px;
-                  " @click="openCollaborator()">
+                <button class="itbkk-manage-Collaboator btn text-white rounded-full bg-orange-300"  @click="openCollaborator()">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                       stroke-width="2">
@@ -442,11 +438,7 @@ const changeVisibility = async () => {
                   Manage Collaboator
                 </button>
                 <!-- MANAGE STATUS -->
-                <button class="itbkk-manage-status btn bg-gray-200" style="
-                    color: white;
-                    background-color: #f785b1;
-                    border-radius: 30px;
-                  " @click="openNewStatus()">
+                <button class="itbkk-manage-status btn text-white rounded-full bg-customPink" @click="openNewStatus()">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                       stroke-width="2">
