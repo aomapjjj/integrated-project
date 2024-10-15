@@ -349,7 +349,7 @@ const clearForm = () => {
                         color: #fff;
                       "
                     >
-                      Acess Right
+                      Access Right
                     </th>
 
                     <th
@@ -398,8 +398,8 @@ const clearForm = () => {
                         v-model="item.accessRight"
                         @change="updateAccessRight(item)"
                       >
-                        <option value="READ">READ</option>
-                        <option value="WRITE">WRITE</option>
+                        <option value="READ">Read</option>
+                        <option value="WRITE">Write</option>
                       </select>
 
                       <!-- Modal Component -->
@@ -418,11 +418,21 @@ const clearForm = () => {
                     <td
                       class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
-                      <button
+                      <!-- <button
                         @click="showRemoveModal(item.id)"
                         class="btn bg-red-500 text-white"
                       >
                         Remove
+                      </button> -->
+                      <button class="btn bg-red-400 rounded-full" @click="showRemoveModal(item.id)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                          <g fill="none" fill-rule="evenodd">
+                            <path
+                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
+                            <path fill="white"
+                              d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z" />
+                          </g>
+                        </svg>
                       </button>
                     </td>
                   </tr>
@@ -454,7 +464,7 @@ const clearForm = () => {
                   type="email"
                   v-model="collaboratorEmail"
                   class="w-full p-2 border rounded mb-4"
-                  placeholder="Enter email"
+                  placeholder="you@ad.sit.kmutt.ac.th	"
                 />
 
                 <label class="block text-sm font-bold mb-2">Access Right</label>
@@ -468,13 +478,13 @@ const clearForm = () => {
 
                 <div class="flex justify-end">
                   <button
-                    class="btn bg-gray-500 text-white mr-4"
+                    class="btn bg-gray-300 mr-4"
                     @click="cancelAction"
                   >
                     Cancel
                   </button>
                   <button
-                    class="btn bg-blue-500 text-white"
+                    class="btn bg-customPink"
                     @click="submitForm"
                   >
                     Save
