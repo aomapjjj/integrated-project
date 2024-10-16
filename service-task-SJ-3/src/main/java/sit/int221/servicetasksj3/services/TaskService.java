@@ -12,10 +12,7 @@ import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
-import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
-import sit.int221.servicetasksj3.exceptions.InternalServerErrorException;
-import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
-import sit.int221.servicetasksj3.exceptions.ValidationException;
+import sit.int221.servicetasksj3.exceptions.*;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.LimitRepository;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
@@ -43,6 +40,8 @@ public class TaskService {
     private ModelMapper modelMapper;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CollaboratorService collaboratorService;
 
 
     //GET ALL TASKS V.2
@@ -118,11 +117,16 @@ public class TaskService {
         task1.setBoard(board);
         TaskStatus status;
 
-        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของ board หรือไม่
+
+
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!board.getOwnerId().equals(currentUser.getOid())) {
+        boolean isWriteAccess = collaboratorService.hasWriteAccess(boardId, currentUser.getOid());
+
+
+        if (!isWriteAccess && !board.getOwnerId().equals(currentUser.getOid())) {
             throw new UnauthorizedException("You are not the owner of this board");
         }
+
 
         try {
             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
