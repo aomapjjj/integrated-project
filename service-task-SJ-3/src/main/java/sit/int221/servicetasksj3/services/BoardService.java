@@ -115,7 +115,6 @@ public class BoardService {
         List<Board> boards = boardRepository.findAllByUserIdOrCollaboratorId(oid);
         System.out.println("Boards found: " + boards.size());
 
-
         return boards.stream().map(board -> {
             BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
 

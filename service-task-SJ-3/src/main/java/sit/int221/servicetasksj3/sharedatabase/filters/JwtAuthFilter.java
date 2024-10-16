@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.exceptions.ErrorResponse;
 import sit.int221.servicetasksj3.exceptions.ForbiddenException;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
@@ -111,14 +112,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (currentUser != null) {
             boolean isCollaborator = collaboratorService.isCollaborator(boardId, currentUser.getOid());
             boolean isOwner = boardService.isBoardOwner(boardId);
+            boolean isWriteAccess = collaboratorService.hasWriteAccess(boardId, currentUser.getOid());
 
             if (isCollaborator) {
-                if (!requestMethod.equals("GET")) {
-                    throw new ForbiddenException(
-                            "Access forbidden: Collaborators are only allowed to access GET methods on board with ID: " + boardId
-                    );
+                if (isWriteAccess) {
+                    if (requestMethod.equals("PATCH")) {
+                        throw new ForbiddenException(
+                                "Access forbidden: Collaborators with WRITE access are not allowed to access PATCH methods on board with ID: " + boardId
+                        );
+                    }
                 }
-            } else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
+
+                else {
+                    if (!requestMethod.equals("GET")) {
+                        throw new ForbiddenException(
+                                "Access forbidden: Collaborators without WRITE access are only allowed to access GET methods on board with ID: " + boardId
+                        );
+                    }
+                }
+            }else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
                 throw new ForbiddenException(
                         "Access forbidden: User with ID: " + currentUser.getOid() + " is not authorized to access board with ID: " + boardId
                 );

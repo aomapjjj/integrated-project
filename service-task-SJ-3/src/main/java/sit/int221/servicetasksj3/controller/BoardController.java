@@ -52,7 +52,6 @@ public class BoardController {
         List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
         Map<String, Object> response = new HashMap<>();
         if (boardIds.isEmpty()) {
-//            response.put("collab", new ArrayList<>());
             response.put("collaborators", new ArrayList<CollaboratorDTO>());
             return ResponseEntity.ok(response);
         }
