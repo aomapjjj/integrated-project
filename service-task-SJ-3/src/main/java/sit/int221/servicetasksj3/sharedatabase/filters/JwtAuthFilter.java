@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.exceptions.ErrorResponse;
 import sit.int221.servicetasksj3.exceptions.ForbiddenException;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
@@ -101,7 +100,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (!isBoardExist) {
             if (!isTokenValid && !requestMethod.equals("GET")) {
-                throw new UnauthorizedException("Access denied: Unauthorized attempt to modify a non-existent board with ID: " + boardId);
+                throw new UnauthorizedException("Unauthorized attempt to modify a non-existent board with ID: " + boardId);
             } else {
                 throw new ItemNotFoundException("Board with ID: " + boardId + " not found.");
             }
@@ -116,21 +115,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (isCollaborator) {
                 if (isWriteAccess) {
-                    if (requestMethod.equals("PATCH")) {
+                    if ((requestMethod.equals("PATCH") || requestMethod.equals("POST")) &&
+                            !(request.getRequestURI().endsWith("/tasks") || request.getRequestURI().endsWith("/statuses"))) {
                         throw new ForbiddenException(
-                                "Access forbidden: Collaborators with WRITE access are not allowed to access PATCH methods on board with ID: " + boardId
+                                "Collaborators with WRITE access are not allowed to access PATCH methods on board with ID: " + boardId
                         );
                     }
-                }
-
-                else {
-                    if (!requestMethod.equals("GET")) {
+                    if (requestMethod.equals("DELETE") && request.getRequestURI().contains("/collabs/")) {
+                        String[] uriParts = request.getRequestURI().split("/");
+                        String collaboratorId = uriParts[uriParts.length - 1];
+                        if (!collaboratorId.equals(currentUser.getOid())) {
+                            throw new ForbiddenException(
+                                    "Collaborators with WRITE access can only remove themselves from board with ID: " + boardId
+                            );
+                        }
+                    }
+                } else {
+                    if (requestMethod.equals("DELETE") && request.getRequestURI().contains("/collabs/")) {
+                        String[] uriParts = request.getRequestURI().split("/");
+                        String collaboratorId = uriParts[uriParts.length - 1];
+                        if (!collaboratorId.equals(currentUser.getOid())) {
+                            throw new ForbiddenException(
+                                    "Collaborators without WRITE access can only remove themselves from board with ID: " + boardId
+                            );
+                        }
+                    } else if (!requestMethod.equals("GET")) {
                         throw new ForbiddenException(
-                                "Access forbidden: Collaborators without WRITE access are only allowed to access GET methods on board with ID: " + boardId
+                                "Collaborators without WRITE access are only allowed to access GET methods on board with ID: " + boardId
                         );
                     }
+                
                 }
-            }else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
+            } else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
                 throw new ForbiddenException(
                         "Access forbidden: User with ID: " + currentUser.getOid() + " is not authorized to access board with ID: " + boardId
                 );
@@ -138,17 +154,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } else {
             if (!isPublic) {
                 if (requestMethod.equals("GET")) {
-                    throw new ForbiddenException("Access forbidden: Anonymous users are not allowed to view private board with ID: " + boardId);
+                    throw new ForbiddenException("Anonymous users are not allowed to view private board with ID: " + boardId);
                 } else {
-                    throw new UnauthorizedException("Unauthorized: Authentication required for this action. Token error: " + tokenError);
+                    throw new UnauthorizedException("Authentication required for this action. Token error: " + tokenError);
                 }
             } else {
                 if (!requestMethod.equals("GET")) {
-                    throw new UnauthorizedException("Unauthorized: Token required for modifying public board with ID: " + boardId + ". Token error: " + tokenError);
+                    throw new UnauthorizedException("Token required for modifying public board with ID: " + boardId + ". Token error: " + tokenError);
                 }
             }
         }
     }
+
     public AuthUser getCurrentUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof AuthUser) {
