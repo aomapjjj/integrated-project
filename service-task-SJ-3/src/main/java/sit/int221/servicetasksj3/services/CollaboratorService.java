@@ -1,26 +1,21 @@
 package sit.int221.servicetasksj3.services;
 
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.boardsDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.Collaborator;
 import sit.int221.servicetasksj3.exceptions.ConflictException;
-import sit.int221.servicetasksj3.exceptions.ForbiddenException;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.CollaboratorRepository;
-import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CollaboratorService {
@@ -41,6 +36,7 @@ public class CollaboratorService {
     }
 
 
+
     public List<CollaboratorDTO> getCollaboratorsByBoardId(String boardId) {
         boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
         return collaboratorRepository.findByBoardId(boardId).stream()
@@ -56,9 +52,11 @@ public class CollaboratorService {
 
     public CollaboratorDTO getCollaboratorByBoardIdAndCollaboratorId(String boardId, String collaboratorId) {
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
+
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
                 collaborator.getCollaboratorName(),
@@ -67,7 +65,6 @@ public class CollaboratorService {
                 collaborator.getAddedOn()
         );
     }
-
 
     public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
         Board board = boardRepository.findById(boardId)
@@ -105,25 +102,13 @@ public class CollaboratorService {
         );
     }
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
-
-
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-
-//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
-//        if (!board.getOwnerId().equals(currentUser.getOid())) {
-//            throw new ForbiddenException("Only the owner can change collaborator access rights");
-//        }
-
 
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
-
 
         AccessRight accessRight;
         try {
@@ -132,10 +117,7 @@ public class CollaboratorService {
             throw new ValidationException("Invalid access right. Only READ and WRITE are allowed.");
         }
 
-
         collaborator.setAccessLevel(accessRight);
-
-
         return collaboratorRepository.save(collaborator);
     }
 
@@ -143,28 +125,12 @@ public class CollaboratorService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        // Allow removal if the current user is either the owner or the collaborator themself
-//        if (!board.getOwnerId().equals(currentUser.getOid()) && !currentUser.getOid().equals(collaboratorId)) {
-//            throw new ForbiddenException("Only the owner or the collaborator can remove themselves from this board");
-//        }
-
-        // Check if the collaborator exists
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
 
-        // Proceed with removal
         collaboratorRepository.delete(collaborator);
-
-        // Return the removed collaborator
         return collaborator;
     }
-
-
-
-
-
 }

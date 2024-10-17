@@ -53,6 +53,7 @@ public class BoardService {
         boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
         boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
         boolean isCollaborator = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, collaboratorId);
+//        boolean isWriteAccess = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, collaboratorId, AccessRight.WRITE);
 
         if (board != null) {
             if (isPublic || isOwner || isCollaborator) {
