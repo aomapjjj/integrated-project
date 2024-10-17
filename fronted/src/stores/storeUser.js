@@ -38,8 +38,6 @@ const useUsers = defineStore("users", () => {
   if (localStorage.getItem("user")) {
     user.value = JSON.parse(localStorage.getItem("user"));
   }
-
-
   
   if (localStorage.getItem("token")) {
     token.value = localStorage.getItem("token");
