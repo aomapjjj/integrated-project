@@ -95,11 +95,7 @@ const setColor = (color, id) => {
     class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
   >
     <!-- Personal Boards -->
-    <h2
-      class="itbkk-personal-board text-xl font-bold mb-4 p-4 items-center justify-center"
-    >
-      Personal Boards
-    </h2>
+    <slot name="labelPersonalBoard"></slot>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div
         v-for="(item, index) in getBoardsByOwner(BoardsList, userName)"
@@ -109,7 +105,7 @@ const setColor = (color, id) => {
           <div
             ref="colorCard"
             :class="`${currentColor[item.id]}`"
-            class="itbkk-personal-item max-w-xs container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl"
+            class="itbkk-personal-item max-w-xs py-4 container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl"
           >
             <div>
               <span
@@ -124,11 +120,11 @@ const setColor = (color, id) => {
                 }}</span
               >
               <h1
-                class="itbkk-board-name text-l mt-2 ml-4 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
+                class="itbkk-board-name text-l px-6 py-2 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
               >
                 {{ item.name }}
               </h1>
-              <div class="px-4 py-2">
+              <div class="px-6 py-2">
                 <span
                   @click="setColor('bg-gray-300', item.id)"
                   class="inline-block rounded-full bg-white border-4 border-gray-400 p-1 text-xs font-bold mr-3"
@@ -155,9 +151,8 @@ const setColor = (color, id) => {
                 ></span>
               </div>
             </div>
-            <div class="flex p-4 justify-between">
+            <div class="flex px-4 py-2 justify-between">
               <div class="flex items-center space-x-2">
-                <!-- <h2 class="text-gray-800 font-bold cursor-pointer">Felipe Sacudon</h2> -->
                 <div class="flex gap-2">
                   <button class="btn rounded-full customBgYellow">
                     <svg
@@ -202,24 +197,19 @@ const setColor = (color, id) => {
 
                   <button
                     @click="toBoardsList(item.id)"
-                    class="flex select-none items-center gap-2 rounded-lg py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase text-customPink transition-all hover:text-pink-400 active:text-pink-500 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                     type="button"
                   >
                     Show More
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
+                      class="h-8 w-8"
                       viewBox="0 0 24 24"
-                      stroke-width="2"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                      class="h-4 w-4"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
-                      ></path>
+                        fill="currentColor"
+                        d="M9.879 17.243a1 1 0 0 1-.707-1.707L12.707 12L9.172 8.464a1 1 0 0 1 1.414-1.414l4.242 4.243a1 1 0 0 1 0 1.414l-4.242 4.243a1 1 0 0 1-.707.293"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -276,46 +266,66 @@ const setColor = (color, id) => {
     </div>
 
     <!-- Collab Boards -->
-    <h2 class="text-xl font-bold mb-4 mt-4 p-4 items-center justify-center">
-      Collab Boards
-    </h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <slot name="labelCollabBoard"></slot>
+    <div class="p-3">
       <div
         v-for="(item, index) in getBoardsCollabsByOwner(BoardsList, userName)"
         :key="index"
       >
-        <div
-          class="overflow-hidden relative bg-transparent transition ease-in-out delay-100 hover:bg-gradient-to-l from-cyan-100 to-teal-50 w-full max-w-lg px-5 py-8 mx-auto bg-white rounded-lg hover:rotate-3 shadow-xl hover:bg-teal-50 hover:rounded-3xl"
+        <ul
+          role="list"
+          class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
-          <div class="max-w-md mx-auto space-y-6">
-            <div
-              class="animate-bounce absolute w-52 h-52 bg-teal-50 rounded-full -bottom-10 -right-10 -z-10"
-            ></div>
-            <div
-              class="animate-bounce absolute w-32 h-32 bg-cyan-100 rounded-full -top-10 -left-10 -z-10"
-            ></div>
-            <p class="text-md font-semibold text-center">
-              {{ item.name }}
-            </p>
-            <div class="flex justify-between items-center">
-              <div class="flex gap-2">
-                <button
-                  class="bg-red-400 px-4 py-2 text-sm rounded-md text-white hover:bg-red-500 ml-10"
-                >
-                  Leave
-                </button>
-                <button
-                  @click="toBoardsList(item.id)"
-                  class="bg-teal-400 px-4 py-2 text-sm rounded-md text-white hover:bg-teal-500 ml-10"
-                >
-                  Show More
-                </button>
+          <li
+            class="itbkk-collab-item col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
+          >
+            <div class="flex w-full items-center justify-between space-x-6 p-6">
+              <div class="flex-1 truncate">
+                <div class="flex items-center space-x-3">
+                  <h3
+                    class="itbkk-board-name truncate text-sm font-medium text-gray-900"
+                  >
+                    {{ item.name }}
+                  </h3>
+                  <span
+                    class="itbkk-access-right inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-blue-600 ring-1 ring-inset ring-green-600/20"
+                  >
+                    Read</span
+                  >
+                </div>
+                <p class="itbkk-owner-name mt-1 truncate text-sm text-gray-500">
+                  {{ item.owner.name }}
+                </p>
+              </div>
+              <img
+                class="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
+                src="https://qph.cf2.quoracdn.net/main-thumb-554097988-200-xietklpojlcioqxaqgcyykzfxblvoqrb.jpeg"
+                alt=""
+              />
+            </div>
+            <div>
+              <div class="-mt-px flex divide-x divide-gray-200">
+                <div class="flex w-0 flex-1">
+                  <span
+                    @click="toBoardsList(item.id)"
+                    class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 cursor-pointer"
+                  >
+                    View
+                  </span>
+                </div>
+                <div class="-ml-px flex w-0 flex-1">
+                  <a
+                    href="tel:+1-202-555-0170"
+                    class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
+                  >
+                    <span class="itbkk-leave-board">Leave</span>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </li>
+        </ul>
 
-        <!-- delete modal for the selected item only -->
         <div
           v-if="openModalToDelete && selectedItemIdToDelete === item.id"
           class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"

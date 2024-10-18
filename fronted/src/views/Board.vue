@@ -173,7 +173,23 @@ const openModalCreate = () => {
         </div>
 
         <!-- Board Card -->
-        <BoardCard />
+        <BoardCard>
+          <template #labelPersonalBoard>
+            <h2
+              class="itbkk-personal-board text-xl font-bold mb-4 p-4 items-center justify-center"
+            >
+              Personal Board
+            </h2>
+          </template>
+
+          <template #labelCollabBoard>
+            <h2
+              class="itbkk-collab-board text-xl font-bold mb-4 p-4 items-center justify-center"
+            >
+              Collab Board
+            </h2>
+          </template>
+        </BoardCard>
 
         <!------------------------- Modal ------------------------->
         <div
