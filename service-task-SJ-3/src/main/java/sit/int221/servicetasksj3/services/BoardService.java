@@ -16,9 +16,7 @@ import sit.int221.servicetasksj3.repositories.*;
 import sit.int221.servicetasksj3.sharedatabase.entities.*;
 import sit.int221.servicetasksj3.sharedatabase.repositories.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +33,8 @@ public class BoardService {
     private LimitRepository limitRepository;
     @Autowired
     private CollaboratorRepository collaboratorRepository;
+    @Autowired
+    private CollaboratorService collaboratorService;
 
 
     private String generateUniqueBoardId() {
@@ -53,7 +53,6 @@ public class BoardService {
         boolean isPublic = board.getVisibility() == Visibility.PUBLIC;
         boolean isPrivate = board.getVisibility() == Visibility.PRIVATE;
         boolean isCollaborator = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, collaboratorId);
-//        boolean isWriteAccess = collaboratorId != null && collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, collaboratorId, AccessRight.WRITE);
 
         if (board != null) {
             if (isPublic || isOwner || isCollaborator) {
@@ -128,6 +127,33 @@ public class BoardService {
         }).collect(Collectors.toList());
     }
 
+    public Map<String, Object> getBoardsByOwner() {
+        List<BoardResponseDTO> boardIds = getBoardIdByOwner();
+        Map<String, Object> response = new HashMap<>();
+        if (boardIds.isEmpty()) {
+            response.put("collaborators", new ArrayList<CollaboratorDTO>());
+            return response;
+        }
+        for (BoardResponseDTO board : boardIds) {
+            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
+            board.setCollaborators(collaborators);
+        }
+        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = currentUser.getOid();
+
+        List<BoardResponseDTO> ownerBoards = boardIds.stream()
+                .filter(board -> board.getOwner().getOid().equals(userId))
+                .collect(Collectors.toList());
+
+        List<BoardResponseDTO> collaboratorBoards = boardIds.stream()
+                .filter(board -> !board.getOwner().getOid().equals(userId))
+                .collect(Collectors.toList());
+
+        response.put("boards", ownerBoards);
+        response.put("collabs", collaboratorBoards);
+        return response;
+    }
+
     // Get board by IDs
     public BoardResponseDTO getBoardById(String id) {
         Board board = boardRepository.findById(id)
@@ -140,6 +166,7 @@ public class BoardService {
         ownerDTO.setOid(board.getOwnerId());
         ownerDTO.setName(owner.getName());
         boardResponse.setOwner(ownerDTO);
+
         return boardResponse;
     }
 

@@ -26,7 +26,6 @@ public class CollaboratorService {
     @Autowired
     private UserRepository usersRepository;
 
-
     public boolean isCollaborator(String boardId, String userId) {
         return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
     }
@@ -34,8 +33,6 @@ public class CollaboratorService {
     public boolean hasWriteAccess(String boardId, String userId){
         return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, userId, AccessRight.WRITE);
     }
-
-
 
     public List<CollaboratorDTO> getCollaboratorsByBoardId(String boardId) {
         boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));

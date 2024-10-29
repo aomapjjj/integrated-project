@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.boardsDTO.*;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
@@ -14,9 +15,11 @@ import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
+import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v3/boards")
@@ -49,26 +52,48 @@ public class BoardController {
     // Board
     @GetMapping("")
     public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
-        List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
-        Map<String, Object> response = new HashMap<>();
-        if (boardIds.isEmpty()) {
-            response.put("collaborators", new ArrayList<CollaboratorDTO>());
-            return ResponseEntity.ok(response);
-        }
-        for (BoardResponseDTO board : boardIds) {
-            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
-            board.setCollaborators(collaborators);
-        }
-        response.put("boards", boardIds);
+        Map<String, Object> response = boardService.getBoardsByOwner();
         return ResponseEntity.ok(response);
     }
+//    @GetMapping("")
+//    public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
+//        List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
+//        Map<String, Object> response = new HashMap<>();
+//        if (boardIds.isEmpty()) {
+//            response.put("collaborators", new ArrayList<CollaboratorDTO>());
+//            return ResponseEntity.ok(response);
+//        }
+//        for (BoardResponseDTO board : boardIds) {
+//            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
+//            board.setCollaborators(collaborators);
+//        }
+//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String userId = currentUser.getOid();
+//
+//        List<BoardResponseDTO> ownerBoards = boardIds.stream()
+//                .filter(board -> board.getOwner().getOid().equals(userId))
+//                .collect(Collectors.toList());
+//
+//        List<BoardResponseDTO> collaboratorBoards = boardIds.stream()
+//                .filter(board -> !board.getOwner().getOid().equals(userId))
+//                .collect(Collectors.toList());
+//
+//        response.put("boards", ownerBoards);
+//        response.put("collabs", collaboratorBoards);
+//        return ResponseEntity.ok(response);
+//    }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+
         BoardResponseDTO boardResponse = boardService.getBoardById(boardId);
+
+        List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(boardId);
+        boardResponse.setCollaborators(collaborators);
+
         return ResponseEntity.ok(boardResponse);
     }
 
