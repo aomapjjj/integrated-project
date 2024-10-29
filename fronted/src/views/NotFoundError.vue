@@ -194,9 +194,6 @@ const goBackHome = () => {
         <i class="mdi mdi-arrow-left mr-2"></i>Go back home
       </button>
     </div>
-    <!-- <div class="mt-10 flex items-center justify-center gap-x-6">
-      <p class="error-title">{{ countdown }}</p>
-    </div> -->
   </div>
 </template>
 
