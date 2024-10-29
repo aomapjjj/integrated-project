@@ -338,7 +338,6 @@ router.beforeEach(async (to, from, next) => {
         )
 
         if (privateResponse.status === 401 && refreshToken) {
-          // Attempt to refresh the token if unauthorized
           return handleTokenRefresh(refreshToken, next)
         }
 
@@ -349,7 +348,6 @@ router.beforeEach(async (to, from, next) => {
         return next()
       }
 
-      // If the board is public, allow access
       return next()
     } catch (error) {
       console.error("Error fetching board data:", error)
