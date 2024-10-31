@@ -13,6 +13,9 @@ import java.sql.Timestamp;
 @Table(name = "collaborators", schema = "kanbanIT", catalog = "")
 public class Collaborator {
     @Id
+    @Column(name = "collabEntryId")
+    private int collabEntryId;
+
     @Column(name = "collabsId")
     private String collaboratorId;
 
