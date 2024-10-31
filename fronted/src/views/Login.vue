@@ -17,6 +17,7 @@ const userInput = ref('')
 const passwordInput = ref('')
 const userStore = useUsers()
 const nameJWT = ref('')
+const emailJWT = ref('')
 const isPasswordVisible = ref(false)
 
 const isValidUsername = computed(() => {
@@ -79,7 +80,8 @@ const submitForm = async () => {
       userStore.setLoginSuccess(true)
       const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name
-
+      emailJWT.value = decoded.email
+      userStore.setEmail(emailJWT.value)
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)
 

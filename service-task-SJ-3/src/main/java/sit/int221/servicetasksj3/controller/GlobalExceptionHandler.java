@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<?> handleConflictException(ConflictException ex, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT.value(), "Email is already exist", request.getDescription(false).replace("uri=", ""));
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage(), request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

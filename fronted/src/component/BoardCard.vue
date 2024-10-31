@@ -5,11 +5,10 @@ import { useUsers } from '../stores/storeUser'
 import { useBoard } from '../stores/storeBoard'
 import { deleteItemById, getBoardItems } from '../libs/fetchUtils.js'
 
-const BoardsList = ref([])
+const boardsList = ref([])
 const openModalToDelete = ref(false)
 const selectedItemIdToDelete = ref()
 const userStore = useUsers()
-const userName = userStore.getUser().username
 const boardStore = useBoard()
 
 const currentColor = ref({})
@@ -25,8 +24,7 @@ function getToken() {
 
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
-  BoardsList.value = itemsBoards.boards
-  console.log(BoardsList.value)
+  boardsList.value = itemsBoards
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -51,14 +49,7 @@ onMounted(async () => {
   }
 })
 
-const getBoardsByOwner = (boardsList, userName) => {
-  return boardsList?.filter((board) => board.owner.name === userName)
-}
-const getBoardsCollabsByOwner = (boardsList, userName) => {
-  return boardsList?.filter((board) => board.owner.name !== userName)
-}
-
-const toBoardsList = (boardId) => {
+const toboardsList = (boardId) => {
   if (boardId !== null) {
     router.push({ name: 'TaskList', params: { id: boardId } })
     userStore.setBoard(boardId)
@@ -98,7 +89,7 @@ const setColor = (color, id) => {
     <slot name="labelPersonalBoard"></slot>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div
-        v-for="(item, index) in getBoardsByOwner(BoardsList, userName)"
+        v-for="(item, index) in boardsList.boards"
         :key="index"
       >
         <div class="p-3">
@@ -196,7 +187,7 @@ const setColor = (color, id) => {
                   </button>
 
                   <button
-                    @click="toBoardsList(item.id)"
+                    @click="toboardsList(item.id)"
                     class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                     type="button"
                   >
@@ -269,7 +260,7 @@ const setColor = (color, id) => {
     <slot name="labelCollabBoard"></slot>
     <div class="p-3">
       <div
-        v-for="(item, index) in getBoardsCollabsByOwner(BoardsList, userName)"
+        v-for="(item, index) in boardsList.collabs"
         :key="index"
       >
         <ul
@@ -307,7 +298,7 @@ const setColor = (color, id) => {
               <div class="-mt-px flex divide-x divide-gray-200">
                 <div class="flex w-0 flex-1">
                   <span
-                    @click="toBoardsList(item.id)"
+                    @click="toboardsList(item.id)"
                     class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 cursor-pointer"
                   >
                     View
