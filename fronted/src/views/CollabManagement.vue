@@ -29,6 +29,7 @@ const collaboratorInfo = ref([])
 const showConfirmModal = ref(false)
 const oidCollaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
+const userEmail = userStore.getEmail()
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
 const alertMessage = ref("")
@@ -69,6 +70,7 @@ onMounted(async () => {
   } else {
     console.log('ตรงกันนะจ๊า')
   }
+  
 })
 
 const openAdd = () => {
@@ -88,7 +90,7 @@ const submitForm = async () => {
         accessRight: collaboratorAccess.value
       })
 
-      console.log(result.statusCode)
+      console.log(result)
       switch (result.statusCode) {
         case 201:
           collaboratorInfo.value.push(result.data)
@@ -114,10 +116,16 @@ const submitForm = async () => {
           setTimeout(hideAlert, 3000)
           break
         case 409:
-          isAlertFailure.value = true
-          alertMessage.value = "The user is already the collaborator of this board."
-          setTimeout(hideAlert, 3000)
-          break
+          isAlertFailure.value = true;
+          if (result.data.message === "The collaborator already exists for this board") {
+            alertMessage.value = "The user is already a collaborator of this board.";
+          } else if (result.data.message === "The collaborator email belongs to the board owner") {
+            alertMessage.value = "Board owner cannot be collaborator of his/her own board";
+          } else {
+            alertMessage.value = "An unknown error occurred.";
+          }
+          setTimeout(hideAlert, 3000);
+          break;
         default:
           isAlertFailure.value = true
           alertMessage.value = "There is a problem. Please try again later."
@@ -217,6 +225,14 @@ const hideAlert = () => {
 const clearForm = () => {
   collaboratorEmail.value = ""
 }
+
+const checkDisabled = () => {
+  if (!collaboratorEmail.value || collaboratorEmail.value === userEmail.email || !collaboratorEmail.value.includes('@')) {
+    return true;
+  }
+  return false;
+}
+
 </script>
 
 <template>
@@ -371,7 +387,8 @@ const clearForm = () => {
                       >
                         Remove
                       </button> -->
-                      <button :disabled="disabledButtonWhileOpenPublic" class="btn bg-red-400 rounded-full" @click="showRemoveModal(item.id)">
+                      <button :disabled="disabledButtonWhileOpenPublic" class="btn bg-red-400 rounded-full"
+                        @click="showRemoveModal(item.id)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
                           <g fill="none" fill-rule="evenodd">
                             <path
@@ -426,7 +443,8 @@ const clearForm = () => {
                   <button class="btn bg-gray-300 mr-4" @click="cancelAction">
                     Cancel
                   </button>
-                  <button :disabled="!collaboratorEmail" class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50" @click="submitForm">
+                  <button :disabled="checkDisabled()"
+                    class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50" @click="submitForm">
                     Add
                   </button>
                 </div>
