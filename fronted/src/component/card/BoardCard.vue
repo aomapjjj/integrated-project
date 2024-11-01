@@ -1,25 +1,40 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
-import { useUsers } from '../stores/storeUser'
-import { useBoard } from '../stores/storeBoard'
-import { deleteItemById, getBoardItems } from '../libs/fetchUtils.js'
+import { useRouter } from "vue-router"
+import { ref, onMounted } from "vue"
+import { useUsers } from "../../stores/storeUser"
+import { useBoard } from "../../stores/storeBoard"
+import { deleteItemById, getBoardItems } from "../../libs/fetchUtils.js"
 
-const boardsList = ref([])
-const openModalToDelete = ref(false)
-const selectedItemIdToDelete = ref()
-const userStore = useUsers()
-const boardStore = useBoard()
-
-const currentColor = ref({})
-const colorCard = ref(null)
+// ----------------------- Router -----------------------
 
 const router = useRouter()
 
+// ----------------------- Stores -----------------------
+
+const userStore = useUsers()
+const boardStore = useBoard()
+
+// ----------------------- List Items -----------------------
+
+const boardsList = ref([])
+const currentColor = ref({})
+
+// ----------------------- Params -----------------------
+
+const selectedItemIdToDelete = ref()
+const colorCard = ref(null)
+
+// ----------------------- Enable & Disable -----------------------
+
+const openModalToDelete = ref(false)
+
+// ----------------------- BaseUrl -----------------------
+
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
+
 function getToken() {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem("access_token")
 }
 
 onMounted(async () => {
@@ -33,12 +48,12 @@ onMounted(async () => {
   })
 
   if (response.status === 404) {
-    router.push({ name: 'ErrorPage' })
+    router.push({ name: "ErrorPage" })
   } else if (response.status === 401) {
-    router.push({ name: 'Login' })
+    router.push({ name: "Login" })
   }
 
-  const savedColors = JSON.parse(localStorage.getItem('boardColors'))
+  const savedColors = JSON.parse(localStorage.getItem("boardColors"))
   if (savedColors) {
     currentColor.value = savedColors
   }
@@ -51,7 +66,7 @@ onMounted(async () => {
 
 const toboardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -76,7 +91,7 @@ const setColor = (color, id) => {
     ...currentColor.value,
     [id]: color
   }
-  localStorage.setItem('boardColors', JSON.stringify(currentColor.value))
+  localStorage.setItem("boardColors", JSON.stringify(currentColor.value))
   boardStore.setChangeColor(currentColor.value)
 }
 </script>
@@ -88,10 +103,7 @@ const setColor = (color, id) => {
     <!-- Personal Boards -->
     <slot name="labelPersonalBoard"></slot>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div
-        v-for="(item, index) in boardsList.boards"
-        :key="index"
-      >
+      <div v-for="(item, index) in boardsList.boards" :key="index">
         <div class="p-3">
           <div
             ref="colorCard"
@@ -259,10 +271,7 @@ const setColor = (color, id) => {
     <!-- Collab Boards -->
     <slot name="labelCollabBoard"></slot>
     <div class="p-3">
-      <div
-        v-for="(item, index) in boardsList.collabs"
-        :key="index"
-      >
+      <div v-for="(item, index) in boardsList.collabs" :key="index">
         <ul
           role="list"
           class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"

@@ -6,41 +6,28 @@ import {
   addCollaborator,
   deleteCollaborator,
   editAccessRight
-} from "../libs/fetchUtils.js"
+} from "./../../libs/fetchUtils.js"
 import { useRoute, useRouter } from "vue-router"
 import { useUsers } from "@/stores/storeUser"
-import SideBar from "@/component/SideBar.vue"
-import Navbar from "@/component/Navbar.vue"
-import Alert from "@/component/Alert.vue"
-import ModalAcess from "@/component/Modal.vue"
-const userStore = useUsers()
+import SideBar from "@/component/bar/SideBar.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+import Alert from "@/component/alert/Alert.vue"
+import ModalAcess from "@/component/modal/Modal.vue"
+
+// ----------------------- Router -----------------------
+
 const route = useRoute()
 const router = useRouter()
 
-const token = localStorage.getItem("access_token")
-const disabledButtonWhileOpenPublic = ref(false)
-const boardId = ref()
-const boardName = ref("")
-const openModalAddCollab = ref(false)
-const collaboratorEmail = ref("")
-const collaboratorAccess = ref("READ")
-const statusList = ref([])
-const collaboratorInfo = ref([])
-const showConfirmModal = ref(false)
-const oidCollaboratorToRemove = ref(null)
-const userName = userStore.getUser().username
-const userEmail = userStore.getEmail()
-const isAlertFailure = ref(false)
-const isAlertSuccess = ref(false)
-const alertMessage = ref("")
-const openModalAcess = ref(false)
-const confirmAcessChange = ref(false)
+// ----------------------- Stores -----------------------
 
-const cancelChange = () => {
-  openModalAcess.value = false
-  confirmAcessChange.value = false
-  pendingItem.value = null
-}
+
+const userStore = useUsers()
+
+// ----------------------- Params -----------------------
+
+const boardName = ref("")
+const boardId = ref()
 watch(
   () => route.params.id,
   (newId) => {
@@ -49,8 +36,45 @@ watch(
   { immediate: true }
 )
 
+const token = localStorage.getItem("access_token")
+const collaboratorEmail = ref("")
+const collaboratorAccess = ref("READ")
+const oidCollaboratorToRemove = ref(null)
+const userName = userStore.getUser().username
+const userEmail = userStore.getEmail()
+
+// ----------------------- List Items -----------------------
+
+const collaboratorInfo = ref([])
+
+// ----------------------- Enable & Disable -----------------------
+
+
+const disabledButtonWhileOpenPublic = ref(false)
+const openModalAddCollab = ref(false)
+const showConfirmModal = ref(false)
+const openModalAcess = ref(false)
+const confirmAcessChange = ref(false)
+
+
+// ----------------------- Alerts -----------------------
+
+const isAlertFailure = ref(false)
+const isAlertSuccess = ref(false)
+const alertMessage = ref("")
+
+// ----------------------- BaseUrl -----------------------
+
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
+
+
+const cancelChange = () => {
+  openModalAcess.value = false
+  confirmAcessChange.value = false
+  pendingItem.value = null
+}
+
 
 onMounted(async () => {
   userStore.setToken(token)
@@ -66,11 +90,10 @@ onMounted(async () => {
   }
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log('ไม่ตรงกันนะจ๊า')
+    console.log("ไม่ตรงกันนะจ๊า")
   } else {
-    console.log('ตรงกันนะจ๊า')
+    console.log("ตรงกันนะจ๊า")
   }
-  
 })
 
 const openAdd = () => {
@@ -116,16 +139,24 @@ const submitForm = async () => {
           setTimeout(hideAlert, 3000)
           break
         case 409:
-          isAlertFailure.value = true;
-          if (result.data.message === "The collaborator already exists for this board") {
-            alertMessage.value = "The user is already a collaborator of this board.";
-          } else if (result.data.message === "The collaborator email belongs to the board owner") {
-            alertMessage.value = "Board owner cannot be collaborator of his/her own board";
+          isAlertFailure.value = true
+          if (
+            result.data.message ===
+            "The collaborator already exists for this board"
+          ) {
+            alertMessage.value =
+              "The user is already a collaborator of this board."
+          } else if (
+            result.data.message ===
+            "The collaborator email belongs to the board owner"
+          ) {
+            alertMessage.value =
+              "Board owner cannot be collaborator of his/her own board"
           } else {
-            alertMessage.value = "An unknown error occurred.";
+            alertMessage.value = "An unknown error occurred."
           }
-          setTimeout(hideAlert, 3000);
-          break;
+          setTimeout(hideAlert, 3000)
+          break
         default:
           isAlertFailure.value = true
           alertMessage.value = "There is a problem. Please try again later."
@@ -227,12 +258,15 @@ const clearForm = () => {
 }
 
 const checkDisabled = () => {
-  if (!collaboratorEmail.value || collaboratorEmail.value === userEmail.email || !collaboratorEmail.value.includes('@')) {
-    return true;
+  if (
+    !collaboratorEmail.value ||
+    collaboratorEmail.value === userEmail.email ||
+    !collaboratorEmail.value.includes("@")
+  ) {
+    return true
   }
-  return false;
+  return false
 }
-
 </script>
 
 <template>
@@ -250,20 +284,36 @@ const checkDisabled = () => {
           <div class="text-sm breadcrumbs">
             <ul>
               <li>
-                <router-link :to="{ name: 'TaskList', params: { id: boardId } }">
-                  <svg xmlns="http://www.w3.org/3000/svg" viewBox="0 0 256 256" class="w-4 h-4 stroke-current mr-2">
-                    <path fill="currentColor"
-                      d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z" />
+                <router-link
+                  :to="{ name: 'TaskList', params: { id: boardId } }"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/3000/svg"
+                    viewBox="0 0 256 256"
+                    class="w-4 h-4 stroke-current mr-2"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z"
+                    />
                   </svg>
                   {{ boardName.toLowerCase() }}
                 </router-link>
               </li>
               <li>
                 <a>
-                  <svg xmlns="http://www.w3.org/3000/svg" fill="none" viewBox="0 0 24 24"
-                    class="w-4 h-4 stroke-current mr-2">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                  <svg
+                    xmlns="http://www.w3.org/3000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    class="w-4 h-4 stroke-current mr-2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                    ></path>
                   </svg>
                   <span class="font-extrabold">Collaborator</span>
                 </a>
@@ -271,18 +321,30 @@ const checkDisabled = () => {
             </ul>
           </div>
 
-          <button :disabled="disabledButtonWhileOpenPublic" :style="{
-            backgroundColor: disabledButtonWhileOpenPublic
-              ? '#d3d3d3'
-              : '#F785B1',
-            color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
-            borderRadius: '30px',
-            cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
-            opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
-          }" @click="openAdd" class="itbkk-button-add btn ml-4">
-            <svg xmlns="http://www.w3.org/3000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path fill="currentColor"
-                d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
+          <button
+            :disabled="disabledButtonWhileOpenPublic"
+            :style="{
+              backgroundColor: disabledButtonWhileOpenPublic
+                ? '#d3d3d3'
+                : '#F785B1',
+              color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
+              borderRadius: '30px',
+              cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
+              opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
+            }"
+            @click="openAdd"
+            class="itbkk-button-add btn ml-4"
+          >
+            <svg
+              xmlns="http://www.w3.org/3000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="currentColor"
+                d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
+              />
             </svg>
             Add Collaborator
           </button>
@@ -292,7 +354,10 @@ const checkDisabled = () => {
           <!-- Table content -->
           <div class="overflow-x-auto">
             <div class="min-w-full">
-              <table class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10" style="table-layout: fixed">
+              <table
+                class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10"
+                style="table-layout: fixed"
+              >
                 <thead>
                   <tr class="bg-base-200">
                     <th
@@ -301,51 +366,70 @@ const checkDisabled = () => {
                         background-color: #9391e4;
                         border-bottom: 2px solid #9391e4;
                         color: #fff;
-                      ">
+                      "
+                    >
                       No.
                     </th>
 
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9391e4;
                         border-bottom: 2px solid #9391e4;
 
                         color: #fff;
-                      ">
+                      "
+                    >
                       Name
                     </th>
 
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9391e4;
                         border-bottom: 2px solid #9391e4;
 
                         color: #fff;
-                      ">
+                      "
+                    >
                       E-mail
                     </th>
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9391e4;
                         border-bottom: 2px solid #9391e4;
 
                         color: #fff;
-                      ">
+                      "
+                    >
                       Access Right
                     </th>
 
-                    <th class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700" style="
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
                         background-color: #9391e4;
                         border-bottom: 2px solid #9391e4;
 
                         color: #fff;
                         text-align: center;
                         vertical-align: middle;
-                      ">
+                      "
+                    >
                       Action
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in collaboratorInfo" :key="item.id" class="itbkk-item">
-                    <td class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                  <tr
+                    v-for="(item, index) in collaboratorInfo"
+                    :key="item.id"
+                    class="itbkk-item"
+                  >
+                    <td
+                      class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
                       {{ index + 1 }}
                     </td>
                     <td class="">
@@ -354,53 +438,87 @@ const checkDisabled = () => {
                       </label>
                     </td>
 
-                    <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                    <td
+                      class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
                       {{ item.email }}
                     </td>
 
-                    <td class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                    <td
+                      class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
                       <div class="relative inline-block w-full">
-                        <select v-model="item.accessRight" @change="updateAccessRight(item)"
-                          class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <select
+                          v-model="item.accessRight"
+                          @change="updateAccessRight(item)"
+                          class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
                           <option value="READ">Read</option>
                           <option value="WRITE">Write</option>
                         </select>
                         <div
-                          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        >
+                          <svg
+                            class="fill-current h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M10 12l-4-4h8z" />
                           </svg>
                         </div>
                       </div>
 
                       <!-- Modal Component -->
-                      <ModalAcess :isOpen="openModalAcess" @confirm="confirmChange" @cancel="cancelChange">
+                      <ModalAcess
+                        :isOpen="openModalAcess"
+                        @confirm="confirmChange"
+                        @cancel="cancelChange"
+                      >
                         <template #headerName>Access Changed!</template>
-                        <template #messageName>Are you sure you want to change the access?</template>
+                        <template #messageName
+                          >Are you sure you want to change the access?</template
+                        >
                       </ModalAcess>
                     </td>
 
-                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+                    <td
+                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
                       <!-- <button
                         @click="showRemoveModal(item.id)"
                         class="btn bg-red-500 text-white"
                       >
                         Remove
                       </button> -->
-                      <button :disabled="disabledButtonWhileOpenPublic" class="btn bg-red-400 rounded-full"
-                        @click="showRemoveModal(item.id)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                      <button
+                        :disabled="disabledButtonWhileOpenPublic"
+                        class="btn bg-red-400 rounded-full"
+                        @click="showRemoveModal(item.id)"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                        >
                           <g fill="none" fill-rule="evenodd">
                             <path
-                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z" />
-                            <path fill="white"
-                              d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z" />
+                              d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
+                            />
+                            <path
+                              fill="white"
+                              d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
+                            />
                           </g>
                         </svg>
                       </button>
                     </td>
                   </tr>
-                  <tr class="bg-base-100 mt-4 md:mt-0" v-if="collaboratorInfo?.length === 0">
+                  <tr
+                    class="bg-base-100 mt-4 md:mt-0"
+                    v-if="collaboratorInfo?.length === 0"
+                  >
                     <td colspan="5" class="text-center py-4 text-gray-400">
                       No Collaboator
                     </td>
@@ -411,9 +529,13 @@ const checkDisabled = () => {
           </div>
 
           <!-- Modal AddCollab -->
-          <div v-if="openModalAddCollab"
-            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
-            <div class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
+          <div
+            v-if="openModalAddCollab"
+            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
+          >
+            <div
+              class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
+            >
               <div class="w-full p-8">
                 <h2 class="text-2xl font-bold text-center mb-4">
                   Add Collaborator
@@ -423,15 +545,23 @@ const checkDisabled = () => {
                   <!-- Email Input -->
                   <div class="flex-1">
                     <label class="block text-sm font-bold mb-2">Email</label>
-                    <input type="email" v-model="collaboratorEmail" class="w-full p-2 border rounded-lg"
-                      placeholder="you@ad.sit.kmutt.ac.th" />
+                    <input
+                      type="email"
+                      v-model="collaboratorEmail"
+                      class="w-full p-2 border rounded-lg"
+                      placeholder="you@ad.sit.kmutt.ac.th"
+                    />
                   </div>
 
                   <!-- Access Right Select -->
                   <div>
-                    <label class="block text-sm font-bold mb-2">Access Right</label>
-                    <select v-model="collaboratorAccess"
-                      class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm">
+                    <label class="block text-sm font-bold mb-2"
+                      >Access Right</label
+                    >
+                    <select
+                      v-model="collaboratorAccess"
+                      class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm"
+                    >
                       <option value="READ">Read</option>
                       <option value="WRITE">Write</option>
                     </select>
@@ -443,8 +573,11 @@ const checkDisabled = () => {
                   <button class="btn bg-gray-300 mr-4" @click="cancelAction">
                     Cancel
                   </button>
-                  <button :disabled="checkDisabled()"
-                    class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50" @click="submitForm">
+                  <button
+                    :disabled="checkDisabled()"
+                    class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
+                    @click="submitForm"
+                  >
                     Add
                   </button>
                 </div>
@@ -452,17 +585,25 @@ const checkDisabled = () => {
             </div>
           </div>
 
-          <div v-if="showConfirmModal"
-            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+          <div
+            v-if="showConfirmModal"
+            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
+          >
             <div class="bg-white p-6 rounded-md max-w-md w-full">
               <h3 class="text-lg font-semibold text-center mb-4">
                 Are you sure you want to remove this collaborator?
               </h3>
               <div class="flex justify-end">
-                <button @click="showConfirmModal = false" class="btn bg-gray-500 text-white mr-4">
+                <button
+                  @click="showConfirmModal = false"
+                  class="btn bg-gray-500 text-white mr-4"
+                >
                   Cancel
                 </button>
-                <button @click="confirmRemove" class="btn bg-red-500 text-white">
+                <button
+                  @click="confirmRemove"
+                  class="btn bg-red-500 text-white"
+                >
                   Confirm
                 </button>
               </div>
