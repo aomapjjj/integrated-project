@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getBoardById } from '../libs/fetchUtils.js'
-import { useRoute } from 'vue-router'
+import { ref, onMounted } from "vue"
+import { getBoardById } from "../../libs/fetchUtils.js"
+import { useRoute } from "vue-router"
 
 const route = useRoute()
-const boardName = ref('')
+const boardName = ref("")
 
 onMounted(async () => {
   const boardId = route.params.id

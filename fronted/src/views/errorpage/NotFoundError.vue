@@ -2,22 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-const countdown = ref(3)
+
 const router = useRouter()
-
-onMounted(() => {
-  // startCountdown();
-})
-
-// const startCountdown = () => {
-//   let interval = setInterval(() => {
-//     countdown.value--;
-//     if (countdown.value <= 0) {
-//       clearInterval(interval);
-//       router.push({ name: 'Board' });
-//     }
-//   }, 1000);
-// };
 
 const goBackHome = () => {
   router.push({ name: 'Board' })

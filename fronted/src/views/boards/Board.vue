@@ -1,41 +1,50 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '@/stores/storeUser'
+import { useRouter } from "vue-router"
+import { ref, computed, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
 import {
-  getItems,
   addBoard,
-  deleteItemById,
   getBoardItems
-} from '../libs/fetchUtils.js'
-import SideBar from '@/component/SideBar.vue'
-import Navbar from '@/component/Navbar.vue'
-import BoardCard from '@/component/BoardCard.vue'
+} from "../../libs/fetchUtils.js"
+import SideBar from "@/component/bar/SideBar.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+import BoardCard from "@/component/card/BoardCard.vue"
 
-const BoardsList = ref([])
-const openModalName = ref(false)
-const openModalToDelete = ref(false)
-const selectedItemIdToDelete = ref()
-const collaboratorInfo = ref()
-const userStore = useUsers()
-const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + ' personal board' })
-// const userID = userStore.getUser()
+
+// ----------------------- Router -----------------------
 
 const router = useRouter()
 
+// ----------------------- List Items -----------------------
+
+const boardsList = ref([])
+
+// ----------------------- Enable & Disable -----------------------
+
+const openModalName = ref(false)
+
+// ----------------------- Stores -----------------------
+
+const userStore = useUsers()
+
+// ----------------------- Params -----------------------
+
+const userName = userStore.getUser().username
+const userBoard = ref({ name: userName + " personal board" })
+
+// ----------------------- BaseUrl -----------------------
+
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-// const baseUrlCollaborator = `${baseUrlBoard}/${boardId.value}/collabs`
+
 function getToken() {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem("access_token")
 }
+
+
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
-  BoardsList.value = itemsBoards.boards
-  console.log(BoardsList.value)
-
-  // console.log(getBoardsCollabsByOwner(BoardsList.value, userName))
-
+  boardsList.value = itemsBoards.boards
+  console.log(boardsList.value)
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -44,22 +53,15 @@ onMounted(async () => {
   })
 
   if (response.status === 404) {
-    router.push({ name: 'ErrorPage' })
+    router.push({ name: "ErrorPage" })
   } else if (response.status === 401) {
-    router.push({ name: 'Login' })
+    router.push({ name: "Login" })
   }
 })
 
-const getBoardsByOwner = (boardsList, userName) => {
-  return boardsList?.filter((board) => board.owner.name === userName)
-}
-const getBoardsCollabsByOwner = (boardsList, userName) => {
-  return boardsList?.filter((board) => board.owner.name !== userName)
-}
-
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -77,30 +79,17 @@ const submitForm = async () => {
   console.log(result.status)
 
   if (result.status === 401) {
-    localStorage.removeItem('access_token')
-    router.push({ name: 'Login' })
+    localStorage.removeItem("access_token")
+    router.push({ name: "Login" })
   } else {
     toBoardsList(result.data.id)
     clearForm()
   }
 }
 
-const deletBoard = async (boardId) => {
-  await deleteItemById(baseUrlBoard, boardId)
-  router.go()
-}
-
-const openModalToDeleteBoard = (itemId) => {
-  selectedItemIdToDelete.value = itemId
-  openModalToDelete.value = true
-}
-
-const confirmDelete = () => {
-  deletBoard(selectedItemIdToDelete.value)
-}
 
 const clearForm = () => {
-  userBoard.value.name = ''
+  userBoard.value.name = ""
 }
 
 const cancelAction = () => {
@@ -110,7 +99,7 @@ const cancelAction = () => {
 
 const openModalCreate = () => {
   openModalName.value = !openModalName.value
-  router.push({ name: 'BoardAdd' })
+  router.push({ name: "BoardAdd" })
 }
 </script>
 

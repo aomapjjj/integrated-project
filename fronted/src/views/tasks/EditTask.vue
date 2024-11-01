@@ -1,40 +1,39 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { getItems, getItemById, editItem } from '@/libs/fetchUtils'
-import { useTasks } from '../stores/store'
-import { toDate } from '../libs/toDate'
+import { useTasks } from '../../stores/store'
+import { toDate } from '../../libs/toDate'
 import { useRoute, useRouter } from 'vue-router'
-import { useLimitStore } from '../stores/storeLimit'
+import { useLimitStore } from '../../stores/storeLimit'
 
-const statusList = ref([])
+// ----------------------- Router -----------------------
+
 const router = useRouter()
 const route = useRoute()
-const cantEdit = ref(false)
-const error = ref('')
+
+// ----------------------- List Items -----------------------
+
+const statusList = ref([])
+const oldValue = ref({})
+
+// ----------------------- Alerts -----------------------
+
+const alertFailToEdit = ref(false)
+const aletMessage = ref('')
+
+// ----------------------- Stores -----------------------
+
 const limitStore = useLimitStore()
 const myTasks = useTasks()
-const oldValue = ref({})
+
+// ----------------------- Enable & Disable -----------------------
 
 const props = defineProps({
   todoId: Number,
   disabledBtn: Boolean
 })
 
-const boardId = ref()
-
-watch(
-  () => route.params.id,
-  (newId) => {
-    boardId.value = newId
-  },
-  { immediate: true }
-)
-
-const showAlertEdit = ref(false)
-const showAlertAfterEdit = ref(false)
-const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
-const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
+// ----------------------- Params -----------------------
 
 const todo = ref({
   id: '',
@@ -45,6 +44,27 @@ const todo = ref({
   createdOn: '',
   updatedOn: ''
 })
+const boardId = ref()
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+// ----------------------- Alerts -----------------------
+
+const showAlertEdit = ref(false)
+const showAlertAfterEdit = ref(false)
+
+
+// ----------------------- BaseUrl -----------------------
+
+const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
+const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
+
 
 watch(
   () => props.todoId,
@@ -162,10 +182,10 @@ const isLimitReached = computed(() => {
       .filter((task) => task.status === status)
     if (tasksInStatus.length >= limitStore.getLimit().maximumTask) {
       setTimeout(() => {
-        cantEdit.value = false
+        alertFailToEdit.value = false
       }, 1800)
-      cantEdit.value = true
-      error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`
+      alertFailToEdit.value = true
+      aletMessage.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`
       return true
     }
   }
@@ -347,7 +367,7 @@ const isLimitReached = computed(() => {
         <div
           role="alert"
           class="alert shadow-lg alert-error"
-          v-show="cantEdit"
+          v-show="alertFailToEdit"
           style="
             position: fixed;
             top: 20px;
@@ -371,7 +391,7 @@ const isLimitReached = computed(() => {
               d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>{{ error }}</span>
+          <span>{{ aletMessage }}</span>
         </div>
 
         <div

@@ -5,20 +5,37 @@ import { ref, computed } from 'vue'
 import { useUsers } from '../stores/storeUser'
 import { getItems } from '../libs/fetchUtils.js'
 
+
+// ----------------------- Router -----------------------
+
+const router = useRouter()
+
+// ----------------------- Alerts -----------------------
+
+const alertLogin = ref(false)
+
+// ----------------------- Enable & Disable -----------------------
+
+const isPasswordVisible = ref(false)
+
+// ----------------------- Stores -----------------------
+
+const userStore = useUsers()
+
+// ----------------------- Params -----------------------
+
+const nameJWT = ref('')
+const emailJWT = ref('')
+const userInput = ref('')
+const passwordInput = ref('')
 const boardId = ref()
+
+// ----------------------- BaseUrl -----------------------
 
 const baseUrlUsers = `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/login`
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 
-const router = useRouter()
-const alertLogin = ref(false)
-const userInput = ref('')
-const passwordInput = ref('')
-const userStore = useUsers()
-const nameJWT = ref('')
-const emailJWT = ref('')
-const isPasswordVisible = ref(false)
+// ----------------------- Validate -----------------------
 
 const isValidUsername = computed(() => {
   return (
@@ -40,12 +57,14 @@ const isFormValid = computed(() => {
   return isValidPassword.value && isValidUsername.value
 })
 
+// ----------------------- Validate -----------------------
+
 const openHomePage = async () => {
   try {
     userStore.setUser(nameJWT.value)
     console.log(userStore.getUser())
     const itemsBoards = await getItems(baseUrlboards)
-    const boardIds = itemsBoards.map((board) => board.id)
+    const boardIds = itemsBoards.boards.map((board) => board.id)
     boardId.value = boardIds
     console.log(boardId.value[0])
     router.push({ name: 'TaskList', params: { id: boardId.value[0] } })

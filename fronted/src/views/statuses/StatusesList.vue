@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -9,23 +9,69 @@ import {
   deleteItemAndTransfer,
   getBoardById,
   getResponseItems
-} from '../libs/fetchUtils.js'
-import { useStatuses } from '../stores/storeStatus'
-import { useRoute, useRouter } from 'vue-router'
-import { useLimitStore } from '../stores/storeLimit'
-import { useTasks } from '../stores/store'
-import { useUsers } from '@/stores/storeUser'
-import SideBar from '@/component/SideBar.vue'
-import Navbar from '@/component/Navbar.vue'
-const userStore = useUsers()
+} from "@/libs/fetchUtils.js"
+import { useStatuses } from "@/stores/storeStatus"
+import { useRoute, useRouter } from "vue-router"
+import { useLimitStore } from "@/stores/storeLimit"
+import { useTasks } from "@/stores/store"
+import { useUsers } from "@/stores/storeUser"
+import SideBar from "@/component/bar/SideBar.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+
+
+
+// ----------------------- Router -----------------------
 
 const route = useRoute()
 const router = useRouter()
-const statusList = ref([])
+
+// ----------------------- Stores -----------------------
+
+const userStore = useUsers()
+const myStatuses = useStatuses()
+const limitStore = useLimitStore()
+const taskStore = useTasks()
+
+// ----------------------- Params -----------------------
+
 const selectedStatusId = ref(0)
+const boardName = ref("")
+const boardId = ref()
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    boardId.value = newId
+  },
+  { immediate: true }
+)
+const token = localStorage.getItem("access_token")
+
+const userName = userStore.getUser().username
+
+// ----------------------- List Items -----------------------
+
+const statusList = ref([])
+const status = ref({
+  id: "",
+  name: "",
+  description: "",
+  createdOn: "",
+  updatedOn: ""
+})
+
+const todo = ref({
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
+
+// ----------------------- Alerts -----------------------
+
 const notFound = ref(false)
-const errorAdd = ref('')
-const errorEdit = ref('')
+const errorAdd = ref("")
+const errorEdit = ref("")
 
 const notAdd = ref(false)
 const notEdit = ref(false)
@@ -39,49 +85,17 @@ const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
 const limitAlert = ref(false)
-const errorLimit = ref('')
+const errorLimit = ref("")
 const errorTrans = ref(false)
 
-const myStatuses = useStatuses()
-const limitStore = useLimitStore()
-const taskStore = useTasks()
+// ----------------------- Enable & Disable -----------------------
 
-const token = localStorage.getItem("access_token")
-
-
-const userName = userStore.getUser().username
 const disabledButtonWhileOpenPublic = ref(false)
-const boardId = ref()
 
-const boardName = ref('')
+// ----------------------- BaseUrl -----------------------
 
-watch(
-  () => route.params.id,
-  (newId) => {
-    boardId.value = newId
-  },
-  { immediate: true }
-)
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
-
-// ------------------------------
-
-const status = ref({
-  id: '',
-  name: '',
-  description: '',
-  createdOn: '',
-  updatedOn: ''
-})
-
-const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status'
-})
 
 onMounted(async () => {
   userStore.setToken(token)
@@ -93,7 +107,7 @@ onMounted(async () => {
   const statusId = route.params.id
 
   const Board = await getBoardById(boardId.value)
-  console.log('Board data', Board.item.owner.name)
+  console.log("Board data", Board.item.owner.name)
 
   if (Board && Board.item && Board.item.name) {
     boardName.value = Board.item.name
@@ -101,9 +115,9 @@ onMounted(async () => {
 
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log('ไม่ตรงกันนะจ๊า')
+    console.log("ไม่ตรงกันนะจ๊า")
   } else {
-    console.log('ตรงกันนะจ๊า')
+    console.log("ตรงกันนะจ๊า")
   }
 })
 
@@ -121,7 +135,7 @@ const submitForm = async () => {
       notAdd.value = false
     }, 1800)
     notAdd.value = true
-    return (errorAdd.value = 'Status name already exists')
+    return (errorAdd.value = "Status name already exists")
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -138,18 +152,16 @@ const submitForm = async () => {
 }
 
 const clearForm = () => {
-  status.value.name = ''
-  status.value.description = ''
+  status.value.name = ""
+  status.value.description = ""
 }
 
 const closeModalAdd = () => {
   clearForm()
-  const modal = document.getElementById('my_modal_4')
+  const modal = document.getElementById("my_modal_4")
   modal.close()
   router.go(-1)
 }
-
-// ----------------------- Add -----------------------
 
 const selectStatus = (statusId) => {
   selectedStatusId.value = statusId
@@ -173,7 +185,7 @@ const UpdateStatus = async () => {
       notEdit.value = false
     }, 1800)
     notEdit.value = true
-    return (errorEdit.value = 'Status name already exists')
+    return (errorEdit.value = "Status name already exists")
   }
 
   myStatuses.updateStatus(
@@ -202,13 +214,13 @@ const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.showModal()
-  router.push({ name: 'EditStatus', params: { statusid: statusId } })
+  router.push({ name: "EditStatus", params: { statusid: statusId } })
 }
 
 const closeModalEdit = () => {
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.close()
   router.go(-1)
   clearForm()
@@ -231,7 +243,6 @@ const statusExists = (name, id) => {
   )
 }
 
-// ----------------------- Edit -----------------------
 
 // ----------------------- Delete -----------------------
 
@@ -245,7 +256,7 @@ const getNameById = (id) => {
 }
 
 const openAdd = () => {
-  router.push({ name: 'AddStatus' })
+  router.push({ name: "AddStatus" })
 }
 
 const selectedItemIdToDelete = ref(0)
@@ -280,12 +291,12 @@ const deleteStatus = async (statusId) => {
 
 const openModalToDelete = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_delete')
+  const modal3 = document.getElementById("my_modal_delete")
   modal3?.showModal()
 }
 
 const closeModal = () => {
-  const modal3 = document.getElementById('my_modal_delete')
+  const modal3 = document.getElementById("my_modal_delete")
   modal3?.close()
 }
 
@@ -296,12 +307,12 @@ const confirmDelete = () => {
 
 const openModalToDeleteTrans = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.showModal()
 }
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.close()
 }
 const confirmDeleteTrans = (statusId) => {
@@ -340,9 +351,11 @@ const deleteandtrans = async (statusId, newID) => {
   }
 }
 
+// ----------------------- Limit -----------------------
+
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === 'No Status' || status === 'Done') {
+  if (status === "No Status" || status === "Done") {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -357,6 +370,7 @@ const isLimitReached = computed(() => {
 })
 
 // ----------------------- Validate -----------------------
+
 const isValidName = (name) => {
   return name && name.trim().length > 0 && name.trim().length <= 50
 }
@@ -383,9 +397,7 @@ const isFormValid = computed(() => {
       <div class="flex flex-col flex-1">
         <!-- Navbar -->
 
-        <Navbar>
-          IT Bangmod Kradan Kanbun
-        </Navbar>
+        <Navbar> IT Bangmod Kradan Kanbun </Navbar>
 
         <div class="mt-9 px-10 flex justify-between items-center">
           <div class="text-sm breadcrumbs">
@@ -635,7 +647,7 @@ const isFormValid = computed(() => {
                       >
                         {{
                           !item.description || item.description.length === 0
-                            ? 'No description is provided'
+                            ? "No description is provided"
                             : item.description
                         }}
                       </label>

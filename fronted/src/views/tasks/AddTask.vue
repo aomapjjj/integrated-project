@@ -1,25 +1,33 @@
 <script setup>
-import { getItems, addItem } from '../libs/fetchUtils.js'
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useTasks } from '../stores/store.js'
-import { useLimitStore } from '../stores/storeLimit'
-import { useUsers } from '@/stores/storeUser'
+import { getItems, addItem } from "../../libs/fetchUtils.js"
+import { ref, onMounted, computed, watch } from "vue"
+import { useRouter, useRoute } from "vue-router"
+import { useTasks } from "../../stores/store.js"
+import { useLimitStore } from "../../stores/storeLimit.js"
+
+
+// ----------------------- Router -----------------------
+
 const router = useRouter()
 const route = useRoute()
+
+// ----------------------- Alerts -----------------------
 
 const alertAdd = ref(false)
 const statusList = ref([])
 const alertLimitAdd = ref(false)
-const error = ref('')
+const errorMessageLimit = ref("")
 
-const userStore = useUsers()
+// ----------------------- Enable & Disable -----------------------
 
 const props = defineProps({
   disabledBtn: Boolean
 })
 
+// ----------------------- Params -----------------------
+
 const boardId = ref()
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -27,19 +35,26 @@ watch(
   },
   { immediate: true }
 )
+
+const todo = ref({
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
+})
+
+
+// ----------------------- BaseUrl -----------------------
+
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlTask = `${baseUrlboards}/${boardId.value}/tasks`
 const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
+// ----------------------- Stores -----------------------
+
 const limitStore = useLimitStore()
 const taskStore = useTasks()
 
-const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status'
-})
 
 onMounted(async () => {
   const itemsStatus = await getItems(baseUrlStatus)
@@ -74,7 +89,7 @@ const submitForm = async () => {
       alertAdd.value = false
     }, 2300)
   } catch (error) {
-    console.error('Error adding task:', error)
+    console.error("Error adding task:", error)
   }
 }
 
@@ -85,10 +100,10 @@ const closeModal = () => {
 }
 
 const clearForm = () => {
-  todo.value.title = ''
-  todo.value.description = ''
-  todo.value.assignees = ''
-  todo.value.status = 'No Status'
+  todo.value.title = ""
+  todo.value.description = ""
+  todo.value.assignees = ""
+  todo.value.status = "No Status"
 }
 
 // ----------------------- Validate -----------------------
@@ -105,9 +120,11 @@ const isFormValid = computed(() => {
   )
 })
 
+// ----------------------- Limit -----------------------
+
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === 'No Status' || status === 'Done') {
+  if (status === "No Status" || status === "Done") {
     return false
   }
 
@@ -120,12 +137,13 @@ const isLimitReached = computed(() => {
         alertLimitAdd.value = false
       }, 1800)
       alertLimitAdd.value = true
-      return (error.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`)
+      return (errorMessageLimit.value = `The status "${todo.value.status}" will have too many tasks. Please make progress and update status of existing tasks first.`)
     }
   }
 
   return false
 })
+
 </script>
 
 <template>
@@ -275,7 +293,7 @@ const isLimitReached = computed(() => {
                 />
               </svg>
               <span class="text-red-500">Error! Tasks cannot be added</span>
-              <span>{{ error }}</span>
+              <span>{{ errorMessageLimit }}</span>
             </div>
 
             <!-- Cancel & Save Button -->
