@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Entity
-@Table(name = "collaborators", schema = "kanbanIT", catalog = "")
+@Table(name = "collaborators", schema = "kanbanIT")
 public class Collaborator {
     @Id
     @Column(name = "collabEntryId")
@@ -32,8 +32,13 @@ public class Collaborator {
     private String ownerId;
 
     @Column(name = "accessLevel")
-    @Enumerated(EnumType.STRING) // บันทึกเป็น String ใน database
-    private AccessRight accessLevel;
+    @Enumerated(EnumType.STRING)
+    private AccessRight accessLevel = AccessRight.READ;
+
     @Column(name = "addedOn")
     private Timestamp addedOn;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private CollabStatus status = CollabStatus.PENDING;
 }
