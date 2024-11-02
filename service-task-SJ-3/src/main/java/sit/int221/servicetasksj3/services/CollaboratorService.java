@@ -2,9 +2,10 @@ package sit.int221.servicetasksj3.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.boardsDTO.CollaboratorDTO;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.CollabStatus;
 import sit.int221.servicetasksj3.entities.Collaborator;
 import sit.int221.servicetasksj3.exceptions.ConflictException;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
@@ -25,6 +26,8 @@ public class CollaboratorService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository usersRepository;
+    @Autowired
+    private EmailService emailService;
 
     public boolean isCollaborator(String boardId, String userId) {
         return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
@@ -37,12 +40,36 @@ public class CollaboratorService {
     public List<CollaboratorDTO> getCollaboratorsByBoardId(String boardId) {
         boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
         return collaboratorRepository.findByBoardId(boardId).stream()
+                .map(c -> {
+                    String name = c.getCollaboratorName();
+                    if (c.getStatus() == CollabStatus.PENDING) {
+                        name += " (Pending Invite)";
+                    }
+                    return new CollaboratorDTO(
+                            c.getCollaboratorId(),
+                            name,
+                            c.getCollaboratorEmail(),
+                            c.getAccessLevel(),
+                            c.getAddedOn(),
+                            c.getStatus()
+                    );
+                })
+                .toList();
+    }
+
+    public List<CollaboratorDTO> getPendingCollaboratorsByBoardId(String boardId) {
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        return collaboratorRepository.findByBoardId(boardId).stream()
+                .filter(c -> c.getStatus() == CollabStatus.PENDING)
                 .map(c -> new CollaboratorDTO(
                         c.getCollaboratorId(),
-                        c.getCollaboratorName(),
+                        c.getCollaboratorName() + " (Pending Invite)",
                         c.getCollaboratorEmail(),
                         c.getAccessLevel(),
-                        c.getAddedOn()
+                        c.getAddedOn(),
+                        c.getStatus()
                 ))
                 .toList();
     }
@@ -59,7 +86,8 @@ public class CollaboratorService {
                 collaborator.getCollaboratorName(),
                 collaborator.getCollaboratorEmail(),
                 collaborator.getAccessLevel(),
-                collaborator.getAddedOn()
+                collaborator.getAddedOn(),
+                collaborator.getStatus()
         );
     }
 
@@ -88,6 +116,40 @@ public class CollaboratorService {
         collaborator.setCollaboratorEmail(collaboratorEmail);
         collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
         collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
+        collaborator.setStatus(CollabStatus.PENDING);
+        collaboratorRepository.save(collaborator);
+
+        emailService.sendInvitationEmail(
+                collaboratorEmail,
+                board.getOwnerId(),
+                board.getName(),
+                accessRight,
+                boardId
+        );
+
+        return new CollaboratorDTO(
+                collaborator.getCollaboratorId(),
+                collaborator.getCollaboratorName(),
+                collaborator.getCollaboratorEmail(),
+                collaborator.getAccessLevel(),
+                collaborator.getAddedOn(),
+                collaborator.getStatus()
+        );
+    }
+
+    public CollaboratorDTO acceptInvitation(String boardId, String collaboratorId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+        if (collaborator == null) {
+            throw new ItemNotFoundException("Collaborator not found");
+        }
+        if (collaborator.getStatus() != CollabStatus.PENDING) {
+            throw new ConflictException("Collaborator must accept the invitation first");
+        }
+
+        collaborator.setStatus(CollabStatus.ACCEPTED);
         collaboratorRepository.save(collaborator);
 
         return new CollaboratorDTO(
@@ -95,9 +157,23 @@ public class CollaboratorService {
                 collaborator.getCollaboratorName(),
                 collaborator.getCollaboratorEmail(),
                 collaborator.getAccessLevel(),
-                collaborator.getAddedOn()
+                collaborator.getAddedOn(),
+                collaborator.getStatus()
         );
     }
+
+//    public void declineInvitation(String boardId, String collaboratorId) {
+//        Board board = boardRepository.findById(boardId)
+//                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+//
+//        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+//        if (collaborator == null) {
+//            throw new ItemNotFoundException("Collaborator not found");
+//        }
+//
+//        collaboratorRepository.delete(collaborator);
+//    }
+
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));

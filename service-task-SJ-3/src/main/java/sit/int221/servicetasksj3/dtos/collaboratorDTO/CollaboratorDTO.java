@@ -1,11 +1,12 @@
-package sit.int221.servicetasksj3.dtos.boardsDTO;
+package sit.int221.servicetasksj3.dtos.collaboratorDTO;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import sit.int221.servicetasksj3.entities.AccessRight;
+import sit.int221.servicetasksj3.entities.CollabStatus;
 
 import java.sql.Timestamp;
 
@@ -18,12 +19,14 @@ public class CollaboratorDTO {
     @NotNull
     private AccessRight accessRight;
     private Timestamp addedOn;
+    private CollabStatus status;
 
-    public CollaboratorDTO(String id, String name, String email, AccessRight accessRight, Timestamp addedOn) {
+    public CollaboratorDTO(String id, String name, String email, AccessRight accessRight, Timestamp addedOn, CollabStatus status) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.accessRight = accessRight;
         this.addedOn = addedOn;
+        this.status = status;
     }
 }

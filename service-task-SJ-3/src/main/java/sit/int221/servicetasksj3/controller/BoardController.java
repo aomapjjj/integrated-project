@@ -7,19 +7,18 @@ import jakarta.validation.constraints.Min;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.boardsDTO.*;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.InvitationResponseDTO;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
-import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v3/boards")
@@ -55,33 +54,6 @@ public class BoardController {
         Map<String, Object> response = boardService.getBoardsByOwner();
         return ResponseEntity.ok(response);
     }
-//    @GetMapping("")
-//    public ResponseEntity<Map<String, Object>> getBoardIdByOwner() {
-//        List<BoardResponseDTO> boardIds = boardService.getBoardIdByOwner();
-//        Map<String, Object> response = new HashMap<>();
-//        if (boardIds.isEmpty()) {
-//            response.put("collaborators", new ArrayList<CollaboratorDTO>());
-//            return ResponseEntity.ok(response);
-//        }
-//        for (BoardResponseDTO board : boardIds) {
-//            List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
-//            board.setCollaborators(collaborators);
-//        }
-//        AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String userId = currentUser.getOid();
-//
-//        List<BoardResponseDTO> ownerBoards = boardIds.stream()
-//                .filter(board -> board.getOwner().getOid().equals(userId))
-//                .collect(Collectors.toList());
-//
-//        List<BoardResponseDTO> collaboratorBoards = boardIds.stream()
-//                .filter(board -> !board.getOwner().getOid().equals(userId))
-//                .collect(Collectors.toList());
-//
-//        response.put("boards", ownerBoards);
-//        response.put("collabs", collaboratorBoards);
-//        return ResponseEntity.ok(response);
-//    }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId, HttpServletRequest request) {
@@ -253,7 +225,7 @@ public class BoardController {
         return ResponseEntity.ok(statusService.updateLimitTask(boardId, maximumTask, isLimit));
     }
 
-
+    // Collaborator
     @GetMapping("/{boardId}/collabs")
     public ResponseEntity<Map<String, List<CollaboratorDTO>>> getCollaboratorsByBoardId(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
@@ -282,6 +254,27 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+    @GetMapping("/{boardId}/collabs/invitations")
+    public ResponseEntity<List<CollaboratorDTO>> getPendingInvitations(@PathVariable String boardId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), null);
+        List<CollaboratorDTO> pendingInvitations = collaboratorService.getPendingCollaboratorsByBoardId(boardId);
+        return ResponseEntity.ok(pendingInvitations);
+    }
+
+    @PostMapping("/{boardId}/collabs/invitations/{collaboratorId}/respond")
+    public ResponseEntity<CollaboratorDTO> respondsEmail(
+            @PathVariable String boardId,
+            @PathVariable String collaboratorId,
+            @RequestBody InvitationResponseDTO invitationResponse,
+            HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+
+        CollaboratorDTO responseDTO = collaboratorService.acceptInvitation(boardId, collaboratorId);
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @PatchMapping("/{boardId}/collabs/{collabId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
@@ -290,22 +283,16 @@ public class BoardController {
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-
-        // ใช้ collabId แทน collaboratorId
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-
-        // ใช้ collabId แทน collaboratorId
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(
-                boardId, collabId, collaboratorRequest.getAccessRight().name());
-
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collabId, collaboratorRequest.getAccessRight().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
                 updatedCollaborator.getCollaboratorEmail(),
                 updatedCollaborator.getAccessLevel(),
-                updatedCollaborator.getAddedOn()
+                updatedCollaborator.getAddedOn(),
+                updatedCollaborator.getStatus()
         );
-
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -316,19 +303,15 @@ public class BoardController {
             HttpServletRequest request) {
         String userId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        // ลบ collaborator
         Collaborator removedCollaborator = collaboratorService.removeCollaborator(boardId, collaboratorId);
-
-        // แปลง collaborator ที่ถูกลบเป็น DTO
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 removedCollaborator.getCollaboratorId(),
                 removedCollaborator.getCollaboratorName(),
                 removedCollaborator.getCollaboratorEmail(),
                 removedCollaborator.getAccessLevel(),
-                removedCollaborator.getAddedOn()
+                removedCollaborator.getAddedOn(),
+                removedCollaborator.getStatus()
         );
-
         return ResponseEntity.ok(responseDTO);
     }
 }
