@@ -3,6 +3,7 @@ package sit.int221.servicetasksj3.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
+import sit.int221.servicetasksj3.emailSender.EmailSenderService;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.CollabStatus;
@@ -26,8 +27,6 @@ public class CollaboratorService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository usersRepository;
-    @Autowired
-    private EmailService emailService;
 
     public boolean isCollaborator(String boardId, String userId) {
         return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
@@ -119,13 +118,6 @@ public class CollaboratorService {
         collaborator.setStatus(CollabStatus.PENDING);
         collaboratorRepository.save(collaborator);
 
-        emailService.sendInvitationEmail(
-                collaboratorEmail,
-                board.getOwnerId(),
-                board.getName(),
-                accessRight,
-                boardId
-        );
 
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
