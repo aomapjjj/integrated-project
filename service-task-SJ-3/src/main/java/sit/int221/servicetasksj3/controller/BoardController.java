@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.boardsDTO.*;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.InvitationResponseDTO;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
@@ -252,6 +254,27 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+    @GetMapping("/{boardId}/collabs/invitations")
+    public ResponseEntity<List<CollaboratorDTO>> getPendingInvitations(@PathVariable String boardId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), null);
+        List<CollaboratorDTO> pendingInvitations = collaboratorService.getPendingCollaboratorsByBoardId(boardId);
+        return ResponseEntity.ok(pendingInvitations);
+    }
+
+    @PostMapping("/{boardId}/collabs/invitations/{collaboratorId}/respond")
+    public ResponseEntity<CollaboratorDTO> respondsEmail(
+            @PathVariable String boardId,
+            @PathVariable String collaboratorId,
+            @RequestBody InvitationResponseDTO invitationResponse,
+            HttpServletRequest request) {
+        String userId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+
+        CollaboratorDTO responseDTO = collaboratorService.acceptInvitation(boardId, collaboratorId);
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @PatchMapping("/{boardId}/collabs/{collabId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
@@ -260,14 +283,8 @@ public class BoardController {
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-
-        // ใช้ collabId แทน collaboratorId
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-
-        // ใช้ collabId แทน collaboratorId
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(
-                boardId, collabId, collaboratorRequest.getAccessRight().name());
-
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collabId, collaboratorRequest.getAccessRight().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
@@ -276,7 +293,6 @@ public class BoardController {
                 updatedCollaborator.getAddedOn(),
                 updatedCollaborator.getStatus()
         );
-
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -287,11 +303,7 @@ public class BoardController {
             HttpServletRequest request) {
         String userId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        // ลบ collaborator
         Collaborator removedCollaborator = collaboratorService.removeCollaborator(boardId, collaboratorId);
-
-        // แปลง collaborator ที่ถูกลบเป็น DTO
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 removedCollaborator.getCollaboratorId(),
                 removedCollaborator.getCollaboratorName(),
@@ -300,7 +312,6 @@ public class BoardController {
                 removedCollaborator.getAddedOn(),
                 removedCollaborator.getStatus()
         );
-
         return ResponseEntity.ok(responseDTO);
     }
 }

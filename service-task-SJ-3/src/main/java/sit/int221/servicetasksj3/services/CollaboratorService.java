@@ -2,7 +2,7 @@ package sit.int221.servicetasksj3.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.boardsDTO.CollaboratorDTO;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.CollabStatus;
@@ -26,8 +26,8 @@ public class CollaboratorService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository usersRepository;
-//    @Autowired
-//    private EmailService emailService;
+    @Autowired
+    private EmailService emailService;
 
     public boolean isCollaborator(String boardId, String userId) {
         return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
@@ -40,9 +40,32 @@ public class CollaboratorService {
     public List<CollaboratorDTO> getCollaboratorsByBoardId(String boardId) {
         boardRepository.findById(boardId).orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
         return collaboratorRepository.findByBoardId(boardId).stream()
+                .map(c -> {
+                    String name = c.getCollaboratorName();
+                    if (c.getStatus() == CollabStatus.PENDING) {
+                        name += " (Pending Invite)";
+                    }
+                    return new CollaboratorDTO(
+                            c.getCollaboratorId(),
+                            name,
+                            c.getCollaboratorEmail(),
+                            c.getAccessLevel(),
+                            c.getAddedOn(),
+                            c.getStatus()
+                    );
+                })
+                .toList();
+    }
+
+    public List<CollaboratorDTO> getPendingCollaboratorsByBoardId(String boardId) {
+        boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        return collaboratorRepository.findByBoardId(boardId).stream()
+                .filter(c -> c.getStatus() == CollabStatus.PENDING)
                 .map(c -> new CollaboratorDTO(
                         c.getCollaboratorId(),
-                        c.getCollaboratorName(),
+                        c.getCollaboratorName() + " (Pending Invite)",
                         c.getCollaboratorEmail(),
                         c.getAccessLevel(),
                         c.getAddedOn(),
@@ -50,6 +73,7 @@ public class CollaboratorService {
                 ))
                 .toList();
     }
+
 
     public CollaboratorDTO getCollaboratorByBoardIdAndCollaboratorId(String boardId, String collaboratorId) {
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
@@ -96,13 +120,13 @@ public class CollaboratorService {
         collaborator.setStatus(CollabStatus.PENDING);
         collaboratorRepository.save(collaborator);
 
-//        emailService.sendInvitationEmail(
-//                collaboratorEmail,
-//                board.getOwnerId(),
-//                board.getName(),
-//                accessRight,
-//                boardId
-//        );
+        emailService.sendInvitationEmail(
+                collaboratorEmail,
+                board.getOwnerId(),
+                board.getName(),
+                accessRight,
+                boardId
+        );
 
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
@@ -137,6 +161,18 @@ public class CollaboratorService {
                 collaborator.getAddedOn(),
                 collaborator.getStatus()
         );
+    }
+
+    public void declineInvitation(String boardId, String collaboratorId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+        if (collaborator == null) {
+            throw new ItemNotFoundException("Collaborator not found");
+        }
+
+        collaboratorRepository.delete(collaborator);
     }
 
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
