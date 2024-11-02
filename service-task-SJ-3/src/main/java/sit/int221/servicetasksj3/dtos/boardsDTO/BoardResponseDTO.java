@@ -1,7 +1,7 @@
 package sit.int221.servicetasksj3.dtos.boardsDTO;
 
 import lombok.*;
-import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.Visibility;
 
 import java.util.List;
