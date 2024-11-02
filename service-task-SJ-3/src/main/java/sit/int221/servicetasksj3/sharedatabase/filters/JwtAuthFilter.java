@@ -40,7 +40,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private CollaboratorService collaboratorService;
 
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         try {

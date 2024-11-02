@@ -74,7 +74,6 @@ public class CollaboratorService {
                 .toList();
     }
 
-
     public CollaboratorDTO getCollaboratorByBoardIdAndCollaboratorId(String boardId, String collaboratorId) {
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
 
@@ -146,8 +145,8 @@ public class CollaboratorService {
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
-        if (collaborator.getStatus() == CollabStatus.ACCEPTED) {
-            throw new ConflictException("Collaborator already accepted the invitation");
+        if (collaborator.getStatus() != CollabStatus.PENDING) {
+            throw new ConflictException("Collaborator must accept the invitation first");
         }
 
         collaborator.setStatus(CollabStatus.ACCEPTED);
@@ -163,17 +162,17 @@ public class CollaboratorService {
         );
     }
 
-    public void declineInvitation(String boardId, String collaboratorId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
-        if (collaborator == null) {
-            throw new ItemNotFoundException("Collaborator not found");
-        }
-
-        collaboratorRepository.delete(collaborator);
-    }
+//    public void declineInvitation(String boardId, String collaboratorId) {
+//        Board board = boardRepository.findById(boardId)
+//                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+//
+//        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+//        if (collaborator == null) {
+//            throw new ItemNotFoundException("Collaborator not found");
+//        }
+//
+//        collaboratorRepository.delete(collaborator);
+//    }
 
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
         Board board = boardRepository.findById(boardId)
