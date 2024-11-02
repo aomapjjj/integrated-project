@@ -1,13 +1,13 @@
 import router from "@/router";
 
-const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`;
 function getToken() {
   return localStorage.getItem("access_token");
 }
 
 async function getItems(url) {
   const token = getToken();
-  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await fetch(url, { headers });
     const items = await response.json();
@@ -22,29 +22,26 @@ async function getBoardItems(url) {
 
   if (!token) {
     console.log("No token provided. Exiting function.");
-    return; 
+    return;
   }
-  
-  const headers = { "Authorization": `Bearer ${token}` }; 
+
+  const headers = { Authorization: `Bearer ${token}` };
   try {
     const response = await fetch(url, { headers });
     const items = await response.json();
     return items;
-
   } catch (error) {
     console.log(`error: ${error}`);
   }
 }
 
-
-
 async function getResponseItems(url) {
   const token = getToken();
-  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
   try {
     const response = await fetch(url, { headers });
     const items = await response.json();
-    return { response, items }; 
+    return { response, items };
   } catch (error) {
     console.log(`error: ${error}`);
     return { error };
@@ -53,11 +50,14 @@ async function getResponseItems(url) {
 
 async function getItemById(taskId, boardId) {
   const token = getToken();
-  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
-  
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
   if (boardId && taskId) {
     try {
-      const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}`, { headers });
+      const response = await fetch(
+        `${baseUrlBoards}/${boardId}/tasks/${taskId}`,
+        { headers }
+      );
       const item = await response.json();
       const responsed = response.status;
       return { item, responsed };
@@ -65,27 +65,27 @@ async function getItemById(taskId, boardId) {
       console.log(`error: ${error}`);
     }
   } else {
-    console.log('Invalid boardId or taskId');
+    console.log("Invalid boardId or taskId");
   }
 }
 
 async function getBoardById(boardId) {
   const token = getToken();
-  const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
   if (boardId) {
     try {
       const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers });
       if (response.status === 404) {
-        router.push({ name: 'ErrorPage' })
+        router.push({ name: "ErrorPage" });
         return;
       }
 
       if (response.status === 403) {
-        router.push({ name: 'ErrorPagePermission' })
+        router.push({ name: "ErrorPagePermission" });
         return;
       }
-      
+
       const item = await response.json();
       const responsed = response.status;
 
@@ -94,10 +94,9 @@ async function getBoardById(boardId) {
       console.log(`error: ${error}`);
     }
   } else {
-    console.log('Invalid boardId or taskId');
+    console.log("Invalid boardId or taskId");
   }
 }
-
 
 async function deleteItemById(url, id) {
   const token = getToken();
@@ -105,8 +104,8 @@ async function deleteItemById(url, id) {
     const response = await fetch(`${url}/${id}`, {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.status;
   } catch (error) {
@@ -120,8 +119,8 @@ async function deleteItemAndTransfer(url, id, newid) {
     const response = await fetch(`${url}/${id}/${newid}`, {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.status;
   } catch (error) {
@@ -136,9 +135,9 @@ async function addItem(url, newItem) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ ...newItem })
+      body: JSON.stringify({ ...newItem }),
     });
     const addedItem = await response.json();
     return addedItem;
@@ -154,9 +153,9 @@ async function editItem(url, id, editItem) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ ...editItem })
+      body: JSON.stringify({ ...editItem }),
     });
     const editedItem = await response.json();
     return editedItem;
@@ -168,13 +167,16 @@ async function editItem(url, id, editItem) {
 async function editLimit(baseUrlLimit, maximumTask, isLimit) {
   const token = getToken();
   try {
-    const response = await fetch(`${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+    const response = await fetch(
+      `${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -194,95 +196,90 @@ async function addBoard(url, newBoard) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(newBoard),
     });
 
     const data = await response.json();
     // Return both status code and data
-    console.log(data)
+    console.log(data);
     return { status: response.status, data };
-    
   } catch (error) {
     console.log(`error: ${error}`);
-    return { status: 401, data: null }; 
+    return { status: 401, data: null };
   }
 }
 
 async function boardVisibility(boardId, currentVisibility) {
   const token = getToken();
 
-  const newVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+  const newVisibility = currentVisibility === "PUBLIC" ? "PRIVATE" : "PUBLIC";
 
   try {
-      
-      const response = await fetch(`${baseUrlBoards}/${boardId}`, {
-          method: "PATCH",
-          headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({ visibility: newVisibility })
-          
-      });
-      
-      if (response.status === 200) {
-          const editedItem = await response.json();
-          console.log(`Visibility changed to: ${editedItem.visibility}`);
-          return {
-            success: true,
-            visibility: editedItem.visibility,
-            message: `Visibility changed to: ${editedItem.visibility}`,
-          }
-      } else if (response.status === 401) {
-          resetAuthentication();
-          redirectToLogin();
-          return null; 
-        } else if (response.status === 403) {
-          const message = "You do not have permission to change board visibility mode."
-          return {
-            success: false,
-            message: message
-          }
-      } else {
-           const message = "There is a problem. Please try again later."
-          return {
-            success: false,
-            message: message
-          }
-      }
-  } catch (error) {
-      console.log(`Error: ${error.message}`);
-      const message = ("There is a problem, Please try again later.");
+    const response = await fetch(`${baseUrlBoards}/${boardId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ visibility: newVisibility }),
+    });
+
+    if (response.status === 200) {
+      const editedItem = await response.json();
+      console.log(`Visibility changed to: ${editedItem.visibility}`);
+      return {
+        success: true,
+        visibility: editedItem.visibility,
+        message: `Visibility changed to: ${editedItem.visibility}`,
+      };
+    } else if (response.status === 401) {
+      resetAuthentication();
+      redirectToLogin();
+      return null;
+    } else if (response.status === 403) {
+      const message =
+        "You do not have permission to change board visibility mode.";
       return {
         success: false,
-        message: message
-      }
+        message: message,
+      };
+    } else {
+      const message = "There is a problem. Please try again later.";
+      return {
+        success: false,
+        message: message,
+      };
+    }
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    const message = "There is a problem, Please try again later.";
+    return {
+      success: false,
+      message: message,
+    };
   }
 }
-async function getItemPublic(boardId , path) {
-    try {
-      const response = await fetch(`${baseUrlBoards}/${boardId}/${path}`) 
-      const item = await response.json();
-     
-      const responsed = response.status;
-      return { item, responsed };
-      
-    } catch (error) {
-      console.log(`error: ${error}`);
-    }
-  
+async function getItemPublic(boardId, path) {
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/${path}`);
+    const item = await response.json();
 
+    const responsed = response.status;
+    return { item, responsed };
+  } catch (error) {
+    console.log(`error: ${error}`);
+  }
 }
 async function getItemsPublic(url) {
   try {
     const responsed = await fetch(url);
     const items = await responsed.json();
-    return { responsed, items }; 
+    return { responsed, items };
   } catch (error) {
     console.log(`error: ${error}`);
-    return { error }
+    return { error };
   }
 }
 
@@ -293,9 +290,9 @@ async function addCollaborator(boardId, collaborator) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(collaborator)
+      body: JSON.stringify(collaborator),
     });
 
     const statusCode = response.status;
@@ -309,17 +306,17 @@ async function addCollaborator(boardId, collaborator) {
 }
 
 async function editAccessRight(boardId, access, oid) {
-  const token = getToken(); 
+  const token = getToken();
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        accessRight: access
-      })
+        accessRight: access,
+      }),
     });
 
     if (!response.ok) {
@@ -339,8 +336,8 @@ async function deleteCollaborator(boardId, oid) {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
     return response.status;
   } catch (error) {
@@ -355,12 +352,12 @@ const validateAccessToken = async (token) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     }
-  )
-  return response
-}
+  );
+  return response;
+};
 
 const refreshAccessToken = async (refreshToken) => {
   const response = await fetch(
@@ -369,13 +366,12 @@ const refreshAccessToken = async (refreshToken) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        requestTokenHeader: `Bearer ${refreshToken}`
-      }
+        requestTokenHeader: `Bearer ${refreshToken}`,
+      },
     }
-  )
-  return response
-}
-
+  );
+  return response;
+};
 
 export {
   getItems,
@@ -391,10 +387,10 @@ export {
   getResponseItems,
   getItemPublic,
   getItemsPublic,
-  getBoardItems, 
+  getBoardItems,
   addCollaborator,
   editAccessRight,
   deleteCollaborator,
   validateAccessToken,
-  refreshAccessToken
-}
+  refreshAccessToken,
+};
