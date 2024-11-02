@@ -347,6 +347,36 @@ async function deleteCollaborator(boardId, oid) {
     console.log(`error: ${error}`);
   }
 }
+
+const validateAccessToken = async (token) => {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    }
+  )
+  return response
+}
+
+const refreshAccessToken = async (refreshToken) => {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        requestTokenHeader: `Bearer ${refreshToken}`
+      }
+    }
+  )
+  return response
+}
+
+
 export {
   getItems,
   getItemById,
@@ -364,5 +394,7 @@ export {
   getBoardItems, 
   addCollaborator,
   editAccessRight,
-  deleteCollaborator
+  deleteCollaborator,
+  validateAccessToken,
+  refreshAccessToken
 }
