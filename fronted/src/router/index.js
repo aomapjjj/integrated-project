@@ -8,7 +8,11 @@ import EditTask from "@/views/tasks/EditTask.vue"
 import Login from "@/views/Login.vue"
 import Board from "@/views/boards/Board.vue"
 import ErrorPagePermission from "@/views/errorpage/PermissionError.vue"
-import { getBoardById } from "../libs/fetchUtils.js"
+import {
+  getBoardById,
+  validateAccessToken,
+  refreshAccessToken
+} from "../libs/fetchUtils.js"
 import CollabManagement from "@/views/boards/CollabManagement.vue"
 const getToken = () => localStorage.getItem("access_token")
 const getRefreshToken = () => localStorage.getItem("refresh_token")
@@ -75,12 +79,7 @@ const routes = [
 
       const currentUsername = loginUsername()
 
-      // ตรวจสอบความเป็นเจ้าของบอร์ด
       if (userNameBoard.item.owner.name !== currentUsername) {
-        // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
-        // if (userNameBoard.item.visibility === "PRIVATE") {
-        //   return next({ name: "ErrorPagePermission" })
-        // }
       } else {
         console.log("ตรงกันนะจ๊า")
         return next()
@@ -91,17 +90,8 @@ const routes = [
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
         )
 
-        // if (response.status === 404) {
-        //   return next({ name: "ErrorPage" })
-        // }
-
-        // if (response.status === 403) {
-        //   return next({ name: "ErrorPagePermission" })
-        // }
-
         const board = await response.json()
 
-        // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
         if (board.visibility === "PUBLIC") {
           return next()
         }
@@ -196,9 +186,8 @@ const routes = [
 
       const userNameBoard = await getBoardById(boardId)
 
-      // ตรวจสอบการมีข้อมูลจาก userNameBoard
       if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPagePermission" }) // ถ้าไม่สามารถดึงข้อมูลได้
+        return next({ name: "ErrorPagePermission" })
       }
       const userNameString = localStorage?.getItem("user")
       console.log('localStorage?.getItem("user")', userNameString)
@@ -207,16 +196,14 @@ const routes = [
 
       const loginUsername = () => {
         if (userName) {
-          return userName.username // แสดงค่า username
+          return userName.username
         } else {
           return null
         }
       }
       const currentUsername = loginUsername()
 
-      // ตรวจสอบความเป็นเจ้าของบอร์ด
       if (userNameBoard.item.owner.name !== currentUsername) {
-        // ถ้าบอร์ดเป็น Private ให้ไปหน้า ErrorPagePermission
         if (userNameBoard.item.visibility === "PRIVATE") {
           return next({ name: "ErrorPagePermission" })
         }
@@ -240,7 +227,6 @@ const routes = [
 
         const board = await response.json()
 
-        // ถ้าบอร์ดเป็น Public ก็ให้ไปต่อได้
         if (board.visibility === "PUBLIC") {
           return next()
         }
@@ -291,17 +277,10 @@ router.beforeEach(async (to, from, next) => {
   const accessToken = getToken()
   const refreshToken = getRefreshToken()
 
-  // Refresh the page every 30 minutes
-  setInterval(() => {
-    router.go(0)
-  }, 30 * 60 * 1000)
-
-  // Handle routes with a board ID (public/private access)
   if (to.name === "board" && to.params.id) {
     const boardId = to.params.id
 
     try {
-      // Fetch the board without authorization header first
       const boardResponse = await fetch(
         `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
       )
@@ -312,13 +291,11 @@ router.beforeEach(async (to, from, next) => {
         return next({ name: "ErrorPage" })
       }
 
-      // If the board is private, check for access token
       if (board.visibility === "PRIVATE") {
         if (!accessToken) {
           return next({ name: "ErrorPagePermission" })
         }
 
-        // Fetch the private board with authorization
         const privateResponse = await fetch(
           `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
           {
@@ -384,34 +361,6 @@ const handleTokenRefresh = async (refreshToken, next) => {
 const handleInvalidTokens = (next) => {
   localStorage.removeItem("access_token")
   next({ name: "Login" })
-}
-
-const validateAccessToken = async (token) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      }
-    }
-  )
-  return response
-}
-
-const refreshAccessToken = async (refreshToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${refreshToken}`
-      }
-    }
-  )
-  return response
 }
 
 export default router

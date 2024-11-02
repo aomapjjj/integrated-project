@@ -47,20 +47,19 @@ public class AuthenticationService {
     }
 
     public JwtResponseTokenDTO refreshAccessToken(String requestTokenHeader) {
-        String refreshToken = extractToken(requestTokenHeader); // แยก refresh token ออกจาก header
-        // ตรวจสอบ refresh token
+        String refreshToken = extractToken(requestTokenHeader);
+
         if (jwtTokenUtil.isTokenExpired(refreshToken)) {
             throw new UnauthorizedException("Refresh token has expired");
         }
-        // ดึง username จาก refresh token
+
         String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
         UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
 
-        // สร้าง access token ใหม่
+
         String newAccessToken = jwtTokenUtil.generateToken(userDetails);
         return new JwtResponseTokenDTO(newAccessToken, null); // คืนเฉพาะ access token
     }
-    // Method สำหรับแยก token ออกจาก header
     private String extractToken(String tokenHeader) {
         if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
             return tokenHeader.substring(7);
