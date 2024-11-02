@@ -35,7 +35,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<JwtResponseTokenDTO> refreshAccessToken(@RequestHeader("Authorization") String requestTokenHeader) {
+    public ResponseEntity<JwtResponseTokenDTO> refreshAccessToken(@RequestHeader String requestTokenHeader) {
         JwtResponseTokenDTO tokens = authenticationService.refreshAccessToken(requestTokenHeader);
         return ResponseEntity.ok(tokens);
     }
