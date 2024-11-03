@@ -9,6 +9,7 @@ import {
 import SideBar from "@/component/bar/SideBar.vue"
 import Navbar from "@/component/bar/Navbar.vue"
 import BoardCard from "@/component/card/BoardCard.vue"
+import LodingPage from "@/component/LodingPage.vue"
 
 
 // ----------------------- Router -----------------------
@@ -31,6 +32,7 @@ const userStore = useUsers()
 
 const userName = userStore.getUser().username
 const userBoard = ref({ name: userName + " personal board" })
+const isLoading = ref(true)
 
 // ----------------------- BaseUrl -----------------------
 
@@ -42,22 +44,28 @@ function getToken() {
 
 
 onMounted(async () => {
-  const itemsBoards = await getBoardItems(baseUrlBoard)
-  boardsList.value = itemsBoards.boards
-  console.log(boardsList.value)
-  const token = getToken()
-  const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+  try {
+    const itemsBoards = await getBoardItems(baseUrlBoard);
+    boardsList.value = itemsBoards.boards;
+    
+    const token = getToken();
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
-  if (response.status === 404) {
-    router.push({ name: "ErrorPage" })
-  } else if (response.status === 401) {
-    router.push({ name: "Login" })
+    if (response.status === 404) {
+      router.push({ name: "ErrorPage" });
+    } else if (response.status === 401) {
+      router.push({ name: "Login" });
+    }
+  } catch (error) {
+    console.error("Error loading boards:", error);
+  } finally {
+    isLoading.value = false
   }
-})
+});
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
@@ -104,7 +112,12 @@ const openModalCreate = () => {
 </script>
 
 <template>
-  <div class="min-h-full max-h-fit">
+  <div v-if="isLoading">
+  <LodingPage/>
+</div>
+
+  <div v-else
+  class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
       <SideBar>
