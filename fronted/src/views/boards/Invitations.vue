@@ -3,9 +3,7 @@ import { ref, onMounted, watch } from "vue"
 import {
     getBoardById,
     getItems,
-    addCollaborator,
-    deleteCollaborator,
-    editAccessRight
+    addCollaboratorByEmail
 } from "./../../libs/fetchUtils.js"
 import { useRoute, useRouter } from "vue-router"
 import { useUsers } from "@/stores/storeUser"
@@ -21,13 +19,14 @@ const router = useRouter()
 
 // ----------------------- Stores -----------------------
 
-
 const userStore = useUsers()
 
 // ----------------------- Params -----------------------
 
+const boardOwnerName = ref("")
 const boardName = ref("")
 const boardId = ref()
+
 watch(
     () => route.params.id,
     (newId) => {
@@ -49,11 +48,9 @@ const collaboratorInfo = ref([])
 
 // ----------------------- Enable & Disable -----------------------
 
-
 const disabledButtonWhileOpenPublic = ref(false)
+const openModalAddCollab = ref(false)
 const showConfirmModal = ref(false)
-
-
 
 // ----------------------- Alerts -----------------------
 
@@ -64,21 +61,23 @@ const alertMessage = ref("")
 // ----------------------- BaseUrl -----------------------
 
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const baseUrlBoardId = `${baseUrlboards}/${boardId.value}`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
-
 
 onMounted(async () => {
     userStore.setToken(token)
     const collaborator = await getItems(baseUrlCollaborator)
     collaboratorInfo.value = collaborator.collaborators
-    console.log("Get Items", collaboratorInfo.value)
+    console.log("Get Items", collaboratorInfo.value[0].email)
+    console.log(baseUrlboards);
 
     const Board = await getBoardById(boardId.value)
+    boardName.value = Board.item.name
+    console.log(Board.item.name)
     console.log("Board data", Board.item.owner.name)
+    boardOwnerName.value = Board.item.owner.name
+    console.log(boardOwnerName.value)
 
-    if (Board && Board.item && Board.item.name) {
-        boardName.value = Board.item.name
-    }
     if (Board.item.owner.name !== userName) {
         disabledButtonWhileOpenPublic.value = true
         console.log("ไม่ตรงกันนะจ๊า")
@@ -87,7 +86,27 @@ onMounted(async () => {
     }
 })
 
-console.log(collaboratorInfo.value)
+const submitFormSendEmail = async () => {
+    const email = collaboratorEmail?.value;
+    const inviterName = boardOwnerName.value;
+    const boardNames = boardName.value;
+    const accessRight = collaboratorAccess.value;
+    const boardUrl = baseUrlBoardId;
+
+    if (!email || !inviterName || !boardNames || !accessRight || !boardUrl) {
+        console.error("One or more required fields are missing.");
+        return;
+    }
+    await addCollaboratorByEmail({
+        email,
+        inviterName,
+        boardName: boardNames,
+        accessRight,
+        boardUrl
+    });
+};
+
+
 const showRemoveModal = (oid) => {
     console.log(oid)
     oidCollaboratorToRemove.value = oid
@@ -103,6 +122,10 @@ const formatStatus = () => {
     }
     return "";
 };
+
+const openAdd = () => {
+    openModalAddCollab.value = true
+}
 
 </script>
 
@@ -127,7 +150,7 @@ const formatStatus = () => {
                                         <path fill="currentColor"
                                             d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z" />
                                     </svg>
-                                    {{ boardName.toLowerCase() }}
+                                    {{ boardOwnerName.toLowerCase() }}
                                 </router-link>
                             </li>
                             <li>
@@ -143,7 +166,23 @@ const formatStatus = () => {
                             </li>
                         </ul>
                     </div>
+                    <button :disabled="disabledButtonWhileOpenPublic" :style="{
+                        backgroundColor: disabledButtonWhileOpenPublic
+                            ? '#d3d3d3'
+                            : '#F785B1',
+                        color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
+                        borderRadius: '30px',
+                        cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
+                        opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
+                    }" @click="openAdd" class="itbkk-button-add btn ml-4">
+                        <svg xmlns="http://www.w3.org/3000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <path fill="currentColor"
+                                d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
+                        </svg>
+                        Invitations
+                    </button>
                 </div>
+
 
                 <div class="flex flex-col items-center mt-1">
                     <!-- Table content -->
@@ -257,6 +296,37 @@ const formatStatus = () => {
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    <div v-if="openModalAddCollab"
+                        class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+                        <div class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
+                            <div class="w-full p-8">
+                                <h2 class="text-2xl font-bold text-center mb-4">
+                                    Add Collaborator
+                                </h2>
+
+                                <div class="flex items-center space-x-4 mb-4">
+                                    <!-- Email Input -->
+                                    <div class="flex-1">
+                                        <label class="block text-sm font-bold mb-2">Email</label>
+                                        <input type="email" v-model="collaboratorEmail"
+                                            class="w-full p-2 border rounded-lg" placeholder="you@ad.sit.kmutt.ac.th" />
+                                    </div>
+                                
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="flex justify-end mt-4">
+                                    <button class="btn bg-gray-300 mr-4">
+                                        Cancel
+                                    </button>
+                                    <button class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
+                                        @click="submitFormSendEmail">
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

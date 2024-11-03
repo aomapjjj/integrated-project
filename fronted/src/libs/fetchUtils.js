@@ -305,6 +305,32 @@ async function addCollaborator(boardId, collaborator) {
   }
 }
 
+async function addCollaboratorByEmail(payload) {
+  const token = getToken();
+  console.log("Token:", token);
+  const urlSendEmail = "http://localhost:8080/api/sendEmail"
+  try {
+    const response = await fetch(`${urlSendEmail}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const statusCode = response.status;
+    const responseData = await response.text();
+
+    console.log(responseData)
+
+    return { statusCode, data: responseData };
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+    return parseInt(error.message) || null;
+  }
+}
+
 async function editAccessRight(boardId, access, oid) {
   const token = getToken();
   try {
@@ -389,6 +415,7 @@ export {
   getItemsPublic,
   getBoardItems,
   addCollaborator,
+  addCollaboratorByEmail,
   editAccessRight,
   deleteCollaborator,
   validateAccessToken,
