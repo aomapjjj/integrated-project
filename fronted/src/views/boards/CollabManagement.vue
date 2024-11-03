@@ -14,6 +14,7 @@ import Navbar from '@/component/bar/Navbar.vue'
 import Alert from '@/component/alert/Alert.vue'
 import ModalAcess from '@/component/modal/Modal.vue'
 import CollabCard from '@/component/card/CollabCard.vue'
+import ConfirmModal from '@/component/modal/ConfirmModal.vue'
 
 // ----------------------- Router -----------------------
 
@@ -42,6 +43,8 @@ const collaboratorAccess = ref('READ')
 const oidCollaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
 const userEmail = userStore.getEmail()
+
+console.log(userStore.getUserInfo)
 
 // ----------------------- List Items -----------------------
 
@@ -170,10 +173,9 @@ const submitForm = async () => {
   }
 }
 console.log(collaboratorInfo.value)
+
 const showRemoveModal = (oid) => {
-  console.log(oid)
   oidCollaboratorToRemove.value = oid
-  console.log(oidCollaboratorToRemove.value)
   showConfirmModal.value = true
 }
 
@@ -436,8 +438,69 @@ const checkDisabled = () => {
                     </select>
                   </div>
                 </template>
+                <template #btn>
+                  <button
+        :disabled="disabledButtonWhileOpenPublic"
+        @click="showRemoveModal(item.id)"
+        class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
+          />
+        </svg>
+      </button>
+                </template>
               </CollabCard>
             </div>
+
+            <ConfirmModal :openModal="showConfirmModal" @confirm="confirmRemove()" @cancel="showConfirmModal = false">
+              <template #svg>
+          <div
+            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <svg
+              class="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+        </template>
+        <template #headerMessage> Delete Collaborator </template>
+        <template #message>
+          <p class="text-sm text-gray-500">
+            Are you sure you want to delete your Collaborator? 
+          </p>
+        </template>
+        <template #confirmBtn>
+          <span
+            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+            >Delete</span
+          >
+        </template>
+        <template #cancelBtn>
+          <span
+            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+            >Cancel</span
+          >
+        </template>
+        </ConfirmModal>
 
             <ModalAcess
               :isOpen="openModalAcess"
@@ -504,7 +567,7 @@ const checkDisabled = () => {
               </div>
             </div>
 
-            <div
+            <!-- <div
               v-if="showConfirmModal"
               class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
             >
@@ -527,7 +590,7 @@ const checkDisabled = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ const useUsers = defineStore("users", () => {
   const user = ref({ username: "" });
   const token = ref("");
   const email = ref("")
+  const userInfo = ref()
   const LoginSuccess = ref(false)
   const refreshToken = ref(""); 
   const boardId = ref("");
@@ -71,6 +72,18 @@ const useUsers = defineStore("users", () => {
     }
     return email.value
   }
+const setUserInfo = (user) => {
+  userInfo.value = { ...user };
+  localStorage.setItem("userInfo", JSON.stringify(userInfo.value));
+};
+
+const getUserInfo = () => {
+  const storedUser = localStorage.getItem("userInfo");
+  if (storedUser) {
+    userInfo.value = JSON.parse(storedUser);
+  }
+  return userInfo.value;
+};
 
   const setBoard = (newBoard) => {
     boardId.value = newBoard;
@@ -101,7 +114,9 @@ const useUsers = defineStore("users", () => {
     setLoginSuccess,
     getLoginSuccess,
     setEmail,
-    getEmail
+    getEmail,
+    setUserInfo,
+    getUserInfo
   }
 });
 
