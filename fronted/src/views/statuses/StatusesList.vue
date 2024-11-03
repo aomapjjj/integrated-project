@@ -17,6 +17,7 @@ import { useTasks } from "@/stores/store"
 import { useUsers } from "@/stores/storeUser"
 import SideBar from "@/component/bar/SideBar.vue"
 import Navbar from "@/component/bar/Navbar.vue"
+import LodingPage from "@/component/LodingPage.vue"
 
 
 
@@ -37,6 +38,7 @@ const taskStore = useTasks()
 const selectedStatusId = ref(0)
 const boardName = ref("")
 const boardId = ref()
+const isLoading = ref(true)
 
 watch(
   () => route.params.id,
@@ -98,26 +100,36 @@ const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
 onMounted(async () => {
-  userStore.setToken(token)
-  if (myStatuses.getStatuses().length === 0) {
-    const items = await getItems(baseUrlStatus)
-    myStatuses.addStatuses(await items)
-  }
-  statusList.value = myStatuses.getStatuses()
-  const statusId = route.params.id
+  try {
+    isLoading.value = true
 
-  const Board = await getBoardById(boardId.value)
-  console.log("Board data", Board.item.owner.name)
+    userStore.setToken(token);
+    
+    if (myStatuses.getStatuses().length === 0) {
+      const items = await getItems(baseUrlStatus);
+      myStatuses.addStatuses(items);
+    }
+    
+    statusList.value = myStatuses.getStatuses();
+    const statusId = route.params.id;
 
-  if (Board && Board.item && Board.item.name) {
-    boardName.value = Board.item.name
-  }
+    const Board = await getBoardById(boardId.value);
+    console.log("Board data", Board.item.owner.name);
 
-  if (Board.item.owner.name !== userName) {
-    disabledButtonWhileOpenPublic.value = true
-    console.log("ไม่ตรงกันนะจ๊า")
-  } else {
-    console.log("ตรงกันนะจ๊า")
+    if (Board && Board.item && Board.item.name) {
+      boardName.value = Board.item.name;
+    }
+
+    if (Board.item.owner.name !== userName) {
+      disabledButtonWhileOpenPublic.value = true;
+      console.log("ไม่ตรงกันนะจ๊า");
+    } else {
+      console.log("ตรงกันนะจ๊า");
+    }
+  } catch (error) {
+    console.error("Error loading data:", error);
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -388,7 +400,12 @@ const isFormValid = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen overflow-hidden">
+   <div v-if="isLoading">
+  <LodingPage/>
+</div>
+
+  <div v-else
+  class="flex flex-col h-screen overflow-hidden">
     <!-- Sidebar -->
     <div class="flex flex-1 overflow-hidden">
       <SideBar />
@@ -414,7 +431,7 @@ const isFormValid = computed(() => {
                       d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z"
                     />
                   </svg>
-                  {{ boardName.toLowerCase() }}
+                  <span class="itbkk-board-name">{{ boardName }}</span>
                 </a>
               </li>
               <li>
