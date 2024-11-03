@@ -1,18 +1,19 @@
 <script setup>
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch } from 'vue'
 import {
   getBoardById,
   getItems,
   addCollaborator,
   deleteCollaborator,
   editAccessRight
-} from "./../../libs/fetchUtils.js"
-import { useRoute, useRouter } from "vue-router"
-import { useUsers } from "@/stores/storeUser"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import Alert from "@/component/alert/Alert.vue"
-import ModalAcess from "@/component/modal/Modal.vue"
+} from './../../libs/fetchUtils.js'
+import { useRoute, useRouter } from 'vue-router'
+import { useUsers } from '@/stores/storeUser'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import Alert from '@/component/alert/Alert.vue'
+import ModalAcess from '@/component/modal/Modal.vue'
+import CollabCard from '@/component/card/CollabCard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -21,12 +22,11 @@ const router = useRouter()
 
 // ----------------------- Stores -----------------------
 
-
 const userStore = useUsers()
 
 // ----------------------- Params -----------------------
 
-const boardName = ref("")
+const boardName = ref('')
 const boardId = ref()
 watch(
   () => route.params.id,
@@ -36,9 +36,9 @@ watch(
   { immediate: true }
 )
 
-const token = localStorage.getItem("access_token")
-const collaboratorEmail = ref("")
-const collaboratorAccess = ref("READ")
+const token = localStorage.getItem('access_token')
+const collaboratorEmail = ref('')
+const collaboratorAccess = ref('READ')
 const oidCollaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
 const userEmail = userStore.getEmail()
@@ -49,25 +49,22 @@ const collaboratorInfo = ref([])
 
 // ----------------------- Enable & Disable -----------------------
 
-
 const disabledButtonWhileOpenPublic = ref(false)
 const openModalAddCollab = ref(false)
 const showConfirmModal = ref(false)
 const openModalAcess = ref(false)
 const confirmAcessChange = ref(false)
 
-
 // ----------------------- Alerts -----------------------
 
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
-const alertMessage = ref("")
+const alertMessage = ref('')
 
 // ----------------------- BaseUrl -----------------------
 
 const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
-
 
 const cancelChange = () => {
   openModalAcess.value = false
@@ -75,24 +72,23 @@ const cancelChange = () => {
   pendingItem.value = null
 }
 
-
 onMounted(async () => {
   userStore.setToken(token)
   const collaborator = await getItems(baseUrlCollaborator)
   collaboratorInfo.value = collaborator.collaborators
-  console.log("Get Items", collaboratorInfo.value)
+  console.log('Get Items', collaboratorInfo.value)
 
   const Board = await getBoardById(boardId.value)
-  console.log("Board data", Board.item.owner.name)
+  console.log('Board data', Board.item.owner.name)
 
   if (Board && Board.item && Board.item.name) {
     boardName.value = Board.item.name
   }
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log("ไม่ตรงกันนะจ๊า")
+    console.log('ไม่ตรงกันนะจ๊า')
   } else {
-    console.log("ตรงกันนะจ๊า")
+    console.log('ตรงกันนะจ๊า')
   }
 })
 
@@ -118,58 +114,58 @@ const submitForm = async () => {
         case 201:
           collaboratorInfo.value.push(result.data)
           isAlertSuccess.value = true
-          alertMessage.value = "Collaborator added successfully!"
+          alertMessage.value = 'Collaborator added successfully!'
           setTimeout(hideAlert, 3000)
           cancelAction()
           break
         case 401:
           isAlertFailure.value = true
-          alertMessage.value = "Unauthorized access. Please log in again."
+          alertMessage.value = 'Unauthorized access. Please log in again.'
           setTimeout(hideAlert, 3000)
           break
         case 403:
           isAlertFailure.value = true
           alertMessage.value =
-            "You do not have permission to add a collaborator."
+            'You do not have permission to add a collaborator.'
           setTimeout(hideAlert, 3000)
           break
         case 404:
           isAlertFailure.value = true
-          alertMessage.value = "The user does not exists."
+          alertMessage.value = 'The user does not exists.'
           setTimeout(hideAlert, 3000)
           break
         case 409:
           isAlertFailure.value = true
           if (
             result.data.message ===
-            "The collaborator already exists for this board"
+            'The collaborator already exists for this board'
           ) {
             alertMessage.value =
-              "The user is already a collaborator of this board."
+              'The user is already a collaborator of this board.'
           } else if (
             result.data.message ===
-            "The collaborator email belongs to the board owner"
+            'The collaborator email belongs to the board owner'
           ) {
             alertMessage.value =
-              "Board owner cannot be collaborator of his/her own board"
+              'Board owner cannot be collaborator of his/her own board'
           } else {
-            alertMessage.value = "An unknown error occurred."
+            alertMessage.value = 'An unknown error occurred.'
           }
           setTimeout(hideAlert, 3000)
           break
         default:
           isAlertFailure.value = true
-          alertMessage.value = "There is a problem. Please try again later."
+          alertMessage.value = 'There is a problem. Please try again later.'
           setTimeout(hideAlert, 3000)
       }
     } catch (error) {
       isAlertFailure.value = true
-      alertMessage.value = "An error occurred: " + error.message
+      alertMessage.value = 'An error occurred: ' + error.message
       setTimeout(hideAlert, 3000)
     }
   } else {
     isAlertFailure.value = true
-    alertMessage.value = "Collaborator email and access right are required."
+    alertMessage.value = 'Collaborator email and access right are required.'
     setTimeout(hideAlert, 3000)
   }
 }
@@ -193,15 +189,15 @@ const confirmRemove = async () => {
           (collab) => collab.id !== oidCollaboratorToRemove.value
         )
         isAlertSuccess.value = true
-        alertMessage.value = "Collaborator removed successfully"
+        alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
       } else {
         isAlertFailure.value = true
-        alertMessage.value = "Failed to remove collaborator"
+        alertMessage.value = 'Failed to remove collaborator'
         setTimeout(hideAlert, 3000)
       }
     } catch (error) {
-      alertMessage.value = "Error removing collaborator:"
+      alertMessage.value = 'Error removing collaborator:'
       setTimeout(hideAlert, 3000)
     } finally {
       showConfirmModal.value = false
@@ -217,7 +213,7 @@ const updateAccessRight = (item) => {
     openModalAcess.value = true
     pendingItem.value = item
   } catch (error) {
-    console.error("Failed to open modal:", error)
+    console.error('Failed to open modal:', error)
   }
 }
 
@@ -234,16 +230,16 @@ const confirmChange = async () => {
         pendingItem.value.id
       )
       console.log(pendingItem.value)
-      alertMessage.value = "Access right updated: " + result.accessRight
+      alertMessage.value = 'Access right updated: ' + result.accessRight
       isAlertSuccess.value = true
       setTimeout(hideAlert, 3000)
       confirmAcessChange.value = false
       pendingItem.value = null
     }
   } catch (error) {
-    console.error("Failed to update access right:", error)
+    console.error('Failed to update access right:', error)
     isAlertFailure.value = true
-    alertMessage.value = "Failed to update access right"
+    alertMessage.value = 'Failed to update access right'
     setTimeout(hideAlert, 3000)
   }
 }
@@ -254,14 +250,14 @@ const hideAlert = () => {
 }
 
 const clearForm = () => {
-  collaboratorEmail.value = ""
+  collaboratorEmail.value = ''
 }
 
 const checkDisabled = () => {
   if (
     !collaboratorEmail.value ||
     collaboratorEmail.value === userEmail.email ||
-    !collaboratorEmail.value.includes("@")
+    !collaboratorEmail.value.includes('@')
   ) {
     return true
   }
@@ -278,7 +274,7 @@ const checkDisabled = () => {
       <SideBar />
 
       <div class="flex flex-col flex-1">
-        <Navbar> IT Bangmod Kradan Kanbun </Navbar>
+        <Navbar> Collaborator Management </Navbar>
 
         <div class="mt-9 px-10 flex justify-between items-center">
           <div class="text-sm breadcrumbs">
@@ -297,7 +293,7 @@ const checkDisabled = () => {
                       d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z"
                     />
                   </svg>
-                  {{ boardName.toLowerCase() }}
+                  <span class="itbkk-board-name">{{ boardName }}</span>
                 </router-link>
               </li>
               <li>
@@ -333,7 +329,7 @@ const checkDisabled = () => {
               opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
             }"
             @click="openAdd"
-            class="itbkk-button-add btn ml-4"
+            class="itbkk-collaborator-add btn ml-4"
           >
             <svg
               xmlns="http://www.w3.org/3000/svg"
@@ -350,147 +346,19 @@ const checkDisabled = () => {
           </button>
         </div>
 
-        <div class="flex flex-col items-center mt-1">
+        <div class="flex flex-col items-center mt-2">
           <!-- Table content -->
-          <div class="overflow-x-auto">
+          <!-- <div class="overflow-x-auto">
             <div class="min-w-full">
               <table
                 class="table-auto1 mt-5 rounded-xl overflow-hidden mb-10"
                 style="table-layout: fixed"
               >
-                <thead>
-                  <tr class="bg-base-200">
-                    <th
-                      class="hidden md:table-cell px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9391e4;
-                        border-bottom: 2px solid #9391e4;
-                        color: #fff;
-                      "
-                    >
-                      No.
-                    </th>
 
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9391e4;
-                        border-bottom: 2px solid #9391e4;
-
-                        color: #fff;
-                      "
-                    >
-                      Name
-                    </th>
-
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9391e4;
-                        border-bottom: 2px solid #9391e4;
-
-                        color: #fff;
-                      "
-                    >
-                      E-mail
-                    </th>
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9391e4;
-                        border-bottom: 2px solid #9391e4;
-
-                        color: #fff;
-                      "
-                    >
-                      Access Right
-                    </th>
-
-                    <th
-                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
-                      style="
-                        background-color: #9391e4;
-                        border-bottom: 2px solid #9391e4;
-
-                        color: #fff;
-                        text-align: center;
-                        vertical-align: middle;
-                      "
-                    >
-                      Action
-                    </th>
-                  </tr>
-                </thead>
                 <tbody>
-                  <tr
-                    v-for="(item, index) in collaboratorInfo"
-                    :key="item.id"
-                    class="itbkk-item"
-                  >
-                    <td
-                      class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      {{ index + 1 }}
-                    </td>
-                    <td class="">
-                      <label class="itbkk-status-name" for="my_modal_6">
-                        {{ item.name }}
-                      </label>
-                    </td>
-
-                    <td
-                      class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      {{ item.email }}
-                    </td>
-
-                    <td
-                      class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      <div class="relative inline-block w-full">
-                        <select
-                          v-model="item.accessRight"
-                          @change="updateAccessRight(item)"
-                          class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                          <option value="READ">Read</option>
-                          <option value="WRITE">Write</option>
-                        </select>
-                        <div
-                          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-                        >
-                          <svg
-                            class="fill-current h-4 w-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M10 12l-4-4h8z" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      <!-- Modal Component -->
-                      <ModalAcess
-                        :isOpen="openModalAcess"
-                        @confirm="confirmChange"
-                        @cancel="cancelChange"
-                      >
-                        <template #headerName>Access Changed!</template>
-                        <template #messageName
-                          >Are you sure you want to change the access?</template
-                        >
-                      </ModalAcess>
-                    </td>
-
                     <td
                       class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
-                      <!-- <button
-                        @click="showRemoveModal(item.id)"
-                        class="btn bg-red-500 text-white"
-                      >
-                        Remove
-                      </button> -->
                       <button
                         :disabled="disabledButtonWhileOpenPublic"
                         class="btn bg-red-400 rounded-full"
@@ -515,97 +383,149 @@ const checkDisabled = () => {
                       </button>
                     </td>
                   </tr>
-                  <tr
-                    class="bg-base-100 mt-4 md:mt-0"
-                    v-if="collaboratorInfo?.length === 0"
-                  >
-                    <td colspan="5" class="text-center py-4 text-gray-400">
-                      No Collaboator
-                    </td>
-                  </tr>
+                  
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> -->
 
-          <!-- Modal AddCollab -->
-          <div
-            v-if="openModalAddCollab"
-            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
-          >
+          <div>
+            <div class="bg-base-100" v-if="collaboratorInfo?.length === 0">
+              <span class="text-center py-4 text-gray-400">
+                No Collaborator
+              </span>
+            </div>
             <div
-              class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
+              v-else
+              class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
             >
-              <div class="w-full p-8">
-                <h2 class="text-2xl font-bold text-center mb-4">
-                  Add Collaborator
-                </h2>
+              <CollabCard
+                v-for="(item, index) in collaboratorInfo"
+                :key="item.id"
+              >
+                <template #name>
+                  <h2 class="itbkk-name font-semibold">{{ item.name }}</h2>
+                </template>
 
-                <div class="flex items-center space-x-4 mb-4">
-                  <!-- Email Input -->
-                  <div class="flex-1">
-                    <label class="block text-sm font-bold mb-2">Email</label>
-                    <input
-                      type="email"
-                      v-model="collaboratorEmail"
-                      class="w-full p-2 border rounded-lg"
-                      placeholder="you@ad.sit.kmutt.ac.th"
-                    />
-                  </div>
+                <template #email>
+                  <p class="itbkk-email mt-2 text-sm text-gray-500">
+                    {{ item.email }}
+                  </p>
+                </template>
 
-                  <!-- Access Right Select -->
-                  <div>
-                    <label class="block text-sm font-bold mb-2"
-                      >Access Right</label
+                <template #access-right>
+                  <div class="itbkk-access-right mt-3 relative inline-flex">
+                    <svg
+                      class="w-2 h-2 absolute top-2 right-1 m-2 pointer-events-none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 412 232"
                     >
+                      <path
+                        d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z"
+                        fill="#648299"
+                        fill-rule="nonzero"
+                      />
+                    </svg>
                     <select
-                      v-model="collaboratorAccess"
-                      class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm"
+                      v-model="item.accessRight"
+                      @change="updateAccessRight(item)"
+                      class="border border-gray-300 rounded-full text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
                     >
                       <option value="READ">Read</option>
                       <option value="WRITE">Write</option>
                     </select>
                   </div>
-                </div>
+                </template>
+              </CollabCard>
+            </div>
 
-                <!-- Buttons -->
-                <div class="flex justify-end mt-4">
-                  <button class="btn bg-gray-300 mr-4" @click="cancelAction">
-                    Cancel
-                  </button>
-                  <button
-                    :disabled="checkDisabled()"
-                    class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
-                    @click="submitForm"
-                  >
-                    Add
-                  </button>
+            <ModalAcess
+              :isOpen="openModalAcess"
+              @confirm="confirmChange"
+              @cancel="cancelChange"
+            >
+              <template #headerName>Access Changed!</template>
+              <template #messageName
+                >Are you sure you want to change the access?</template
+              >
+            </ModalAcess>
+
+            <!-- Modal AddCollab -->
+            <div
+              v-if="openModalAddCollab"
+              class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
+            >
+              <div
+                class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
+              >
+                <div class="w-full p-8">
+                  <h2 class="text-2xl font-bold text-center mb-4">
+                    Add Collaborator
+                  </h2>
+
+                  <div class="flex items-center space-x-4 mb-4">
+                    <div class="flex-1">
+                      <label class="block text-sm font-bold mb-2">Email</label>
+                      <input
+                        type="email"
+                        v-model="collaboratorEmail"
+                        class="w-full p-2 border rounded-lg"
+                        placeholder="you@ad.sit.kmutt.ac.th"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-bold mb-2"
+                        >Access Right</label
+                      >
+                      <select
+                        v-model="collaboratorAccess"
+                        class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm"
+                      >
+                        <option value="READ">Read</option>
+                        <option value="WRITE">Write</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="flex justify-end mt-4">
+                    <button class="btn bg-gray-300 mr-4" @click="cancelAction">
+                      Cancel
+                    </button>
+                    <button
+                      :disabled="checkDisabled()"
+                      class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
+                      @click="submitForm"
+                    >
+                      Add
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div
-            v-if="showConfirmModal"
-            class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
-          >
-            <div class="bg-white p-6 rounded-md max-w-md w-full">
-              <h3 class="text-lg font-semibold text-center mb-4">
-                Are you sure you want to remove this collaborator?
-              </h3>
-              <div class="flex justify-end">
-                <button
-                  @click="showConfirmModal = false"
-                  class="btn bg-gray-500 text-white mr-4"
-                >
-                  Cancel
-                </button>
-                <button
-                  @click="confirmRemove"
-                  class="btn bg-red-500 text-white"
-                >
-                  Confirm
-                </button>
+            <div
+              v-if="showConfirmModal"
+              class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
+            >
+              <div class="bg-white p-6 rounded-md max-w-md w-full">
+                <h3 class="text-lg font-semibold text-center mb-4">
+                  Are you sure you want to remove this collaborator?
+                </h3>
+                <div class="flex justify-end">
+                  <button
+                    @click="showConfirmModal = false"
+                    class="btn bg-gray-500 text-white mr-4"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    @click="confirmRemove"
+                    class="btn bg-red-500 text-white"
+                  >
+                    Confirm
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -616,30 +536,23 @@ const checkDisabled = () => {
 </template>
 
 <style>
-@media (max-width: 576px) {
-  .table-auto1 {
-    width: 100%;
-    overflow-x: auto;
-  }
+.customPink {
+  color: #f785b1;
 }
 
-td {
-  border-bottom: 1px solid #ababab;
+.customPurple {
+  color: #9391e4;
 }
 
-tr:nth-child(even) {
-  background-color: #f2f2f2;
+.customBlue {
+  color: #9fc3e9;
 }
 
-tr:nth-child(odd) {
-  background-color: #ffffff;
+.customRed {
+  color: #eb4343;
 }
 
-thead th {
-  height: 3rem;
-}
-
-.table-auto1 {
-  table-layout: fixed;
+.customBgYellow {
+  background-color: #fae59d;
 }
 </style>
