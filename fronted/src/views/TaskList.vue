@@ -20,6 +20,7 @@ import SideBar from "../component/bar/SideBar.vue"
 import Modal from "../component/modal/Modal.vue"
 import Alert from "@/component/alert/Alert.vue"
 import Navbar from "@/component/bar/Navbar.vue"
+import LodingPage from "@/component/LodingPage.vue"
 
 
 // ----------------------- Router -----------------------
@@ -40,7 +41,7 @@ const boardId = ref()
 const userName = userStore.getUser().username
 const token = localStorage.getItem("access_token")
 const boardName = ref("")
-
+const isLoading = ref(true)
 watch(
   () => route.params.id,
   (newId) => {
@@ -89,34 +90,45 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 
 
+
 onMounted(async () => {
-  userStore.setToken(token)
-  if (taskStore.getTasks().length === 0) {
-    items = await getItems(baseUrlTask)
-    taskStore.addTasks(await items)
-  }
-  const Board = await getBoardById(boardId.value)
-  if (Board.item.owner.name !== userName) {
-    disabledButtonWhileOpenPublic.value = true
-  }
-  boardName.value = Board.item.name
-  visibility.value = Board.item.visibility
-  todoList.value = items
+  try {
+    isLoading.value = true; // เริ่มการโหลดข้อมูล
 
-  const itemsStatus = await getItems(baseUrlStatus)
-  statusList.value = itemsStatus
-
-  const itemLimit = await getItems(baseUrlLimit)
-  limitStore.setLimit(itemLimit)
-
-  const taskId = route.params.id
-  if (taskId !== undefined) {
-    const response = await getItemById(taskId)
-    if (response && (response.status === 404 || response.status === 400)) {
-      router.push("/error")
+    userStore.setToken(token);
+    
+    if (taskStore.getTasks().length === 0) {
+      const items = await getItems(baseUrlTask);
+      taskStore.addTasks(items);
     }
+    
+    const Board = await getBoardById(boardId.value);
+    if (Board.item.owner.name !== userName) {
+      disabledButtonWhileOpenPublic.value = true;
+    }
+    
+    boardName.value = Board.item.name;
+    visibility.value = Board.item.visibility;
+    todoList.value = items;
+
+    const itemsStatus = await getItems(baseUrlStatus);
+    statusList.value = itemsStatus;
+
+    const itemLimit = await getItems(baseUrlLimit);
+    limitStore.setLimit(itemLimit);
+
+    const taskId = route.params.id;
+    if (taskId !== undefined) {
+      const response = await getItemById(taskId);
+      if (response && (response.status === 404 || response.status === 400)) {
+        router.push("/error");
+      }
+    }
+  } catch (error) {
+    console.error("Error loading data:", error);
+  } finally {
+    isLoading.value = false; // ปิดการโหลดเมื่อทำงานเสร็จ
   }
-  return items
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -318,7 +330,12 @@ const changeVisibility = async () => {
 </script>
 
 <template>
-  <div class="min-h-full max-h-fit">
+  <div v-if="isLoading">
+  <LodingPage/>
+</div>
+
+  <div v-else
+  class="min-h-full max-h-fit">
     <!-- Modal -->
 
     <div class="min-h-screen flex">

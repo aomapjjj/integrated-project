@@ -1,4 +1,7 @@
-<script setup></script>
+<script setup>
+
+
+</script>
 
 <template>
   <div class="flex flex-col">
@@ -32,24 +35,8 @@
         </div>
       </div>
 
-      <!-- กากบาท -->
-      <button
-        :disabled="disabledButtonWhileOpenPublic"
-        @click="showRemoveModal(item.id)"
-        class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-4 h-4"
-          viewBox="0 0 24 24"
-        >
-          <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
-          />
-        </svg>
-      </button>
+      <slot name="btn"></slot>
+      
     </div>
   </div>
 </template>
