@@ -26,6 +26,7 @@ const userStore = useUsers()
 
 const nameJWT = ref('')
 const emailJWT = ref('')
+const userInfowhileLogin = ref()
 const userInput = ref('')
 const passwordInput = ref('')
 const boardId = ref()
@@ -100,6 +101,11 @@ const submitForm = async () => {
       const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name
       emailJWT.value = decoded.email
+
+      userInfowhileLogin.value = {...decoded}
+      
+      userStore.setUserInfo(userInfowhileLogin.value)
+      console.log(userStore.getUserInfo())
       userStore.setEmail(emailJWT.value)
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)

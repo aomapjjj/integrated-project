@@ -3,7 +3,14 @@ import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
 import { useUsers } from "../../stores/storeUser"
 import { useBoard } from "../../stores/storeBoard"
-import { deleteItemById, getBoardItems } from "../../libs/fetchUtils.js"
+import {
+  deleteItemById,
+  getBoardItems,
+  deleteCollaborator
+} from "../../libs/fetchUtils.js"
+import Alert from "../alert/Alert.vue"
+import ConfirmModal from "../modal/ConfirmModal.vue"
+
 
 // ----------------------- Router -----------------------
 
@@ -23,15 +30,62 @@ const currentColor = ref({})
 
 const selectedItemIdToDelete = ref()
 const colorCard = ref(null)
+const oidCollaboratorToRemove = ref()
+const boardIdCollabs = ref()
 
 // ----------------------- Enable & Disable -----------------------
 
 const openModalToDelete = ref(false)
+const showConfirmModal = ref(false)
+const isAlertFailure = ref(false)
+const isAlertSuccess = ref(false)
+const alertMessage = ref("")
 
 // ----------------------- BaseUrl -----------------------
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
+const showRemoveModal = (boardId) => {
+  boardIdCollabs.value = boardId
+  showConfirmModal.value = true
+  oidCollaboratorToRemove.value = userStore.getUserInfo().oid
+
+}
+
+const hideAlert = () => {
+  isAlertFailure.value = false
+  isAlertSuccess.value = false
+}
+
+const confirmRemove = async () => {
+
+  if (oidCollaboratorToRemove.value) {
+    try {
+      const status = await deleteCollaborator(
+        boardIdCollabs.value,
+        oidCollaboratorToRemove.value
+      )
+      if (status === 200) {
+        collaboratorInfo.value = collaboratorInfo.value.filter(
+          (collab) => collab.id !== oidCollaboratorToRemove.value
+        )
+        isAlertSuccess.value = true
+        alertMessage.value = "Collaborator removed successfully"
+        setTimeout(hideAlert, 3000)
+      } else {
+        isAlertFailure.value = true
+        alertMessage.value = "Failed to remove collaborator"
+        setTimeout(hideAlert, 3000)
+      }
+    } catch (error) {
+      alertMessage.value = "Error removing collaborator:"
+      setTimeout(hideAlert, 3000)
+    } finally {
+      showConfirmModal.value = false
+      oidCollaboratorToRemove.value = null
+    }
+  }
+}
 
 function getToken() {
   return localStorage.getItem("access_token")
@@ -67,8 +121,8 @@ onMounted(async () => {
 const toboardsList = (boardId) => {
   if (boardId !== null) {
     router.push({ name: "TaskList", params: { id: boardId } }).then(() => {
-        router.go()
-      })
+      router.go()
+    })
     userStore.setBoard(boardId)
   }
 }
@@ -99,6 +153,9 @@ const setColor = (color, id) => {
 </script>
 
 <template>
+  <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
+    {{ alertMessage }}
+  </Alert>
   <div
     class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
   >
@@ -223,50 +280,48 @@ const setColor = (color, id) => {
           </div>
         </div>
 
-        <!-- delete modal for the selected item only -->
-        <div
-          v-if="openModalToDelete && selectedItemIdToDelete === item.id"
-          class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-        >
+      
+        <ConfirmModal :openModal="openModalToDelete && selectedItemIdToDelete === item.id" @confirm="confirmDelete()" @cancel="openModalToDelete = false">
+              <template #svg>
           <div
-            class="w-full max-w-lg p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white"
+            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
           >
-            <div>
-              <div class="text-center p-3 flex-auto justify-center leading-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-16 h-16 flex items-center customRed mx-auto"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <h2 class="text-2xl font-bold py-4">Are you sure?</h2>
-                <p class="text-md text-gray-500 px-8">
-                  Do you really want to Delete your Board?
-                </p>
-              </div>
-              <div class="p-3 mt-2 text-center space-x-4 md:block">
-                <button
-                  class="itbkk-button-ok customRed mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-md hover:shadow-lg hover:bg-gray-100"
-                  @click="confirmDelete()"
-                >
-                  Delete
-                </button>
-                <button
-                  @click="openModalToDelete = false"
-                  class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            <svg
+              class="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
           </div>
-        </div>
+        </template>
+        <template #headerMessage> Delete Board </template>
+        <template #message>
+          <p class="text-sm text-gray-500">
+            Do you really want to Delete your Board?
+          </p>
+        </template>
+        <template #confirmBtn>
+          <span
+            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+            >Delete</span
+          >
+        </template>
+        <template #cancelBtn>
+          <span
+            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+            >Cancel</span
+          >
+        </template>
+        </ConfirmModal>
       </div>
     </div>
 
@@ -316,64 +371,65 @@ const setColor = (color, id) => {
                   </span>
                 </div>
                 <div class="-ml-px flex w-0 flex-1">
-                  <a
-                    href="tel:+1-202-555-0170"
+                  <button
+                    @click="showRemoveModal(item.id)"
                     class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
                   >
                     <span class="itbkk-leave-board">Leave</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
           </li>
         </ul>
 
-        <div
-          v-if="openModalToDelete && selectedItemIdToDelete === item.id"
-          class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
-        >
-          <div
-            class="w-full max-w-lg p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white"
-          >
-            <div>
-              <div class="text-center p-3 flex-auto justify-center leading-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-16 h-16 flex items-center customRed mx-auto"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <h2 class="text-2xl font-bold py-4">Are you sure?</h2>
-                <p class="text-md text-gray-500 px-8">
-                  Do you really want to Delete your Board?
-                </p>
-              </div>
-              <div class="p-3 mt-2 text-center space-x-4 md:block">
-                <button
-                  class="itbkk-button-ok customRed mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-md hover:shadow-lg hover:bg-gray-100"
-                  @click="confirmDelete()"
-                >
-                  Delete
-                </button>
-                <button
-                  @click="openModalToDelete = false"
-                  class="itbkk-button-cancel mb-2 md:mb-0 bg-gray-500 border border-gray-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-md hover:shadow-lg hover:bg-gray-600"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+     
+   
       </div>
     </div>
   </div>
+
+  <ConfirmModal :openModal="showConfirmModal" @confirm="confirmRemove()" @cancel="showConfirmModal = false">
+              <template #svg>
+          <div
+            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+          >
+            <svg
+              class="h-6 w-6 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              data-slot="icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+          </div>
+        </template>
+        <template #headerMessage> Leave Board </template>
+        <template #message>
+          <p class="text-sm text-gray-500">
+            Are you sure you want to Leave ? 
+          </p>
+        </template>
+        <template #confirmBtn>
+          <span
+            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+            >Leave</span
+          >
+        </template>
+        <template #cancelBtn>
+          <span
+            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+            >Cancel</span
+          >
+        </template>
+        </ConfirmModal>
 </template>
 
 <style scoped>
