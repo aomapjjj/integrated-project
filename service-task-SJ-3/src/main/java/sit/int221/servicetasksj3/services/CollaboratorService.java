@@ -103,12 +103,12 @@ public class CollaboratorService {
         Users user = usersRepository.findByEmail(collaboratorEmail)
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
 
-        // ตรวจสอบว่า email นี้เป็นของเจ้าของบอร์ดหรือไม่
+
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
 
-        // ตรวจสอบว่าผู้ใช้นี้เป็น collaborator ในบอร์ดนี้แล้วหรือไม่
+
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
         }
