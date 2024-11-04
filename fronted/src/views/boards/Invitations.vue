@@ -1,9 +1,12 @@
 <script setup>
-import { ref, onMounted, watch } from "vue"
+import { ref, onMounted, watch, computed } from 'vue'
 import {
     getBoardById,
     getItems,
-    addCollaboratorByEmail
+    addCollaborator,
+    addCollaboratorByEmail,
+    editStatusCollab,
+    deleteCollaborator
 } from "./../../libs/fetchUtils.js"
 import { useRoute, useRouter } from "vue-router"
 import { useUsers } from "@/stores/storeUser"
@@ -68,7 +71,7 @@ onMounted(async () => {
     userStore.setToken(token)
     const collaborator = await getItems(baseUrlCollaborator)
     collaboratorInfo.value = collaborator.collaborators
-    console.log("Get Items", collaboratorInfo.value[0].email)
+    console.log("Get Items", collaboratorInfo.value)
     console.log(baseUrlboards);
 
     const Board = await getBoardById(boardId.value)
@@ -80,32 +83,46 @@ onMounted(async () => {
 
     if (Board.item.owner.name !== userName) {
         disabledButtonWhileOpenPublic.value = true
-        console.log("ไม่ตรงกันนะจ๊า")
-    } else {
-        console.log("ตรงกันนะจ๊า")
     }
 })
 
 const submitFormSendEmail = async () => {
     const email = collaboratorEmail?.value;
+    const accessRight = collaboratorAccess.value;
+    const boardIdValue = boardId.value;
     const inviterName = boardOwnerName.value;
     const boardNames = boardName.value;
-    const accessRight = collaboratorAccess.value;
     const boardUrl = baseUrlBoardId;
 
-    if (!email || !inviterName || !boardNames || !accessRight || !boardUrl) {
+    if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
         console.error("One or more required fields are missing.");
         return;
     }
-    await addCollaboratorByEmail({
-        email,
-        inviterName,
-        boardName: boardNames,
-        accessRight,
-        boardUrl
-    });
-};
 
+    try {
+        const result = await addCollaborator(boardIdValue, {
+            email,
+            accessRight,
+            status: "PENDING"
+        });
+
+        if (result) {
+            await addCollaboratorByEmail({
+                email,
+                inviterName,
+                boardName: boardNames,
+                accessRight,
+                boardUrl,
+                boardIdValue
+            });
+            console.log("Collaborator added and email sent successfully.");
+        } else {
+            console.error("Failed to add collaborator.");
+        }
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
+};
 
 const showRemoveModal = (oid) => {
     console.log(oid)
@@ -127,6 +144,40 @@ const openAdd = () => {
     openModalAddCollab.value = true
 }
 
+const filteredCollaboratorInfo = computed(() =>
+    collaboratorInfo.value.filter(item => item.status === 'PENDING')
+);
+
+const cancelAction = () => {
+  openModalAddCollab.value = false
+  clearForm()
+}
+
+const acceptCollaborator = async (collaborator) => {
+    try {
+        if (collaborator) {
+            collaborator.status = 'ACCEPTED'; 
+            await editStatusCollab(boardId.value, collaborator.status, collaborator.id, collaborator.accessRight);
+            console.log('Collaborator status updated to ACCEPT');
+        }
+    } catch (error) {
+        console.error('Error updating collaborator status:', error);
+    }
+};
+
+const declineCollaborator = async (collaborator) => {
+    try {
+        const status = await deleteCollaborator(boardId.value, collaborator.id);
+        if (status === 200) {
+            console.log('Collaborator deleted successfully');
+            collaboratorInfo.value = collaboratorInfo.value.filter(c => c.id !== collaborator.id);
+        } else {
+            console.log('Failed to delete collaborator');
+        }
+    } catch (error) {
+        console.error('Error deleting collaborator:', error);
+    }
+}
 </script>
 
 <template>
@@ -244,7 +295,8 @@ const openAdd = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item, index) in collaboratorInfo" :key="item.id" class="itbkk-item">
+                                    <tr v-for="(item, index) in filteredCollaboratorInfo" :key="item.id"
+                                        class="itbkk-item">
                                         <td
                                             class="hidden md:table-cell px-4 py-2 text-center md:text-left text-sm text-gray-700">
                                             {{ index + 1 }}
@@ -269,7 +321,7 @@ const openAdd = () => {
                                             class="px-4 py-2 text-center md:text-left text-sm text-gray-700 space-x-2 flex justify-center">
                                             <button :disabled="disabledButtonWhileOpenPublic"
                                                 class="inline-flex bg-green-500 hover:bg-green-600 text-white rounded-full w-8 h-8 items-center justify-center"
-                                                @click="showRemoveModal(item.id)">
+                                                @click="acceptCollaborator(item)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -278,7 +330,7 @@ const openAdd = () => {
                                             </button>
                                             <button :disabled="disabledButtonWhileOpenPublic"
                                                 class="inline-flex bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 items-center justify-center"
-                                                @click="showRemoveModal(item.id)">
+                                                @click="declineCollaborator(item)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor" class="w-4 h-4">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -313,12 +365,12 @@ const openAdd = () => {
                                         <input type="email" v-model="collaboratorEmail"
                                             class="w-full p-2 border rounded-lg" placeholder="you@ad.sit.kmutt.ac.th" />
                                     </div>
-                                
+
                                 </div>
 
                                 <!-- Buttons -->
                                 <div class="flex justify-end mt-4">
-                                    <button class="btn bg-gray-300 mr-4">
+                                    <button class="btn bg-gray-300 mr-4" @click="cancelAction">
                                         Cancel
                                     </button>
                                     <button class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"

@@ -96,7 +96,7 @@ public class CollaboratorService {
         );
     }
 
-    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
+    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight, String status) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
@@ -121,7 +121,7 @@ public class CollaboratorService {
         collaborator.setCollaboratorEmail(collaboratorEmail);
         collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
         collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
-        collaborator.setStatus(CollabStatus.PENDING);
+        collaborator.setStatus(CollabStatus.valueOf(status));
         collaboratorRepository.save(collaborator);
 
 
@@ -189,6 +189,26 @@ public class CollaboratorService {
         }
 
         collaborator.setAccessLevel(accessRight);
+        return collaboratorRepository.save(collaborator);
+    }
+
+    public Collaborator updateCollaboratorStatus(String boardId, String collaboratorId, String newStatus) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+        if (collaborator == null) {
+            throw new ItemNotFoundException("Collaborator not found");
+        }
+
+        CollabStatus collabStatus;
+        try {
+            collabStatus = CollabStatus.valueOf(newStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Invalid access right. Only READ and WRITE are allowed.");
+        }
+
+        collaborator.setStatus(collabStatus);
         return collaboratorRepository.save(collaborator);
     }
 
