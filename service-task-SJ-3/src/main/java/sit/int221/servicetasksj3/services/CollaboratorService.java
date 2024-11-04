@@ -29,8 +29,14 @@ public class CollaboratorService {
     private UserRepository usersRepository;
 
     public boolean isCollaborator(String boardId, String userId) {
-        return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
+        if (!collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED)){
+            return false;
+        }else {
+            return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED);
+        }
+
     }
+
 
     public boolean hasWriteAccess(String boardId, String userId){
         return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, userId, AccessRight.WRITE);
