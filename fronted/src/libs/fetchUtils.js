@@ -331,7 +331,7 @@ async function addCollaboratorByEmail(payload) {
   }
 }
 
-async function editAccessRight(boardId, access, oid) {
+async function editAccessRight(boardId, access, oid, status) {
   const token = getToken();
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
@@ -342,6 +342,33 @@ async function editAccessRight(boardId, access, oid) {
       },
       body: JSON.stringify({
         accessRight: access,
+        status: status
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const editedItem = await response.json();
+    return editedItem;
+  } catch (error) {
+    console.log(`Error: ${error.message}`);
+  }
+}
+
+async function editStatusCollab(boardId, status, collaboratorId, access) {
+  const token = getToken();
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${collaboratorId}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        accessRight: access,
+        status: status,
       }),
     });
 
@@ -418,6 +445,7 @@ export {
   addCollaboratorByEmail,
   editAccessRight,
   deleteCollaborator,
+  editStatusCollab,
   validateAccessToken,
   refreshAccessToken,
 };

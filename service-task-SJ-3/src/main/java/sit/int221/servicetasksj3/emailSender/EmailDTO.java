@@ -11,6 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmailDTO {
+    private String boardId;
+    private String collabId;
     private String email;
     private String inviterName;
     private String boardName;
