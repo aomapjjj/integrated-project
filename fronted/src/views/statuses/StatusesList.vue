@@ -113,18 +113,18 @@ onMounted(async () => {
     statusList.value = myStatuses.getStatuses();
     const statusId = route.params.id;
 
-    const Board = await getBoardById(boardId.value);
-    console.log("Board data", Board.item.owner.name);
+    const board = await getBoardById(boardId.value);
+    console.log("Board data", board.item.owner.name);
 
-    if (Board && Board.item && Board.item.name) {
-      boardName.value = Board.item.name;
+    if (board && board.item && board.item.name) {
+      boardName.value = board.item.name;
     }
-
-    if (Board.item.owner.name !== userName) {
-      disabledButtonWhileOpenPublic.value = true;
-      console.log("ไม่ตรงกันนะจ๊า");
-    } else {
-      console.log("ตรงกันนะจ๊า");
+    if (!userName ||
+      board.item.collaborators.some(
+        (collab) => collab.name === userName && collab.accessRight === "READ"
+      )
+    ) {
+      disabledButtonWhileOpenPublic.value = true
     }
   } catch (error) {
     console.error("Error loading data:", error);
