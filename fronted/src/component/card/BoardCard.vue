@@ -94,6 +94,8 @@ function getToken() {
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   boardsList.value = itemsBoards
+  console.log(boardsList.value)
+  
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -117,6 +119,23 @@ onMounted(async () => {
     currentColor.value = savedColor
   }
 })
+
+// const filterCollaboratorsByAccessRightAndName = (boardId, name) => {
+//   const board = boardLo.find((b) => b.id === boardId);
+//   if (!board) {
+//     console.error("Board not found");
+//     return [];
+//   }
+
+//   if (!board.collaborators) {
+//     console.error("Collaborators not found in the specified board");
+//     return [];
+//   }
+
+//   return board.collaborators
+//     .filter((collab) => collab.name === name)
+//     .map((collab) => ({ name: collab.name, accessRight: collab.accessRight }));
+// }
 
 const toboardsList = (boardId) => {
   if (boardId !== null) {
@@ -347,7 +366,7 @@ const setColor = (color, id) => {
                   <span
                     class="itbkk-access-right inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-blue-600 ring-1 ring-inset ring-green-600/20"
                   >
-                    Read</span
+                    </span
                   >
                 </div>
                 <p class="itbkk-owner-name mt-1 truncate text-sm text-gray-500">
