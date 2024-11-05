@@ -25,13 +25,22 @@ const useBoard = defineStore('board', () => {
 
   const setCollabs = (newCollabs) => {
     collabs.value = newCollabs
+  }  
+  
+  const getCollabs = () => {
+   return  collabs.value
+  }
+  const getBoards = () => {
+    return  boards.value
   }
 
   return {
     setChangeColor,
     getChangeColor,
     setBoards,
-    setCollabs
+    setCollabs,
+    getCollabs,
+    getBoards
   }
 })
 

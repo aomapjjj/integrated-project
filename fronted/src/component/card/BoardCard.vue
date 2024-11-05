@@ -33,6 +33,9 @@ const selectedItemIdToDelete = ref()
 const colorCard = ref(null)
 const oidCollaboratorToRemove = ref()
 const boardIdCollabs = ref()
+const userName = userStore.getUser().username
+const boardsOwner = ref()
+const boardsCollab = ref()
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -93,8 +96,14 @@ function getToken() {
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
   boardsList.value = itemsBoards || { boards: [], collabs: [] }
+
   boardStore.setBoards(itemsBoards.boards)
   boardStore.setCollabs(itemsBoards.collabs)
+
+  boardsOwner.value = boardStore.getBoards()
+  boardsCollab.value = boardStore.getCollabs()
+
+  console.log(boardsCollab.value)
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -169,6 +178,21 @@ const setColor = (color, id) => {
   localStorage.setItem('boardColors', JSON.stringify(currentColor.value))
   boardStore.setChangeColor(currentColor.value)
 }
+
+const getAccessRight = (boardId, username) => {
+  const board = boardsCollab.value.find((board) => board.id === boardId);
+  
+  if (board) {
+    const collaborator = board.collaborators.find(
+      (collab) => collab.name === username
+    );
+    
+    return collaborator ? collaborator.accessRight : null;
+  }
+  
+  return null; 
+};
+
 </script>
 
 <template>
@@ -184,7 +208,7 @@ const setColor = (color, id) => {
       <EmptyBoard />
     </div>
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="(item, index) in boardsList.boards" :key="index">
+      <div v-for="(item, index) in boardsOwner" :key="index">
         <div
           ref="colorCard"
           :class="`${currentColor[item.id]}`"
@@ -352,11 +376,10 @@ const setColor = (color, id) => {
 
     <!-- Collab Boards -->
     <slot name="labelCollabBoard"></slot>
-    <div v-if="!boardsList.collabs || boardsList.collabs.length === 0">
-      <EmptyBoard />
-    </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div v-for="(item, index) in boardsList.collabs" :key="index">
+    
+    <div v-if="boardsCollab"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div v-for="(item, index) in boardsCollab" :key="index">
         <div
           ref="colorCard"
           :class="`${currentColor[item.id]}`"
@@ -371,7 +394,7 @@ const setColor = (color, id) => {
                   'bg-gray-400': item.visibility === 'PRIVATE'
                 }"
               >
-                READ
+                {{  getAccessRight(item.id , userName) }}
               </span>
             </template>
 
@@ -407,6 +430,9 @@ const setColor = (color, id) => {
           </PersonalAndCollabBoard>
         </div>
       </div>
+    </div>
+    <div v-else-if="!boardsCollab || boardsCollab.length === 0">
+      <EmptyBoard />
     </div>
   </div>
 
