@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from 'vue'
 import {
   getItemById,
   getItems,
@@ -7,20 +7,20 @@ import {
   editLimit,
   getBoardById,
   getResponseItems
-} from "../libs/fetchUtils.js"
-import TaskDetail from "./tasks/TaskDetail.vue"
-import AddTask from "./tasks/AddTask.vue"
-import EditTask from "./tasks/EditTask.vue"
-import { boardVisibility } from "../libs/fetchUtils.js"
-import { useLimitStore } from "../stores/storeLimit.js"
-import { useUsers } from "@/stores/storeUser"
-import { useTasks } from "../stores/store.js"
-import { useRoute, useRouter } from "vue-router"
-import SideBar from "../component/bar/SideBar.vue"
-import Modal from "../component/modal/Modal.vue"
-import Alert from "@/component/alert/Alert.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import LodingPage from "@/component/LodingPage.vue"
+} from '../libs/fetchUtils.js'
+import TaskDetail from './tasks/TaskDetail.vue'
+import AddTask from './tasks/AddTask.vue'
+import EditTask from './tasks/EditTask.vue'
+import { boardVisibility } from '../libs/fetchUtils.js'
+import { useLimitStore } from '../stores/storeLimit.js'
+import { useUsers } from '@/stores/storeUser'
+import { useTasks } from '../stores/store.js'
+import { useRoute, useRouter } from 'vue-router'
+import SideBar from '../component/bar/SideBar.vue'
+import Modal from '../component/modal/Modal.vue'
+import Alert from '@/component/alert/Alert.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import LodingPage from '@/component/LodingPage.vue'
 
 // ----------------------- Router -----------------------
 
@@ -37,8 +37,8 @@ const userStore = useUsers()
 
 const boardId = ref()
 const userName = userStore.getUser().username
-const token = localStorage.getItem("access_token")
-const boardName = ref("")
+const token = localStorage.getItem('access_token')
+const boardName = ref('')
 const isLoading = ref(true)
 watch(
   () => route.params.id,
@@ -66,7 +66,7 @@ const deleteComplete = ref(false)
 const alertLimit = ref(false)
 const alertEnabledFail = ref(false)
 const alertEnabledSuc = ref(false)
-const messageLimit = ref("")
+const messageLimit = ref('')
 const messageAlert = ref()
 
 // ----------------------- Enable & Disable -----------------------
@@ -74,8 +74,8 @@ const messageAlert = ref()
 const showDetail = ref(false)
 const disabledButtonWhileOpenPublic = ref(false)
 const isModalVisible = ref(false)
-const visibility = ref("")
-const tempVisibility = ref("")
+const visibility = ref('')
+const tempVisibility = ref('')
 
 // ----------------------- BaseUrl -----------------------
 
@@ -98,9 +98,10 @@ onMounted(async () => {
 
     const board = await getBoardById(boardId.value)
 
-    if (!userName ||
+    if (
+      !userName ||
       board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === "READ"
+        (collab) => collab.name === userName && collab.accessRight === 'READ'
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
@@ -120,11 +121,11 @@ onMounted(async () => {
     if (taskId !== undefined) {
       const response = await getItemById(taskId)
       if (response && (response.status === 404 || response.status === 400)) {
-        router.push("/error")
+        router.push('/error')
       }
     }
   } catch (error) {
-    console.error("Error loading data:", error)
+    console.error('Error loading data:', error)
   } finally {
     isLoading.value = false // ปิดการโหลดเมื่อทำงานเสร็จ
   }
@@ -146,10 +147,10 @@ const UpdateLimit = async () => {
 
   if (alertLimit.value) {
     messageLimit.value =
-      "The Kanban board now limits " + limitStore.getLimit().maximumTask
+      'The Kanban board now limits ' + limitStore.getLimit().maximumTask
   } else {
     alertLimit.value = true
-    messageLimit.value = "The Kanban board has disabled the task limit in each "
+    messageLimit.value = 'The Kanban board has disabled the task limit in each '
   }
   setTimeout(() => {
     alertLimit.value = false
@@ -160,7 +161,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: "TaskDetail", params: { taskid: todoId } })
+    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -182,7 +183,7 @@ const deleteTodo = async (todoId, index) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById("my_modal_delete")
+  const modal = document.getElementById('my_modal_delete')
   modal.showModal()
 }
 
@@ -202,33 +203,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ""
+    return ''
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref("default")
-const statusSortOrder = ref("default")
+const showIcon = ref('default')
+const statusSortOrder = ref('default')
 
 const toggleIcon = () => {
-  if (showIcon.value === "default") {
-    showIcon.value = "asc"
-    statusSortOrder.value = "asc"
-  } else if (showIcon.value === "asc") {
-    showIcon.value = "desc"
-    statusSortOrder.value = "desc"
+  if (showIcon.value === 'default') {
+    showIcon.value = 'asc'
+    statusSortOrder.value = 'asc'
+  } else if (showIcon.value === 'asc') {
+    showIcon.value = 'desc'
+    statusSortOrder.value = 'desc'
   } else {
-    showIcon.value = "default"
-    statusSortOrder.value = "default"
+    showIcon.value = 'default'
+    statusSortOrder.value = 'default'
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === "asc") {
+  if (currentSortOrder === 'asc') {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === "desc") {
+  } else if (currentSortOrder === 'desc') {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -258,16 +259,16 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
+  router.push({ name: 'StatusesList' })
 }
 
 const openCollaborator = () => {
-  router.push({ name: "Collab" })
+  router.push({ name: 'Collab' })
 }
 
 const clearToken = () => {
-  router.push({ name: "Login" })
-  localStorage.removeItem("access_token")
+  router.push({ name: 'Login' })
+  localStorage.removeItem('access_token')
 }
 
 // ----------------------- Limit ---------------------------
@@ -280,7 +281,7 @@ const handleToggleClick = () => {
   if (disabledButtonWhileOpenPublic.value) {
     return
   }
-  tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
+  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   isModalVisible.value = true
 }
 
@@ -296,7 +297,7 @@ const cancelChange = () => {
 
 if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
   alertEnabledSuc.value = true
-  messageAlert.value = "Welcome, You have logged in successfully"
+  messageAlert.value = 'Welcome, You have logged in successfully'
 
   setTimeout(() => {
     alertEnabledSuc.value = false
@@ -307,7 +308,7 @@ if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
 const changeVisibility = async () => {
   const updatedBoard = await boardVisibility(
     boardId.value,
-    visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
+    visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   )
 
   if (updatedBoard && updatedBoard.success) {
@@ -637,9 +638,9 @@ const changeVisibility = async () => {
             <template #headerName>Board visibility changed!</template>
             <template #messageName>
               {{
-                tempVisibility === "PUBLIC"
-                  ? "In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? "
-                  : "In private, only board owner can access / control board. Do you want to change the visibility toPrivate ? "
+                tempVisibility === 'PUBLIC'
+                  ? 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? '
+                  : 'In private, only board owner can access / control board. Do you want to change the visibility toPrivate ? '
               }}</template
             >
           </Modal>
@@ -806,7 +807,7 @@ const changeVisibility = async () => {
                     >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? "Unassigned"
+                          ? 'Unassigned'
                           : item.assignees
                       }}
                     </td>
