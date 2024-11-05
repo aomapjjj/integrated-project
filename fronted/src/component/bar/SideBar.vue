@@ -26,7 +26,7 @@ function getToken() {
 
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
-  BoardsList.value = itemsBoards.boards
+  BoardsList.value = itemsBoards?.boards
 
   const token = getToken()
 })
