@@ -19,8 +19,6 @@ import SideBar from "@/component/bar/SideBar.vue"
 import Navbar from "@/component/bar/Navbar.vue"
 import LodingPage from "@/component/LodingPage.vue"
 
-
-
 // ----------------------- Router -----------------------
 
 const route = useRoute()
@@ -103,31 +101,36 @@ onMounted(async () => {
   try {
     isLoading.value = true
 
-    userStore.setToken(token);
-    
-    if (myStatuses.getStatuses().length === 0) {
-      const items = await getItems(baseUrlStatus);
-      myStatuses.addStatuses(items);
-    }
-    
-    statusList.value = myStatuses.getStatuses();
-    const statusId = route.params.id;
+    userStore.setToken(token)
 
-    const board = await getBoardById(boardId.value);
-    console.log("Board data", board.item.owner.name);
+    if (myStatuses.getStatuses().length === 0) {
+      const items = await getItems(baseUrlStatus)
+      myStatuses.addStatuses(items)
+    }
+
+    statusList.value = myStatuses.getStatuses()
+    const statusId = route.params.id
+
+    const board = await getBoardById(boardId.value)
+    console.log("Board data", board.item.owner.name)
 
     if (board && board.item && board.item.name) {
-      boardName.value = board.item.name;
+      boardName.value = board.item.name
     }
-    if (!userName ||
-      board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === "READ"
+    if (!userName) {
+      disabledButtonWhileOpenPublic.value = true
+    } else if (
+      board.item.owner.name !== userName &&
+      !board.item.collaborators.some(
+        (collab) => collab.name === userName && collab.accessRight === "WRITE"
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
+    } else {
+      disabledButtonWhileOpenPublic.value = false
     }
   } catch (error) {
-    console.error("Error loading data:", error);
+    console.error("Error loading data:", error)
   } finally {
     isLoading.value = false
   }
@@ -254,7 +257,6 @@ const statusExists = (name, id) => {
       status.id !== id
   )
 }
-
 
 // ----------------------- Delete -----------------------
 
@@ -400,12 +402,11 @@ const isFormValid = computed(() => {
 </script>
 
 <template>
-   <div v-if="isLoading">
-  <LodingPage/>
-</div>
+  <div v-if="isLoading">
+    <LodingPage />
+  </div>
 
-  <div v-else
-  class="flex flex-col h-screen overflow-hidden">
+  <div v-else class="flex flex-col h-screen overflow-hidden">
     <!-- Sidebar -->
     <div class="flex flex-1 overflow-hidden">
       <SideBar />

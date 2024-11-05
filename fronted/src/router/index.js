@@ -1,167 +1,119 @@
-import { createRouter, createWebHistory } from "vue-router";
-import TaskList from "@/views/TaskList.vue";
-import ErrorPage from "@/views/errorpage/NotFoundError.vue";
-import AddTask from "@/views/tasks/AddTask.vue";
-import StatusesList from "@/views/statuses/StatusesList.vue";
-import TaskDetail from "@/views/tasks/TaskDetail.vue";
-import EditTask from "@/views/tasks/EditTask.vue";
-import Login from "@/views/Login.vue";
-import Board from "@/views/boards/Board.vue";
-import ErrorPagePermission from "@/views/errorpage/PermissionError.vue";
+import { createRouter, createWebHistory } from "vue-router"
+import TaskList from "@/views/TaskList.vue"
+import ErrorPage from "@/views/errorpage/NotFoundError.vue"
+import AddTask from "@/views/tasks/AddTask.vue"
+import StatusesList from "@/views/statuses/StatusesList.vue"
+import TaskDetail from "@/views/tasks/TaskDetail.vue"
+import EditTask from "@/views/tasks/EditTask.vue"
+import Login from "@/views/Login.vue"
+import Board from "@/views/boards/Board.vue"
+import ErrorPagePermission from "@/views/errorpage/PermissionError.vue"
 import {
   getBoardById,
   validateAccessToken,
-  refreshAccessToken,
-} from "../libs/fetchUtils.js";
-import CollabManagement from "@/views/boards/CollabManagement.vue";
-import Invitations from "@/views/boards/Invitations.vue";
-const getToken = () => localStorage.getItem("access_token");
-const getRefreshToken = () => localStorage.getItem("refresh_token");
+  refreshAccessToken
+} from "../libs/fetchUtils.js"
+import CollabManagement from "@/views/boards/CollabManagement.vue"
+import Invitations from "@/views/boards/Invitations.vue"
+const getToken = () => localStorage.getItem("access_token")
+const getRefreshToken = () => localStorage.getItem("refresh_token")
+
+const getCurrentUser = () => {
+  const userNameString = localStorage?.getItem("user")
+  return userNameString ? JSON.parse(userNameString) : null
+}
+
+const checkAccessRight = async (boardId, requiredAccess) => {
+  const board = await getBoardById(boardId)
+
+  const currentUser = getCurrentUser()
+  // if (!currentUser) return { error: "Login" }
+
+  const currentUsername = currentUser?.username
+  const { owner, collaborators, visibility } = board.item
+
+ 
+  if (owner.name === currentUsername) return { hasAccess: true }
+
+  const collaborator = collaborators.find(
+    (collab) => collab.name === currentUsername
+  )
+  if (collaborator) {
+    if (
+      collaborator.accessRight === requiredAccess ||
+      collaborator.accessRight === "WRITE"
+    ) {
+      return { hasAccess: true }
+    }
+    return { error: "ErrorPagePermission" }
+  }
+
+  if (visibility === "PUBLIC" && requiredAccess === "READ") {
+    return { hasAccess: true }
+  } else if (visibility === "PUBLIC" && requiredAccess === "WRITE") {
+    return { error: "ErrorPagePermission" } 
+  }
+
+  return { error: "ErrorPagePermission" }
+}
+
+const checkWriteAccess = async (to, from, next) => {
+  const { id: boardId } = to.params
+  const accessCheck = await checkAccessRight(boardId, "WRITE")
+
+  if (accessCheck.hasAccess) next()
+
+  else next({ name: accessCheck.error })
+}
 
 const routes = [
   { path: "/", redirect: { name: "Login" } },
-  {
-    path: "/board/:id/status/:statusid/edit",
-    name: "EditStatus",
-    component: StatusesList,
-    beforeEnter: async (to, from, next) => {
-      const { id: boardId, statusid: statusId } = to.params;
-      try {
-        const token = getToken();
-        const response = await fetch(
-          `${
-            import.meta.env.VITE_BASE_URL_MAIN
-          }/boards/${boardId}/statuses/${statusId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
 
-        if (response.status === 404) {
-          next({ name: "ErrorPage" });
-        } else if (response.ok) {
-          next();
-        }
-        if (response.status === 401) {
-          next({ name: "Login" });
-        }
-      } catch (error) {
-        console.error("Error checking board id:", error);
-      }
-    },
-  },
   {
     path: "/board/:id",
     name: "TaskList",
     component: TaskList,
     props: true,
     beforeEnter: async (to, from, next) => {
-      const { id: boardId } = to.params;
+      const { id: boardId } = to.params
+      const accessCheck = await checkAccessRight(boardId, "READ")
 
-      const userNameBoard = await getBoardById(boardId);
-
-      if (userNameBoard.status === 404) {
-        return next({ name: "ErrorPage" });
-      }
-      // ตรวจสอบการมีข้อมูลจาก userNameBoard
-      if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPagePermission" }); // ถ้าไม่สามารถดึงข้อมูลได้
-      }
-      const userNameString = localStorage?.getItem("user");
-      console.log('localStorage?.getItem("user")', userNameString);
-
-      const userName = userNameString ? JSON.parse(userNameString) : null;
-
-      const loginUsername = () => {
-        if (userName) {
-          return userName.username; // แสดงค่า username
-        } else {
-          return null;
-        }
-      };
-
-      const currentUsername = loginUsername();
-
-      if (userNameBoard.item.owner.name !== currentUsername) {
-      } else {
-        console.log("ตรงกันนะจ๊า");
-        return next();
-      }
-
-      try {
-        let response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-        );
-
-        const board = await response.json();
-
-        if (board.visibility === "PUBLIC") {
-          return next();
-        }
-
-        const token = getToken();
-        if (!token) {
-          return next({ name: "Login" });
-        }
-
-        response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.status === 401) {
-          return next({ name: "Login" });
-        }
-        if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
-        }
-
-        if (response.ok) {
-          return next();
-        }
-      } catch (error) {
-        console.error("Error checking board id:", error);
-        return next({ name: "ErrorPagePermission" });
-      }
+      if (accessCheck.hasAccess) next()
+      else next({ name: accessCheck.error })
     },
     children: [
-      { path: "task/add", name: "AddTask", component: AddTask },
+      {
+        path: "task/add",
+        name: "AddTask",
+        component: AddTask,
+        beforeEnter: checkWriteAccess
+      },
       { path: "task/:taskid", name: "TaskDetail", component: TaskDetail },
       {
         path: "task/:taskid/edit",
         name: "TaskEdit",
         component: EditTask,
-        beforeEnter: async (to, from, next) => {
-          const { id: boardId, taskid: taskId } = to.params;
-          try {
-            const token = getToken();
-            const response = await fetch(
-              `${
-                import.meta.env.VITE_BASE_URL_MAIN
-              }/boards/${boardId}/tasks/${taskId}`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            if (response.status === 404) {
-              next({ name: "ErrorPage" });
-            } else if (response.ok) {
-              next();
-            }
-            if (response.status === 401) {
-              next({ name: "Login" });
-            }
-          } catch (error) {
-            console.error("Error checking board id:", error);
-          }
-        },
+        beforeEnter: checkWriteAccess
       },
-    ],
+      {
+        path: "status/add",
+        name: "AddStatus",
+        component: StatusesList,
+        beforeEnter: checkWriteAccess
+      },
+      {
+        path: "status/:statusid/edit",
+        name: "EditStatus",
+        component: StatusesList,
+        beforeEnter: checkWriteAccess
+      }
+    ]
   },
   { path: "/error", name: "ErrorPage", component: ErrorPage },
   {
     path: "/errorPermission",
     name: "ErrorPagePermission",
-    component: ErrorPagePermission,
+    component: ErrorPagePermission
   },
   {
     path: "/board/:id/status",
@@ -169,181 +121,61 @@ const routes = [
     component: StatusesList,
     props: true,
     beforeEnter: async (to, from, next) => {
-      const { id: boardId } = to.params;
-      try {
-        const token = getToken();
-        const response = await getResponseItems(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}/statuses`
-        );
+      const { id: boardId } = to.params
+      const accessCheck = await checkAccessRight(boardId, "READ")
 
-        if (response.status === 404) {
-          next({ name: "ErrorPage" });
-        } else if (response.ok) {
-          next();
-        }
-      } catch (error) {
-        next();
-      }
-
-      const userNameBoard = await getBoardById(boardId);
-
-      if (!userNameBoard || !userNameBoard.item) {
-        return next({ name: "ErrorPagePermission" });
-      }
-      const userNameString = localStorage?.getItem("user");
-      console.log('localStorage?.getItem("user")', userNameString);
-
-      const userName = userNameString ? JSON.parse(userNameString) : null;
-
-      const loginUsername = () => {
-        if (userName) {
-          return userName.username;
-        } else {
-          return null;
-        }
-      };
-      const currentUsername = loginUsername();
-
-      if (userNameBoard.item.owner.name !== currentUsername) {
-        if (userNameBoard.item.visibility === "PRIVATE") {
-          return next({ name: "ErrorPagePermission" });
-        }
-      } else {
-        console.log("ตรงกันนะจ๊า");
-        return next();
-      }
-
-      try {
-        let response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-        );
-
-        if (response.status === 404) {
-          return next({ name: "ErrorPage" });
-        }
-
-        if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
-        }
-
-        const board = await response.json();
-
-        if (board.visibility === "PUBLIC") {
-          return next();
-        }
-
-        const token = getToken();
-        if (!token) {
-          return next({ name: "Login" });
-        }
-
-        response = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.status === 401) {
-          return next({ name: "Login" });
-        }
-        if (response.status === 403) {
-          return next({ name: "ErrorPagePermission" });
-        }
-
-        if (response.ok) {
-          return next();
-        }
-      } catch (error) {
-        console.error("Error checking board id:", error);
-        return next({ name: "ErrorPagePermission" });
-      }
+      if (accessCheck.hasAccess) next()
+      else next({ name: accessCheck.error })
     },
-
-    children: [{ path: "add", name: "AddStatus", component: StatusesList }],
+    children: [
+      {
+        path: "add",
+        name: "AddStatus",
+        component: StatusesList,
+        beforeEnter: checkWriteAccess
+      },
+      {
+        path: ":statusid/edit",
+        name: "EditStatus",
+        component: StatusesList,
+        beforeEnter: checkWriteAccess
+      }
+    ]
   },
   { path: "/login", name: "Login", component: Login },
-  { path: "/board", name: "Board", component: Board },
+  {
+    path: "/board",
+    name: "Board",
+    component: Board,
+    beforeEnter: (to, from, next) => {
+      if (!getToken()) {
+        next({ name: "Login" })
+      } else {
+        next()
+      }
+    }
+  },
   { path: "/board/add", name: "BoardAdd", component: Board },
   { path: "/:pathMatch(.*)*", redirect: { name: "ErrorPage" } },
-  { path: "/board/:id/collab", name: "Collab", component: CollabManagement },
-  { path: "/board/:id/collab/invitations", name: "Invitations", component: Invitations },
-];
+  { path: "/board/:id/collab", name: "Collab", component: CollabManagement , 
+    beforeEnter: async (to, from, next) => {
+    const { id: boardId } = to.params
+    const accessCheck = await checkAccessRight(boardId, "READ")
+
+    if (accessCheck.hasAccess) next()
+    else next({ name: accessCheck.error })
+  },},
+  {
+    path: "/board/:id/collab/invitations",
+    name: "Invitations",
+    component: Invitations
+  }
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-});
-
-router.beforeEach(async (to, from, next) => {
-  const accessToken = getToken();
-  const refreshToken = getRefreshToken();
-
-  if (to.name === "board" && to.params.id) {
-    const boardId = to.params.id;
-
-    try {
-      const boardResponse = await fetch(
-        `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
-      );
-      const board = await boardResponse.json();
-
-      if (boardResponse.status === 404) {
-        console.error("Board not found.");
-        return next({ name: "ErrorPage" });
-      }
-
-      if (board.visibility === "PRIVATE") {
-        if (!accessToken) {
-          return next({ name: "ErrorPagePermission" });
-        }
-
-        const privateResponse = await fetch(
-          `${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`,
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-
-        if (privateResponse.status === 401 && refreshToken) {
-          return handleTokenRefresh(refreshToken, next);
-        }
-
-        if (privateResponse.status === 401) {
-          return handleInvalidTokens(next);
-        }
-
-        return next();
-      }
-
-      return next();
-    } catch (error) {
-      console.error("Error fetching board data:", error);
-      return next({ name: "Login" });
-    }
-  }
-
-  if (!accessToken) {
-    return next();
-  }
-
-  try {
-    const validateResponse = await validateAccessToken(accessToken);
-
-    if (validateResponse.status === 200) {
-      return next();
-    }
-
-    if (validateResponse.status === 401 && refreshToken) {
-      return handleTokenRefresh(refreshToken, next);
-    }
-
-    return handleInvalidTokens(next);
-  } catch (error) {
-    console.error("Error validating token:", error);
-    return handleInvalidTokens(next);
-  }
-});
+  routes
+})
 
 const handleTokenRefresh = async (refreshToken, next) => {
   try {
@@ -351,18 +183,60 @@ const handleTokenRefresh = async (refreshToken, next) => {
     if (refreshResponse.status === 200) {
       const refreshData = await refreshResponse.json();
       localStorage.setItem("access_token", refreshData.access_token);
-      return next();
+      return true
     }
-    handleInvalidTokens(next);
+    return false
   } catch (error) {
     console.error("Error refreshing token:", error);
-    handleInvalidTokens(next);
+    return false
   }
 };
 
-const handleInvalidTokens = (next) => {
-  localStorage.removeItem("access_token");
-  next({ name: "Login" });
+const checkAuthorization = async (next, accessToken, refreshToken) => {
+  try {
+    const validateResponse = await validateAccessToken(accessToken);
+    if (validateResponse.status === 200) return true;
+
+    if (validateResponse.status === 401 && refreshToken) {
+      return await handleTokenRefresh(refreshToken, next);
+    }
+  } catch (error) {
+    console.error("Error validating token:", error);
+  }
+  return false;
 };
 
-export default router;
+
+router.beforeEach(async (to, from, next) => {
+  const accessToken = getToken();
+  const refreshToken = getRefreshToken();
+  
+  if (to.name === "board" && to.params.id) {
+    const boardId = to.params.id;
+    try {
+      const boardResponse = await fetch(`
+        ${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
+      );
+      const board = await boardResponse.json();
+
+      if (boardResponse.status === 404) return next({ name: "ErrorPage" });
+      if (board.visibility === "PRIVATE" && !accessToken) {
+        return next({ name: "ErrorPagePermission" });
+      }
+      const authorized = await checkAuthorization(next, accessToken, refreshToken);
+      if (!authorized) return next({ name: "Login" });
+      
+      return next();
+    } catch (error) {
+      console.error("Error fetching board data:", error);
+      return next({ name: "Login" });
+    }
+  }
+
+  if (!accessToken) return next(); 
+  const authorized = await checkAuthorization(next, accessToken, refreshToken);
+  if (!authorized) return next({ name: "Login" });
+  next();
+})
+
+export default router
