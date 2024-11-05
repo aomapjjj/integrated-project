@@ -1,16 +1,12 @@
 <script setup>
-import { useRouter } from "vue-router"
-import { ref, computed, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
-import {
-  addBoard,
-  getBoardItems
-} from "../../libs/fetchUtils.js"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import BoardCard from "@/component/card/BoardCard.vue"
-import LodingPage from "@/component/LodingPage.vue"
-
+import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
+import { addBoard, getBoardItems } from '../../libs/fetchUtils.js'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import BoardCard from '@/component/card/BoardCard.vue'
+import LodingPage from '@/component/LodingPage.vue'
 
 // ----------------------- Router -----------------------
 
@@ -31,7 +27,7 @@ const userStore = useUsers()
 // ----------------------- Params -----------------------
 
 const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + " personal board" })
+const userBoard = ref({ name: userName + ' personal board' })
 const isLoading = ref(true)
 
 // ----------------------- BaseUrl -----------------------
@@ -39,37 +35,39 @@ const isLoading = ref(true)
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return localStorage.getItem('access_token')
 }
-
 
 onMounted(async () => {
   try {
-    const itemsBoards = await getBoardItems(baseUrlBoard);
-    boardsList.value = itemsBoards.boards;
-    
-    const token = getToken();
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const itemsBoards = await getBoardItems(baseUrlBoard)
+    boardsList.value = itemsBoards.boards
+
+    const token = getToken()
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL_MAIN}/boards`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    )
 
     if (response.status === 404) {
-      router.push({ name: "ErrorPage" });
+      router.push({ name: 'ErrorPage' })
     } else if (response.status === 401) {
-      router.push({ name: "Login" });
+      router.push({ name: 'Login' })
     }
   } catch (error) {
-    console.error("Error loading boards:", error);
+    console.error('Error loading boards:', error)
   } finally {
     isLoading.value = false
   }
-});
+})
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } })
+    router.push({ name: 'TaskList', params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -87,17 +85,16 @@ const submitForm = async () => {
   console.log(result.status)
 
   if (result.status === 401) {
-    localStorage.removeItem("access_token")
-    router.push({ name: "Login" })
+    localStorage.removeItem('access_token')
+    router.push({ name: 'Login' })
   } else {
     toBoardsList(result.data.id)
     clearForm()
   }
 }
 
-
 const clearForm = () => {
-  userBoard.value.name = ""
+  userBoard.value.name = ''
 }
 
 const cancelAction = () => {
@@ -107,17 +104,16 @@ const cancelAction = () => {
 
 const openModalCreate = () => {
   openModalName.value = !openModalName.value
-  router.push({ name: "BoardAdd" })
+  router.push({ name: 'BoardAdd' })
 }
 </script>
 
 <template>
   <div v-if="isLoading">
-  <LodingPage/>
-</div>
+    <LodingPage />
+  </div>
 
-  <div v-else
-  class="min-h-full max-h-fit">
+  <div v-else class="min-h-full max-h-fit">
     <div class="min-h-screen flex">
       <!-- Sidebar -->
       <SideBar>
@@ -178,7 +174,7 @@ const openModalCreate = () => {
         <BoardCard>
           <template #labelPersonalBoard>
             <h2
-              class="itbkk-personal-board text-xl font-bold mb-4 p-4 items-center justify-center"
+              class="itbkk-personal-board text-xl font-bold mb-2 p-4 items-center justify-center"
             >
               Personal Board
             </h2>
@@ -186,7 +182,7 @@ const openModalCreate = () => {
 
           <template #labelCollabBoard>
             <h2
-              class="itbkk-collab-board text-xl font-bold mb-4 p-4 items-center justify-center"
+              class="itbkk-collab-board text-xl font-bold p-4 mt-2 mb-2 items-center justify-center"
             >
               Collab Board
             </h2>
