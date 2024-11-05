@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import {
   getBoardById,
   getItems,
@@ -39,12 +39,11 @@ watch(
 
 const token = localStorage.getItem('access_token')
 const collaboratorEmail = ref('')
+const isOwnerEmail = ref(false)
 const collaboratorAccess = ref('READ')
-const oidCollaboratorToRemove = ref(null)
+const collaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
 const userEmail = userStore.getEmail()
-
-console.log(userStore.getUserInfo)
 
 // ----------------------- List Items -----------------------
 
@@ -174,21 +173,21 @@ const submitForm = async () => {
 }
 console.log(collaboratorInfo.value)
 
-const showRemoveModal = (oid) => {
-  oidCollaboratorToRemove.value = oid
+const showRemoveModal = (item) => {
+  collaboratorToRemove.value = item
   showConfirmModal.value = true
 }
 
 const confirmRemove = async () => {
-  if (oidCollaboratorToRemove.value) {
+  if (collaboratorToRemove.value.id) {
     try {
       const status = await deleteCollaborator(
         boardId.value,
-        oidCollaboratorToRemove.value
+        collaboratorToRemove.value.id
       )
       if (status === 200) {
         collaboratorInfo.value = collaboratorInfo.value.filter(
-          (collab) => collab.id !== oidCollaboratorToRemove.value
+          (collab) => collab.id !== collaboratorToRemove.value.id
         )
         isAlertSuccess.value = true
         alertMessage.value = 'Collaborator removed successfully'
@@ -203,7 +202,7 @@ const confirmRemove = async () => {
       setTimeout(hideAlert, 3000)
     } finally {
       showConfirmModal.value = false
-      oidCollaboratorToRemove.value = null
+      collaboratorToRemove.value.id = null
     }
   }
 }
@@ -214,6 +213,7 @@ const updateAccessRight = (item) => {
   try {
     openModalAcess.value = true
     pendingItem.value = item
+    console.log(pendingItem.value)
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -255,24 +255,30 @@ const clearForm = () => {
   collaboratorEmail.value = ''
 }
 
-const checkDisabled = () => {
-  if (
+const checkEmail = computed(() => {
+  if (collaboratorEmail.value === userEmail.email) {
+    isOwnerEmail.value = true
+  } else {
+    isOwnerEmail.value = false
+  }
+  return (
     !collaboratorEmail.value ||
     collaboratorEmail.value === userEmail.email ||
+    isOwnerEmail.value ||
     !collaboratorEmail.value.includes('@')
-  ) {
-    return true
-  }
-  return false
-}
+  )
+})
 </script>
 
 <template>
+  <div class="fixed top-0 right-0 mt-4 mr-4 z-20">
+    <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
+      {{ alertMessage }}
+    </Alert>
+  </div>
+
   <div class="flex flex-col h-screen overflow-hidden">
     <div class="flex flex-1 overflow-hidden">
-      <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
-        {{ alertMessage }}
-      </Alert>
       <SideBar />
 
       <div class="flex flex-col flex-1">
@@ -358,6 +364,39 @@ const checkDisabled = () => {
               >
 
                 <tbody>
+                  <tr
+                    v-for="(item, index) in collaboratorInfo"
+                    :key="item.id"
+                    class="itbkk-item"
+                  >
+
+                    <td
+                      class="itbkk-status-description px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      <div class="relative inline-block w-full">
+                        <select
+                          v-model="item.accessRight"
+                          @change="updateAccessRight(item)"
+                          class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="READ">Read</option>
+                          <option value="WRITE">Write</option>
+                        </select>
+                        <div
+                          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+                        >
+                          <svg
+                            class="fill-current h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M10 12l-4-4h8z" />
+                          </svg>
+                        </div>
+                      </div>
+
+                    </td>
+
                     <td
                       class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
@@ -385,14 +424,24 @@ const checkDisabled = () => {
                       </button>
                     </td>
                   </tr>
-                  
+                  <tr
+                    class="bg-base-100 mt-4 md:mt-0"
+                    v-if="collaboratorInfo?.length === 0"
+                  >
+                    <td colspan="5" class="text-center py-4 text-gray-400">
+                      No Collaboator
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div> -->
 
           <div>
-            <div class="bg-base-100" v-if="collaboratorInfo?.length === 0">
+            <div
+              class="bg-base-100 mt-4 md:mt-0"
+              v-if="collaboratorInfo?.length === 0"
+            >
               <span class="text-center py-4 text-gray-400">
                 No Collaborator
               </span>
@@ -440,76 +489,81 @@ const checkDisabled = () => {
                 </template>
                 <template #btn>
                   <button
-        :disabled="disabledButtonWhileOpenPublic"
-        @click="showRemoveModal(item.id)"
-        class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-4 h-4"
-          viewBox="0 0 24 24"
-        >
-          <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
-          />
-        </svg>
-      </button>
+                    :disabled="disabledButtonWhileOpenPublic"
+                    @click="showRemoveModal(item)"
+                    class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-4 h-4"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
+                      />
+                    </svg>
+                  </button>
                 </template>
               </CollabCard>
             </div>
 
-            <ConfirmModal :openModal="showConfirmModal" @confirm="confirmRemove()" @cancel="showConfirmModal = false">
-              <template #svg>
-          <div
-            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-          >
-            <svg
-              class="h-6 w-6 text-red-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
+            <ConfirmModal
+              :openModal="showConfirmModal"
+              @confirm="confirmRemove()"
+              @cancel="showConfirmModal = false"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-              />
-            </svg>
-          </div>
-        </template>
-        <template #headerMessage> Delete Collaborator </template>
-        <template #message>
-          <p class="text-sm text-gray-500">
-            Are you sure you want to delete your Collaborator? 
-          </p>
-        </template>
-        <template #confirmBtn>
-          <span
-            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
-            >Delete</span
-          >
-        </template>
-        <template #cancelBtn>
-          <span
-            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-            >Cancel</span
-          >
-        </template>
-        </ConfirmModal>
+              <template #svg>
+                <div
+                  class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                >
+                  <svg
+                    class="h-6 w-6 text-red-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                    data-slot="icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                    />
+                  </svg>
+                </div>
+              </template>
+              <template #headerMessage> Delete Collaborator </template>
+              <template #message>
+                <p class="text-sm text-gray-500">
+                  Do you want to remove {{ collaboratorToRemove.name }} from the board?
+                </p>
+              </template>
+              <template #confirmBtn>
+                <span
+                  class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+                  >Delete</span
+                >
+              </template>
+              <template #cancelBtn>
+                <span
+                  class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >Cancel</span
+                >
+              </template>
+            </ConfirmModal>
 
             <ModalAcess
               :isOpen="openModalAcess"
               @confirm="confirmChange"
               @cancel="cancelChange"
             >
-              <template #headerName>Access Changed!</template>
+              <template #headerName>Access Collaborator</template>
               <template #messageName
-                >Are you sure you want to change the access?</template
+                >Do you want to change access right of {{ pendingItem.name }} to
+                {{ pendingItem.accessRight }}?</template
               >
             </ModalAcess>
 
@@ -532,9 +586,20 @@ const checkDisabled = () => {
                       <input
                         type="email"
                         v-model="collaboratorEmail"
-                        class="w-full p-2 border rounded-lg"
+                        :class="[
+                          'w-full p-2 rounded-lg border',
+                          isOwnerEmail ? 'border-red-400' : 'border-gray-300'
+                        ]"
                         placeholder="you@ad.sit.kmutt.ac.th"
                       />
+
+                      <p class="text-red-500 text-sm mt-1">
+                        {{
+                          isOwnerEmail
+                            ? 'Board owner cannot be collaborator of his/her own board'
+                            : ''
+                        }}
+                      </p>
                     </div>
 
                     <div>
@@ -556,7 +621,7 @@ const checkDisabled = () => {
                       Cancel
                     </button>
                     <button
-                      :disabled="checkDisabled()"
+                      :disabled="checkEmail"
                       class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
                       @click="submitForm"
                     >
@@ -566,31 +631,6 @@ const checkDisabled = () => {
                 </div>
               </div>
             </div>
-
-            <!-- <div
-              v-if="showConfirmModal"
-              class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
-            >
-              <div class="bg-white p-6 rounded-md max-w-md w-full">
-                <h3 class="text-lg font-semibold text-center mb-4">
-                  Are you sure you want to remove this collaborator?
-                </h3>
-                <div class="flex justify-end">
-                  <button
-                    @click="showConfirmModal = false"
-                    class="btn bg-gray-500 text-white mr-4"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    @click="confirmRemove"
-                    class="btn bg-red-500 text-white"
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </div>
-            </div> -->
           </div>
         </div>
       </div>
