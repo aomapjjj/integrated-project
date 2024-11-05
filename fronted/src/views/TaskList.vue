@@ -98,14 +98,18 @@ onMounted(async () => {
 
     const board = await getBoardById(boardId.value)
 
-    if (!userName ||
-      board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === "READ"
+    if (!userName) {
+      disabledButtonWhileOpenPublic.value = true
+    } else if (
+      board.item.owner.name !== userName &&
+      !board.item.collaborators.some(
+        (collab) => collab.name === userName && collab.accessRight === "WRITE"
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
+    } else {
+      disabledButtonWhileOpenPublic.value = false
     }
-
     boardName.value = board.item.name
     visibility.value = board.item.visibility
     todoList.value = items
