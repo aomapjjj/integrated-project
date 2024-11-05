@@ -109,7 +109,7 @@ const submitForm = async () => {
       const result = await addCollaborator(boardId.value, {
         email: collaboratorEmail.value,
         accessRight: collaboratorAccess.value,
-        status: "ACCEPTED"
+        status: 'ACCEPTED'
       })
 
       console.log(result)
@@ -271,9 +271,8 @@ const checkEmail = computed(() => {
 })
 
 const filteredCollaboratorInfo = computed(() =>
-  collaboratorInfo.value.filter(item => item.status === 'ACCEPTED')
-);
-
+  collaboratorInfo.value.filter((item) => item.status === 'ACCEPTED')
+)
 </script>
 
 <template>
@@ -445,8 +444,11 @@ const filteredCollaboratorInfo = computed(() =>
 
           <div>
             <div
-              class="bg-base-100 mt-4 md:mt-0"
-              v-if="!filteredCollaboratorInfo.length || collaboratorInfo?.length === 0"
+              class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center"
+              v-if="
+                !filteredCollaboratorInfo.length ||
+                collaboratorInfo?.length === 0
+              "
             >
               <span class="text-center py-4 text-gray-400">
                 No Collaborator
@@ -544,7 +546,8 @@ const filteredCollaboratorInfo = computed(() =>
               <template #headerMessage> Delete Collaborator </template>
               <template #message>
                 <p class="text-sm text-gray-500">
-                  Do you want to remove {{ collaboratorToRemove.name }} from the board?
+                  Do you want to remove {{ collaboratorToRemove.name }} from the
+                  board?
                 </p>
               </template>
               <template #confirmBtn>

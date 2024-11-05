@@ -1,16 +1,17 @@
 <script setup>
-import { useRouter } from "vue-router"
-import { ref, onMounted } from "vue"
-import { useUsers } from "../../stores/storeUser"
-import { useBoard } from "../../stores/storeBoard"
+import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useUsers } from '../../stores/storeUser'
+import { useBoard } from '../../stores/storeBoard'
 import {
   deleteItemById,
   getBoardItems,
   deleteCollaborator
-} from "../../libs/fetchUtils.js"
-import Alert from "../alert/Alert.vue"
-import ConfirmModal from "../modal/ConfirmModal.vue"
-
+} from '../../libs/fetchUtils.js'
+import Alert from '../alert/Alert.vue'
+import ConfirmModal from '../modal/ConfirmModal.vue'
+import EmptyBoard from './EmptyBoard.vue'
+import PersonalAndCollabBoard from '../board/PersonalAndCollabBoard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -39,7 +40,7 @@ const openModalToDelete = ref(false)
 const showConfirmModal = ref(false)
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
-const alertMessage = ref("")
+const alertMessage = ref('')
 
 // ----------------------- BaseUrl -----------------------
 
@@ -49,7 +50,6 @@ const showRemoveModal = (boardId) => {
   boardIdCollabs.value = boardId
   showConfirmModal.value = true
   oidCollaboratorToRemove.value = userStore.getUserInfo().oid
-
 }
 
 const hideAlert = () => {
@@ -58,7 +58,6 @@ const hideAlert = () => {
 }
 
 const confirmRemove = async () => {
-
   if (oidCollaboratorToRemove.value) {
     try {
       const status = await deleteCollaborator(
@@ -70,15 +69,15 @@ const confirmRemove = async () => {
           (collab) => collab.id !== oidCollaboratorToRemove.value
         )
         isAlertSuccess.value = true
-        alertMessage.value = "Collaborator removed successfully"
+        alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
       } else {
         isAlertFailure.value = true
-        alertMessage.value = "Failed to remove collaborator"
+        alertMessage.value = 'Failed to remove collaborator'
         setTimeout(hideAlert, 3000)
       }
     } catch (error) {
-      alertMessage.value = "Error removing collaborator:"
+      alertMessage.value = 'Error removing collaborator:'
       setTimeout(hideAlert, 3000)
     } finally {
       showConfirmModal.value = false
@@ -88,14 +87,15 @@ const confirmRemove = async () => {
 }
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return localStorage.getItem('access_token')
 }
 
 onMounted(async () => {
   const itemsBoards = await getBoardItems(baseUrlBoard)
-  boardsList.value = itemsBoards
-  console.log(boardsList.value)
-  
+  boardsList.value = itemsBoards || { boards: [], collabs: [] }
+  boardStore.setBoards(itemsBoards.boards)
+  boardStore.setCollabs(itemsBoards.collabs)
+
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -104,12 +104,12 @@ onMounted(async () => {
   })
 
   if (response.status === 404) {
-    router.push({ name: "ErrorPage" })
+    router.push({ name: 'ErrorPage' })
   } else if (response.status === 401) {
-    router.push({ name: "Login" })
+    router.push({ name: 'Login' })
   }
 
-  const savedColors = JSON.parse(localStorage.getItem("boardColors"))
+  const savedColors = JSON.parse(localStorage.getItem('boardColors'))
   if (savedColors) {
     currentColor.value = savedColors
   }
@@ -139,7 +139,7 @@ onMounted(async () => {
 
 const toboardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } }).then(() => {
+    router.push({ name: 'TaskList', params: { id: boardId } }).then(() => {
       router.go()
     })
     userStore.setBoard(boardId)
@@ -166,7 +166,7 @@ const setColor = (color, id) => {
     ...currentColor.value,
     [id]: color
   }
-  localStorage.setItem("boardColors", JSON.stringify(currentColor.value))
+  localStorage.setItem('boardColors', JSON.stringify(currentColor.value))
   boardStore.setChangeColor(currentColor.value)
 }
 </script>
@@ -180,15 +180,18 @@ const setColor = (color, id) => {
   >
     <!-- Personal Boards -->
     <slot name="labelPersonalBoard"></slot>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div v-if="boardsList.boards?.length === undefined">
+      <EmptyBoard />
+    </div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-for="(item, index) in boardsList.boards" :key="index">
-        <div class="p-3">
-          <div
-            ref="colorCard"
-            :class="`${currentColor[item.id]}`"
-            class="itbkk-personal-item max-w-xs py-4 container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl"
-          >
-            <div>
+        <div
+          ref="colorCard"
+          :class="`${currentColor[item.id]}`"
+          class="itbkk-personal-item max-w-xs py-4 border container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl"
+        >
+          <PersonalAndCollabBoard>
+            <template #toggle>
               <span
                 class="itbkk-board-visibility text-white text-xs font-bold rounded-full inline-block ml-4 py-1.5 px-4 cursor-pointer"
                 :class="{
@@ -200,108 +203,110 @@ const setColor = (color, id) => {
                   item.visibility.slice(1).toLowerCase()
                 }}</span
               >
+            </template>
+            <template #name>
               <h1
                 class="itbkk-board-name text-l px-6 py-2 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
               >
                 {{ item.name }}
               </h1>
-              <div class="px-6 py-2">
-                <span
-                  @click="setColor('bg-gray-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-gray-400 p-1 text-xs font-bold mr-3"
-                ></span>
-                <span
-                  @click="setColor('bg-purple-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-purple-400 p-1 text-xs font-bold mr-3"
-                ></span>
-                <span
-                  @click="setColor('bg-indigo-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-indigo-400 p-1 text-xs font-bold mr-3"
-                ></span>
-                <span
-                  @click="setColor('bg-blue-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-blue-400 p-1 text-xs font-bold mr-3"
-                ></span>
-                <span
-                  @click="setColor('bg-yellow-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-yellow-400 p-1 text-xs font-bold mr-3"
-                ></span>
-                <span
-                  @click="setColor('bg-red-300', item.id)"
-                  class="inline-block rounded-full bg-white border-4 border-red-400 p-1 text-xs font-bold mr-3"
-                ></span>
-              </div>
-            </div>
-            <div class="flex px-4 py-2 justify-between">
-              <div class="flex items-center space-x-2">
-                <div class="flex gap-2">
-                  <button class="btn rounded-full customBgYellow">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                    >
-                      <g fill="none">
-                        <path
-                          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-                        />
-                        <path
-                          fill="currentColor"
-                          d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"
-                        />
-                      </g>
-                    </svg>
-                  </button>
-
-                  <button
-                    class="btn bg-red-400 rounded-full"
-                    @click="openModalToDeleteBoard(item.id)"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                    >
-                      <g fill="none" fill-rule="evenodd">
-                        <path
-                          d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
-                        />
-                        <path
-                          fill="white"
-                          d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
-                        />
-                      </g>
-                    </svg>
-                  </button>
-
-                  <button
-                    @click="toboardsList(item.id)"
-                    class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                    type="button"
-                  >
-                    Show More
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-8 w-8"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M9.879 17.243a1 1 0 0 1-.707-1.707L12.707 12L9.172 8.464a1 1 0 0 1 1.414-1.414l4.242 4.243a1 1 0 0 1 0 1.414l-4.242 4.243a1 1 0 0 1-.707.293"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+            </template>
+            <template #colorBoard>
+              <span
+                @click="setColor('bg-gray-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-gray-400 p-1 text-xs font-bold mr-3"
+              ></span>
+              <span
+                @click="setColor('bg-purple-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-purple-400 p-1 text-xs font-bold mr-3"
+              ></span>
+              <span
+                @click="setColor('bg-indigo-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-indigo-400 p-1 text-xs font-bold mr-3"
+              ></span>
+              <span
+                @click="setColor('bg-blue-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-blue-400 p-1 text-xs font-bold mr-3"
+              ></span>
+              <span
+                @click="setColor('bg-yellow-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-yellow-400 p-1 text-xs font-bold mr-3"
+              ></span>
+              <span
+                @click="setColor('bg-red-300', item.id)"
+                class="inline-block rounded-full bg-white border-4 border-red-400 p-1 text-xs font-bold mr-3"
+              ></span>
+            </template>
+            <template #Btn>
+              <button class="btn rounded-full customBgYellow">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                >
+                  <g fill="none">
+                    <path
+                      d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+                    />
+                    <path
+                      fill="currentColor"
+                      d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"
+                    />
+                  </g>
+                </svg>
+              </button>
+            </template>
+            <template #deleteBtn>
+              <button
+                class="btn bg-red-400 rounded-full"
+                @click="openModalToDeleteBoard(item.id)"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                >
+                  <g fill="none" fill-rule="evenodd">
+                    <path
+                      d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
+                    />
+                    <path
+                      fill="white"
+                      d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
+                    />
+                  </g>
+                </svg>
+              </button>
+            </template>
+            <template #viewBtn>
+              <button
+                @click="toboardsList(item.id)"
+                class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                type="button"
+              >
+                Show More
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M9.879 17.243a1 1 0 0 1-.707-1.707L12.707 12L9.172 8.464a1 1 0 0 1 1.414-1.414l4.242 4.243a1 1 0 0 1 0 1.414l-4.242 4.243a1 1 0 0 1-.707.293"
+                  />
+                </svg>
+              </button>
+            </template>
+          </PersonalAndCollabBoard>
         </div>
-
-      
-        <ConfirmModal :openModal="openModalToDelete && selectedItemIdToDelete === item.id" @confirm="confirmDelete()" @cancel="openModalToDelete = false">
-              <template #svg>
+          <ConfirmModal
+        :openModal="openModalToDelete && selectedItemIdToDelete === item.id"
+        @confirm="confirmDelete()"
+        @cancel="openModalToDelete = false"
+      >
+        <template #svg>
           <div
             class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
           >
@@ -340,115 +345,114 @@ const setColor = (color, id) => {
             >Cancel</span
           >
         </template>
-        </ConfirmModal>
+      </ConfirmModal>
       </div>
+    
     </div>
 
     <!-- Collab Boards -->
     <slot name="labelCollabBoard"></slot>
-    <div class="p-3">
+    <div v-if="!boardsList.collabs || boardsList.collabs.length === 0">
+      <EmptyBoard />
+    </div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <div v-for="(item, index) in boardsList.collabs" :key="index">
-        <ul
-          role="list"
-          class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        <div
+          ref="colorCard"
+          :class="`${currentColor[item.id]}`"
+          class="itbkk-collab-item max-w-xs py-4 border container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl"
         >
-          <li
-            class="itbkk-collab-item col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow"
-          >
-            <div class="flex w-full items-center justify-between space-x-6 p-6">
-              <div class="flex-1 truncate">
-                <div class="flex items-center space-x-3">
-                  <h3
-                    class="itbkk-board-name truncate text-sm font-medium text-gray-900"
-                  >
-                    {{ item.name }}
-                  </h3>
-                  <span
-                    class="itbkk-access-right inline-flex flex-shrink-0 items-center rounded-full bg-green-50 px-1.5 py-0.5 text-xs font-medium text-blue-600 ring-1 ring-inset ring-green-600/20"
-                  >
-                    </span
-                  >
-                </div>
-                <p class="itbkk-owner-name mt-1 truncate text-sm text-gray-500">
-                  {{ item.owner.name }}
-                </p>
-              </div>
-              <img
-                class="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
-                src="https://qph.cf2.quoracdn.net/main-thumb-554097988-200-xietklpojlcioqxaqgcyykzfxblvoqrb.jpeg"
-                alt=""
-              />
-            </div>
-            <div>
-              <div class="-mt-px flex divide-x divide-gray-200">
-                <div class="flex w-0 flex-1">
-                  <span
-                    @click="toboardsList(item.id)"
-                    class="relative -mr-px inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-bl-lg border border-transparent py-4 text-sm font-semibold text-gray-900 cursor-pointer"
-                  >
-                    View
-                  </span>
-                </div>
-                <div class="-ml-px flex w-0 flex-1">
-                  <button
-                    @click="showRemoveModal(item.id)"
-                    class="relative inline-flex w-0 flex-1 items-center justify-center gap-x-3 rounded-br-lg border border-transparent py-4 text-sm font-semibold text-gray-900"
-                  >
-                    <span class="itbkk-leave-board">Leave</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
+          <PersonalAndCollabBoard>
+            <template #toggle>
+              <span
+                class="itbkk-access-right text-white text-xs font-bold rounded-full inline-block ml-4 py-1.5 px-4 cursor-pointer"
+                :class="{
+                  'bg-green-400': item.visibility === 'PUBLIC',
+                  'bg-gray-400': item.visibility === 'PRIVATE'
+                }"
+              >
+                READ
+              </span>
+            </template>
 
-     
-   
+            <template #name>
+              <h1
+                class="itbkk-board-name text-sm px-6 py-2 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
+              >
+                {{ item.name }}
+              </h1>
+            </template>
+            <template #ownerName>
+              <h1
+                class="itbkk-owner-name text-sm px-6 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
+              >
+                {{ item.owner.name }}
+              </h1>
+            </template>
+            
+              <template #Btn>
+                <button class="btn rounded-lg customBgYellow">
+                  <span @click="toboardsList(item.id)">View</span>
+                </button>
+              </template>
+              <template #deleteBtn>
+                <button
+                  class="itbkk-leave-board btn bg-red-400 rounded-lg"
+                  @click="showRemoveModal(item.id)"
+                >
+                  <span class="text-white">Leave</span>
+                </button>
+              </template>
+            
+          </PersonalAndCollabBoard>
+        </div>
       </div>
     </div>
   </div>
 
-  <ConfirmModal :openModal="showConfirmModal" @confirm="confirmRemove()" @cancel="showConfirmModal = false">
-              <template #svg>
-          <div
-            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-          >
-            <svg
-              class="h-6 w-6 text-red-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              aria-hidden="true"
-              data-slot="icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-              />
-            </svg>
-          </div>
-        </template>
-        <template #headerMessage> Leave Board </template>
-        <template #message>
-          <p class="text-sm text-gray-500">
-            Are you sure you want to Leave ? 
-          </p>
-        </template>
-        <template #confirmBtn>
-          <span
-            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
-            >Leave</span
-          >
-        </template>
-        <template #cancelBtn>
-          <span
-            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-            >Cancel</span
-          >
-        </template>
-        </ConfirmModal>
+  <ConfirmModal
+    :openModal="showConfirmModal"
+    @confirm="confirmRemove()"
+    @cancel="showConfirmModal = false"
+  >
+    <template #svg>
+      <div
+        class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+      >
+        <svg
+          class="h-6 w-6 text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          aria-hidden="true"
+          data-slot="icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+          />
+        </svg>
+      </div>
+    </template>
+    <template #headerMessage> Leave Board </template>
+    <template #message>
+      <p class="text-sm text-gray-500">Are you sure you want to Leave ?</p>
+    </template>
+    <template #confirmBtn>
+      <span
+        class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+        >Leave</span
+      >
+    </template>
+    <template #cancelBtn>
+      <span
+        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+        >Cancel</span
+      >
+    </template>
+  </ConfirmModal>
 </template>
 
 <style scoped>
