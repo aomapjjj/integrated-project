@@ -38,6 +38,8 @@ public class StatusService {
     private ModelMapper modelMapper;
     @Autowired
     private ListMapper listMapper;
+    @Autowired
+    private CollaboratorService collaboratorService;
 
     // GET ALL STATUSES V.2
     public List<StatusDTOTwo> getAllStatusesV2() {
@@ -66,9 +68,13 @@ public class StatusService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
-        // ตรวจสอบว่าผู้ใช้เป็นเจ้าของ board หรือไม่
+
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!board.getOwnerId().equals(currentUser.getOid())) {
+
+        boolean isWriteAccess = collaboratorService.hasWriteAccess(boardId, currentUser.getOid());
+
+
+        if (!isWriteAccess && !board.getOwnerId().equals(currentUser.getOid())) {
             throw new UnauthorizedException("You are not the owner of this board");
         }
 
