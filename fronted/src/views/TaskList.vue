@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from 'vue'
 import {
   getItemById,
   getItems,
@@ -7,21 +7,20 @@ import {
   editLimit,
   getBoardById,
   getResponseItems
-} from "../libs/fetchUtils.js"
-import TaskDetail from "./tasks/TaskDetail.vue"
-import AddTask from "./tasks/AddTask.vue"
-import EditTask from "./tasks/EditTask.vue"
-import { boardVisibility } from "../libs/fetchUtils.js"
-import { useLimitStore } from "../stores/storeLimit.js"
-import { useUsers } from "@/stores/storeUser"
-import { useTasks } from "../stores/store.js"
-import { useRoute, useRouter } from "vue-router"
-import SideBar from "../component/bar/SideBar.vue"
-import Modal from "../component/modal/Modal.vue"
-import Alert from "@/component/alert/Alert.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import LodingPage from "@/component/LodingPage.vue"
-
+} from '../libs/fetchUtils.js'
+import TaskDetail from './tasks/TaskDetail.vue'
+import AddTask from './tasks/AddTask.vue'
+import EditTask from './tasks/EditTask.vue'
+import { boardVisibility } from '../libs/fetchUtils.js'
+import { useLimitStore } from '../stores/storeLimit.js'
+import { useUsers } from '@/stores/storeUser'
+import { useTasks } from '../stores/store.js'
+import { useRoute, useRouter } from 'vue-router'
+import SideBar from '../component/bar/SideBar.vue'
+import Modal from '../component/modal/Modal.vue'
+import Alert from '@/component/alert/Alert.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import LodingPage from '@/component/LodingPage.vue'
 
 // ----------------------- Router -----------------------
 
@@ -34,13 +33,12 @@ const taskStore = useTasks()
 const limitStore = useLimitStore()
 const userStore = useUsers()
 
-
 // ----------------------- Params -----------------------
 
 const boardId = ref()
 const userName = userStore.getUser().username
-const token = localStorage.getItem("access_token")
-const boardName = ref("")
+const token = localStorage.getItem('access_token')
+const boardName = ref('')
 const isLoading = ref(true)
 watch(
   () => route.params.id,
@@ -68,7 +66,7 @@ const deleteComplete = ref(false)
 const alertLimit = ref(false)
 const alertEnabledFail = ref(false)
 const alertEnabledSuc = ref(false)
-const messageLimit = ref("")
+const messageLimit = ref('')
 const messageAlert = ref()
 
 // ----------------------- Enable & Disable -----------------------
@@ -76,9 +74,8 @@ const messageAlert = ref()
 const showDetail = ref(false)
 const disabledButtonWhileOpenPublic = ref(false)
 const isModalVisible = ref(false)
-const visibility = ref("")
-const tempVisibility = ref("")
-
+const visibility = ref('')
+const tempVisibility = ref('')
 
 // ----------------------- BaseUrl -----------------------
 
@@ -88,46 +85,43 @@ const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 const baseUrlLimit = `${baseUrlboards}/${boardId.value}/statuses/limit`
 const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
-
-
-
 onMounted(async () => {
   try {
-    isLoading.value = true; // เริ่มการโหลดข้อมูล
+    isLoading.value = true // เริ่มการโหลดข้อมูล
 
-    userStore.setToken(token);
-    
+    userStore.setToken(token)
+
     if (taskStore.getTasks().length === 0) {
-      const items = await getItems(baseUrlTask);
-      taskStore.addTasks(items);
+      const items = await getItems(baseUrlTask)
+      taskStore.addTasks(items)
     }
-    
-    const Board = await getBoardById(boardId.value);
+
+    const Board = await getBoardById(boardId.value)
     if (Board.item.owner.name !== userName) {
-      disabledButtonWhileOpenPublic.value = true;
+      disabledButtonWhileOpenPublic.value = true
     }
-    
-    boardName.value = Board.item.name;
-    visibility.value = Board.item.visibility;
-    todoList.value = items;
 
-    const itemsStatus = await getItems(baseUrlStatus);
-    statusList.value = itemsStatus;
+    boardName.value = Board.item.name
+    visibility.value = Board.item.visibility
+    todoList.value = items
 
-    const itemLimit = await getItems(baseUrlLimit);
-    limitStore.setLimit(itemLimit);
+    const itemsStatus = await getItems(baseUrlStatus)
+    statusList.value = itemsStatus
 
-    const taskId = route.params.id;
+    const itemLimit = await getItems(baseUrlLimit)
+    limitStore.setLimit(itemLimit)
+
+    const taskId = route.params.id
     if (taskId !== undefined) {
-      const response = await getItemById(taskId);
+      const response = await getItemById(taskId)
       if (response && (response.status === 404 || response.status === 400)) {
-        router.push("/error");
+        router.push('/error')
       }
     }
   } catch (error) {
-    console.error("Error loading data:", error);
+    console.error('Error loading data:', error)
   } finally {
-    isLoading.value = false; // ปิดการโหลดเมื่อทำงานเสร็จ
+    isLoading.value = false // ปิดการโหลดเมื่อทำงานเสร็จ
   }
 })
 
@@ -147,10 +141,10 @@ const UpdateLimit = async () => {
 
   if (alertLimit.value) {
     messageLimit.value =
-      "The Kanban board now limits " + limitStore.getLimit().maximumTask
+      'The Kanban board now limits ' + limitStore.getLimit().maximumTask
   } else {
     alertLimit.value = true
-    messageLimit.value = "The Kanban board has disabled the task limit in each "
+    messageLimit.value = 'The Kanban board has disabled the task limit in each '
   }
   setTimeout(() => {
     alertLimit.value = false
@@ -161,7 +155,7 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
-    router.push({ name: "TaskDetail", params: { taskid: todoId } })
+    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
   selectedTodoId.value = todoId
   showDetail.value = true
@@ -183,7 +177,7 @@ const deleteTodo = async (todoId, index) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById("my_modal_delete")
+  const modal = document.getElementById('my_modal_delete')
   modal.showModal()
 }
 
@@ -203,33 +197,33 @@ const filterAndLogTitleById = (id) => {
   if (item) {
     return item.title
   } else {
-    return ""
+    return ''
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref("default")
-const statusSortOrder = ref("default")
+const showIcon = ref('default')
+const statusSortOrder = ref('default')
 
 const toggleIcon = () => {
-  if (showIcon.value === "default") {
-    showIcon.value = "asc"
-    statusSortOrder.value = "asc"
-  } else if (showIcon.value === "asc") {
-    showIcon.value = "desc"
-    statusSortOrder.value = "desc"
+  if (showIcon.value === 'default') {
+    showIcon.value = 'asc'
+    statusSortOrder.value = 'asc'
+  } else if (showIcon.value === 'asc') {
+    showIcon.value = 'desc'
+    statusSortOrder.value = 'desc'
   } else {
-    showIcon.value = "default"
-    statusSortOrder.value = "default"
+    showIcon.value = 'default'
+    statusSortOrder.value = 'default'
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === "asc") {
+  if (currentSortOrder === 'asc') {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === "desc") {
+  } else if (currentSortOrder === 'desc') {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -259,16 +253,16 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: "StatusesList" })
+  router.push({ name: 'StatusesList' })
 }
 
 const openCollaborator = () => {
-  router.push({ name: "Collab" })
+  router.push({ name: 'Collab' })
 }
 
 const clearToken = () => {
-  router.push({ name: "Login" })
-  localStorage.removeItem("access_token")
+  router.push({ name: 'Login' })
+  localStorage.removeItem('access_token')
 }
 
 // ----------------------- Limit ---------------------------
@@ -281,14 +275,13 @@ const handleToggleClick = () => {
   if (disabledButtonWhileOpenPublic.value) {
     return
   }
-  tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC" 
+  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   isModalVisible.value = true
 }
 
-
 const confirmChangeVisibility = async () => {
-  visibility.value = tempVisibility.value 
-  isModalVisible.value = false 
+  visibility.value = tempVisibility.value
+  isModalVisible.value = false
   await changeVisibility()
 }
 
@@ -298,7 +291,7 @@ const cancelChange = () => {
 
 if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
   alertEnabledSuc.value = true
-  messageAlert.value = "Welcome, You have logged in successfully"
+  messageAlert.value = 'Welcome, You have logged in successfully'
 
   setTimeout(() => {
     alertEnabledSuc.value = false
@@ -309,7 +302,7 @@ if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
 const changeVisibility = async () => {
   const updatedBoard = await boardVisibility(
     boardId.value,
-    visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
+    visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   )
 
   if (updatedBoard && updatedBoard.success) {
@@ -331,11 +324,10 @@ const changeVisibility = async () => {
 
 <template>
   <div v-if="isLoading">
-  <LodingPage/>
-</div>
+    <LodingPage />
+  </div>
 
-  <div v-else
-  class="min-h-full max-h-fit">
+  <div v-else class="min-h-full max-h-fit">
     <!-- Modal -->
 
     <div class="min-h-screen flex">
@@ -516,9 +508,21 @@ const changeVisibility = async () => {
             <div class="hidden md:block">
               <!-- Limit Notice -->
               <div class="flex space-x-1">
-                <!-- ADD BUTTON -->
+                <!-- Add Task Button and Tooltip-->
+                <div class="relative group">
+                  <div
+                    v-show="disabledButtonWhileOpenPublic"
+                    class="tooltip tooltip-error group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out absolute bottom-full mb-2 px-3 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-md shadow-lg w-max"
+                  >
+                    <span class="text-red-400"
+                      >You need to be board owner or have write access to
+                      perform this action</span
+                    >
+                    <div class="tooltip-arrow bg-white"></div>
+                  </div>
+                  <AddTask :disabledBtn="disabledButtonWhileOpenPublic" />
+                </div>
 
-                <AddTask :disabledBtn="disabledButtonWhileOpenPublic" />
                 <button
                   class="itbkk-manage-Collaboator btn text-white rounded-full bg-orange-300"
                   @click="openCollaborator()"
@@ -577,7 +581,18 @@ const changeVisibility = async () => {
 
         <div class="flex flex-col items-center mt-9 h-[60vh] max-sm:h-[50vh]">
           <!-- Toggle Public / Private -->
-          <div class="flex mb-4 items-end">
+          <div class="flex mb-4 items-end relative group justify-center">
+            <!-- Tooltip -->
+            <div
+              v-show="disabledButtonWhileOpenPublic"
+              class="tooltip tooltip-error group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out absolute bottom-full mb-2 px-3 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-md shadow-lg w-max"
+            >
+              <span class="text-red-400">
+                You need to be board owner or have write access to perform this
+                action
+              </span>
+              <div class="tooltip-arrow bg-white"></div>
+            </div>
             <div
               class="absolute pl-12 w-1/12 h-11 z-10 bg-transparent"
               @click="handleToggleClick"
@@ -591,6 +606,9 @@ const changeVisibility = async () => {
               />
               <div
                 class="peer flex h-8 w-30 items-center gap-4 rounded-full bg-orange-400 px-3 after:absolute after:left-1 after:h-6 after:w-14 after:rounded-full after:bg-white/40 after:transition-all after:content-[''] peer-checked:bg-stone-500 peer-checked:after:translate-x-full peer-focus:outline-none dark:border-slate-600 dark:bg-slate-700 text-sm text-white"
+                :class="
+                  disabledButtonWhileOpenPublic ? 'cursor-not-allowed' : ''
+                "
               >
                 <span> Public </span>
                 <span> Private </span>
@@ -614,16 +632,19 @@ const changeVisibility = async () => {
             <template #headerName>Board visibility changed!</template>
             <template #messageName>
               {{
-                tempVisibility === "PUBLIC"
-                  ? "In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? "
-                  : "In private, only board owner can access / control board. Do you want to change the visibility toPrivate ? "
+                tempVisibility === 'PUBLIC'
+                  ? 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? '
+                  : 'In private, only board owner can access / control board. Do you want to change the visibility toPrivate ? '
               }}</template
             >
           </Modal>
 
-          <div class="overflow-x-auto max-h-96 w-min-full">
-            <div class="min-w-full">
-              <table class="table-auto" style="table-layout: fixed">
+          <div class="overflow-x-auto max-h-96 w-full mx-auto px-2">
+            <div class="w-full mx-auto max-w-screen-lg">
+              <table
+                class="table-auto w-full mx-auto"
+                style="table-layout: fixed"
+              >
                 <!-- TABLE -->
                 <thead>
                   <tr class="bg-base-200 mt-4 md:mt-0">
@@ -780,7 +801,7 @@ const changeVisibility = async () => {
                     >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? "Unassigned"
+                          ? 'Unassigned'
                           : item.assignees
                       }}
                     </td>
@@ -805,60 +826,88 @@ const changeVisibility = async () => {
                     </td>
 
                     <div class="itbkk-button-action">
-                      <td style="display: flex; justify-content: center">
+                      <td class="flex justify-center">
                         <div
-                          class="itbkk-button-edit hidden md:table-cell text-sm px-4 py-2"
+                          class="itbkk-button-edit hidden md:table-cell text-sm py-2 relative"
                         >
-                          <!-- EDIT -->
-
-                          <EditTask
-                            :todo-id="item.id"
-                            :disabledBtn="disabledButtonWhileOpenPublic"
-                          />
-
-                          <!-- Delete -->
-
-                          <button
-                            :disabled="disabledButtonWhileOpenPublic"
-                            :class="[
-                              'itbkk-button-delete ml-2',
-                              'btn',
-                              'rounded-full',
-                              { 'btn-disabled': disabledButtonWhileOpenPublic }
-                            ]"
-                            :style="{
-                              backgroundColor: disabledButtonWhileOpenPublic
-                                ? '#d3d3d3'
-                                : '#f87171',
-                              color: disabledButtonWhileOpenPublic
-                                ? '#a9a9a9'
-                                : 'white',
-                              borderRadius: '30px',
-                              position: 'static',
-                              cursor: disabledButtonWhileOpenPublic
-                                ? 'not-allowed'
-                                : 'pointer',
-                              opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
-                            }"
-                            @click="openModalToDelete(item.id, index)"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="18"
-                              height="18"
-                              viewBox="0 0 24 24"
+                          <!-- Edit Button and Tooltip -->
+                          <div class="relative group pointer-events-auto">
+                            <div
+                              v-show="disabledButtonWhileOpenPublic"
+                              class="tooltip tooltip-error group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out absolute bottom-full mb-2 px-3 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-md shadow-lg w-max"
                             >
-                              <g fill="none" fill-rule="evenodd">
-                                <path
-                                  d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
-                                />
-                                <path
-                                  fill="white"
-                                  d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
-                                />
-                              </g>
-                            </svg>
-                          </button>
+                              <span class="text-red-400"
+                                >You need to be board owner or have write access
+                                to perform this action</span
+                              >
+                              <div class="tooltip-arrow bg-white"></div>
+                            </div>
+                            <EditTask
+                              :todo-id="item.id"
+                              :disabledBtn="disabledButtonWhileOpenPublic"
+                            />
+                          </div>
+                        </div>
+
+                        <div
+                          class="itbkk-button-delete hidden md:table-cell text-sm py-2 relative"
+                        >
+                          <!-- Delete Button and Tooltip -->
+                          <div class="relative group">
+                            <div
+                              v-show="disabledButtonWhileOpenPublic"
+                              class="tooltip tooltip-error group-hover:opacity-100 opacity-0 transition-opacity duration-200 ease-in-out absolute bottom-full mb-2 px-3 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-md shadow-lg w-max"
+                            >
+                              <span class="text-red-400"
+                                >You need to be board owner or have write access
+                                to perform this action</span
+                              >
+                              <div class="tooltip-arrow bg-white"></div>
+                            </div>
+                            <button
+                              :disabled="disabledButtonWhileOpenPublic"
+                              :class="[
+                                'itbkk-button-delete ml-2',
+                                'btn',
+                                'rounded-full',
+                                {
+                                  'btn-disabled': disabledButtonWhileOpenPublic
+                                }
+                              ]"
+                              :style="{
+                                backgroundColor: disabledButtonWhileOpenPublic
+                                  ? '#d3d3d3'
+                                  : '#f87171',
+                                color: disabledButtonWhileOpenPublic
+                                  ? '#a9a9a9'
+                                  : 'white',
+                                borderRadius: '30px',
+                                position: 'static',
+                                cursor: disabledButtonWhileOpenPublic
+                                  ? 'not-allowed'
+                                  : 'pointer',
+                                opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
+                              }"
+                              @click="openModalToDelete(item.id, index)"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                              >
+                                <g fill="none" fill-rule="evenodd">
+                                  <path
+                                    d="M24 0v24H0V0zM12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036c-.01-.003-.019 0-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"
+                                  />
+                                  <path
+                                    fill="white"
+                                    d="M14.28 2a2 2 0 0 1 1.897 1.368L16.72 5H20a1 1 0 1 1 0 2h-1v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7H4a1 1 0 0 1 0-2h3.28l.543-1.632A2 2 0 0 1 9.721 2zM17 7H7v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1zm-2.72-3H9.72l-.333 1h5.226z"
+                                  />
+                                </g>
+                              </svg>
+                            </button>
+                          </div>
                         </div>
 
                         <dialog id="my_modal_delete" class="modal">

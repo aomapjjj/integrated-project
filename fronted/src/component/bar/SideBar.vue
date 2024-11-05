@@ -1,59 +1,60 @@
 <script setup>
-import { useRouter, useRoute } from "vue-router"
-import { ref, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
-import { getItems, getBoardItems } from "../../libs/fetchUtils.js"
+import { useRouter, useRoute } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
+import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
 
 const route = useRoute()
 const router = useRouter()
 const BoardsList = ref()
 
-const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-
-function getToken() {
-  return localStorage.getItem("access_token")
-}
-
-onMounted(async () => {
-  const itemsBoards = await getBoardItems(baseUrlBoard)
-  BoardsList.value = itemsBoards.boards
-  console.log("Side Bar", BoardsList.value)
-  const token = getToken()
-})
-
+// Sidebar state
 const sidebarOpen = ref(false)
 
-const toggleSidebar = () => {
-  sidebarOpen.value = !sidebarOpen.value
-}
-
+// Dropdown state
 const isExpanded = ref(false)
-
-function toggleDropdown() {
-  isExpanded.value = !isExpanded.value
-}
 
 // Username
 const userStore = useUsers()
 const userName = userStore.getUser().username
 
+const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+
+function getToken() {
+  return localStorage.getItem('access_token')
+}
+
+onMounted(async () => {
+  const itemsBoards = await getBoardItems(baseUrlBoard)
+  BoardsList.value = itemsBoards.boards
+
+  const token = getToken()
+})
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
+
+function toggleDropdown() {
+  isExpanded.value = !isExpanded.value
+}
+
 // Log out
 const clearToken = () => {
   localStorage.clear()
-  localStorage.removeItem("access_token")
-  router.push({ name: "Login" })
+  localStorage.removeItem('access_token')
+  router.push({ name: 'Login' })
 }
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } }).then(() => {
+    router.push({ name: 'TaskList', params: { id: boardId } }).then(() => {
       router.go()
     })
     console.log(boardId)
     userStore.setBoard(boardId)
   }
 }
-
 </script>
 
 <template>
@@ -121,7 +122,7 @@ const toBoardsList = (boardId) => {
             </svg>
             All boards
             <!-- Count boards -->
-            <div class="badge badge-sm text-xxs">{{ BoardsList?.length }}</div>
+            <div class="badge badge-sm text-xxs">{{ BoardsList?.length ? BoardsList?.length : '0' }}</div>
             <!-- Icon when expanded -->
             <svg
               v-if="isExpanded"
@@ -158,7 +159,7 @@ const toBoardsList = (boardId) => {
 
           <!-- Submenu -->
           <div
-            v-show="isExpanded"
+            v-show="isExpanded && BoardsList.length"
             class="hs-collapse w-full overflow-hidden transition-[height] duration-300"
           >
             <ul
@@ -291,13 +292,13 @@ const toBoardsList = (boardId) => {
             <p
               class="itbkk-fullname text-sm font-medium text-gray-800 dark:text-white"
             >
-              {{ userName }}
+              {{ !userName ? 'Guest' : userName }}
             </p>
-            <!-- <p
+            <p
               class="itbkk-fullname text-xs font-medium text-gray-800 dark:text-white"
             >
-              {{ userRole }}
-            </p> -->
+              {{ userStore.getUserInfo()?.role }}
+            </p>
           </div>
         </div>
         <!-- Log out -->

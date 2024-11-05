@@ -1,10 +1,9 @@
 <script setup>
-import { getItems, addItem } from "../../libs/fetchUtils.js"
-import { ref, onMounted, computed, watch } from "vue"
-import { useRouter, useRoute } from "vue-router"
-import { useTasks } from "../../stores/store.js"
-import { useLimitStore } from "../../stores/storeLimit.js"
-
+import { getItems, addItem } from '../../libs/fetchUtils.js'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useTasks } from '../../stores/store.js'
+import { useLimitStore } from '../../stores/storeLimit.js'
 
 // ----------------------- Router -----------------------
 
@@ -16,7 +15,7 @@ const route = useRoute()
 const alertAdd = ref(false)
 const statusList = ref([])
 const alertLimitAdd = ref(false)
-const errorMessageLimit = ref("")
+const errorMessageLimit = ref('')
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -37,12 +36,11 @@ watch(
 )
 
 const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
+  title: '',
+  description: '',
+  assignees: '',
+  status: 'No Status'
 })
-
 
 // ----------------------- BaseUrl -----------------------
 
@@ -54,7 +52,6 @@ const baseUrlStatus = `${baseUrlboards}/${boardId.value}/statuses`
 
 const limitStore = useLimitStore()
 const taskStore = useTasks()
-
 
 onMounted(async () => {
   const itemsStatus = await getItems(baseUrlStatus)
@@ -88,8 +85,9 @@ const submitForm = async () => {
     setTimeout(() => {
       alertAdd.value = false
     }, 2300)
+    closeModal()
   } catch (error) {
-    console.error("Error adding task:", error)
+    console.error('Error adding task:', error)
   }
 }
 
@@ -100,10 +98,10 @@ const closeModal = () => {
 }
 
 const clearForm = () => {
-  todo.value.title = ""
-  todo.value.description = ""
-  todo.value.assignees = ""
-  todo.value.status = "No Status"
+  todo.value.title = ''
+  todo.value.description = ''
+  todo.value.assignees = ''
+  todo.value.status = 'No Status'
 }
 
 // ----------------------- Validate -----------------------
@@ -124,7 +122,7 @@ const isFormValid = computed(() => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === "No Status" || status === "Done") {
+  if (status === 'No Status' || status === 'Done') {
     return false
   }
 
@@ -143,7 +141,6 @@ const isLimitReached = computed(() => {
 
   return false
 })
-
 </script>
 
 <template>
