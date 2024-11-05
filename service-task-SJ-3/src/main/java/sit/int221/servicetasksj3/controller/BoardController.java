@@ -263,13 +263,13 @@ public class BoardController {
     @PatchMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
-            @PathVariable String collabId,
+            @PathVariable String collaboratorId,
             @Valid @RequestBody CollaboratorDTO collaboratorRequest,
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collabId, collaboratorRequest.getAccessRight().name());
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collaboratorId, collaboratorRequest.getAccessRight().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
@@ -284,13 +284,13 @@ public class BoardController {
     @PatchMapping("/{boardId}/collabs/{collaboratorId}/status")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorStatus(
             @PathVariable String boardId,
-            @PathVariable String collabId,
+            @PathVariable String collaboratorId,
             @Valid @RequestBody CollaboratorDTO collaboratorRequest,
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorStatus(boardId, collabId, collaboratorRequest.getStatus().name());
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorStatus(boardId, collaboratorId, collaboratorRequest.getStatus().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
