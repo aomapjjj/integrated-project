@@ -19,6 +19,7 @@ public class CollaboratorDTO {
     @NotNull
     private AccessRight accessRight;
     private Timestamp addedOn;
+    @NotNull
     private CollabStatus status;
 
     public CollaboratorDTO(String id, String name, String email, AccessRight accessRight, Timestamp addedOn, CollabStatus status) {

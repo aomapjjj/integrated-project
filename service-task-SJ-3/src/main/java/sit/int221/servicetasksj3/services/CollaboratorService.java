@@ -29,8 +29,14 @@ public class CollaboratorService {
     private UserRepository usersRepository;
 
     public boolean isCollaborator(String boardId, String userId) {
-        return collaboratorRepository.existsByBoardIdAndCollaboratorId(boardId, userId);
+        if (!collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED)){
+            return false;
+        }else {
+            return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED);
+        }
+
     }
+
 
     public boolean hasWriteAccess(String boardId, String userId){
         return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, userId, AccessRight.WRITE);
@@ -90,19 +96,19 @@ public class CollaboratorService {
         );
     }
 
-    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight) {
+    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight, String status) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
         Users user = usersRepository.findByEmail(collaboratorEmail)
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
 
-        // ตรวจสอบว่า email นี้เป็นของเจ้าของบอร์ดหรือไม่
+
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
 
-        // ตรวจสอบว่าผู้ใช้นี้เป็น collaborator ในบอร์ดนี้แล้วหรือไม่
+
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
         }
@@ -115,7 +121,7 @@ public class CollaboratorService {
         collaborator.setCollaboratorEmail(collaboratorEmail);
         collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
         collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
-        collaborator.setStatus(CollabStatus.PENDING);
+        collaborator.setStatus(CollabStatus.valueOf(status));
         collaboratorRepository.save(collaborator);
 
 
@@ -183,6 +189,26 @@ public class CollaboratorService {
         }
 
         collaborator.setAccessLevel(accessRight);
+        return collaboratorRepository.save(collaborator);
+    }
+
+    public Collaborator updateCollaboratorStatus(String boardId, String collaboratorId, String newStatus) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
+
+        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
+        if (collaborator == null) {
+            throw new ItemNotFoundException("Collaborator not found");
+        }
+
+        CollabStatus collabStatus;
+        try {
+            collabStatus = CollabStatus.valueOf(newStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Invalid access right. Only READ and WRITE are allowed.");
+        }
+
+        collaborator.setStatus(collabStatus);
         return collaboratorRepository.save(collaborator);
     }
 

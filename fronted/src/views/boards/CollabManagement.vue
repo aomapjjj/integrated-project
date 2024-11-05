@@ -108,7 +108,8 @@ const submitForm = async () => {
     try {
       const result = await addCollaborator(boardId.value, {
         email: collaboratorEmail.value,
-        accessRight: collaboratorAccess.value
+        accessRight: collaboratorAccess.value,
+        status: "ACCEPTED"
       })
 
       console.log(result)
@@ -171,7 +172,6 @@ const submitForm = async () => {
     setTimeout(hideAlert, 3000)
   }
 }
-console.log(collaboratorInfo.value)
 
 const showRemoveModal = (item) => {
   collaboratorToRemove.value = item
@@ -229,7 +229,8 @@ const confirmChange = async () => {
       const result = await editAccessRight(
         boardId.value,
         pendingItem.value.accessRight,
-        pendingItem.value.id
+        pendingItem.value.id,
+        pendingItem.value.status
       )
       console.log(pendingItem.value)
       alertMessage.value = 'Access right updated: ' + result.accessRight
@@ -268,6 +269,11 @@ const checkEmail = computed(() => {
     !collaboratorEmail.value.includes('@')
   )
 })
+
+const filteredCollaboratorInfo = computed(() =>
+  collaboratorInfo.value.filter(item => item.status === 'ACCEPTED')
+);
+
 </script>
 
 <template>
@@ -440,7 +446,7 @@ const checkEmail = computed(() => {
           <div>
             <div
               class="bg-base-100 mt-4 md:mt-0"
-              v-if="collaboratorInfo?.length === 0"
+              v-if="!filteredCollaboratorInfo.length || collaboratorInfo?.length === 0"
             >
               <span class="text-center py-4 text-gray-400">
                 No Collaborator
@@ -451,7 +457,7 @@ const checkEmail = computed(() => {
               class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
             >
               <CollabCard
-                v-for="(item, index) in collaboratorInfo"
+                v-for="(item, index) in filteredCollaboratorInfo"
                 :key="item.id"
               >
                 <template #name>
