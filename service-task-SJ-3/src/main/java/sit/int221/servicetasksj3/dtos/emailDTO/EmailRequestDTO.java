@@ -1,4 +1,4 @@
-package sit.int221.servicetasksj3.emailSender;
+package sit.int221.servicetasksj3.dtos.emailDTO;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailDTO {
+public class EmailRequestDTO {
     private String boardId;
     private String email;
     private String inviterName;

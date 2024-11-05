@@ -6,6 +6,7 @@ import sit.int221.servicetasksj3.entities.CollabStatus;
 import sit.int221.servicetasksj3.entities.Collaborator;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CollaboratorRepository extends JpaRepository<Collaborator, String> {
 
@@ -15,5 +16,6 @@ public interface CollaboratorRepository extends JpaRepository<Collaborator, Stri
     boolean existsByBoardIdAndCollaboratorEmail(String boardId, String collaboratorEmail);
     boolean existsByBoardIdAndCollaboratorIdAndAccessLevel(String boardId, String collaboratorId, AccessRight accessLevel);
     boolean existsByBoardIdAndCollaboratorIdAndStatus(String boardId, String collaboratorId, CollabStatus status);
+    Optional<Collaborator> findByBoardIdAndCollaboratorEmail(String boardId, String collaboratorEmail);
 
 }
