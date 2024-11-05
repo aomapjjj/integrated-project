@@ -3,7 +3,6 @@ package sit.int221.servicetasksj3.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
-import sit.int221.servicetasksj3.emailSender.EmailSenderService;
 import sit.int221.servicetasksj3.entities.AccessRight;
 import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.CollabStatus;
@@ -34,9 +33,7 @@ public class CollaboratorService {
         }else {
             return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED);
         }
-
     }
-
 
     public boolean hasWriteAccess(String boardId, String userId){
         return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndAccessLevel(boardId, userId, AccessRight.WRITE);
@@ -59,23 +56,6 @@ public class CollaboratorService {
                             c.getStatus()
                     );
                 })
-                .toList();
-    }
-
-    public List<CollaboratorDTO> getPendingCollaboratorsByBoardId(String boardId) {
-        boardRepository.findById(boardId)
-                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        return collaboratorRepository.findByBoardId(boardId).stream()
-                .filter(c -> c.getStatus() == CollabStatus.PENDING)
-                .map(c -> new CollaboratorDTO(
-                        c.getCollaboratorId(),
-                        c.getCollaboratorName() + " (Pending Invite)",
-                        c.getCollaboratorEmail(),
-                        c.getAccessLevel(),
-                        c.getAddedOn(),
-                        c.getStatus()
-                ))
                 .toList();
     }
 
@@ -103,14 +83,21 @@ public class CollaboratorService {
         Users user = usersRepository.findByEmail(collaboratorEmail)
                 .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
 
-
         if (user.getOid().equals(board.getOwnerId())) {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
 
-
         if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
             throw new ConflictException("The collaborator already exists for this board");
+        }
+
+        if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
+            Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)
+                    .orElseThrow(() -> new ItemNotFoundException("Collaborator not found"));
+
+            if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
+                throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
+            }
         }
 
         Collaborator collaborator = new Collaborator();
@@ -124,7 +111,6 @@ public class CollaboratorService {
         collaborator.setStatus(CollabStatus.valueOf(status));
         collaboratorRepository.save(collaborator);
 
-
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
                 collaborator.getCollaboratorName(),
@@ -134,43 +120,6 @@ public class CollaboratorService {
                 collaborator.getStatus()
         );
     }
-
-    public CollaboratorDTO acceptInvitation(String boardId, String collaboratorId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
-        if (collaborator == null) {
-            throw new ItemNotFoundException("Collaborator not found");
-        }
-        if (collaborator.getStatus() != CollabStatus.PENDING) {
-            throw new ConflictException("Collaborator must accept the invitation first");
-        }
-
-        collaborator.setStatus(CollabStatus.ACCEPTED);
-        collaboratorRepository.save(collaborator);
-
-        return new CollaboratorDTO(
-                collaborator.getCollaboratorId(),
-                collaborator.getCollaboratorName(),
-                collaborator.getCollaboratorEmail(),
-                collaborator.getAccessLevel(),
-                collaborator.getAddedOn(),
-                collaborator.getStatus()
-        );
-    }
-
-//    public void declineInvitation(String boardId, String collaboratorId) {
-//        Board board = boardRepository.findById(boardId)
-//                .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-//
-//        Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
-//        if (collaborator == null) {
-//            throw new ItemNotFoundException("Collaborator not found");
-//        }
-//
-//        collaboratorRepository.delete(collaborator);
-//    }
 
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
         Board board = boardRepository.findById(boardId)

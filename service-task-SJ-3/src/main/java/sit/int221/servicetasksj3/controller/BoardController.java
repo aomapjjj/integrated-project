@@ -1,5 +1,6 @@
 package sit.int221.servicetasksj3.controller;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.boardsDTO.*;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.InvitationResponseDTO;
+import sit.int221.servicetasksj3.dtos.emailDTO.EmailRequestDTO;
+import sit.int221.servicetasksj3.dtos.emailDTO.EmailResponseDTO;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
@@ -18,6 +21,7 @@ import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @RestController
@@ -37,6 +41,8 @@ public class BoardController {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private CollaboratorService collaboratorService;
+    @Autowired
+    private EmailSenderService emailSenderService;
 
 
     private String getUserId(HttpServletRequest request) {
@@ -254,28 +260,7 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-    @GetMapping("/{boardId}/collabs/invitations")
-    public ResponseEntity<List<CollaboratorDTO>> getPendingInvitations(@PathVariable String boardId, HttpServletRequest request) {
-        String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), null);
-        List<CollaboratorDTO> pendingInvitations = collaboratorService.getPendingCollaboratorsByBoardId(boardId);
-        return ResponseEntity.ok(pendingInvitations);
-    }
-
-    @PostMapping("/{boardId}/collabs/invitations/{collaboratorId}/respond")
-    public ResponseEntity<CollaboratorDTO> respondsEmail(
-            @PathVariable String boardId,
-            @PathVariable String collaboratorId,
-            @RequestBody InvitationResponseDTO invitationResponse,
-            HttpServletRequest request) {
-        String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-
-        CollaboratorDTO responseDTO = collaboratorService.acceptInvitation(boardId, collaboratorId);
-        return ResponseEntity.ok(responseDTO);
-    }
-
-    @PatchMapping("/{boardId}/collabs/{collabId}")
+    @PatchMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
             @PathVariable String collabId,
@@ -296,7 +281,7 @@ public class BoardController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PatchMapping("/{boardId}/collabs/{collabId}/status")
+    @PatchMapping("/{boardId}/collabs/{collaboratorId}/status")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorStatus(
             @PathVariable String boardId,
             @PathVariable String collabId,
@@ -335,4 +320,11 @@ public class BoardController {
         );
         return ResponseEntity.ok(responseDTO);
     }
+
+    // Email
+    @PostMapping("/{boardId}/collabs/invitations")
+    public EmailResponseDTO sendEmail(@RequestBody EmailRequestDTO request) throws MessagingException, UnsupportedEncodingException {
+        return emailSenderService.sendEmail(request);
+    }
+
 }
