@@ -66,6 +66,8 @@ const baseUrlboards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 const baseUrlBoardId = `${baseUrlboards}/${boardId.value}`
 const baseUrlCollaborator = `${baseUrlboards}/${boardId.value}/collabs`
 
+console.log(userEmail.email);
+
 onMounted(async () => {
     userStore.setToken(token)
     const collaborator = await getItems(baseUrlCollaborator)
@@ -86,43 +88,43 @@ onMounted(async () => {
 })
 
 const submitFormSendEmail = async () => {
-  const email = collaboratorEmail?.value;
-  const accessRight = collaboratorAccess.value;
-  const boardIdValue = boardId.value;
-  const inviterName = boardOwnerName.value;
-  const boardNames = boardName.value;
-  const boardUrl = baseUrlBoardId;
+    const email = collaboratorEmail?.value;
+    const accessRight = collaboratorAccess.value;
+    const boardIdValue = boardId.value;
+    const inviterName = boardOwnerName.value;
+    const boardNames = boardName.value;
+    const boardUrl = baseUrlBoardId;
 
-  if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
-    console.error("One or more required fields are missing.");
-    return;
-  }
-
-  try {
-    const collaboratorWithEmailDTO = {
-      collaborator: {
-        email,
-        accessRight,
-        status: "PENDING",
-      },
-      email: {
-        inviterName,
-        boardName: boardNames,
-        accessRight,
-        boardUrl,
-      },
-    };
-
-    const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO);
-
-    if (result.statusCode === 201) {
-      console.log("Collaborator added and email sent successfully.");
-    } else {
-      console.error("Failed to add collaborator.");
+    if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
+        console.error("One or more required fields are missing.");
+        return;
     }
-  } catch (error) {
-    console.error("An error occurred:", error);
-  }
+
+    try {
+        const collaboratorWithEmailDTO = {
+            collaborator: {
+                email,
+                accessRight,
+                status: "PENDING",
+            },
+            email: {
+                inviterName,
+                boardName: boardNames,
+                accessRight,
+                boardUrl,
+            },
+        };
+
+        const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO);
+
+        if (result.statusCode === 201) {
+            console.log("Collaborator added and email sent successfully.");
+        } else {
+            console.error("Failed to add collaborator.");
+        }
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
 }
 
 const showRemoveModal = (oid) => {
@@ -146,18 +148,20 @@ const openAdd = () => {
 }
 
 const filteredCollaboratorInfo = computed(() =>
-    collaboratorInfo.value.filter(item => item.status === 'PENDING')
+    collaboratorInfo.value.filter(item => item.status === 'PENDING' && item.email === userEmail.email)
 );
 
 const cancelAction = () => {
-  openModalAddCollab.value = false
-  clearForm()
+    openModalAddCollab.value = false
+    clearForm()
 }
 
 const acceptCollaborator = async (collaborator) => {
+    console.log(collaborator);
+    
     try {
         if (collaborator) {
-            collaborator.status = 'ACCEPTED'; 
+            collaborator.status = 'ACCEPTED';
             await editStatusCollab(boardId.value, collaborator.status, collaborator.id, collaborator.accessRight);
             console.log('Collaborator status updated to ACCEPT');
         }
@@ -320,7 +324,7 @@ const declineCollaborator = async (collaborator) => {
 
                                         <td
                                             class="px-4 py-2 text-center md:text-left text-sm text-gray-700 space-x-2 flex justify-center">
-                                            <button :disabled="disabledButtonWhileOpenPublic"
+                                            <button
                                                 class="inline-flex bg-green-500 hover:bg-green-600 text-white rounded-full w-8 h-8 items-center justify-center"
                                                 @click="acceptCollaborator(item)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -329,7 +333,7 @@ const declineCollaborator = async (collaborator) => {
                                                         d="M5 13l4 4L19 7" />
                                                 </svg>
                                             </button>
-                                            <button :disabled="disabledButtonWhileOpenPublic"
+                                            <button
                                                 class="inline-flex bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 items-center justify-center"
                                                 @click="declineCollaborator(item)">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

@@ -98,12 +98,13 @@ onMounted(async () => {
   boardsList.value = itemsBoards || { boards: [], collabs: [] }
 
   boardStore.setBoards(itemsBoards.boards)
+  
   boardStore.setCollabs(itemsBoards.collabs)
 
   boardsOwner.value = boardStore.getBoards()
+  console.log(boardsOwner.value);
   boardsCollab.value = boardStore.getCollabs()
-
-  console.log(boardsCollab.value)
+  console.log(boardsCollab);
 
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
@@ -146,12 +147,40 @@ onMounted(async () => {
 //     .map((collab) => ({ name: collab.name, accessRight: collab.accessRight }));
 // }
 
-const toboardsList = (boardId) => {
-  if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } }).then(() => {
+const toBoardsList = (board) => {
+  if (board.id !== null) {
+    router.push({ name: 'TaskList', params: { id: board.id } }).then(() => {
       router.go()
     })
-    userStore.setBoard(boardId)
+    userStore.setBoard(board.id)
+  }
+}
+
+const toBoardsInvitations = (board) => {
+  console.log(board);
+  if (board.id !== null) {
+    router.push({ name: 'Invitations', params: { id: board.id } })
+    userStore.setBoard(board.id)
+  }
+}
+
+function handleBoardCollabStatus(board) {
+  console.log(board);
+
+  // Check if board.collaborators exists and is an array
+  if (Array.isArray(board.collaborators)) {
+    // Loop through each collaborator to check their status
+    board.collaborators.forEach(collaborator => {
+      if (collaborator.status === 'ACCEPTED') {
+        toBoardsList(board);
+      } else if (collaborator.status === 'PENDING') {
+        toBoardsInvitations(board);
+      } else {
+        console.error('Unknown status:', collaborator.status);
+      }
+    });
+  } else {
+    console.error('board.collaborators is not an array or is missing.');
   }
 }
 
@@ -306,7 +335,7 @@ const getAccessRight = (boardId, username) => {
             </template>
             <template #viewBtn>
               <button
-                @click="toboardsList(item.id)"
+                @click="handleBoardCollabStatus(item)"
                 class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 type="button"
               >
@@ -415,7 +444,7 @@ const getAccessRight = (boardId, username) => {
             
               <template #Btn>
                 <button class="btn rounded-lg customBgYellow">
-                  <span @click="toboardsList(item.id)">View</span>
+                  <span @click="handleBoardCollabStatus(item)">View</span>
                 </button>
               </template>
               <template #deleteBtn>
