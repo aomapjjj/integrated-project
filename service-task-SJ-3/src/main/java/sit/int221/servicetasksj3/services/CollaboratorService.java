@@ -87,16 +87,13 @@ public class CollaboratorService {
             throw new ConflictException("The collaborator email belongs to the board owner");
         }
 
-        if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
-            throw new ConflictException("The collaborator already exists for this board");
-        }
+        Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
 
-        if (collaboratorRepository.existsByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)) {
-            Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail)
-                    .orElseThrow(() -> new ItemNotFoundException("Collaborator not found"));
-
+        if (existingCollaborator != null) {
             if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
                 throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
+            } else {
+                throw new ConflictException("The collaborator already exists for this board");
             }
         }
 

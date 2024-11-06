@@ -4,7 +4,6 @@ import {
     getBoardById,
     getItems,
     addCollaborator,
-    addCollaboratorByEmail,
     editStatusCollab,
     deleteCollaborator
 } from "./../../libs/fetchUtils.js"
@@ -87,42 +86,44 @@ onMounted(async () => {
 })
 
 const submitFormSendEmail = async () => {
-    const email = collaboratorEmail?.value;
-    const accessRight = collaboratorAccess.value;
-    const boardIdValue = boardId.value;
-    const inviterName = boardOwnerName.value;
-    const boardNames = boardName.value;
-    const boardUrl = baseUrlBoardId;
+  const email = collaboratorEmail?.value;
+  const accessRight = collaboratorAccess.value;
+  const boardIdValue = boardId.value;
+  const inviterName = boardOwnerName.value;
+  const boardNames = boardName.value;
+  const boardUrl = baseUrlBoardId;
 
-    if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
-        console.error("One or more required fields are missing.");
-        return;
+  if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
+    console.error("One or more required fields are missing.");
+    return;
+  }
+
+  try {
+    const collaboratorWithEmailDTO = {
+      collaborator: {
+        email,
+        accessRight,
+        status: "PENDING",
+      },
+      email: {
+        inviterName,
+        boardName: boardNames,
+        accessRight,
+        boardUrl,
+      },
+    };
+
+    const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO);
+
+    if (result.statusCode === 201) {
+      console.log("Collaborator added and email sent successfully.");
+    } else {
+      console.error("Failed to add collaborator.");
     }
-
-    try {
-        const result = await addCollaborator(boardIdValue, {
-            email,
-            accessRight,
-            status: "PENDING"
-        });
-
-        if (result) {
-            await addCollaboratorByEmail({
-                email,
-                inviterName,
-                boardName: boardNames,
-                accessRight,
-                boardUrl,
-                boardIdValue
-            });
-            console.log("Collaborator added and email sent successfully.");
-        } else {
-            console.error("Failed to add collaborator.");
-        }
-    } catch (error) {
-        console.error("An error occurred:", error);
-    }
-};
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
+}
 
 const showRemoveModal = (oid) => {
     console.log(oid)

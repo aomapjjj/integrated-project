@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import sit.int221.servicetasksj3.dtos.boardsDTO.*;
+import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorWithEmailDTO;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
-import sit.int221.servicetasksj3.dtos.collaboratorDTO.InvitationResponseDTO;
 import sit.int221.servicetasksj3.dtos.emailDTO.EmailRequestDTO;
-import sit.int221.servicetasksj3.dtos.emailDTO.EmailResponseDTO;
 import sit.int221.servicetasksj3.dtos.limitsDTO.SimpleLimitDTO;
 import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
@@ -252,24 +251,44 @@ public class BoardController {
     }
 
     @PostMapping("/{boardId}/collabs")
-    public ResponseEntity<CollaboratorDTO> addCollaborator(@PathVariable String boardId, @Valid @RequestBody CollaboratorDTO collaboratorRequest, HttpServletRequest request) {
-        String userId = getUserId(request);
-        String collaboratorId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
-        CollaboratorDTO responseDTO = collaboratorService.addCollaboratorToBoard(boardId, collaboratorRequest.getEmail(), collaboratorRequest.getAccessRight().name(), String.valueOf(collaboratorRequest.getStatus()));
+    public ResponseEntity<CollaboratorDTO> addCollaborator(
+            @PathVariable String boardId,
+            @Valid @RequestBody CollaboratorWithEmailDTO request,
+            HttpServletRequest httpRequest) throws MessagingException, UnsupportedEncodingException {
+
+        String userId = getUserId(httpRequest);
+        String collaboratorId = getUserId(httpRequest);
+        boardService.checkOwnerAndVisibility(boardId, userId, httpRequest.getMethod(), collaboratorId);
+
+        CollaboratorDTO collaboratorRequest = request.getCollaborator();
+        EmailRequestDTO emailRequest = request.getEmail();
+
+        emailRequest.setBoardId(boardId);
+        emailRequest.setEmail(collaboratorRequest.getEmail());
+        emailRequest.setAccessRight(collaboratorRequest.getAccessRight().name());
+        emailSenderService.sendEmail(emailRequest);
+
+        CollaboratorDTO responseDTO = collaboratorService.addCollaboratorToBoard(
+                boardId,
+                collaboratorRequest.getEmail(),
+                collaboratorRequest.getAccessRight().name(),
+                String.valueOf(collaboratorRequest.getStatus())
+        );
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PatchMapping("/{boardId}/collabs/{collaboratorId}")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorAccessRight(
             @PathVariable String boardId,
-            @PathVariable String collabId,
+            @PathVariable String collaboratorId,
             @Valid @RequestBody CollaboratorDTO collaboratorRequest,
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collabId, collaboratorRequest.getAccessRight().name());
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorAccessRight(boardId, collaboratorId, collaboratorRequest.getAccessRight().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
@@ -284,13 +303,13 @@ public class BoardController {
     @PatchMapping("/{boardId}/collabs/{collaboratorId}/status")
     public ResponseEntity<CollaboratorDTO> updateCollaboratorStatus(
             @PathVariable String boardId,
-            @PathVariable String collabId,
+            @PathVariable String collaboratorId,
             @Valid @RequestBody CollaboratorDTO collaboratorRequest,
             HttpServletRequest request) {
 
         String userId = getUserId(request);
-        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collabId);
-        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorStatus(boardId, collabId, collaboratorRequest.getStatus().name());
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        Collaborator updatedCollaborator = collaboratorService.updateCollaboratorStatus(boardId, collaboratorId, collaboratorRequest.getStatus().name());
         CollaboratorDTO responseDTO = new CollaboratorDTO(
                 updatedCollaborator.getCollaboratorId(),
                 updatedCollaborator.getCollaboratorName(),
@@ -320,11 +339,4 @@ public class BoardController {
         );
         return ResponseEntity.ok(responseDTO);
     }
-
-    // Email
-    @PostMapping("/{boardId}/collabs/invitations")
-    public EmailResponseDTO sendEmail(@RequestBody EmailRequestDTO request) throws MessagingException, UnsupportedEncodingException {
-        return emailSenderService.sendEmail(request);
-    }
-
 }

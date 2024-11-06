@@ -43,7 +43,7 @@ public class BoardService {
         return boardId;
     }
 
-    public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod , String collaboratorId) {
+    public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod, String collaboratorId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
@@ -56,7 +56,7 @@ public class BoardService {
             if (isPublic || isOwner || isCollaborator) {
                 return;
             } else {
-                if (!isCollaborator){
+                if (!isCollaborator) {
                     throw new ItemNotFoundException("The board exists, but the user is not authorized to access this board.");
                 }
                 throw new ForbiddenException("The board exists, but the user is not authorized to access this board.");
@@ -86,11 +86,12 @@ public class BoardService {
         throw new ForbiddenException("The board exists, but the user is not the owner and the board is private.");
     }
 
-    public  Boolean isBoardPublic(String boardId) {
+    public Boolean isBoardPublic(String boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
         return board.getVisibility().equals(Visibility.PUBLIC);
     }
+
     public Boolean isBoardOwner(String boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
@@ -183,17 +184,17 @@ public class BoardService {
 
         // Add default statuses
         List<TaskStatus> statuses = new ArrayList<>();
-        TaskStatus status1 = new TaskStatus("No Status","A status has not been assigned", newBoard.getId());
-        TaskStatus status2 = new TaskStatus("To Do","The task is included in the project", newBoard.getId());
-        TaskStatus status3 = new TaskStatus("Doing","The task is being worked on", newBoard.getId());
-        TaskStatus status4 = new TaskStatus("Done","The task has been completed", newBoard.getId());
+        TaskStatus status1 = new TaskStatus("No Status", "A status has not been assigned", newBoard.getId());
+        TaskStatus status2 = new TaskStatus("To Do", "The task is included in the project", newBoard.getId());
+        TaskStatus status3 = new TaskStatus("Doing", "The task is being worked on", newBoard.getId());
+        TaskStatus status4 = new TaskStatus("Done", "The task has been completed", newBoard.getId());
         statuses.add(status1);
         statuses.add(status2);
         statuses.add(status3);
         statuses.add(status4);
         statusRepository.saveAll(statuses);
 
-        TaskLimit limit = new TaskLimit(10,false, newBoard.getId());
+        TaskLimit limit = new TaskLimit(10, false, newBoard.getId());
         limitRepository.save(limit);
 
         // Map owner information
@@ -208,7 +209,7 @@ public class BoardService {
 
     // Delete
     @Transactional
-    public Board removeBoard(String boardId){
+    public Board removeBoard(String boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new ValidationException("Board not found with ID: " + boardId));
         try {
