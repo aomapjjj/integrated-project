@@ -283,53 +283,27 @@ async function getItemsPublic(url) {
   }
 }
 
-async function addCollaborator(boardId, collaborator) {
-  const token = getToken();
+async function addCollaborator(boardId, collaboratorWithEmai) {
+  const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify(collaborator),
-    });
+      body: JSON.stringify(collaboratorWithEmai)
+    })
 
-    const statusCode = response.status;
-
-    const editedItem = await response.json();
-    return { statusCode, data: editedItem };
+    const statusCode = response.status
+    const editedItem = await response.json()
+    return { statusCode, data: editedItem }
   } catch (error) {
-    console.log(`Error: ${error.message}`);
-    return parseInt(error.message) || null;
+    console.log(`Error: ${error.message}`)
+    return parseInt(error.message) || null
   }
 }
 
-async function addCollaboratorByEmail(payload) {
-  const token = getToken();
-  console.log("Token:", token);
-  const urlSendEmail = "http://localhost:8080/api/sendEmail"
-  try {
-    const response = await fetch(`${urlSendEmail}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const statusCode = response.status;
-    const responseData = await response.text();
-
-    console.log(responseData)
-
-    return { statusCode, data: responseData };
-  } catch (error) {
-    console.log(`Error: ${error.message}`);
-    return parseInt(error.message) || null;
-  }
-}
 
 async function editAccessRight(boardId, access, oid, status) {
   const token = getToken();
@@ -442,7 +416,6 @@ export {
   getItemsPublic,
   getBoardItems,
   addCollaborator,
-  addCollaboratorByEmail,
   editAccessRight,
   deleteCollaborator,
   editStatusCollab,
