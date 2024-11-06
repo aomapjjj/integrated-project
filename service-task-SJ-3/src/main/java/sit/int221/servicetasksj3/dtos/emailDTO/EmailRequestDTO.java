@@ -16,5 +16,5 @@ public class EmailRequestDTO {
     private String inviterName;
     private String boardName;
     private String accessRight;
-    private String boardUrl;
+//    private String boardUrl;
 }
