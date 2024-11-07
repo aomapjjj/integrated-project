@@ -266,7 +266,13 @@ public class BoardController {
         emailRequest.setBoardId(boardId);
         emailRequest.setEmail(collaboratorRequest.getEmail());
         emailRequest.setAccessRight(collaboratorRequest.getAccessRight().name());
-        emailSenderService.sendEmail(emailRequest);
+        emailSenderService.sendEmail(
+                boardId,
+                emailRequest.getEmail(),
+                emailRequest.getInviterName(),
+                emailRequest.getAccessRight(),
+                emailRequest.getBoardName()
+        );
 
         CollaboratorDTO responseDTO = collaboratorService.addCollaboratorToBoard(
                 boardId,

@@ -3,15 +3,9 @@ package sit.int221.servicetasksj3.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
-import sit.int221.servicetasksj3.entities.AccessRight;
-import sit.int221.servicetasksj3.entities.Board;
-import sit.int221.servicetasksj3.entities.CollabStatus;
-import sit.int221.servicetasksj3.entities.Collaborator;
-import sit.int221.servicetasksj3.exceptions.ConflictException;
-import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
-import sit.int221.servicetasksj3.exceptions.ValidationException;
-import sit.int221.servicetasksj3.repositories.BoardRepository;
-import sit.int221.servicetasksj3.repositories.CollaboratorRepository;
+import sit.int221.servicetasksj3.entities.*;
+import sit.int221.servicetasksj3.exceptions.*;
+import sit.int221.servicetasksj3.repositories.*;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
@@ -27,10 +21,14 @@ public class CollaboratorService {
     @Autowired
     private UserRepository usersRepository;
 
+    public boolean isPending(String boardId, String userId) {
+        return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.PENDING);
+    }
+
     public boolean isCollaborator(String boardId, String userId) {
         if (!collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED)){
             return false;
-        }else {
+        } else {
             return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED);
         }
     }
