@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import sit.int221.servicetasksj3.dtos.emailDTO.EmailRequestDTO;
 import sit.int221.servicetasksj3.dtos.emailDTO.EmailResponseDTO;
 import sit.int221.servicetasksj3.exceptions.ConflictException;
 import sit.int221.servicetasksj3.exceptions.ForbiddenException;
