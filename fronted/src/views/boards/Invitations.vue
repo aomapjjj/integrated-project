@@ -158,7 +158,7 @@ const cancelAction = () => {
 
 const acceptCollaborator = async (collaborator) => {
     console.log(collaborator);
-    
+
     try {
         if (collaborator) {
             collaborator.status = 'ACCEPTED';

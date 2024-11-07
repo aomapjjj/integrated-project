@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+const props = defineProps({
+  isShow: Boolean
+})
+</script>
 
 <template>
   <div class="p-3">
@@ -16,6 +20,7 @@
           <slot name="Btn"></slot>
           <slot name="deleteBtn"></slot>
           <slot name="viewBtn"></slot>
+          <slot name="pendingBtn"></slot>
         </div>
       </div>
     </div>
