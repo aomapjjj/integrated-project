@@ -71,6 +71,7 @@ const toBoardsList = (boardId) => {
     userStore.setBoard(boardId)
   }
 }
+
 // ----------------------- Validate -----------------------
 
 const isValidName = computed(() => {
@@ -106,6 +107,8 @@ const openModalCreate = () => {
   openModalName.value = !openModalName.value
   router.push({ name: 'BoardAdd' })
 }
+
+
 </script>
 
 <template>
