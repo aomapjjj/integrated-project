@@ -106,9 +106,7 @@ onMounted(async () => {
   boardsOwner.value = boardStore.getBoards()
   console.log(boardsOwner.value);
   boardsCollab.value = boardStore.getCollabs()
-  console.log(boardsCollab.value.collaborators);
-  console.log(boardsCollab.value);
-  console.log(getCollaboratorStatus(boardsCollab.value, 'PENDING'));
+
   const token = getToken()
   const response = await fetch(`${import.meta.env.VITE_BASE_URL_MAIN}/boards`, {
     headers: {
@@ -152,9 +150,7 @@ onMounted(async () => {
 
 const toBoardsList = (board) => {
   if (board.id !== null) {
-    router.push({ name: 'TaskList', params: { id: board.id } }).then(() => {
-      router.go()
-    })
+    router.push({ name: 'TaskList', params: { id: board.id } })
     userStore.setBoard(board.id)
   }
 }
@@ -166,24 +162,24 @@ const toBoardsInvitations = (board) => {
   }
 }
 
-function handleBoardCollabStatus(board) {
-  console.log(board);
+// function handleBoardCollabStatus(board) {
+//   console.log(board);
 
-  if (Array.isArray(board.collaborators)) {
-    board.collaborators.forEach(collaborator => {
-      if (collaborator.status === 'ACCEPTED') {
-        toBoardsList(board);
-      } else if (collaborator.status === 'PENDING') {
-        toBoardsInvitations(board);
-        isPending.value = true
-      } else {
-        console.error('Unknown status:', collaborator.status);
-      }
-    });
-  } else {
-    console.error('board.collaborators is not an array or is missing.');
-  }
-}
+//   if (Array.isArray(board.collaborators)) {
+//     board.collaborators.forEach(collaborator => {
+//       if (collaborator.status === 'ACCEPTED') {
+//         toBoardsList(board);
+//       } else if (collaborator.status === 'PENDING') {
+//         toBoardsInvitations(board);
+//         isPending.value = true
+//       } else {
+//         console.error('Unknown status:', collaborator.status);
+//       }
+//     });
+//   } else {
+//     console.error('board.collaborators is not an array or is missing.');
+//   }
+// }
 
 const deletBoard = async (boardId) => {
   await deleteItemById(baseUrlBoard, boardId)
@@ -223,11 +219,14 @@ const getAccessRight = (boardId, username) => {
   return null;
 };
 
-const getCollaboratorStatus = (board, status) => {
-  return board.find(collaborator => collaborator.collaborators.status === status);
-};
-
-
+const getCollaboratorStatus = (collaborators, name, status) => {
+    for (let collab of collaborators) {
+        if (collab.name === name + " (Pending Invite)" && collab.status === status) {
+            return true 
+        }
+    }
+    return false;
+}
 
 </script>
 
@@ -302,7 +301,7 @@ const getCollaboratorStatus = (board, status) => {
               </button>
             </template>
             <template #viewBtn>
-              <button @click="handleBoardCollabStatus(item)"
+              <button @click="toBoardsList(item)"
                 class="flex select-none items-center gap-2 rounded-lg px-6 text-center align-middle font-sans text-xs font-bold uppercase text-pink-400 transition-all hover:text-pink-600 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                 type="button">
                 Show More
@@ -353,7 +352,7 @@ const getCollaboratorStatus = (board, status) => {
         <div ref="colorCard" :class="`${currentColor[board.id]}`"
           class="itbkk-collab-item max-w-xs py-4 border container rounded-xl shadow-lg transform transition duration-500 hover:scale-105 hover:shadow-2xl">
 
-          <PersonalAndCollabBoard :is-show="getCollaboratorStatus(boardsCollab, 'PENDING')">
+          <PersonalAndCollabBoard :is-show="getCollaboratorStatus(boardsCollab[index].collaborators, userName, 'PENDING')">
             <template #toggle>
               <span
                 class="itbkk-access-right text-white text-xs font-bold rounded-full inline-block ml-4 py-1.5 px-4 cursor-pointer"
@@ -381,12 +380,12 @@ const getCollaboratorStatus = (board, status) => {
 
             <!-- Display buttons based on collaborator status -->
             <template #pendingBtn>
-              <button class="btn rounded-lg customBgYellow" @click="handleBoardCollabStatus(board)">
+              <button class="btn rounded-lg customBgYellow" @click="toBoardsInvitations(board)">
                 Accept/Decline
               </button>
             </template>
             <template #Btn>
-              <button class="btn rounded-lg customBgYellow" @click="handleBoardCollabStatus(board)">
+              <button class="btn rounded-lg customBgYellow" @click="toBoardsList(board)">
                 View
               </button>
               <button class="itbkk-leave-board btn bg-red-400 rounded-lg" @click="showRemoveModal(board.id)">
