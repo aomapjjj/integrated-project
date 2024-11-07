@@ -111,6 +111,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             boolean isCollaborator = collaboratorService.isCollaborator(boardId, currentUser.getOid());
             boolean isOwner = boardService.isBoardOwner(boardId);
             boolean isWriteAccess = collaboratorService.hasWriteAccess(boardId, currentUser.getOid());
+            boolean isUserPending = collaboratorService.isPending(boardId, currentUser.getOid());
+
+            if (isUserPending) {
+                if (requestMethod.equals("DELETE") && request.getRequestURI().contains("/collabs/")) {
+                    String[] uriParts = request.getRequestURI().split("/");
+                    String collaboratorId = uriParts[uriParts.length - 1];
+                    if (!collaboratorId.equals(currentUser.getOid())) {
+                        throw new ForbiddenException(
+                                "Pending collaborators can only remove themselves from board with ID: " + boardId
+                        );
+                    }
+                    return;
+                } else if (requestMethod.equals("PATCH") && request.getRequestURI().contains("/collabs/") && request.getRequestURI().endsWith("/status")) {
+                    return;
+                } else if (!requestMethod.equals("GET")) {
+                    throw new ForbiddenException(
+                            "Pending collaborators are only allowed to access GET methods on board with ID: " + boardId
+                    );
+                }
+
+            }
 
             if (isCollaborator) {
                 if (isWriteAccess) {
@@ -143,7 +164,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 "Collaborators without WRITE access are only allowed to access GET methods on board with ID: " + boardId
                         );
                     }
-                
+
                 }
             } else if (!isOwner && (!isPublic || !requestMethod.equals("GET"))) {
                 throw new ForbiddenException(

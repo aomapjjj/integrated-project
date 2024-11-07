@@ -126,17 +126,43 @@ public class BoardService {
         }).collect(Collectors.toList());
     }
 
+    public boolean isPending(String boardId, String userId) {
+        if (collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.PENDING)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     public Map<String, Object> getBoardsByOwner() {
         List<BoardResponseDTO> boardIds = getBoardIdByOwner();
         Map<String, Object> response = new HashMap<>();
+
         if (boardIds.isEmpty()) {
-            response.put("collaborators", new ArrayList<CollaboratorDTO>());
+            response.put("boards", new ArrayList<BoardResponseDTO>());
+            response.put("invites", new ArrayList<CollaboratorDTO>());
+            response.put("collabs", new ArrayList<CollaboratorDTO>());
             return response;
         }
+
+        List<CollaboratorDTO> invites = new ArrayList<>();
+        List<CollaboratorDTO> collabs = new ArrayList<>();
+
         for (BoardResponseDTO board : boardIds) {
             List<CollaboratorDTO> collaborators = collaboratorService.getCollaboratorsByBoardId(board.getId());
+
+            for (CollaboratorDTO collaborator : collaborators) {
+                if (collaborator.getStatus() == CollabStatus.PENDING) {
+                    invites.add(collaborator);
+                } else if (collaborator.getStatus() == CollabStatus.ACCEPTED &&
+                        (collaborator.getAccessRight() == AccessRight.READ || collaborator.getAccessRight() == AccessRight.WRITE)) {
+                    collabs.add(collaborator);
+                }
+            }
+
             board.setCollaborators(collaborators);
         }
+
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = currentUser.getOid();
 
@@ -150,8 +176,11 @@ public class BoardService {
 
         response.put("boards", ownerBoards);
         response.put("collabs", collaboratorBoards);
+        response.put("invites", invites);
+
         return response;
     }
+
 
     // Get board by IDs
     public BoardResponseDTO getBoardById(String id) {

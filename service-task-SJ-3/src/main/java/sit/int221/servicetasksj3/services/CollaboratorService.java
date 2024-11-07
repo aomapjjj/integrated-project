@@ -21,6 +21,10 @@ public class CollaboratorService {
     @Autowired
     private UserRepository usersRepository;
 
+    public boolean isPending(String boardId, String userId) {
+        return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.PENDING);
+    }
+
     public boolean isCollaborator(String boardId, String userId) {
         if (!collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.ACCEPTED)){
             return false;
