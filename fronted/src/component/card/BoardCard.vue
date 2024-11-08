@@ -55,7 +55,7 @@ const isPending = ref(false)
 boardsOwner.value = boardStore.getBoards()
 boardsCollab.value = boardStore.getCollabs()
 
-console.log(boardsOwner.value)
+console.log(boardStore.getBoards())
 
 // ----------------------- Enable & Disable -----------------------
 

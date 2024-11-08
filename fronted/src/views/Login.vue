@@ -117,7 +117,6 @@ const submitForm = async () => {
       localStorage.setItem("refresh_token", data.refresh_token)
 
       const itemsBoards = await getBoardItems(baseUrlboards)
-      boardStore.setBoards(itemsBoards.boards)
       boardStore.addNewBoards(itemsBoards.boards)
       boardStore.setCollabs(itemsBoards.collabs)
       console.log(boardStore.getBoards())

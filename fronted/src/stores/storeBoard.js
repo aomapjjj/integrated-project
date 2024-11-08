@@ -28,6 +28,7 @@ const useBoard = defineStore('board', () => {
     boards.value.push({ ...newBoard })
     saveBoardsToLocalStorage()
   }
+  
   const addNewBoards = (newBoards) => {
     newBoards.forEach((newBoard) => {
       addNewBoard(newBoard)
