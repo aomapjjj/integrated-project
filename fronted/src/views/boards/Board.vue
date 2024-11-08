@@ -7,6 +7,7 @@ import SideBar from '@/component/bar/SideBar.vue'
 import Navbar from '@/component/bar/Navbar.vue'
 import BoardCard from '@/component/card/BoardCard.vue'
 import LodingPage from '@/component/LodingPage.vue'
+import { useBoard } from '@/stores/storeBoard.js'
 
 // ----------------------- Router -----------------------
 
@@ -14,7 +15,6 @@ const router = useRouter()
 
 // ----------------------- List Items -----------------------
 
-const boardsList = ref([])
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -23,6 +23,7 @@ const openModalName = ref(false)
 // ----------------------- Stores -----------------------
 
 const userStore = useUsers()
+const boardStore = useBoard()
 
 // ----------------------- Params -----------------------
 
@@ -40,9 +41,7 @@ function getToken() {
 
 onMounted(async () => {
   try {
-    const itemsBoards = await getBoardItems(baseUrlBoard)
-    boardsList.value = itemsBoards.boards
-
+  
     const token = getToken()
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL_MAIN}/boards`,
@@ -83,6 +82,9 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
+  console.log(result.data)
+  boardStore.addNewBoard(result.data)
+
   console.log(result.status)
 
   if (result.status === 401) {

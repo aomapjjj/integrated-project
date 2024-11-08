@@ -25,6 +25,7 @@ const router = useRouter()
 
 const userStore = useUsers()
 
+
 // ----------------------- Params -----------------------
 
 const boardName = ref('')
@@ -306,15 +307,62 @@ const submitFormSendEmail = async () => {
 
         const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO);
 
-        if (result.statusCode === 201) {
-            console.log("Collaborator added and email sent successfully.");
-        } else {
-            console.error("Failed to add collaborator.");
-        }
+        switch (result.statusCode) {
+        case 201:
+          collaboratorInfo.value.push(result.data)
+          isAlertSuccess.value = true
+          alertMessage.value = 'Collaborator added successfully!'
+          setTimeout(hideAlert, 3000)
+          cancelAction()
+          break
+        case 401:
+          isAlertFailure.value = true
+          alertMessage.value = 'Unauthorized access. Please log in again.'
+          setTimeout(hideAlert, 3000)
+          break
+        case 403:
+          isAlertFailure.value = true
+          alertMessage.value =
+            'You do not have permission to add a collaborator.'
+          setTimeout(hideAlert, 3000)
+          break
+        case 404:
+          isAlertFailure.value = true
+          alertMessage.value = 'The user does not exists.'
+          setTimeout(hideAlert, 3000)
+          break
+        case 409:
+          isAlertFailure.value = true
+          if (
+            result.data.message ===
+            'The collaborator already exists for this board'
+          ) {
+            alertMessage.value =
+              'The user is already a collaborator of this board.'
+          } else if (
+            result.data.message ===
+            'The collaborator email belongs to the board owner'
+          ) {
+            alertMessage.value =
+              'Board owner cannot be collaborator of his/her own board'
+          } else {
+            alertMessage.value = 'An unknown error occurred.'
+          }
+          setTimeout(hideAlert, 3000)
+          break
+        default:
+          isAlertFailure.value = true
+          alertMessage.value = 'There is a problem. Please try again later.'
+          setTimeout(hideAlert, 3000)
+      }
     } catch (error) {
-        console.error("An error occurred:", error);
+      isAlertFailure.value = true
+      alertMessage.value = 'An error occurred: ' + error.message
+      setTimeout(hideAlert, 3000)
     }
-}
+  } 
+
+
 </script>
 
 <template>
@@ -488,7 +536,7 @@ const submitFormSendEmail = async () => {
             <div
               class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center"
               v-if="
-                !filteredCollaboratorInfo.length ||
+                !collaboratorInfo.length ||
                 collaboratorInfo?.length === 0
               "
             >
@@ -501,7 +549,7 @@ const submitFormSendEmail = async () => {
               class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
             >
               <CollabCard
-                v-for="(item, index) in filteredCollaboratorInfo"
+                v-for="(item, index) in collaboratorInfo"
                 :key="item.id"
               >
                 <template #name>

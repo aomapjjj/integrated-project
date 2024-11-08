@@ -13,9 +13,11 @@ import SideBar from "@/component/bar/SideBar.vue"
 import Navbar from "@/component/bar/Navbar.vue"
 import Alert from "@/component/alert/Alert.vue"
 
+
 // ----------------------- Router -----------------------
 
 const route = useRoute()
+const router = useRouter()
 
 // ----------------------- Stores -----------------------
 
@@ -85,45 +87,6 @@ onMounted(async () => {
     }
 })
 
-const submitFormSendEmail = async () => {
-    const email = collaboratorEmail?.value;
-    const accessRight = collaboratorAccess.value;
-    const boardIdValue = boardId.value;
-    const inviterName = boardOwnerName.value;
-    const boardNames = boardName.value;
-    const boardUrl = baseUrlBoardId;
-
-    if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
-        console.error("One or more required fields are missing.");
-        return;
-    }
-
-    try {
-        const collaboratorWithEmailDTO = {
-            collaborator: {
-                email,
-                accessRight,
-                status: "PENDING",
-            },
-            email: {
-                inviterName,
-                boardName: boardNames,
-                accessRight,
-                boardUrl,
-            },
-        };
-
-        const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO);
-
-        if (result.statusCode === 201) {
-            console.log("Collaborator added and email sent successfully.");
-        } else {
-            console.error("Failed to add collaborator.");
-        }
-    } catch (error) {
-        console.error("An error occurred:", error);
-    }
-}
 
 const formatStatus = () => {
     if (collaboratorInfo.value.length > 0) {
@@ -132,18 +95,13 @@ const formatStatus = () => {
     return "";
 };
 
-const openAdd = () => {
-    openModalAddCollab.value = true
-}
+
 
 const filteredCollaboratorInfo = computed(() =>
     collaboratorInfo.value.filter(item => item.status === 'PENDING' && item.email === userEmail.email)
 );
 
-const cancelAction = () => {
-    openModalAddCollab.value = false
-    clearForm()
-}
+
 
 const acceptCollaborator = async (collaborator) => {
     console.log(collaborator);
@@ -152,7 +110,7 @@ const acceptCollaborator = async (collaborator) => {
         if (collaborator) {
             collaborator.status = 'ACCEPTED';
             await editStatusCollab(boardId.value, collaborator.status, collaborator.id, collaborator.accessRight);
-            console.log('Collaborator status updated to ACCEPT');
+            router.push({ name: 'TaskList', params: { id: boardId.value } })
         }
     } catch (error) {
         console.error('Error updating collaborator status:', error);
@@ -185,7 +143,7 @@ const declineCollaborator = async (collaborator) => {
             <div class="flex flex-col flex-1">
                 <Navbar> IT Bangmod Kradan Kanbun </Navbar>
 
-                <div class="mt-9 px-10 flex justify-between items-center">
+                <!-- <div class="mt-9 px-10 flex justify-between items-center">
                     <div class="text-sm breadcrumbs">
                         <ul>
                             <li>
@@ -226,7 +184,7 @@ const declineCollaborator = async (collaborator) => {
                         </svg>
                         Invitations
                     </button>
-                </div>
+                </div> -->
 
 
                 <div class="flex flex-col items-center mt-1">
@@ -335,7 +293,7 @@ const declineCollaborator = async (collaborator) => {
 
 
                                     </tr>
-                                    <tr class="bg-base-100 mt-4 md:mt-0" v-if="collaboratorInfo?.length === 0">
+                                    <tr class="bg-base-100 mt-4 md:mt-0" v-if="filteredCollaboratorInfo?.length === 0">
                                         <td colspan="5" class="text-center py-4 text-gray-400">
                                             Sorry, we couldn't find the invitation to this board
                                         </td>
@@ -344,7 +302,7 @@ const declineCollaborator = async (collaborator) => {
                             </table>
                         </div>
                     </div>
-                    <div v-if="openModalAddCollab"
+                    <!-- <div v-if="openModalAddCollab"
                         class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
                         <div class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
                             <div class="w-full p-8">
@@ -353,7 +311,7 @@ const declineCollaborator = async (collaborator) => {
                                 </h2>
 
                                 <div class="flex items-center space-x-4 mb-4">
-                                    <!-- Email Input -->
+                                   
                                     <div class="flex-1">
                                         <label class="block text-sm font-bold mb-2">Email</label>
                                         <input type="email" v-model="collaboratorEmail"
@@ -362,7 +320,7 @@ const declineCollaborator = async (collaborator) => {
 
                                 </div>
 
-                                <!-- Buttons -->
+                              
                                 <div class="flex justify-end mt-4">
                                     <button class="btn bg-gray-300 mr-4" @click="cancelAction">
                                         Cancel
@@ -374,7 +332,7 @@ const declineCollaborator = async (collaborator) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

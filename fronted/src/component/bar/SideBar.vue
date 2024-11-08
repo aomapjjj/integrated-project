@@ -3,6 +3,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
+import { useBoard } from '@/stores/storeBoard.js';
 
 const route = useRoute()
 const router = useRouter()
@@ -17,6 +18,7 @@ const isExpanded = ref(false)
 // Username
 const userStore = useUsers()
 const userName = userStore.getUser().username
+const userBoard = useBoard()
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 

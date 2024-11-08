@@ -6,6 +6,7 @@ const useBoard = defineStore('board', () => {
   const boards = ref([])
   const collabs = ref([])
 
+
   const setChangeColor = (color) => {
     colorBoard.value = color
     localStorage.setItem('colorBoard', JSON.stringify(colorBoard.value))
@@ -19,20 +20,89 @@ const useBoard = defineStore('board', () => {
     return colorBoard.value
   }
 
+  const saveBoardsToLocalStorage = () => {
+    localStorage.setItem('boards', JSON.stringify(boards.value))
+  }
+
+  const addNewBoard = (newBoard) => {
+    boards.value.push({ ...newBoard })
+    saveBoardsToLocalStorage()
+  }
+  const addNewBoards = (newBoards) => {
+    newBoards.forEach((newBoard) => {
+      addNewBoard(newBoard)
+    })
+    saveBoardsToLocalStorage()
+  }
+
+  const removeBoard = (deleteBoardID) => {
+    boards.value = boards.value.filter(
+      (board) => board.id !== deleteBoardID
+    )
+    saveBoardsToLocalStorage()
+  }
+
+  const resetBoard = () => {
+    boards.value = []
+    saveBoardsToLocalStorage()
+  }
+
+  const getBoards = () => {
+    const storedBoards = localStorage.getItem('boards')
+    return storedBoards ? JSON.parse(storedBoards) : []
+  }
+
+
   const setBoards = (newBoards) => {
     boards.value = newBoards
+    localStorage.setItem('boards', JSON.stringify(boards.value)) 
   }
+
+  //--------------------------------- Collabs -------------------------
 
   const setCollabs = (newCollabs) => {
     collabs.value = newCollabs
+    localStorage.setItem('collabs', JSON.stringify(collabs.value)) 
   }  
   
+  
   const getCollabs = () => {
-   return  collabs.value
+    const storedCollabs = localStorage.getItem('collabs')
+    return storedCollabs ? JSON.parse(storedCollabs) : []
   }
-  const getBoards = () => {
-    return  boards.value
+  
+  const saveCollabsToLocalStorage = () => {
+    localStorage.setItem('collabs', JSON.stringify(boards.value))
   }
+
+  const addNewCollab = (newCollab) => {
+    collabs.value.push({ ...newCollab })
+    saveCollabsToLocalStorage()
+  }
+  const addNewCollabs = (newCollabs) => {
+    newCollabs.forEach((newCollab) => {
+      addNewBoard(newCollab)
+    })
+    saveCollabsToLocalStorage()
+  }
+  const editCollab = (editedCollab) => {
+    collabs.value = { ...editedCollab }
+    setCollabs(collabs.value)
+  }
+
+  const removeCollabs = (deleteCollabID) => {
+    collabs.value = collabs.value.filter(
+      (collab) => collab.id !== deleteCollabID
+    )
+    saveCollabsToLocalStorage()
+  }
+
+  const resetCollabs = () => {
+    collabs.value = []
+    saveCollabsToLocalStorage()
+  }
+
+
 
   return {
     setChangeColor,
@@ -40,7 +110,17 @@ const useBoard = defineStore('board', () => {
     setBoards,
     setCollabs,
     getCollabs,
-    getBoards
+    getBoards,
+    addNewBoard,
+    addNewBoards,
+    removeBoard,
+    resetBoard,
+    addNewCollab,
+    addNewCollabs,
+    editCollab,
+    removeCollabs,
+    resetCollabs
+
   }
 })
 

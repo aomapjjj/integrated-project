@@ -1,10 +1,10 @@
 <script setup>
-import { jwtDecode } from 'jwt-decode'
-import { useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
-import { useUsers } from '../stores/storeUser'
-import { getItems } from '../libs/fetchUtils.js'
-
+import { jwtDecode } from "jwt-decode"
+import { useRouter } from "vue-router"
+import { ref, computed } from "vue"
+import { useUsers } from "../stores/storeUser"
+import { useBoard  } from "@/stores/storeBoard"
+import { getItems , getBoardItems } from "../libs/fetchUtils.js"
 
 // ----------------------- Router -----------------------
 
@@ -21,14 +21,15 @@ const isPasswordVisible = ref(false)
 // ----------------------- Stores -----------------------
 
 const userStore = useUsers()
+const boardStore = useBoard()
 
 // ----------------------- Params -----------------------
 
-const nameJWT = ref('')
-const emailJWT = ref('')
+const nameJWT = ref("")
+const emailJWT = ref("")
 const userInfowhileLogin = ref()
-const userInput = ref('')
-const passwordInput = ref('')
+const userInput = ref("")
+const passwordInput = ref("")
 const boardId = ref()
 
 // ----------------------- BaseUrl -----------------------
@@ -68,10 +69,11 @@ const openHomePage = async () => {
     const boardIds = itemsBoards.boards.map((board) => board.id)
     boardId.value = boardIds
     console.log(boardId.value[0])
-    router.push({ name: 'TaskList', params: { id: boardId.value[0] } })
+    router.push({ name: "TaskList", params: { id: boardId.value[0] } })
     userStore.setBoard(boardId.value)
   } catch (error) {
-    router.push({ name: 'Board' })
+    router.push({ name: "Board" })
+    
   }
 }
 
@@ -85,9 +87,9 @@ const showAlert = () => {
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         userName: userInput.value,
@@ -97,22 +99,29 @@ const submitForm = async () => {
 
     if (response.status === 200) {
       const data = await response.json()
+  
       userStore.setLoginSuccess(true)
       const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name
       emailJWT.value = decoded.email
 
-      userInfowhileLogin.value = {...decoded}
-      
+      userInfowhileLogin.value = { ...decoded }
+
       userStore.setUserInfo(userInfowhileLogin.value)
       console.log(userStore.getUserInfo())
       userStore.setEmail(emailJWT.value)
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)
 
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      localStorage.setItem("access_token", data.access_token)
+      localStorage.setItem("refresh_token", data.refresh_token)
 
+      const itemsBoards = await getBoardItems(baseUrlboards)
+      boardStore.setBoards(itemsBoards.boards)
+      boardStore.addNewBoards(itemsBoards.boards)
+      boardStore.setCollabs(itemsBoards.collabs)
+      console.log(boardStore.getBoards())
+    
       openHomePage()
     } else if (response.status === 401) {
       showAlert()
@@ -123,6 +132,7 @@ const submitForm = async () => {
     showAlert()
   }
 }
+
 </script>
 
 <template>
