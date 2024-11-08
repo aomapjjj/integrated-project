@@ -12,12 +12,10 @@ import { useUsers } from "@/stores/storeUser"
 import SideBar from "@/component/bar/SideBar.vue"
 import Navbar from "@/component/bar/Navbar.vue"
 import Alert from "@/component/alert/Alert.vue"
-import ModalAcess from "@/component/modal/Modal.vue"
 
 // ----------------------- Router -----------------------
 
 const route = useRoute()
-const router = useRouter()
 
 // ----------------------- Stores -----------------------
 
@@ -126,15 +124,6 @@ const submitFormSendEmail = async () => {
         console.error("An error occurred:", error);
     }
 }
-
-const showRemoveModal = (oid) => {
-    console.log(oid)
-    oidCollaboratorToRemove.value = oid
-    console.log(oidCollaboratorToRemove.value)
-    showConfirmModal.value = true
-}
-
-const pendingItem = ref(null)
 
 const formatStatus = () => {
     if (collaboratorInfo.value.length > 0) {
