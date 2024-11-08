@@ -15,6 +15,7 @@ const router = useRouter()
 
 // ----------------------- List Items -----------------------
 
+const boardsList = ref([])
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -41,7 +42,9 @@ function getToken() {
 
 onMounted(async () => {
   try {
-  
+    const itemsBoards = await getBoardItems(baseUrlBoard)
+    boardsList.value = itemsBoards.boards
+
     const token = getToken()
     const response = await fetch(
       `${import.meta.env.VITE_BASE_URL_MAIN}/boards`,
@@ -82,7 +85,7 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
-  console.log(result.data)
+  console.log(result)
   boardStore.addNewBoard(result.data)
 
   console.log(result.status)
