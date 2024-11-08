@@ -123,9 +123,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         );
                     }
                     return;
-                } else if (requestMethod.equals("PATCH") && request.getRequestURI().contains("/collabs/") && request.getRequestURI().endsWith("/status")) {
+                } else if (requestMethod.equals("GET") || requestMethod.equals("PATCH") && request.getRequestURI().contains("/collabs/") && request.getRequestURI().endsWith("/status")) {
                     return;
-                } else if (!requestMethod.equals("GET")) {
+                } else {
                     throw new ForbiddenException(
                             "Pending collaborators are only allowed to access GET methods on board with ID: " + boardId
                     );
