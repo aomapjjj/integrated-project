@@ -121,7 +121,7 @@ const submitForm = async () => {
       ) //sort by createdOn
       console.log(itemsBoards.boards)
 
-      boardStore.addNewBoards(itemsBoards.boards) //set value board
+      boardStore.setBoards(itemsBoards.boards) //set value board
 
       boardStore.setCollabs(itemsBoards.collabs)
       console.log(boardStore.getBoards())
