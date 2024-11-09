@@ -1,17 +1,17 @@
 <script setup>
-import { useRouter } from "vue-router"
-import { ref, onMounted } from "vue"
-import { useUsers } from "../../stores/storeUser"
-import { useBoard } from "../../stores/storeBoard"
+import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useUsers } from '../../stores/storeUser'
+import { useBoard } from '../../stores/storeBoard'
 import {
   deleteItemById,
   getBoardItems,
   deleteCollaborator
-} from "../../libs/fetchUtils.js"
-import Alert from "../alert/Alert.vue"
-import ConfirmModal from "../modal/ConfirmModal.vue"
-import EmptyBoard from "./EmptyBoard.vue"
-import PersonalAndCollabBoard from "../board/PersonalAndCollabBoard.vue"
+} from '../../libs/fetchUtils.js'
+import Alert from '../alert/Alert.vue'
+import ConfirmModal from '../modal/ConfirmModal.vue'
+import EmptyBoard from './EmptyBoard.vue'
+import PersonalAndCollabBoard from '../board/PersonalAndCollabBoard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -21,19 +21,17 @@ const router = useRouter()
 
 const userStore = useUsers()
 const boardStore = useBoard()
-const  {
-    addNewBoard,
-    addNewBoards,
-    removeBoard,
-    resetBoard,
-    addNewCollab,
-    addNewCollabs,
-    editCollab,
-    removeCollabs,
-    resetCollabs
-  }
-     = useBoard()
-
+const {
+  addNewBoard,
+  addNewBoards,
+  removeBoard,
+  resetBoard,
+  addNewCollab,
+  addNewCollabs,
+  editCollab,
+  removeCollabs,
+  resetCollabs
+} = useBoard()
 
 // ----------------------- List Items -----------------------
 
@@ -63,7 +61,7 @@ const openModalToDelete = ref(false)
 const showConfirmModal = ref(false)
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
-const alertMessage = ref("")
+const alertMessage = ref('')
 
 // ----------------------- BaseUrl -----------------------
 
@@ -93,15 +91,15 @@ const confirmRemove = async () => {
         )
         boardStore.removeBoard(boardIdCollabs.value)
         isAlertSuccess.value = true
-        alertMessage.value = "Collaborator removed successfully"
+        alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
       } else {
         isAlertFailure.value = true
-        alertMessage.value = "Failed to remove collaborator"
+        alertMessage.value = 'Failed to remove collaborator'
         setTimeout(hideAlert, 3000)
       }
     } catch (error) {
-      alertMessage.value = "Error removing collaborator:"
+      alertMessage.value = 'Error removing collaborator:'
       setTimeout(hideAlert, 3000)
     } finally {
       showConfirmModal.value = false
@@ -110,9 +108,8 @@ const confirmRemove = async () => {
   }
 }
 
-
 function getToken() {
-  return localStorage.getItem("access_token")
+  return localStorage.getItem('access_token')
 }
 
 onMounted(async () => {
@@ -124,14 +121,14 @@ onMounted(async () => {
   })
 
   if (response.status === 404) {
-    router.push({ name: "ErrorPage" })
+    router.push({ name: 'ErrorPage' })
   } else if (response.status === 401) {
-    router.push({ name: "Login" })
+    router.push({ name: 'Login' })
   }
   const itemsBoards = await getBoardItems(baseUrlBoard)
   boardsCollab.value = itemsBoards.collabs
-  
-  const savedColors = JSON.parse(localStorage.getItem("boardColors"))
+
+  const savedColors = JSON.parse(localStorage.getItem('boardColors'))
   if (savedColors) {
     currentColor.value = savedColors
   }
@@ -161,14 +158,14 @@ onMounted(async () => {
 
 const toBoardsList = (board) => {
   if (board.id !== null) {
-    router.push({ name: "TaskList", params: { id: board.id } })
+    router.push({ name: 'TaskList', params: { id: board.id } })
     userStore.setBoard(board.id)
   }
 }
 
 const toBoardsInvitations = (board) => {
   if (board.id !== null) {
-    router.push({ name: "Invitations", params: { id: board.id } })
+    router.push({ name: 'Invitations', params: { id: board.id } })
     userStore.setBoard(board.id)
   }
 }
@@ -214,7 +211,7 @@ const setColor = (color, id) => {
     ...currentColor.value,
     [id]: color
   }
-  localStorage.setItem("boardColors", JSON.stringify(currentColor.value))
+  localStorage.setItem('boardColors', JSON.stringify(currentColor.value))
   boardStore.setChangeColor(currentColor.value)
 }
 
@@ -235,7 +232,7 @@ const getAccessRight = (boardId, username) => {
 const getCollaboratorStatus = (collaborators, name, status) => {
   for (let collab of collaborators) {
     if (
-      collab.name === name + " (Pending Invite)" &&
+      collab.name === name + ' (Pending Invite)' &&
       collab.status === status
     ) {
       return true
@@ -449,6 +446,19 @@ const getCollaboratorStatus = (collaborators, name, status) => {
           >
             <template #toggle>
               <span
+                v-if="
+                  getCollaboratorStatus(
+                    board.collaborators,
+                    userName,
+                    'PENDING'
+                  )
+                "
+                class="itbkk-access-right text-white text-xs font-bold rounded-full inline-block ml-4 py-1.5 px-4 bg-yellow-400 cursor-pointer"
+              >
+                PENDING
+              </span>
+              <span
+                v-else
                 class="itbkk-access-right text-white text-xs font-bold rounded-full inline-block ml-4 py-1.5 px-4 cursor-pointer"
                 :class="{
                   'bg-green-400': board.visibility === 'PUBLIC',
@@ -460,25 +470,50 @@ const getCollaboratorStatus = (collaborators, name, status) => {
             </template>
 
             <template #name>
-              <h1
-                class="itbkk-board-name text-sm px-6 py-2 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
+              <div
+                class="flex items-center space-x-2 cursor-pointer hover:text-gray-900 transition duration-100 mx-4 my-4"
               >
-                {{ board.name }}
-              </h1>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5 text-customPink"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M20 4H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h4l-1.8 2.4l1.6 1.2l2.7-3.6h3l2.7 3.6l1.6-1.2L16 18h4c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM5 13h4v2H5v-2z"
+                    fill="currentColor"
+                  />
+                </svg>
+
+                <h1 class="itbkk-board-name text-sm font-bold text-gray-800">
+                  {{ board.name }}
+                </h1>
+              </div>
             </template>
 
             <template #ownerName>
-              <h1
-                class="itbkk-owner-name text-sm px-6 font-bold text-gray-800 cursor-pointer hover:text-gray-900 transition duration-100"
+              <div
+                class="flex items-center space-x-2 cursor-pointer hover:text-gray-900 transition duration-100 mx-4"
               >
-                {{ board.owner.name }}
-              </h1>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  class="w-5 h-5 text-customPink"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12 19.2c-2.5 0-4.71-1.28-6-3.2c.03-2 4-3.1 6-3.1s5.97 1.1 6 3.1a7.23 7.23 0 0 1-6 3.2M12 5a3 3 0 0 1 3 3a3 3 0 0 1-3 3a3 3 0 0 1-3-3a3 3 0 0 1 3-3m0-3A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10c0-5.53-4.5-10-10-10"
+                  />
+                </svg>
+                <h1 class="itbkk-owner-name text-sm font-bold text-gray-800">
+                  {{ board.owner.name }}
+                </h1>
+              </div>
             </template>
 
             <!-- Display buttons based on collaborator status -->
             <template #pendingBtn>
               <button
-                class="btn rounded-lg customBgYellow"
+                class="btn rounded-full customBgYellow"
                 @click="toBoardsInvitations(board)"
               >
                 Accept/Decline
@@ -486,13 +521,13 @@ const getCollaboratorStatus = (collaborators, name, status) => {
             </template>
             <template #Btn>
               <button
-                class="btn rounded-lg customBgYellow"
+                class="btn rounded-full customBgYellow"
                 @click="toBoardsList(board)"
               >
                 View
               </button>
               <button
-                class="itbkk-leave-board btn bg-red-400 rounded-lg"
+                class="itbkk-leave-board btn bg-red-400 rounded-full"
                 @click="showRemoveModal(board.id)"
               >
                 Leave
