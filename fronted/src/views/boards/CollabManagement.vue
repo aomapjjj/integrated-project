@@ -261,22 +261,23 @@ const submitFormSendEmail = async () => {
         case 409:
           isAlertFailure.value = true
           if (
-            result.data.message ===
-            'The collaborator already exists for this board'
+          result.data.message ===
+          'The collaborator already exists for this board'
           ) {
-            alertMessage.value =
-              'The user is already a collaborator of this board.'
+          alertMessage.value =
+            'The user is already the collaborator or pending collaborator of this board.'
           } else if (
-            result.data.message ===
-            'The collaborator email belongs to the board owner'
+          result.data.message ===
+          'The collaborator email belongs to the board owner'
           ) {
-            alertMessage.value =
-              'Board owner cannot be collaborator of his/her own board'
+          alertMessage.value =
+            'Board owner cannot be collaborator of his/her own board'
           } else {
-            alertMessage.value = 'An unknown error occurred.'
+          alertMessage.value = 'An unknown error occurred.'
           }
-          setTimeout(hideAlert, 3000)
-          break
+        setTimeout(hideAlert, 3000)
+        break
+
         default:
           isAlertFailure.value = true
           alertMessage.value = 'There is a problem. Please try again later.'
