@@ -4,6 +4,7 @@ import lombok.*;
 import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.Visibility;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,7 @@ import java.util.List;
 public class BoardResponseDTO{
     private String id;
     private String name;
+    private ZonedDateTime createdOn;
     private Visibility visibility;
     private OwnerDTO owner;
 

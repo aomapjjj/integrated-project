@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useUsers } from '../../stores/storeUser'
 import { useBoard } from '../../stores/storeBoard'
 import {
@@ -42,13 +42,13 @@ const currentColor = ref({})
 
 const selectedItemIdToDelete = ref()
 const colorCard = ref(null)
+
+const userName = userStore.getUser().username
+
+const boardsOwner = ref()
 const oidCollaboratorToRemove = ref()
 const boardIdCollabs = ref()
-const userName = userStore.getUser().username
-const boardsOwner = ref()
-
 const boardsCollab = ref()
-const isPending = ref(false)
 
 boardsOwner.value = boardStore.getBoards()
 boardsCollab.value = boardStore.getCollabs()
@@ -90,7 +90,7 @@ const confirmRemove = async () => {
           (collab) => collab.id !== oidCollaboratorToRemove.value
         )
         boardStore.removeBoard(boardIdCollabs.value)
-        
+
         isAlertSuccess.value = true
         alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
@@ -140,23 +140,6 @@ onMounted(async () => {
   }
 })
 
-// const filterCollaboratorsByAccessRightAndName = (boardId, name) => {
-//   const board = boardLo.find((b) => b.id === boardId);
-//   if (!board) {
-//     console.error("Board not found");
-//     return [];
-//   }
-
-//   if (!board.collaborators) {
-//     console.error("Collaborators not found in the specified board");
-//     return [];
-//   }
-
-//   return board.collaborators
-//     .filter((collab) => collab.name === name)
-//     .map((collab) => ({ name: collab.name, accessRight: collab.accessRight }));
-// }
-
 const toBoardsList = (board) => {
   if (board.id !== null) {
     router.push({ name: 'TaskList', params: { id: board.id } })
@@ -172,15 +155,14 @@ const toBoardsInvitations = (board) => {
 }
 
 const deletBoard = async (boardId) => {
- const deletBoard =  await deleteItemById(baseUrlBoard, boardId)
- console.log(boardId)
- if(deletBoard === 200){
-  removeBoard(boardId)
-  openModalToDelete.value = false
-  console.log(boardStore.getBoards())
-  boardsOwner.value = boardStore.getBoards()
- }
-
+  const deletBoard = await deleteItemById(baseUrlBoard, boardId)
+  console.log(boardId)
+  if (deletBoard === 200) {
+    removeBoard(boardId)
+    openModalToDelete.value = false
+    console.log(boardStore.getBoards())
+    boardsOwner.value = boardStore.getBoards()
+  }
 }
 
 const openModalToDeleteBoard = (itemId) => {
@@ -190,7 +172,6 @@ const openModalToDeleteBoard = (itemId) => {
 
 const confirmDelete = () => {
   deletBoard(selectedItemIdToDelete.value)
-  
 }
 
 // Color
