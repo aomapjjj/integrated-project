@@ -17,8 +17,8 @@ const props = defineProps({
     <div class="flex px-4 py-2 justify-between">
       <div class="flex items-center space-x-2">
         <div class="flex gap-2">
-          <slot name="Btn"v-if="isShow === false"></slot>
-          <slot name="deleteBtn" v-if="isShow  === false "></slot>
+          <slot name="Btn" v-if="isShow === false"></slot>
+          <slot name="deleteBtn" v-if="isShow === false"></slot>
           <slot name="viewBtn"></slot>
           <slot name="pendingBtn" v-if="isShow"></slot>
         </div>
