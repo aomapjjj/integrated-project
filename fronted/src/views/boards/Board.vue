@@ -85,10 +85,12 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
-  console.log(result)
   boardStore.addNewBoard(result.data)
 
-  console.log(result.status)
+  const items = await getBoardItems(baseUrlBoard)
+
+  boardStore.setBoards(items.boards)
+  console.log(items)
 
   if (result.status === 401) {
     localStorage.removeItem('access_token')

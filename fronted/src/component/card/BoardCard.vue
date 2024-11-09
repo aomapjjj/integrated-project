@@ -90,6 +90,7 @@ const confirmRemove = async () => {
           (collab) => collab.id !== oidCollaboratorToRemove.value
         )
         boardStore.removeBoard(boardIdCollabs.value)
+        
         isAlertSuccess.value = true
         alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
@@ -170,30 +171,16 @@ const toBoardsInvitations = (board) => {
   }
 }
 
-// function handleBoardCollabStatus(board) {
-//   console.log(board);
-
-//   if (Array.isArray(board.collaborators)) {
-//     board.collaborators.forEach(collaborator => {
-//       if (collaborator.status === 'ACCEPTED') {
-//         toBoardsList(board);
-//       } else if (collaborator.status === 'PENDING') {
-//         toBoardsInvitations(board);
-//         isPending.value = true
-//       } else {
-//         console.error('Unknown status:', collaborator.status);
-//       }
-//     });
-//   } else {
-//     console.error('board.collaborators is not an array or is missing.');
-//   }
-// }
-
 const deletBoard = async (boardId) => {
-  await deleteItemById(baseUrlBoard, boardId)
+ const deletBoard =  await deleteItemById(baseUrlBoard, boardId)
+ console.log(boardId)
+ if(deletBoard === 200){
   removeBoard(boardId)
-  boardsOwner.value = boardStore.getBoards()
   openModalToDelete.value = false
+  console.log(boardStore.getBoards())
+  boardsOwner.value = boardStore.getBoards()
+ }
+
 }
 
 const openModalToDeleteBoard = (itemId) => {
@@ -203,6 +190,7 @@ const openModalToDeleteBoard = (itemId) => {
 
 const confirmDelete = () => {
   deletBoard(selectedItemIdToDelete.value)
+  
 }
 
 // Color
