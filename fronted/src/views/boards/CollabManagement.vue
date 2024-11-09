@@ -15,6 +15,7 @@ import Alert from '@/component/alert/Alert.vue'
 import ModalAcess from '@/component/modal/Modal.vue'
 import CollabCard from '@/component/card/CollabCard.vue'
 import ConfirmModal from '@/component/modal/ConfirmModal.vue'
+import WaitModal from '@/component/modal/WaitModal.vue'
 
 // ----------------------- Router -----------------------
 
@@ -64,6 +65,7 @@ const confirmAcessChange = ref(false)
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
 const alertMessage = ref('')
+const waitModal = ref(false)
 
 // ----------------------- BaseUrl -----------------------
 
@@ -104,76 +106,6 @@ const openAdd = () => {
 const cancelAction = () => {
   openModalAddCollab.value = false
   clearForm()
-}
-
-const submitForm = async () => {
-  if (collaboratorAccess.value && collaboratorEmail.value) {
-    try {
-      const result = await addCollaborator(boardId.value, {
-        email: collaboratorEmail.value,
-        accessRight: collaboratorAccess.value,
-        status: 'ACCEPTED'
-      })
-
-      console.log(result)
-      switch (result.statusCode) {
-        case 201:
-          collaboratorInfo.value.push(result.data)
-          isAlertSuccess.value = true
-          alertMessage.value = 'Collaborator added successfully!'
-          setTimeout(hideAlert, 3000)
-          cancelAction()
-          break
-        case 401:
-          isAlertFailure.value = true
-          alertMessage.value = 'Unauthorized access. Please log in again.'
-          setTimeout(hideAlert, 3000)
-          break
-        case 403:
-          isAlertFailure.value = true
-          alertMessage.value =
-            'You do not have permission to add a collaborator.'
-          setTimeout(hideAlert, 3000)
-          break
-        case 404:
-          isAlertFailure.value = true
-          alertMessage.value = 'The user does not exists.'
-          setTimeout(hideAlert, 3000)
-          break
-        case 409:
-          isAlertFailure.value = true
-          if (
-            result.data.message ===
-            'The collaborator already exists for this board'
-          ) {
-            alertMessage.value =
-              'The user is already a collaborator of this board.'
-          } else if (
-            result.data.message ===
-            'The collaborator email belongs to the board owner'
-          ) {
-            alertMessage.value =
-              'Board owner cannot be collaborator of his/her own board'
-          } else {
-            alertMessage.value = 'An unknown error occurred.'
-          }
-          setTimeout(hideAlert, 3000)
-          break
-        default:
-          isAlertFailure.value = true
-          alertMessage.value = 'There is a problem. Please try again later.'
-          setTimeout(hideAlert, 3000)
-      }
-    } catch (error) {
-      isAlertFailure.value = true
-      alertMessage.value = 'An error occurred: ' + error.message
-      setTimeout(hideAlert, 3000)
-    }
-  } else {
-    isAlertFailure.value = true
-    alertMessage.value = 'Collaborator email and access right are required.'
-    setTimeout(hideAlert, 3000)
-  }
 }
 
 const showRemoveModal = (item) => {
@@ -284,7 +216,7 @@ const submitFormSendEmail = async () => {
     const inviterName = boardOwnerName.value;
     const boardNames = boardName.value;
     const boardUrl = baseUrlBoardId;
-
+    waitModal.value = true
     if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
         console.error("One or more required fields are missing.");
         return;
@@ -360,12 +292,21 @@ const submitFormSendEmail = async () => {
       alertMessage.value = 'An error occurred: ' + error.message
       setTimeout(hideAlert, 3000)
     }
+    finally {
+        waitModal.value = false
+    }
   } 
 
 
 </script>
 
 <template>
+<div>
+  <WaitModal :is-loading="waitModal" />
+
+</div>  
+
+
   <div class="fixed top-0 right-0 mt-4 mr-4 z-20">
     <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
       {{ alertMessage }}

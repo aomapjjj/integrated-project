@@ -87,8 +87,7 @@ const baseUrlLimitMax = `${baseUrlboards}/${boardId.value}/statuses/maximumtask`
 
 onMounted(async () => {
   try {
-    isLoading.value = true // เริ่มการโหลดข้อมูล
-
+    isLoading.value = true 
     userStore.setToken(token)
 
     if (taskStore.getTasks().length === 0) {
@@ -242,10 +241,12 @@ const sortByStatus = () => {
 // ----------------------- Filter -----------------------
 
 const filter = ref([])
+console.log(taskStore.getTasks())
 
 const filteredTasks = computed(() => {
   if (filter.value.length === 0) {
     return taskStore.getTasks()
+    
   }
   return taskStore
     .getTasks()
