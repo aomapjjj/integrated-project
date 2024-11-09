@@ -85,10 +85,11 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
+
   boardStore.addNewBoard(result.data)
 
   const items = await getBoardItems(baseUrlBoard)
-
+  items.boards.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn)) //sort by createdOn
   boardStore.setBoards(items.boards)
   console.log(items)
 
@@ -114,8 +115,6 @@ const openModalCreate = () => {
   openModalName.value = !openModalName.value
   router.push({ name: 'BoardAdd' })
 }
-
-
 </script>
 
 <template>
@@ -186,7 +185,7 @@ const openModalCreate = () => {
             <h2
               class="itbkk-personal-board text-xl font-bold mb-2 p-4 items-center justify-center"
             >
-              Personal Board
+              Personal Boards
             </h2>
           </template>
 
@@ -194,7 +193,7 @@ const openModalCreate = () => {
             <h2
               class="itbkk-collab-board text-xl font-bold p-4 mt-2 mb-2 items-center justify-center"
             >
-              Collab Board
+              Collab Boards
             </h2>
           </template>
         </BoardCard>
