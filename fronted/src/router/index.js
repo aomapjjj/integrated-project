@@ -170,7 +170,14 @@ const routes = [
     path: "/board/:id/collab/invitations",
     name: "Invitations",
     component: Invitations,
-    meta: { requiresAuth: true }
+    beforeEnter: (to, from, next) => {
+      if (!getToken()) {
+        next({ name: "ToLoginPage" }) 
+      } else {
+        next()  
+      }
+    }
+    
   },
   {
     path: "/tologin",
