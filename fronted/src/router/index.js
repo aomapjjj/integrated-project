@@ -7,6 +7,7 @@ import TaskDetail from "@/views/tasks/TaskDetail.vue"
 import EditTask from "@/views/tasks/EditTask.vue"
 import Login from "@/views/Login.vue"
 import Board from "@/views/boards/Board.vue"
+import ToLoginPage from "@/views/errorpage/ToLoginPage.vue"
 import ErrorPagePermission from "@/views/errorpage/PermissionError.vue"
 import {
   getBoardById,
@@ -168,7 +169,13 @@ const routes = [
   {
     path: "/board/:id/collab/invitations",
     name: "Invitations",
-    component: Invitations
+    component: Invitations,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/tologin",
+    name: "ToLoginPage",
+    component: ToLoginPage
   }
 ]
 
@@ -218,7 +225,11 @@ router.beforeEach(async (to, from, next) => {
         ${import.meta.env.VITE_BASE_URL_MAIN}/boards/${boardId}`
       );
       const board = await boardResponse.json();
-
+      if (to.meta.requiresAuth && !getToken()) {
+        next({ name: 'ToLoginPage' })
+      } else {
+        next() 
+      }
       if (boardResponse.status === 404) return next({ name: "ErrorPage" });
       if (board.visibility === "PRIVATE" && !accessToken) {
         return next({ name: "ErrorPagePermission" });
