@@ -204,11 +204,6 @@ const checkEmail = computed(() => {
     !collaboratorEmail.value.includes('@')
   )
 })
-
-const filteredCollaboratorInfo = computed(() =>
-  collaboratorInfo.value.filter((item) => item.status === 'ACCEPTED')
-)
-
 const submitFormSendEmail = async () => {
     const email = collaboratorEmail?.value;
     const accessRight = collaboratorAccess.value;
@@ -296,6 +291,15 @@ const submitFormSendEmail = async () => {
         waitModal.value = false
     }
   } 
+  
+  
+const deleteConfirmationMessage = computed(() => {
+  if (collaboratorToRemove.value && collaboratorToRemove.value.status === 'PENDING') {
+    return `Do you want to cancel the invitation to ${collaboratorToRemove.value.name}?`
+  }
+  return `Do you want to remove ${collaboratorToRemove.value.name} from the board?`
+})
+
 
 
 </script>
@@ -324,36 +328,20 @@ const submitFormSendEmail = async () => {
           <div class="text-sm breadcrumbs">
             <ul>
               <li>
-                <router-link
-                  :to="{ name: 'TaskList', params: { id: boardId } }"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/3000/svg"
-                    viewBox="0 0 256 256"
-                    class="w-4 h-4 stroke-current mr-2"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z"
-                    />
+                <router-link :to="{ name: 'TaskList', params: { id: boardId } }">
+                  <svg xmlns="http://www.w3.org/3000/svg" viewBox="0 0 256 256" class="w-4 h-4 stroke-current mr-2">
+                    <path fill="currentColor"
+                      d="m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z" />
                   </svg>
                   <span class="itbkk-board-name">{{ boardName }}</span>
                 </router-link>
               </li>
               <li>
                 <a>
-                  <svg
-                    xmlns="http://www.w3.org/3000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    class="w-4 h-4 stroke-current mr-2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                    ></path>
+                  <svg xmlns="http://www.w3.org/3000/svg" fill="none" viewBox="0 0 24 24"
+                    class="w-4 h-4 stroke-current mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                   </svg>
                   <span class="font-extrabold">Collaborator</span>
                 </a>
@@ -361,30 +349,18 @@ const submitFormSendEmail = async () => {
             </ul>
           </div>
 
-          <button
-            :disabled="disabledButtonWhileOpenPublic"
-            :style="{
-              backgroundColor: disabledButtonWhileOpenPublic
-                ? '#d3d3d3'
-                : '#F785B1',
-              color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
-              borderRadius: '30px',
-              cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
-              opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
-            }"
-            @click="openAdd"
-            class="itbkk-collaborator-add btn ml-4"
-          >
-            <svg
-              xmlns="http://www.w3.org/3000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
-              />
+          <button :disabled="disabledButtonWhileOpenPublic" :style="{
+            backgroundColor: disabledButtonWhileOpenPublic
+              ? '#d3d3d3'
+              : '#F785B1',
+            color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
+            borderRadius: '30px',
+            cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
+            opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
+          }" @click="openAdd" class="itbkk-collaborator-add btn ml-4">
+            <svg xmlns="http://www.w3.org/3000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="currentColor"
+                d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
             </svg>
             Add Collaborator
           </button>
@@ -474,25 +450,16 @@ const submitFormSendEmail = async () => {
           </div> -->
 
           <div>
-            <div
-              class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center"
-              v-if="
-                !collaboratorInfo.length ||
-                collaboratorInfo?.length === 0
-              "
-            >
+            <div class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center" v-if="
+              !collaboratorInfo.length ||
+              collaboratorInfo?.length === 0
+            ">
               <span class="text-center py-4 text-gray-400">
                 No Collaborator
               </span>
             </div>
-            <div
-              v-else
-              class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
-            >
-              <CollabCard
-                v-for="(item, index) in collaboratorInfo"
-                :key="item.id"
-              >
+            <div v-else class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+              <CollabCard v-for="(item, index) in collaboratorInfo" :key="item.id">
                 <template #name>
                   <h2 class="itbkk-name font-semibold">{{ item.name }}</h2>
                 </template>
@@ -505,116 +472,80 @@ const submitFormSendEmail = async () => {
 
                 <template #access-right>
                   <div class="itbkk-access-right mt-3 relative inline-flex">
-                    <svg
-                      class="w-2 h-2 absolute top-2 right-1 m-2 pointer-events-none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 412 232"
-                    >
+                    <svg class="w-2 h-2 absolute top-2 right-1 m-2 pointer-events-none"
+                      xmlns="http://www.w3.org/2000/svg" viewBox="0 0 412 232">
                       <path
                         d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z"
-                        fill="#648299"
-                        fill-rule="nonzero"
-                      />
+                        fill="#648299" fill-rule="nonzero" />
                     </svg>
-                    <select
-                      v-model="item.accessRight"
-                      @change="updateAccessRight(item)"
-                      class="border border-gray-300 rounded-full text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
-                    >
+                    <select v-model="item.accessRight" @change="updateAccessRight(item)"
+                      class="border border-gray-300 rounded-full text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none">
                       <option value="READ">Read</option>
                       <option value="WRITE">Write</option>
                     </select>
                   </div>
                 </template>
                 <template #btn>
-                  <button
-                    :disabled="disabledButtonWhileOpenPublic"
-                    @click="showRemoveModal(item)"
-                    class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="w-4 h-4"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="currentColor"
-                        fill-rule="evenodd"
-                        d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
-                      />
+                  <button :disabled="disabledButtonWhileOpenPublic" @click="showRemoveModal(item)"
+                    class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24">
+                      <path fill="currentColor" fill-rule="evenodd"
+                        d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z" />
                     </svg>
                   </button>
                 </template>
               </CollabCard>
             </div>
 
-            <ConfirmModal
-              :openModal="showConfirmModal"
-              @confirm="confirmRemove()"
-              @cancel="showConfirmModal = false"
-            >
+            <ConfirmModal :openModal="showConfirmModal" @confirm="confirmRemove()" @cancel="showConfirmModal = false">
               <template #svg>
                 <div
-                  class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-                >
-                  <svg
-                    class="h-6 w-6 text-red-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-                    />
+                  class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" aria-hidden="true" data-slot="icon">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                   </svg>
                 </div>
               </template>
-              <template #headerMessage> Delete Collaborator </template>
+
+              <template #headerMessage>
+                {{ collaboratorToRemove?.status === 'PENDING' ? 'Cancel Collaborator' : 'Delete Collaborator' }}
+              </template>
+
               <template #message>
                 <p class="text-sm text-gray-500">
-                  Do you want to remove {{ collaboratorToRemove.name }} from the
-                  board?
+                  {{ deleteConfirmationMessage }}
                 </p>
               </template>
+
               <template #confirmBtn>
                 <span
-                  class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
-                  >Delete</span
-                >
+                  :class="collaboratorToRemove?.status === 'PENDING'
+                    ? 'inline-flex w-full justify-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-400 sm:ml-3 sm:w-auto'
+                    : 'inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-400 sm:ml-3 sm:w-auto'">
+                  {{ collaboratorToRemove?.status === 'PENDING' ? 'Confirm' : 'Delete' }}
+                </span>
               </template>
+
               <template #cancelBtn>
                 <span
-                  class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  >Cancel</span
-                >
+                  class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                  Cancel
+                </span>
               </template>
             </ConfirmModal>
 
-            <ModalAcess
-              :isOpen="openModalAcess"
-              @confirm="confirmChange"
-              @cancel="cancelChange"
-            >
+            <ModalAcess :isOpen="openModalAcess" @confirm="confirmChange" @cancel="cancelChange">
               <template #headerName>Access Collaborator</template>
-              <template #messageName
-                >Do you want to change access right of {{ pendingItem.name }} to
-                {{ pendingItem.accessRight }}?</template
-              >
+              <template #messageName>Do you want to change access right of {{ pendingItem.name }} to
+                {{ pendingItem.accessRight }}?</template>
             </ModalAcess>
 
             <!-- Modal AddCollab -->
-            <div
-              v-if="openModalAddCollab"
-              class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50"
-            >
-              <div
-                class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
-              >
+            <div v-if="openModalAddCollab"
+              class="fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+              <div class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white">
                 <div class="w-full p-8">
                   <h2 class="text-2xl font-bold text-center mb-4">
                     Add Collaborator
@@ -623,15 +554,10 @@ const submitFormSendEmail = async () => {
                   <div class="flex items-center space-x-4 mb-4">
                     <div class="flex-1">
                       <label class="block text-sm font-bold mb-2">Email</label>
-                      <input
-                        type="email"
-                        v-model="collaboratorEmail"
-                        :class="[
-                          'w-full p-2 rounded-lg border',
-                          isOwnerEmail ? 'border-red-400' : 'border-gray-300'
-                        ]"
-                        placeholder="you@ad.sit.kmutt.ac.th"
-                      />
+                      <input type="email" v-model="collaboratorEmail" :class="[
+                        'w-full p-2 rounded-lg border',
+                        isOwnerEmail ? 'border-red-400' : 'border-gray-300'
+                      ]" placeholder="you@ad.sit.kmutt.ac.th" />
 
                       <p class="text-red-500 text-sm mt-1">
                         {{
@@ -643,13 +569,9 @@ const submitFormSendEmail = async () => {
                     </div>
 
                     <div>
-                      <label class="block text-sm font-bold mb-2"
-                        >Access Right</label
-                      >
-                      <select
-                        v-model="collaboratorAccess"
-                        class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm"
-                      >
+                      <label class="block text-sm font-bold mb-2">Access Right</label>
+                      <select v-model="collaboratorAccess"
+                        class="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm">
                         <option value="READ">Read</option>
                         <option value="WRITE">Write</option>
                       </select>
@@ -660,11 +582,8 @@ const submitFormSendEmail = async () => {
                     <button class="btn bg-gray-300 mr-4" @click="cancelAction">
                       Cancel
                     </button>
-                    <button
-                      :disabled="checkEmail"
-                      class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
-                      @click="submitFormSendEmail"
-                    >
+                    <button :disabled="checkEmail" class="btn bg-customPink hover:bg-customPinkDark disabled:opacity-50"
+                      @click="submitFormSendEmail">
                       Add
                     </button>
                   </div>

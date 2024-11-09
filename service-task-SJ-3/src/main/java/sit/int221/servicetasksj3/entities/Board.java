@@ -1,8 +1,11 @@
 package sit.int221.servicetasksj3.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.ZonedDateTime;
 
 
 @Getter
@@ -20,6 +23,10 @@ public class Board {
     @JsonIgnore
     @Column(name = "userId", length = 36, nullable = false)
     private String ownerId;
+
+    @Column(name = "createdOn", updatable = false, insertable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'",timezone = "UTC")
+    private ZonedDateTime createdOn;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "visibility")
