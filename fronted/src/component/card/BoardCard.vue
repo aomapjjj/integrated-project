@@ -228,7 +228,10 @@ const getCollaboratorAccessRight = (collaborators, name) => {
     <div v-if="boardsOwner?.length === 0">
       <EmptyBoard />
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      v-else
+      class="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+    >
       <div v-for="(item, index) in boardsOwner" :key="index">
         <div
           ref="colorCard"
@@ -401,7 +404,7 @@ const getCollaboratorAccessRight = (collaborators, name) => {
     </div>
     <div
       v-if="boardsCollab"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      class="px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
     >
       <div v-for="(board, index) in boardsCollab" :key="board.id">
         <div
