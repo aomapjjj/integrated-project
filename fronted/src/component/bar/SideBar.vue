@@ -1,9 +1,9 @@
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
-import { useBoard } from '@/stores/storeBoard.js';
+import { useBoard } from '@/stores/storeBoard.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,7 +123,9 @@ const toBoardsList = (boardId) => {
             </svg>
             All boards
             <!-- Count boards -->
-            <div class="badge badge-sm text-xxs">{{ BoardsList?.length ? BoardsList?.length : '0' }}</div>
+            <div class="badge badge-sm text-xxs">
+              {{ BoardsList?.length ? BoardsList?.length : '0' }}
+            </div>
             <!-- Icon when expanded -->
             <svg
               v-if="isExpanded"
@@ -204,7 +206,9 @@ const toBoardsList = (boardId) => {
                 d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3s1.34 3 3 3m-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5S5 6.34 5 8s1.34 3 3 3m0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5m8 0c-.29 0-.62.02-.97.05c1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5"
               />
             </svg>
-            <span class="">Members</span>
+            <RouterLink to="/members">
+              <span>Members</span>
+            </RouterLink>
           </a>
         </li>
       </ul>

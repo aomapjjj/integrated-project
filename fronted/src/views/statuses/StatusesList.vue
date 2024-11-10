@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from 'vue'
 import {
   getItemById,
   getItems,
@@ -9,15 +9,15 @@ import {
   deleteItemAndTransfer,
   getBoardById,
   getResponseItems
-} from "@/libs/fetchUtils.js"
-import { useStatuses } from "@/stores/storeStatus"
-import { useRoute, useRouter } from "vue-router"
-import { useLimitStore } from "@/stores/storeLimit"
-import { useTasks } from "@/stores/store"
-import { useUsers } from "@/stores/storeUser"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import LodingPage from "@/component/LodingPage.vue"
+} from '@/libs/fetchUtils.js'
+import { useStatuses } from '@/stores/storeStatus'
+import { useRoute, useRouter } from 'vue-router'
+import { useLimitStore } from '@/stores/storeLimit'
+import { useTasks } from '@/stores/store'
+import { useUsers } from '@/stores/storeUser'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import LodingPage from '@/component/ui/LodingPage.vue'
 
 // ----------------------- Router -----------------------
 
@@ -34,7 +34,7 @@ const taskStore = useTasks()
 // ----------------------- Params -----------------------
 
 const selectedStatusId = ref(0)
-const boardName = ref("")
+const boardName = ref('')
 const boardId = ref()
 const isLoading = ref(true)
 
@@ -45,7 +45,7 @@ watch(
   },
   { immediate: true }
 )
-const token = localStorage.getItem("access_token")
+const token = localStorage.getItem('access_token')
 
 const userName = userStore.getUser().username
 
@@ -53,25 +53,25 @@ const userName = userStore.getUser().username
 
 const statusList = ref([])
 const status = ref({
-  id: "",
-  name: "",
-  description: "",
-  createdOn: "",
-  updatedOn: ""
+  id: '',
+  name: '',
+  description: '',
+  createdOn: '',
+  updatedOn: ''
 })
 
 const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
+  title: '',
+  description: '',
+  assignees: '',
+  status: 'No Status'
 })
 
 // ----------------------- Alerts -----------------------
 
 const notFound = ref(false)
-const errorAdd = ref("")
-const errorEdit = ref("")
+const errorAdd = ref('')
+const errorEdit = ref('')
 
 const notAdd = ref(false)
 const notEdit = ref(false)
@@ -85,7 +85,7 @@ const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
 const limitAlert = ref(false)
-const errorLimit = ref("")
+const errorLimit = ref('')
 const errorTrans = ref(false)
 
 // ----------------------- Enable & Disable -----------------------
@@ -112,7 +112,7 @@ onMounted(async () => {
     const statusId = route.params.id
 
     const board = await getBoardById(boardId.value)
-    console.log("Board data", board.item.owner.name)
+    console.log('Board data', board.item.owner.name)
 
     if (board && board.item && board.item.name) {
       boardName.value = board.item.name
@@ -122,7 +122,7 @@ onMounted(async () => {
     } else if (
       board.item.owner.name !== userName &&
       !board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === "WRITE"
+        (collab) => collab.name === userName && collab.accessRight === 'WRITE'
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
@@ -130,7 +130,7 @@ onMounted(async () => {
       disabledButtonWhileOpenPublic.value = false
     }
   } catch (error) {
-    console.error("Error loading data:", error)
+    console.error('Error loading data:', error)
   } finally {
     isLoading.value = false
   }
@@ -150,7 +150,7 @@ const submitForm = async () => {
       notAdd.value = false
     }, 1800)
     notAdd.value = true
-    return (errorAdd.value = "Status name already exists")
+    return (errorAdd.value = 'Status name already exists')
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -167,13 +167,13 @@ const submitForm = async () => {
 }
 
 const clearForm = () => {
-  status.value.name = ""
-  status.value.description = ""
+  status.value.name = ''
+  status.value.description = ''
 }
 
 const closeModalAdd = () => {
   clearForm()
-  const modal = document.getElementById("my_modal_4")
+  const modal = document.getElementById('my_modal_4')
   modal.close()
   router.go(-1)
 }
@@ -200,7 +200,7 @@ const UpdateStatus = async () => {
       notEdit.value = false
     }, 1800)
     notEdit.value = true
-    return (errorEdit.value = "Status name already exists")
+    return (errorEdit.value = 'Status name already exists')
   }
 
   myStatuses.updateStatus(
@@ -229,13 +229,13 @@ const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
-  const modal = document.getElementById("my_modal_edit")
+  const modal = document.getElementById('my_modal_edit')
   modal.showModal()
-  router.push({ name: "EditStatus", params: { statusid: statusId } })
+  router.push({ name: 'EditStatus', params: { statusid: statusId } })
 }
 
 const closeModalEdit = () => {
-  const modal = document.getElementById("my_modal_edit")
+  const modal = document.getElementById('my_modal_edit')
   modal.close()
   router.go(-1)
   clearForm()
@@ -270,7 +270,7 @@ const getNameById = (id) => {
 }
 
 const openAdd = () => {
-  router.push({ name: "AddStatus" })
+  router.push({ name: 'AddStatus' })
 }
 
 const selectedItemIdToDelete = ref(0)
@@ -305,12 +305,12 @@ const deleteStatus = async (statusId) => {
 
 const openModalToDelete = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById("my_modal_delete")
+  const modal3 = document.getElementById('my_modal_delete')
   modal3?.showModal()
 }
 
 const closeModal = () => {
-  const modal3 = document.getElementById("my_modal_delete")
+  const modal3 = document.getElementById('my_modal_delete')
   modal3?.close()
 }
 
@@ -321,12 +321,12 @@ const confirmDelete = () => {
 
 const openModalToDeleteTrans = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById("my_modal_deleteTrans")
+  const modal3 = document.getElementById('my_modal_deleteTrans')
   modal3?.showModal()
 }
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById("my_modal_deleteTrans")
+  const modal3 = document.getElementById('my_modal_deleteTrans')
   modal3?.close()
 }
 const confirmDeleteTrans = (statusId) => {
@@ -369,7 +369,7 @@ const deleteandtrans = async (statusId, newID) => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === "No Status" || status === "Done") {
+  if (status === 'No Status' || status === 'Done') {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -665,7 +665,7 @@ const isFormValid = computed(() => {
                       >
                         {{
                           !item.description || item.description.length === 0
-                            ? "No description is provided"
+                            ? 'No description is provided'
                             : item.description
                         }}
                       </label>
