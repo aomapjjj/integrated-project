@@ -91,7 +91,7 @@ const submitForm = async () => {
   const items = await getBoardItems(baseUrlBoard)
   items.boards.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn)) //sort by createdOn
   boardStore.setBoards(items.boards)
-  console.log(items)
+
 
   if (result.status === 401) {
     localStorage.removeItem('access_token')

@@ -1,6 +1,6 @@
 <script setup>
 import { jwtDecode } from 'jwt-decode'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from "vue-router"
 import { ref, computed } from 'vue'
 import { useUsers } from '../stores/storeUser'
 import { useBoard } from '@/stores/storeBoard'
@@ -9,6 +9,7 @@ import { getItems, getBoardItems } from '../libs/fetchUtils.js'
 // ----------------------- Router -----------------------
 
 const router = useRouter()
+const route = useRoute()
 
 // ----------------------- Alerts -----------------------
 
@@ -31,6 +32,8 @@ const userInfowhileLogin = ref()
 const userInput = ref('')
 const passwordInput = ref('')
 const boardId = ref()
+const referringId = computed(() => route.query.refId)
+
 
 // ----------------------- BaseUrl -----------------------
 
@@ -64,12 +67,15 @@ const isFormValid = computed(() => {
 const openHomePage = async () => {
   try {
     userStore.setUser(nameJWT.value)
-    console.log(userStore.getUser())
+   
     const itemsBoards = await getItems(baseUrlboards)
     const boardIds = itemsBoards.boards.map((board) => board.id)
     boardId.value = boardIds
-    console.log(boardId.value[0])
-    router.push({ name: 'TaskList', params: { id: boardId.value[0] } })
+   if (referringId.value) {
+      router.push({ name: 'Invitations', params: { id: referringId.value } })
+    } else {
+      router.push({ name: 'TaskList', params: { id: boardId.value[0] } })
+    }
     userStore.setBoard(boardId.value)
   } catch (error) {
     router.push({ name: 'Board' })
@@ -107,7 +113,7 @@ const submitForm = async () => {
       userInfowhileLogin.value = { ...decoded }
 
       userStore.setUserInfo(userInfowhileLogin.value)
-      console.log(userStore.getUserInfo())
+     
       userStore.setEmail(emailJWT.value)
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)
@@ -119,12 +125,12 @@ const submitForm = async () => {
       itemsBoards.boards.sort(
         (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
       ) //sort by createdOn
-      console.log(itemsBoards.boards)
+
 
       boardStore.setBoards(itemsBoards.boards) //set value board
 
       boardStore.setCollabs(itemsBoards.collabs)
-      console.log(boardStore.getBoards())
+    
 
       openHomePage()
     } else if (response.status === 401) {

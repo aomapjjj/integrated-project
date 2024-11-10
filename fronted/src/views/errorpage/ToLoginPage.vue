@@ -1,10 +1,14 @@
 <script setup>
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from "vue-router"
 const router = useRouter()
 
+const route = useRoute()
+const referringId = computed(() => route.query.refId)
+
 
 const toLogin = () => {
- router.push({ name: "Login" })
+ router.push({ name: "Login" , query: { refId: referringId.value }})
 }
 
 </script>

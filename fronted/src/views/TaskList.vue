@@ -241,7 +241,7 @@ const sortByStatus = () => {
 // ----------------------- Filter -----------------------
 
 const filter = ref([])
-console.log(taskStore.getTasks())
+
 
 const filteredTasks = computed(() => {
   if (filter.value.length === 0) {

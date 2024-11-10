@@ -84,19 +84,18 @@ onMounted(async () => {
   userStore.setToken(token)
   const collaborator = await getItems(baseUrlCollaborator)
   collaboratorInfo.value = collaborator.collaborators
-  console.log('Get Items', collaboratorInfo.value)
-
+ 
   const Board = await getBoardById(boardId.value)
-  console.log('Board data', Board.item.owner.name)
+ 
   boardOwnerName.value = Board.item.owner.name
   if (Board && Board.item && Board.item.name) {
     boardName.value = Board.item.name
   }
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-    console.log('ไม่ตรงกันนะจ๊า')
+  
   } else {
-    console.log('ตรงกันนะจ๊า')
+    console.log('Error')
   }
 })
 
@@ -149,7 +148,7 @@ const updateAccessRight = (item) => {
   try {
     openModalAcess.value = true
     pendingItem.value = item
-    console.log(pendingItem.value)
+
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -168,7 +167,7 @@ const confirmChange = async () => {
         pendingItem.value.id,
         pendingItem.value.status
       )
-      console.log(pendingItem.value)
+
       alertMessage.value = 'Access right updated: ' + result.accessRight
       isAlertSuccess.value = true
       setTimeout(hideAlert, 3000)
@@ -274,7 +273,7 @@ const submitFormSendEmail = async () => {
           alertMessage.value =
             'Board owner cannot be collaborator of his/her own board'
         } else {
-          alertMessage.value = 'An unknown error occurred.'
+          alertMessage.value = 'The user is already the collaborator or pending collaborator of this board.'
         }
         setTimeout(hideAlert, 3000)
         break
