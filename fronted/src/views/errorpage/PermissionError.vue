@@ -14,11 +14,6 @@ const goBackHome = () => {
   <div
     class="grid min-h-full place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8 text-center"
   >
-    <h1
-      class="text-base font-semibold customPink border border-gray-600 rounded-full w-16"
-    >
-      403
-    </h1>
     <svg
       class="w-1/2 md:1/3 lg:w-1/4"
       viewBox="0 0 450 338"
@@ -165,7 +160,7 @@ const goBackHome = () => {
         @click="goBackHome"
         class="rounded-button rounded-md bg-error px-3.5 py-2.5 text-sm font-semibold text-white"
       >
-        <i class="mdi mdi-arrow-left mr-2"></i>Go back 
+        <i class="mdi mdi-arrow-left mr-2"></i>Go back home
       </button>
     </div>
     <!-- <div class="mt-10 flex items-center justify-center gap-x-6">

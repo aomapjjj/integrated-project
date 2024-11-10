@@ -1,74 +1,50 @@
 <script setup>
 const props = defineProps({
-    isLoading: Boolean,
+  isLoading: Boolean
 })
 </script>
- 
+
 <template>
-  <div v-if="isLoading" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="itbkk-modal-alert modal-box w-1/3">
-      <h3 class="font-bold text-lg customPurple">Almost there, just a moment...</h3>
-
-    
-      <div class="loader"></div> 
-
+  <div
+    v-if="isLoading"
+    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div
+      class="itbkk-modal-alert modal-box w-1/3 p-6 text-center flex flex-col items-center justify-center space-y-4"
+    >
+      <h3 class="font-bold text-lg customPurple">
+        Please hold on, we're almost ready...
+      </h3>
+      <div class="loader"></div>
+      <p class="text-gray-700">
+        Sending your invitation email now. <br />
+        This will only take a moment.
+      </p>
+      <p class="text-sm text-gray-500">
+        please check your email for the board invite!
+      </p>
     </div>
-    
   </div>
 </template>
- 
+
 <style scoped>
 .loader {
-  width: 40px;
+  width: 120px;
   height: 20px;
-  --c:no-repeat radial-gradient(farthest-side,#000 93%,#0000);
-  background:
-    var(--c) 0    0,
-    var(--c) 50%  0;
-  background-size: 8px 8px;
-  position: relative;
-  clip-path: inset(-200% -100% 0 0);
-  animation: l6-0 1.5s linear infinite;
+  border-radius: 20px;
+  background: repeating-linear-gradient(135deg, #f03355 0 10px, #ffa516 0 20px)
+      0/0% no-repeat,
+    repeating-linear-gradient(135deg, #ddd 0 10px, #eee 0 20px) 0/100%;
+  animation: l3 2s infinite;
 }
-.loader:before {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 12px;
-  background: #000;
-  left: -16px;
-  top: 0;
-  animation: 
-    l6-1 1.5s linear infinite,
-    l6-2 0.5s cubic-bezier(0,200,.8,200) infinite;
+
+@keyframes l3 {
+  100% {
+    background-size: 100%;
+  }
 }
-.loader:after {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto auto;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #000; 
-  animation: l6-3 1.5s linear infinite;
-}
-@keyframes l6-0 {
-  0%,30%  {background-position: 0  0   ,50% 0   }
-  33%     {background-position: 0  100%,50% 0   }
-  41%,63% {background-position: 0  0   ,50% 0   }
-  66%     {background-position: 0  0   ,50% 100%}
-  74%,100%{background-position: 0  0   ,50% 0   }
-}
-@keyframes l6-1 {
-  90%  {transform:translateY(0)}
-  95%  {transform:translateY(15px)}
-  100% {transform:translateY(15px);left:calc(100% - 8px)}
-}
-@keyframes l6-2 {
-  100% {top:-0.1px}
-}
-@keyframes l6-3 {
-  0%,80%,100% {transform:translate(0)}
-  90%         {transform:translate(26px)}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem;
 }
 </style>

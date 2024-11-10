@@ -185,7 +185,7 @@ const confirmChange = async () => {
 const hideAlert = () => {
   isAlertFailure.value = false
   isAlertSuccess.value = false
-  isSendEmailSuccess.value = false
+  // isSendEmailSuccess.value = false
 }
 
 const clearForm = () => {
@@ -312,7 +312,7 @@ const deleteConfirmationMessage = computed(() => {
     <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
       {{ alertMessage }}
     </Alert>
-    <SuccessModal :isSuccess="isSendEmailSuccess" />
+    <SuccessModal :isSuccess="isSendEmailSuccess" @close="isSendEmailSuccess = false" />
 
 
   </div>

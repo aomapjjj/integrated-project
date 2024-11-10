@@ -53,8 +53,6 @@ const boardsCollab = ref()
 boardsOwner.value = boardStore.getBoards()
 boardsCollab.value = boardStore.getCollabs()
 
-
-
 // ----------------------- Enable & Disable -----------------------
 
 const openModalToDelete = ref(false)
