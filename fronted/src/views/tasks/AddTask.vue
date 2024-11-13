@@ -4,6 +4,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTasks } from '../../stores/store.js'
 import { useLimitStore } from '../../stores/storeLimit.js'
+import UploadFileCard from '@/component/card/UploadFileCard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -70,6 +71,9 @@ const submitForm = async () => {
       assignees: trimmedAssignees,
       status: todo.value.status
     })
+
+
+
 
     taskStore.addTask(
       itemAdd.id,
@@ -176,9 +180,11 @@ const isLimitReached = computed(() => {
   </RouterLink>
 
   <div class="itbkk-modal-task">
+    
     <dialog id="my_modal_1" class="modal fixed min-h-full max-h-fit flex">
+     
       <div
-        class="modal-container bg-white xl:w-3/4 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
+        class="modal-container bg-white xl:w-2/4 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
       >
         <div
           form
@@ -234,6 +240,8 @@ const isLimitReached = computed(() => {
               {{ todo.description?.length }}/500
             </p>
           </div>
+          <!-- <UploadFileCard/> -->
+          
           <div class="modal-content py-4 text-left px-10 mb-2">
             <!-- Assignees -->
             <span
@@ -254,6 +262,7 @@ const isLimitReached = computed(() => {
             >
               {{ todo.assignees?.length }}/30
             </p>
+            
             <!-- Status -->
             <div class="mb-4 mt-2">
               <span
@@ -349,6 +358,7 @@ const isLimitReached = computed(() => {
       </div>
     </dialog>
   </div>
+
 </template>
 <style>
 .fixed-alert {

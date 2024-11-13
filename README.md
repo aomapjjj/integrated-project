@@ -15,7 +15,7 @@ Our team consists of three people. Although everyone is a **full-stack developer
 
 | Student ID    | Full Name               | Responsibility   | Work Percentage |
 |---------------|-------------------------|------------------|-----------------|
-| 65130500007   | Jakathorn Sorvises      | Front-end            | 33%            |
+| 65130500007   | Jakathorn Sorvises      | Front-end, Back-end  | 33%            |
 | 65130500050   | Panipak Jongsirivanich  | Front-end, Back-end  | 33%            |
 | 65130500056   | Pearmai Wannasiri       | Back-end, UX/UI Designer| 33%            |
 
