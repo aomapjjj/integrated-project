@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,6 +39,21 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "boardId")
     private Board board;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TaskFile> files = new ArrayList<>();
+
+    // Method to add a file to the task
+    public void addFile(TaskFile file) {
+        files.add(file);
+        file.setTask(this);
+    }
+
+    // Method to remove a file from the task
+    public void removeFile(TaskFile file) {
+        files.remove(file);
+        file.setTask(null);
+    }
 
     public void setTitle(String title) {
         if (title == null || title.isEmpty()) {

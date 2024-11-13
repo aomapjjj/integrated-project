@@ -21,4 +21,7 @@ public class ErrorResponse {
         this.message = message;
         this.instance = instance;
     }
+
+
+
 }
