@@ -17,6 +17,7 @@ import CollabCard from '@/component/card/CollabCard.vue'
 import ConfirmModal from '@/component/modal/ConfirmModal.vue'
 import WaitModal from '@/component/modal/WaitModal.vue'
 import SuccessModal from '@/component/alert/SuccessModal.vue'
+import CollaboratorCard from '@/component/card/CollaboratorCard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -32,6 +33,8 @@ const userStore = useUsers()
 const boardName = ref('')
 const isSendEmailSuccess = ref(false)
 const boardId = ref()
+// const isLoading = ref(false)
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -43,7 +46,11 @@ watch(
 const token = localStorage.getItem('access_token')
 const collaboratorEmail = ref('')
 const isOwnerEmail = ref(false)
+
+// Dropdown state
+const isOpenDropdown = ref(false)
 const collaboratorAccess = ref('READ')
+
 const collaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
 const userEmail = userStore.getEmail()
@@ -82,18 +89,19 @@ const cancelChange = () => {
 
 onMounted(async () => {
   userStore.setToken(token)
+
   const collaborator = await getItems(baseUrlCollaborator)
   collaboratorInfo.value = collaborator.collaborators
- 
+
   const Board = await getBoardById(boardId.value)
- 
+
   boardOwnerName.value = Board.item.owner.name
+
   if (Board && Board.item && Board.item.name) {
     boardName.value = Board.item.name
   }
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
-  
   } else {
     console.log('Error')
   }
@@ -148,7 +156,6 @@ const updateAccessRight = (item) => {
   try {
     openModalAcess.value = true
     pendingItem.value = item
-
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -205,6 +212,7 @@ const checkEmail = computed(() => {
     !collaboratorEmail.value.includes('@')
   )
 })
+
 const submitFormSendEmail = async () => {
   const email = collaboratorEmail?.value
   const accessRight = collaboratorAccess.value
@@ -237,7 +245,8 @@ const submitFormSendEmail = async () => {
 
     switch (result.statusCode) {
       case 201:
-        collaboratorInfo.value.push(result.data)
+        // collaboratorInfo.value.push(result.data)
+        await fetchCollaborators()
         isSendEmailSuccess.value = true
         alertMessage.value = 'Collaborator added successfully!'
         setTimeout(hideAlert, 3000)
@@ -273,7 +282,8 @@ const submitFormSendEmail = async () => {
           alertMessage.value =
             'Board owner cannot be collaborator of his/her own board'
         } else {
-          alertMessage.value = 'The user is already the collaborator or pending collaborator of this board.'
+          alertMessage.value =
+            'The user is already the collaborator or pending collaborator of this board.'
         }
         setTimeout(hideAlert, 3000)
         break
@@ -289,8 +299,26 @@ const submitFormSendEmail = async () => {
     setTimeout(hideAlert, 3000)
   } finally {
     waitModal.value = false
+    // isLoading.value = false
   }
 }
+
+const fetchCollaborators = async () => {
+  try {
+    const collaborator = await getItems(baseUrlCollaborator)
+    collaboratorInfo.value = collaborator.collaborators
+  } catch (error) {
+    console.error('Failed to fetch collaborators:', error)
+  }
+}
+
+watch(
+  () => boardId.value,
+  async () => {
+    await fetchCollaborators()
+  },
+  { immediate: true }
+)
 
 const deleteConfirmationMessage = computed(() => {
   if (
@@ -312,9 +340,10 @@ const deleteConfirmationMessage = computed(() => {
     <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
       {{ alertMessage }}
     </Alert>
-    <SuccessModal :isSuccess="isSendEmailSuccess" @close="isSendEmailSuccess = false" />
-
-
+    <SuccessModal
+      :isSuccess="isSendEmailSuccess"
+      @close="isSendEmailSuccess = false"
+    />
   </div>
 
   <div class="flex flex-col h-screen overflow-hidden">
@@ -394,7 +423,7 @@ const deleteConfirmationMessage = computed(() => {
           </button>
         </div>
 
-        <div class="flex flex-col items-center mt-2">
+        <div class="flex flex-col items-center mt-2 overflow-y-auto">
           <div>
             <div
               class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center"
@@ -406,65 +435,150 @@ const deleteConfirmationMessage = computed(() => {
             </div>
             <div
               v-else
-              class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+              class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
             >
-              <CollabCard
+              <CollaboratorCard
                 v-for="(item, index) in collaboratorInfo"
                 :key="item.id"
               >
-                <template #name>
-                  <h2 class="itbkk-name font-semibold">{{ item.name }}</h2>
+                <template #status>
+                  <!-- pendind -->
+                  <div class="flex items-center">
+                    <svg
+                      v-if="item.status === 'PENDING'"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-3 h-3 text-yellow-400"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10"
+                        opacity=".5"
+                      />
+                      <path
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        d="M12 7.25a.75.75 0 0 1 .75.75v3.69l2.28 2.28a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1-.22-.53V8a.75.75 0 0 1 .75-.75"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <!-- accept -->
+                    <svg
+                      v-if="item.status === 'ACCEPTED'"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-3 h-3 text-green-400"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        fill-rule="evenodd"
+                        d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 0 0 1.414 0l5.952-5.95l-1.062-1.062z"
+                      />
+                    </svg>
+                    <span
+                      :class="{
+                        ' text-yellow-400': item.status === 'PENDING',
+                        ' text-green-400': item.status === 'ACCEPTED'
+                      }"
+                      class="text-xs font-medium px-2 py-1 rounded-full"
+                    >
+                      {{ item.status === 'PENDING' ? 'PENDING' : 'ACCEPTED' }}
+                    </span>
+                  </div>
                 </template>
-
+                <template #name>
+                  <p class="itbkk-name">{{ item.name }}</p>
+                </template>
                 <template #email>
-                  <p class="itbkk-email mt-2 text-sm text-gray-500">
+                  <p class="itbkk-email">
                     {{ item.email }}
                   </p>
                 </template>
-
                 <template #access-right>
-                  <div class="itbkk-access-right mt-3 relative inline-flex">
-                    <svg
-                      class="w-2 h-2 absolute top-2 right-1 m-2 pointer-events-none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 412 232"
-                    >
-                      <path
-                        d="M206 171.144L42.678 7.822c-9.763-9.763-25.592-9.763-35.355 0-9.763 9.764-9.763 25.592 0 35.355l181 181c4.88 4.882 11.279 7.323 17.677 7.323s12.796-2.441 17.678-7.322l181-181c9.763-9.764 9.763-25.592 0-35.355-9.763-9.763-25.592-9.763-35.355 0L206 171.144z"
-                        fill="#648299"
-                        fill-rule="nonzero"
-                      />
-                    </svg>
-                    <select
+                  <div class="itbkk-access-right">
+
+                    <section class="">
+    <div class="relative inline-block text-left">
+        <div>
+            <button
+                  type="button"
+                  class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                  id="menu-button"
+                  aria-expanded="true"
+                  aria-haspopup="true"
+                >
+                  Sort By
+                  <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+        </div>
+
+        <div class="absolute z-10 mt-2 left-5 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+            role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+            <div class="py-1" role="none">
+                <p class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
+                    >Read</p>
+                <p class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
+                    >Write</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+                    <!-- <select
                       v-model="item.accessRight"
                       @change="updateAccessRight(item)"
-                      class="border border-gray-300 rounded-full text-gray-600 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
+                      class="border border-gray-300 rounded-full text-gray-900 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
                     >
                       <option value="READ">Read</option>
                       <option value="WRITE">Write</option>
-                    </select>
+                    </select> -->
                   </div>
                 </template>
                 <template #btn>
                   <button
                     :disabled="disabledButtonWhileOpenPublic"
                     @click="showRemoveModal(item)"
-                    class="itbkk-collab -ml-4 flex items-center justify-center rounded-full px-2 hover:text-red-500 text-red-400 transition duration-200 ease-in-out"
+                    class="itbkk-collab flex items-center justify-center rounded-full transition duration-200 ease-in-out"
+                    :class="
+                      item.status === 'PENDING'
+                        ? 'hover:text-gray-500 text-gray-400'
+                        : 'hover:text-red-500 text-red-400'
+                    "
                   >
+                    <!-- cancel -->
                     <svg
+                      v-if="item.status === 'PENDING'"
                       xmlns="http://www.w3.org/2000/svg"
-                      class="w-4 h-4"
+                      class="w-6 h-6"
+                      viewBox="0 0 1024 1024"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M512 64a448 448 0 1 1 0 896a448 448 0 0 1 0-896M288 512a38.4 38.4 0 0 0 38.4 38.4h371.2a38.4 38.4 0 0 0 0-76.8H326.4A38.4 38.4 0 0 0 288 512"
+                      />
+                    </svg>
+                    <!-- delete -->
+                    <svg
+                      v-else-if="item.status === 'ACCEPTED'"
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="w-6 h-6"
                       viewBox="0 0 24 24"
                     >
                       <path
                         fill="currentColor"
-                        fill-rule="evenodd"
-                        d="m12 10.586l5.657-5.657l1.414 1.414L13.414 12l5.657 5.657l-1.414 1.414L12 13.414l-5.657 5.657l-1.414-1.414L10.586 12L4.929 6.343L6.343 4.93z"
+                        d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m4.3 14.3a.996.996 0 0 1-1.41 0L12 13.41L9.11 16.3a.996.996 0 1 1-1.41-1.41L10.59 12L7.7 9.11A.996.996 0 1 1 9.11 7.7L12 10.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41"
                       />
                     </svg>
                   </button>
                 </template>
-              </CollabCard>
+              </CollaboratorCard>
             </div>
 
             <ConfirmModal
