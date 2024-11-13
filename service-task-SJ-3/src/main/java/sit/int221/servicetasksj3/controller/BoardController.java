@@ -20,6 +20,7 @@ import sit.int221.servicetasksj3.dtos.statusesDTO.*;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.services.*;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
@@ -165,7 +166,7 @@ public class BoardController {
         TaskDTOTwo updatedTaskDTO = modelMapper.map(updatedTask, TaskDTOTwo.class);
         return ResponseEntity.ok(updatedTaskDTO);
     }
-
+    // Get File
     @GetMapping("/{boardId}/tasks/{taskId}/attachments")
     public ResponseEntity<List<TaskFile>> getAttachments(@PathVariable Integer taskId) {
         try {
@@ -175,22 +176,25 @@ public class BoardController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
+    // Add File
     @PostMapping("/{boardId}/tasks/{taskId}/attachments")
     public ResponseEntity<?> addAttachments(
             @PathVariable Integer taskId,
             @RequestParam("files") List<MultipartFile> files) {
 
         try {
-            List<String> errorMessages = taskFileService.addAttachments(taskId, files);
-            if (!errorMessages.isEmpty()) {
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
+            taskFileService.addAttachments(taskId, files);
             return ResponseEntity.status(HttpStatus.CREATED).body("Files added successfully.");
+        } catch (ValidationException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload files.");
+        } catch (ItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found.");
         }
     }
+
+    // Delete File
     @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
     public ResponseEntity<String> deleteAttachment(@PathVariable Long attachmentId) {
         taskFileService.deleteAttachment(attachmentId);

@@ -372,6 +372,70 @@ async function deleteCollaborator(boardId, oid) {
   }
 }
 
+async function getAttachments(boardId, taskId) {
+  const token = getToken()
+
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const statusCode = response.status
+    const responseData = await response.json()
+    return { statusCode, data: responseData }
+  } catch (error) {
+    console.log(`Error: ${error.message}`)
+    return { statusCode: null, error: error.message }
+  }
+}
+
+async function addAttachments(boardId, taskId, files) {
+  const token = getToken()
+  const formData = new FormData()
+  files.forEach(file => formData.append('files', file))
+
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    })
+
+    const statusCode = response.status
+    const responseData = await response.json()
+    return { statusCode, data: responseData }
+  } catch (error) {
+    console.log(`Error: ${error.message}`)
+    return { statusCode: null, error: error.message }
+  }
+}
+
+async function deleteAttachment(boardId, taskId, attachmentId) {
+  const token = getToken()
+
+  try {
+    const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${attachmentId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    const statusCode = response.status
+    const message = await response.text() // Assuming server responds with a simple message
+    return { statusCode, message }
+  } catch (error) {
+    console.log(`Error: ${error.message}`)
+    return { statusCode: null, error: error.message }
+  }
+}
+
+
 const validateAccessToken = async (token) => {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
@@ -421,4 +485,7 @@ export {
   editStatusCollab,
   validateAccessToken,
   refreshAccessToken,
+  addAttachments,
+  deleteAttachment,
+  getAttachments
 };

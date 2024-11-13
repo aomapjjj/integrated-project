@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskFile;
+import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
+import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.TaskFileRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
@@ -31,35 +34,30 @@ public class TaskFileService {
 
     public List<TaskFile> getAttachments(Integer taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+                .orElseThrow(() -> new ItemNotFoundException("Task not found"));
         return task.getFiles();
     }
 
-
-    public List<String> addAttachments(Integer taskId, List<MultipartFile> files) throws IOException {
-        List<String> errorMessages = new ArrayList<>();
+    public void addAttachments(Integer taskId, List<MultipartFile> files) throws IOException {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
+                .orElseThrow(() -> new ItemNotFoundException("Task not found"));
 
-        // Check if adding files exceeds max file limit
         if (task.getFiles().size() + files.size() > MAX_FILES) {
-            errorMessages.add("Each task can have at most " + MAX_FILES + " files.");
+            throw new ValidationException("Each task can have at most " + MAX_FILES + " files.");
         }
 
         for (MultipartFile file : files) {
             String fileName = file.getOriginalFilename();
 
-            // Check for file size and uniqueness
             if (!isValidFileSize(file)) {
-                errorMessages.add(fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
-                continue;
-            }
-            if (isDuplicateFile(task, fileName)) {
-                errorMessages.add("File with the same filename cannot be added: " + fileName);
-                continue;
+                throw new ValidationException(fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
             }
 
-            // Save valid files
+            if (isDuplicateFile(task, fileName)) {
+                throw new ValidationException("File with the same filename cannot be added: " + fileName);
+            }
+
+
             TaskFile taskFile = new TaskFile();
             taskFile.setTask(task);
             taskFile.setFileName(fileName);
@@ -67,8 +65,6 @@ public class TaskFileService {
             taskFileRepository.save(taskFile);
             task.addFile(taskFile);
         }
-
-        return errorMessages;
     }
 
     private boolean isValidFileSize(MultipartFile file) {
@@ -83,7 +79,8 @@ public class TaskFileService {
         if (taskFileRepository.existsById(attachmentId)) {
             taskFileRepository.deleteById(attachmentId);
         } else {
-            throw new ResourceNotFoundException("Attachment not found");
+            throw new ItemNotFoundException("Attachment not found");
         }
     }
 }
+
