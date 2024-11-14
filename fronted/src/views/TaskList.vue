@@ -686,6 +686,16 @@ const changeVisibility = async () => {
                     >
                       Assignees
                     </th>
+                    <th
+                      class="px-4 py-2 text-center md:text-left text-md font-semibold text-gray-700"
+                      style="
+                        background-color: #9fc3e9;
+                        border-bottom: 2px solid #9fc3e9;
+                        color: #fff;
+                      "
+                    >
+                    Attachments
+                    </th>
 
                     <!-- STATUS SORT -->
 
@@ -812,6 +822,11 @@ const changeVisibility = async () => {
                           ? 'Unassigned'
                           : item.assignees
                       }}
+                    </td>
+                    <td
+                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      {{ index + 1 }}
                     </td>
                     <td
                       class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"

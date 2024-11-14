@@ -1,5 +1,5 @@
 <script setup>
-import { getItems, addItem } from '../../libs/fetchUtils.js'
+import { getItems, addItem, addAttachments } from '../../libs/fetchUtils.js'
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTasks } from '../../stores/store.js'
@@ -27,6 +27,11 @@ const props = defineProps({
 // ----------------------- Params -----------------------
 
 const boardId = ref()
+
+// ----------------------- object -----------------------
+
+const files = ref([])
+const maxFiles = 10
 
 watch(
   () => route.params.id,
@@ -59,10 +64,22 @@ onMounted(async () => {
   statusList.value = itemsStatus
 })
 
+
+const handleFileChange = (event) => {
+  const selectedFiles = Array.from(event.target.files);
+
+  if (selectedFiles.length > maxFiles) {
+    alert(`You can only upload up to ${maxFiles} files.`);
+    files.value = selectedFiles.slice(0, maxFiles); // เลือกแค่ 10 ไฟล์แรก
+  } else {
+    files.value = selectedFiles;
+  }
+};
+
 const submitForm = async () => {
-  const trimmedTitle = todo.value.title?.trim()
-  const trimmedDescription = todo.value.description?.trim()
-  const trimmedAssignees = todo.value.assignees?.trim()
+  const trimmedTitle = todo.value.title?.trim();
+  const trimmedDescription = todo.value.description?.trim();
+  const trimmedAssignees = todo.value.assignees?.trim();
 
   try {
     const itemAdd = await addItem(baseUrlTask, {
@@ -70,10 +87,7 @@ const submitForm = async () => {
       description: trimmedDescription,
       assignees: trimmedAssignees,
       status: todo.value.status
-    })
-
-
-
+    });
 
     taskStore.addTask(
       itemAdd.id,
@@ -83,17 +97,29 @@ const submitForm = async () => {
       itemAdd.status,
       itemAdd.createdOn,
       itemAdd.updateOn
-    )
+    );
 
-    alertAdd.value = true
+    if (files.value.length > 0) {
+      const attachmentsResponse = await addAttachments(boardId.value, itemAdd.id, files.value);
+
+      if (attachmentsResponse.statusCode === 200 || attachmentsResponse.statusCode === 201) {
+        console.log('Files added successfully:', attachmentsResponse.data);
+      } else {
+        console.error('Failed to add files:', attachmentsResponse.data || attachmentsResponse.error);
+      }
+    }
+
+    alertAdd.value = true;
     setTimeout(() => {
-      alertAdd.value = false
-    }, 2300)
-    closeModal()
+      alertAdd.value = false;
+    }, 2300);
+    closeModal();
   } catch (error) {
-    console.error('Error adding task:', error)
+    console.error('Error adding task:', error);
   }
-}
+};
+
+
 
 const closeModal = () => {
   my_modal_1.close()
@@ -150,153 +176,86 @@ const isLimitReached = computed(() => {
 <template>
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
-    <button
-      :disabled="disabledBtn"
-      :class="['itbkk-button-add', 'btn', { 'btn-disabled': disabledBtn }]"
-      :style="{
-        backgroundColor: disabledBtn ? '#d3d3d3' : '#9391e4',
-        color: disabledBtn ? '#a9a9a9' : 'white',
-        borderRadius: '30px',
-        position: 'relative',
-        cursor: disabledBtn ? 'not-allowed' : 'pointer',
-        opacity: disabledBtn ? 0.6 : 1
-      }"
-      onclick="my_modal_1.showModal()"
-      class="itbkk-button-add btn ml-4"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-      >
-        <path
-          fill="currentColor"
-          d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z"
-        />
+    <button :disabled="disabledBtn" :class="['itbkk-button-add', 'btn', { 'btn-disabled': disabledBtn }]" :style="{
+      backgroundColor: disabledBtn ? '#d3d3d3' : '#9391e4',
+      color: disabledBtn ? '#a9a9a9' : 'white',
+      borderRadius: '30px',
+      position: 'relative',
+      cursor: disabledBtn ? 'not-allowed' : 'pointer',
+      opacity: disabledBtn ? 0.6 : 1
+    }" onclick="my_modal_1.showModal()" class="itbkk-button-add btn ml-4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <path fill="currentColor"
+          d="M11 13H6q-.425 0-.712-.288T5 12t.288-.712T6 11h5V6q0-.425.288-.712T12 5t.713.288T13 6v5h5q.425 0 .713.288T19 12t-.288.713T18 13h-5v5q0 .425-.288.713T12 19t-.712-.288T11 18z" />
       </svg>
       Add new task
     </button>
   </RouterLink>
 
   <div class="itbkk-modal-task">
-    
+
     <dialog id="my_modal_1" class="modal fixed min-h-full max-h-fit flex">
-     
-      <div
-        class="modal-container bg-white xl:w-2/4 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
-      >
-        <div
-          form
-          @submit.prevent="submitForm"
-          class="flex justify-between w-full h-full"
-          style="align-items: center"
-        >
+
+      <div class="modal-container bg-white xl:w-2/4 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex">
+        <div form @submit.prevent="submitForm" class="flex justify-between w-full h-full" style="align-items: center">
           <!-- Title -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-              style="color: #9391e4; margin: 15px"
-              >Title<span style="color: red"> *</span>
+            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+              style="color: #9391e4; margin: 15px">Title<span style="color: red"> *</span>
             </span>
-            <label
-              class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4"
-            >
-              <input
-                type="text"
-                class="grow"
-                placeholder="Enter Your Title"
-                v-model="todo.title"
-              />
+            <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4">
+              <input type="text" class="grow" placeholder="Enter Your Title" v-model="todo.title" />
             </label>
-            <p
-              class="text-sm text-gray-400 ml-4 mb-2 mt-2"
-              style="text-align: right"
-            >
+            <p class="text-sm text-gray-400 ml-4 mb-2 mt-2" style="text-align: right">
               {{ todo.title?.length }}/100
             </p>
             <!-- Description -->
             <label for="description" class="form-control flex-grow ml-4">
               <div class="label">
-                <span
-                  class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                  style="color: #9391e4"
-                  >Description</span
-                >
+                <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
+                  style="color: #9391e4">Description</span>
               </div>
-              <textarea
-                id="description"
-                class="itbkk-description textarea textarea-bordered h-3/4"
-                rows="4"
-                placeholder="No Description Provided"
-                style="height: 200px"
-                v-model="todo.description"
-              ></textarea>
+              <textarea id="description" class="itbkk-description textarea textarea-bordered h-3/4" rows="4"
+                placeholder="No Description Provided" style="height: 200px" v-model="todo.description"></textarea>
             </label>
-            <p
-              class="text-sm text-gray-400 mb-2 mt-2"
-              style="text-align: right"
-            >
+            <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ todo.description?.length }}/500
             </p>
           </div>
           <!-- <UploadFileCard/> -->
-          
+
           <div class="modal-content py-4 text-left px-10 mb-2">
             <!-- Assignees -->
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900"
-              style="color: #9391e4"
-              >Assignees</span
-            >
-            <textarea
-              id="assignees"
-              class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-              rows="4"
-              placeholder="Unassigned"
-              v-model="todo.assignees"
-            ></textarea>
-            <p
-              class="text-sm text-gray-400 mb-2 mt-2"
-              style="text-align: right"
-            >
+            <span class="block text-lg font-bold leading-6 text-gray-900" style="color: #9391e4">Assignees</span>
+            <textarea id="assignees" class="itbkk-assignees textarea textarea-bordered w-full mt-1" rows="4"
+              placeholder="Unassigned" v-model="todo.assignees"></textarea>
+            <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ todo.assignees?.length }}/30
             </p>
-            
+
             <!-- Status -->
             <div class="mb-4 mt-2">
-              <span
-                class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-                style="color: #9391e4"
-                >Status</span
-              >
-              <select
-                class="itbkk-status select select-bordered w-full max-w-xs mt-1"
-                v-model="todo.status"
-              >
+              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2" style="color: #9391e4">Status</span>
+              <select class="itbkk-status select select-bordered w-full max-w-xs mt-1" v-model="todo.status">
                 <option v-for="status in statusList" :value="status.name">
                   {{ status.name }}
                 </option>
               </select>
             </div>
 
-            <div
-              role="alert"
-              v-show="alertLimitAdd"
-              class="flex flex-col fixed-alert alert"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+            <div class="mb-4 mt-2">
+              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                style="color: #9391e4">Attachments</span>
+              <input type="file" multiple @change="handleFileChange" class="w-full max-w-xs mt-1" />
+              <p class="text-sm text-gray-400 mt-1">Selected {{ files.value?.length }}/{{ maxFiles }} files</p>
+            </div>
+
+
+            <div role="alert" v-show="alertLimitAdd" class="flex flex-col fixed-alert alert">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="text-red-500">Error! Tasks cannot be added</span>
               <span>{{ errorMessageLimit }}</span>
@@ -305,13 +264,10 @@ const isLimitReached = computed(() => {
             <!-- Cancel & Save Button -->
             <div class="modal-action">
               <form method="dialog">
-                <button
-                  type="submit"
+                <button type="submit"
                   class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
-                  style="background-color: #f785b1"
-                  :class="{ disabled: !isFormValid || isLimitReached }"
-                  :disabled="!isFormValid || isLimitReached"
-                >
+                  style="background-color: #f785b1" :class="{ disabled: !isFormValid || isLimitReached }"
+                  :disabled="!isFormValid || isLimitReached">
                   Save
                 </button>
               </form>
@@ -323,11 +279,7 @@ const isLimitReached = computed(() => {
         </div>
 
         <!-- ALERT -->
-        <div
-          role="alert"
-          class="alert shadow-lg"
-          :class="{ hidden: !alertAdd }"
-          style="
+        <div role="alert" class="alert shadow-lg" :class="{ hidden: !alertAdd }" style="
             position: fixed;
             top: 20px;
             left: 50%;
@@ -336,24 +288,13 @@ const isLimitReached = computed(() => {
             width: 400px;
             color: rgb(74 222 128 / var(--tw-text-opacity));
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span class="font-bold text-green-400"
-            >The task has been successfully added</span
-          >
+          <span class="font-bold text-green-400">The task has been successfully added</span>
         </div>
       </div>
     </dialog>
