@@ -17,4 +17,5 @@ public class AttachmentDTO {
     private String fileType;
     private byte[] fileData;
     private LocalDateTime uploadDate;
+    private boolean previewAble;
 }

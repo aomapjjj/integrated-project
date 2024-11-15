@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentDTO;
 import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
@@ -42,12 +43,24 @@ public class FileService {
         return task.getFiles().stream().anyMatch(existingFile -> existingFile.getFileName().equals(fileName));
     }
 
+    private static final List<String> PREVIEW_FILE_TYPES = List.of(
+            "image/png",
+            "image/jpeg",
+            "text/plain",
+            "application/rtf",
+            "application/pdf"
+    );
+
+    private boolean isPreviewFileType(String fileType) {
+        return fileType != null && PREVIEW_FILE_TYPES.contains(fileType.toLowerCase());
+    }
+
     // Get all attachments of a task
     public List<AttachmentDTO> getAttachments(Integer taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ItemNotFoundException("Task not found"));
         return task.getFiles().stream()
-                .map(file -> new AttachmentDTO(file.getFileId(), file.getFileName(), file.getFileType(), file.getFileData(), file.getUploadDate()))
+                .map(file -> new AttachmentDTO(file.getFileId(), file.getFileName(), file.getFileType(), file.getFileData(), file.getUploadDate(), isPreviewFileType(file.getFileType())))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +78,9 @@ public class FileService {
         Resource resource = new ByteArrayResource(taskFile.getFileData());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + taskFile.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, isPreviewFileType(fileType) ?
+                        "inline; filename=\"" + taskFile.getFileName() + "\"" :
+                        "attachment; filename=\"" + taskFile.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType(fileType != null ? fileType : MediaType.APPLICATION_OCTET_STREAM_VALUE))
                 .body(resource);
     }
@@ -75,8 +90,11 @@ public class FileService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ItemNotFoundException("Task not found"));
 
+        ValidationException validationError = new ValidationException("Validation error");
+
         if (task.getFiles().size() + files.size() > MAX_FILES) {
-            throw new ValidationException("Each task can have at most " + MAX_FILES + " files.");
+            validationError.addValidationError("files", "Each task can have at most " + MAX_FILES + " files.");
+            throw validationError;
         }
 
         List<AttachmentDTO> attachmentDTOs = files.stream().map(file -> {
@@ -85,10 +103,12 @@ public class FileService {
                 String fileType = file.getContentType();
 
                 if (!isValidFileSize(file)) {
-                    throw new ValidationException(fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
+                    validationError.addValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
+                    throw validationError;
                 }
                 if (isDuplicateFile(task, fileName)) {
-                    throw new ValidationException("File with the same filename cannot be added: " + fileName);
+                    validationError.addValidationError("files", "File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add it again to update the file.");
+                    throw validationError;
                 }
 
                 TaskFile taskFile = new TaskFile();
@@ -99,7 +119,10 @@ public class FileService {
                 fileRepository.save(taskFile);
                 task.addFile(taskFile);
 
-                return new AttachmentDTO(taskFile.getFileId(), taskFile.getFileName(), taskFile.getFileType(), taskFile.getFileData(), taskFile.getUploadDate());
+                return new AttachmentDTO(taskFile.getFileId(), taskFile.getFileName(), taskFile.getFileType(), taskFile.getFileData(), taskFile.getUploadDate(), isPreviewFileType(taskFile.getFileType()));
+//            } catch (MaxUploadSizeExceededException e) {
+//                validationError.addValidationError("files", "File size exceeds the maximum allowed size.");
+//                return null;
             } catch (IOException e) {
                 throw new ValidationException("Error uploading file: " + file.getOriginalFilename());
             }
@@ -108,18 +131,21 @@ public class FileService {
     }
 
     // Delete an attachment
-//    public AttachmentDTO deleteAttachment(Integer attachmentId) {
-//        TaskFile taskFile = fileRepository.findById(attachmentId)
-//                .orElseThrow(() -> new ItemNotFoundException("Attachment not found"));
-//
-//        AttachmentDTO deletedAttachmentDTO = new AttachmentDTO(
-//                taskFile.getFileId(),
-//                taskFile.getFileName(),
-//                taskFile.getUploadDate()
-//        );
-//
-//        fileRepository.delete(taskFile);
-//        return deletedAttachmentDTO;
-//    }
+    public AttachmentDTO deleteAttachment(Integer attachmentId) {
+        TaskFile taskFile = fileRepository.findById(attachmentId)
+                .orElseThrow(() -> new ItemNotFoundException("Attachment not found"));
+
+        AttachmentDTO deletedAttachmentDTO = new AttachmentDTO(
+                taskFile.getFileId(),
+                taskFile.getFileName(),
+                taskFile.getFileType(),
+                taskFile.getFileData(),
+                taskFile.getUploadDate(),
+                isPreviewFileType(taskFile.getFileType())
+        );
+
+        fileRepository.delete(taskFile);
+        return deletedAttachmentDTO;
+    }
 }
 

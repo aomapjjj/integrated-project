@@ -170,11 +170,11 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // Delete File
-//    @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
-//    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId) {
-//        AttachmentDTO deletedAttachment = fileService.deleteAttachment(attachmentId);
-//        return ResponseEntity.ok(deletedAttachment);
-//    }
+    @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
+    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId) {
+        AttachmentDTO deletedAttachment = fileService.deleteAttachment(attachmentId);
+        return ResponseEntity.ok(deletedAttachment);
+    }
 
     // ----------------------- Status -----------------------
     @GetMapping("/{boardId}/statuses")

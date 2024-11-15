@@ -73,18 +73,12 @@ public class GlobalExceptionHandler {
         return createErrorResponse("Request body contains invalid data. Please check the 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "File size exceeds the maximum allowed size.",
-                request.getDescription(false).replace("uri=", "")
+    public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
+        List<ErrorDetails.ValidationError> errors = List.of(
+                new ErrorDetails.ValidationError("files", "File size exceeds the maximum limit of 20MB")
         );
-
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException exception, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access is denied", request.getDescription(false).replace("uri=", ""));
@@ -105,7 +99,6 @@ public class GlobalExceptionHandler {
         }
         return List.of(new ErrorDetails.ValidationError("message", cause != null ? cause.getMessage() : "Unknown error"));
     }
-
     private ResponseEntity<ErrorResponse> createErrorResponse(String message, HttpStatus httpStatus, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message, request.getDescription(false).replace("uri=", ""));
         return ResponseEntity.status(httpStatus).body(errorResponse);
