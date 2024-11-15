@@ -34,7 +34,6 @@ public class BoardService {
     @Autowired
     private CollaboratorService collaboratorService;
 
-
     private String generateUniqueBoardId() {
         String boardId;
         do {
