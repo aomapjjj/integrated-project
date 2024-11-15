@@ -5,7 +5,7 @@
 <template>
   <div class="px-4 py-6">
     <div
-      class="relative bg-[#eff6e0] p-6 rounded-xl shadow-md text-gray-700 w-80"
+      class="relative bg-[#eff6e0] p-6 rounded-xl shadow-md text-gray-700 w-80 " 
     >
       <div class="flex justify-between items-center mb-4">
         <span
@@ -60,7 +60,7 @@
           <!-- <p class="text-lg font-semibold text-gray-900">$250/hr</p>
             <p class="text-sm text-gray-500">San Francisco, CA</p> -->
         </div>
-        <div class="mt-3 relative inline-flex">
+        <div class="mt-3 relative inline-flex ">
           <slot name="access-right"></slot>
         </div>
 
