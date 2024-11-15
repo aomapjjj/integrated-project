@@ -486,7 +486,7 @@ export {
   deleteCollaborator,
   editStatusCollab,
   validateAccessToken,
-  z,
+  refreshAccessToken,
   addAttachments,
   deleteAttachment,
   getAttachments
