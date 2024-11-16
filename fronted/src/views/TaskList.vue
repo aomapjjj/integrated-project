@@ -6,7 +6,7 @@ import {
   deleteItemById,
   editLimit,
   getBoardById,
-  getResponseItems
+  getAttachments
 } from '../libs/fetchUtils.js'
 import TaskDetail from './tasks/TaskDetail.vue'
 import AddTask from './tasks/AddTask.vue'
@@ -95,6 +95,14 @@ onMounted(async () => {
       taskStore.addTasks(items)
     }
 
+    for (const task of taskStore.getTasks()) {
+    const { statusCode, data } = await getAttachments(boardId.value, task.id);
+
+    if (statusCode === 200) {
+      taskStore.updateAttachments(task.id, data);
+    }
+  }
+
     const board = await getBoardById(boardId.value)
 
     if (!userName) {
@@ -129,8 +137,11 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error loading data:', error)
   } finally {
-    isLoading.value = false // ปิดการโหลดเมื่อทำงานเสร็จ
+    isLoading.value = false
   }
+
+  console.log(taskStore.getTasks());
+  
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -823,11 +834,11 @@ const changeVisibility = async () => {
                           : item.assignees
                       }}
                     </td>
-                    <td
-                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
-                    >
-                      {{ index + 1 }}
-                    </td>
+                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
+  {{ item.attachments && Array.isArray(item.attachments) && item.attachments.length > 0 ? item.attachments.length : '-' }}
+</td>
+
+
                     <td
                       class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >

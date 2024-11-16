@@ -393,36 +393,27 @@ async function getAttachments(boardId, taskId) {
 }
 
 async function addAttachments(boardId, taskId, files) {
-  const formData = new FormData();
-  files.forEach((file) => formData.append('files', file));
+  const token = getToken()
+  const formData = new FormData()
+  files.forEach(file => formData.append('files', file))
 
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${getToken()}`
+        Authorization: `Bearer ${token}`
       },
       body: formData
-    });
+    })
 
-    const statusCode = response.status;
-
-    // ตรวจสอบ status code และ response
-    let responseData;
-    if (statusCode === 200 || statusCode === 201) {
-      responseData = await response.text(); // อ่านเป็นข้อความเมื่ออัปโหลดสำเร็จ
-    } else {
-      responseData = await response.json(); // อ่านเป็น JSON เมื่อเกิด error
-    }
-
-    return { statusCode, data: responseData };
+    const statusCode = response.status
+    const responseData = await response.json()
+    return { statusCode, data: responseData }
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    return { statusCode: null, error: error.message };
+    console.log(`Error: ${error.message}`)
+    return { statusCode: null, error: error.message }
   }
 }
-
-
 
 async function deleteAttachment(boardId, taskId, attachmentId) {
   const token = getToken()
@@ -436,7 +427,7 @@ async function deleteAttachment(boardId, taskId, attachmentId) {
     })
 
     const statusCode = response.status
-    const message = await response.text() // Assuming server responds with a simple message
+    const message = await response.text() 
     return { statusCode, message }
   } catch (error) {
     console.log(`Error: ${error.message}`)

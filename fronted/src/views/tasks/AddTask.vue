@@ -32,6 +32,7 @@ const boardId = ref()
 
 const files = ref([])
 const maxFiles = 10
+const maxTotalSizePerFile = 20 * 1024 * 1024 // 20 MB
 
 watch(
   () => route.params.id,
@@ -64,17 +65,82 @@ onMounted(async () => {
   statusList.value = itemsStatus
 })
 
-
 const handleFileChange = (event) => {
   const selectedFiles = Array.from(event.target.files);
 
-  if (selectedFiles.length > maxFiles) {
-    alert(`You can only upload up to ${maxFiles} files.`);
-    files.value = selectedFiles.slice(0, maxFiles); // เลือกแค่ 10 ไฟล์แรก
-  } else {
-    files.value = selectedFiles;
+  if (files.value.length + selectedFiles.length > maxFiles) {
+    alert(`You can upload up to ${maxFiles} files.`);
+    return;
+  }
+
+  const newFiles = [];
+  for (const file of selectedFiles) {
+    if (file.size > maxTotalSizePerFile) {
+      alert(`File ${file.name} exceeds the maximum size of 20 MB.`);
+      continue;
+    }
+    newFiles.push(file);
+  }
+
+  files.value = [...files.value, ...newFiles];
+};
+
+
+watch(
+  () => files.value,
+  (newFiles) => {
+    files.value = newFiles
+    console.log('Updated files:', newFiles)
+  }
+)
+
+const isImage = (file) => {
+  return file.type.startsWith("image/");
+};
+
+const getFileIcon = (file) => {
+  if (!file || typeof file !== 'object' || !file.name) {
+    return '/image/files/default.png';
+  }
+
+  const extension = file.name.split('.').pop().toLowerCase();
+  if (!extension) return '/image/files/default.png';
+
+  // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
+  switch (extension) {
+    case 'pdf':
+      return '/image/files/PDF.png';
+    case 'doc':
+    case 'docx':
+      return '/image/files/DOC.png';
+    case 'xls':
+    case 'xlsx':
+      return '/image/files/XLS.png';
+    case 'ppt':
+    case 'pptx':
+      return '/image/files/PPT.png';
+    case 'txt':
+      return '/image/files/TXT.png';
+    case 'png':
+    case 'jpeg':
+    case 'jpg':
+    case 'gif':
+      return file instanceof File ? URL.createObjectURL(file) : '/image/files/default.png';
+    default:
+      return '/image/files/default.png';
   }
 };
+
+
+
+const clearFileUrls = () => {
+  files.value.forEach((file) => {
+    if (file instanceof File && file.url) {
+      URL.revokeObjectURL(file.url);
+    }
+  });
+};
+
 
 const submitForm = async () => {
   const trimmedTitle = todo.value.title?.trim();
@@ -82,12 +148,32 @@ const submitForm = async () => {
   const trimmedAssignees = todo.value.assignees?.trim();
 
   try {
+    // เพิ่ม Task ไปยัง backend
     const itemAdd = await addItem(baseUrlTask, {
       title: trimmedTitle,
       description: trimmedDescription,
       assignees: trimmedAssignees,
-      status: todo.value.status
+      status: todo.value.status,
     });
+
+    // อัปโหลดไฟล์แนบ
+    let attachments = [];
+    const attachmentsResponse = await addAttachments(boardId.value, itemAdd.id, files.value);
+
+    if (
+      attachmentsResponse.statusCode === 200 || 
+      attachmentsResponse.statusCode === 201
+    ) {
+      console.log('File added successfully:', attachmentsResponse.data);
+      
+      if (attachmentsResponse.data && Array.isArray(attachmentsResponse.data.attachments)) {
+        attachments = attachmentsResponse.data.attachments; 
+      } else {
+        console.error('attachmentsResponse.data.attachments is not an array:', attachmentsResponse.data);
+      }
+    } else {
+      console.error('Failed to add file:', attachmentsResponse);
+    }
 
     taskStore.addTask(
       itemAdd.id,
@@ -96,18 +182,11 @@ const submitForm = async () => {
       itemAdd.assignees,
       itemAdd.status,
       itemAdd.createdOn,
-      itemAdd.updateOn
+      itemAdd.updateOn,
+      attachments
     );
 
-    if (files.value.length > 0) {
-      const attachmentsResponse = await addAttachments(boardId.value, itemAdd.id, files.value);
-
-      if (attachmentsResponse.statusCode === 200 || attachmentsResponse.statusCode === 201) {
-        console.log('Files added successfully:', attachmentsResponse.data);
-      } else {
-        console.error('Failed to add files:', attachmentsResponse.data || attachmentsResponse.error);
-      }
-    }
+    console.log(taskStore.getTasks());
 
     alertAdd.value = true;
     setTimeout(() => {
@@ -118,6 +197,8 @@ const submitForm = async () => {
     console.error('Error adding task:', error);
   }
 };
+
+
 
 
 
@@ -132,6 +213,7 @@ const clearForm = () => {
   todo.value.description = ''
   todo.value.assignees = ''
   todo.value.status = 'No Status'
+  files.value = []
 }
 
 // ----------------------- Validate -----------------------
@@ -173,6 +255,7 @@ const isLimitReached = computed(() => {
 })
 </script>
 
+
 <template>
   <!-- ADD -->
   <RouterLink :to="{ name: 'AddTask' }">
@@ -200,8 +283,8 @@ const isLimitReached = computed(() => {
         <div form @submit.prevent="submitForm" class="flex justify-between w-full h-full" style="align-items: center">
           <!-- Title -->
           <div class="modal-content py-4 text-left px-6 flex-grow">
-            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-              style="color: #9391e4; margin: 15px">Title<span style="color: red"> *</span>
+            <span class="block text-lg font-bold leading-6 text-gray-900 mb-1" style="color: #9391e4; margin: 15px">
+              Title<span style="color: red"> *</span>
             </span>
             <label class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4">
               <input type="text" class="grow" placeholder="Enter Your Title" v-model="todo.title" />
@@ -209,6 +292,7 @@ const isLimitReached = computed(() => {
             <p class="text-sm text-gray-400 ml-4 mb-2 mt-2" style="text-align: right">
               {{ todo.title?.length }}/100
             </p>
+
             <!-- Description -->
             <label for="description" class="form-control flex-grow ml-4">
               <div class="label">
@@ -221,9 +305,28 @@ const isLimitReached = computed(() => {
             <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
               {{ todo.description?.length }}/500
             </p>
-          </div>
-          <!-- <UploadFileCard/> -->
 
+            <!-- Attachments -->
+            <div class="mb-4 mt-2">
+              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2"
+                style="color: #9391e4">Attachments</span>
+              <input type="file" multiple @change="handleFileChange" class="w-full max-w-xs mt-1" />
+
+              <div v-for="(file, index) in files" :key="index" class="flex items-center mt-3">
+                <div v-if="isImage(file) && typeof file === 'object' && 'name' in file" class="flex items-center gap-2">
+                  <img :src="URL.createObjectURL(file)" alt="Image Thumbnail"
+                    class="w-12 h-12 object-cover rounded shadow-md" />
+                </div>
+                <div v-else class="flex items-center gap-2">
+                  <img :src="getFileIcon(file)" alt="File Icon" class="w-12 h-12 object-cover rounded shadow-md" />
+                </div>
+                <p class="font-semibold text-gray-700">{{ file.name }}</p>
+              </div>
+
+
+              <p class="text-sm text-gray-400 mt-1">Selected {{ files?.length }}/{{ maxFiles }} files</p>
+            </div>
+          </div>
           <div class="modal-content py-4 text-left px-10 mb-2">
             <!-- Assignees -->
             <span class="block text-lg font-bold leading-6 text-gray-900" style="color: #9391e4">Assignees</span>
@@ -242,14 +345,6 @@ const isLimitReached = computed(() => {
                 </option>
               </select>
             </div>
-
-            <div class="mb-4 mt-2">
-              <span class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-                style="color: #9391e4">Attachments</span>
-              <input type="file" multiple @change="handleFileChange" class="w-full max-w-xs mt-1" />
-              <p class="text-sm text-gray-400 mt-1">Selected {{ files.value?.length }}/{{ maxFiles }} files</p>
-            </div>
-
 
             <div role="alert" v-show="alertLimitAdd" class="flex flex-col fixed-alert alert">
               <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
