@@ -97,7 +97,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           </label>
 
           <!-- Attachments Section -->
-          <!-- Attachments Section -->
           <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
             <h2 class="text-lg font-bold mb-2" style="color: #9391e4">Attachments</h2>
             <div v-if="todo.attachments?.length > 0">
