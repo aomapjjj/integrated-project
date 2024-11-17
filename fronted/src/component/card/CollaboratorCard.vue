@@ -3,9 +3,9 @@
 </script>
 
 <template>
-  <div class="px-4 py-6">
+  <div class="px-4 py-7">
     <div
-      class="relative bg-[#eff6e0] p-6 rounded-xl shadow-md text-gray-700 w-80 " 
+      class="relative bg-[#eff6e0] p-6 rounded-xl shadow-md text-gray-700 w-80"
     >
       <div class="flex justify-between items-center mb-4">
         <span
@@ -45,30 +45,11 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-2 mb-4">
-        <!-- <span
-          class="text-xs font-medium bg-white text-gray-600 px-3 py-1 rounded-full"
-          >COLLABORATOR</span
-        > -->
-        <!-- <span
-          class="text-xs font-medium bg-white text-gray-600 px-3 py-1 rounded-full"
-          ><slot name="role"></slot
-        ></span> -->
-      </div>
       <div class="flex justify-between items-center mt-4">
-        <div>
-          <!-- <p class="text-lg font-semibold text-gray-900">$250/hr</p>
-            <p class="text-sm text-gray-500">San Francisco, CA</p> -->
-        </div>
-        <div class="mt-3 relative inline-flex ">
+        <div></div>
+        <div class="mt-3 relative inline-flex">
           <slot name="access-right"></slot>
         </div>
-
-        <!-- <button
-            class="text-white bg-gray-900 text-sm font-medium px-4 py-2 rounded-full hover:bg-gray-800"
-          >
-            Details
-          </button> -->
       </div>
     </div>
   </div>
