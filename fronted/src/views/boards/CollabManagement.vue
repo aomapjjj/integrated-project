@@ -1,23 +1,22 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue"
+import { ref, onMounted, watch, computed } from 'vue'
 import {
   getBoardById,
   getItems,
   addCollaborator,
   deleteCollaborator,
   editAccessRight
-} from "./../../libs/fetchUtils.js"
-import { useRoute, useRouter } from "vue-router"
-import { useUsers } from "@/stores/storeUser"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import Alert from "@/component/alert/Alert.vue"
-import ModalAcess from "@/component/modal/Modal.vue"
-import CollabCard from "@/component/card/CollabCard.vue"
-import ConfirmModal from "@/component/modal/ConfirmModal.vue"
-import WaitModal from "@/component/modal/WaitModal.vue"
-import SuccessModal from "@/component/alert/SuccessModal.vue"
-import CollaboratorCard from "@/component/card/CollaboratorCard.vue"
+} from './../../libs/fetchUtils.js'
+import { useRoute, useRouter } from 'vue-router'
+import { useUsers } from '@/stores/storeUser'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import Alert from '@/component/alert/Alert.vue'
+import ModalAcess from '@/component/modal/Modal.vue'
+import ConfirmModal from '@/component/modal/ConfirmModal.vue'
+import WaitModal from '@/component/modal/WaitModal.vue'
+import SuccessModal from '@/component/alert/SuccessModal.vue'
+import CollaboratorCard from '@/component/card/CollaboratorCard.vue'
 
 // ----------------------- Router -----------------------
 
@@ -30,7 +29,7 @@ const userStore = useUsers()
 
 // ----------------------- Params -----------------------
 
-const boardName = ref("")
+const boardName = ref('')
 const isSendEmailSuccess = ref(false)
 const boardId = ref()
 // const isLoading = ref(false)
@@ -44,13 +43,13 @@ watch(
   { immediate: true }
 )
 
-const token = localStorage.getItem("access_token")
-const collaboratorEmail = ref("")
+const token = localStorage.getItem('access_token')
+const collaboratorEmail = ref('')
 const isOwnerEmail = ref(false)
 
 // Dropdown state
 const isOpenDropdown = ref(false)
-const collaboratorAccess = ref("READ")
+const collaboratorAccess = ref('READ')
 
 const collaboratorToRemove = ref(null)
 const userName = userStore.getUser().username
@@ -59,7 +58,7 @@ const userEmail = userStore.getEmail()
 // ----------------------- List Items -----------------------
 
 const collaboratorInfo = ref([])
-const boardOwnerName = ref("")
+const boardOwnerName = ref('')
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -73,7 +72,7 @@ const confirmAcessChange = ref(false)
 
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
-const alertMessage = ref("")
+const alertMessage = ref('')
 const waitModal = ref(false)
 
 // ----------------------- BaseUrl -----------------------
@@ -104,7 +103,7 @@ onMounted(async () => {
   if (Board.item.owner.name !== userName) {
     disabledButtonWhileOpenPublic.value = true
   } else {
-    console.log("Error")
+    console.log('Error')
   }
 })
 
@@ -134,15 +133,15 @@ const confirmRemove = async () => {
           (collab) => collab.id !== collaboratorToRemove.value.id
         )
         isAlertSuccess.value = true
-        alertMessage.value = "Collaborator removed successfully"
+        alertMessage.value = 'Collaborator removed successfully'
         setTimeout(hideAlert, 3000)
       } else {
         isAlertFailure.value = true
-        alertMessage.value = "Failed to remove collaborator"
+        alertMessage.value = 'Failed to remove collaborator'
         setTimeout(hideAlert, 3000)
       }
     } catch (error) {
-      alertMessage.value = "Error removing collaborator:"
+      alertMessage.value = 'Error removing collaborator:'
       setTimeout(hideAlert, 3000)
     } finally {
       showConfirmModal.value = false
@@ -163,7 +162,7 @@ const updateAccessRight = (item, access) => {
     pendingItem.value.accessRight = access
     console.log(pendingItem.value.accessRight)
   } catch (error) {
-    console.error("Failed to open modal:", error)
+    console.error('Failed to open modal:', error)
   }
 }
 
@@ -180,10 +179,10 @@ const confirmChange = async () => {
         pendingItem.value.id,
         pendingItem.value.status
       )
-      if (typeof result === "object") {
+      if (typeof result === 'object') {
         await fetchCollaborators()
         openDropdownId.value = false
-        alertMessage.value = "Access right updated: " + result.accessRight
+        alertMessage.value = 'Access right updated: ' + result.accessRight
         isAlertSuccess.value = true
         setTimeout(hideAlert, 3000)
         confirmAcessChange.value = false
@@ -191,9 +190,9 @@ const confirmChange = async () => {
       }
     }
   } catch (error) {
-    console.error("Failed to update access right:", error)
+    console.error('Failed to update access right:', error)
     isAlertFailure.value = true
-    alertMessage.value = "Failed to update access right"
+    alertMessage.value = 'Failed to update access right'
     setTimeout(hideAlert, 3000)
   }
 }
@@ -205,7 +204,7 @@ const hideAlert = () => {
 }
 
 const clearForm = () => {
-  collaboratorEmail.value = ""
+  collaboratorEmail.value = ''
 }
 
 const checkEmail = computed(() => {
@@ -218,7 +217,7 @@ const checkEmail = computed(() => {
     !collaboratorEmail.value ||
     collaboratorEmail.value === userEmail.email ||
     isOwnerEmail.value ||
-    !collaboratorEmail.value.includes("@")
+    !collaboratorEmail.value.includes('@')
   )
 })
 
@@ -231,7 +230,7 @@ const submitFormSendEmail = async () => {
   const boardUrl = baseUrlBoardId
   waitModal.value = true
   if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
-    console.error("One or more required fields are missing.")
+    console.error('One or more required fields are missing.')
     return
   }
 
@@ -240,7 +239,7 @@ const submitFormSendEmail = async () => {
       collaborator: {
         email,
         accessRight,
-        status: "PENDING"
+        status: 'PENDING'
       },
       email: {
         inviterName,
@@ -257,54 +256,54 @@ const submitFormSendEmail = async () => {
         // collaboratorInfo.value.push(result.data)
         await fetchCollaborators()
         isSendEmailSuccess.value = true
-        alertMessage.value = "Collaborator added successfully!"
+        alertMessage.value = 'Collaborator added successfully!'
         setTimeout(hideAlert, 3000)
         cancelAction()
         break
       case 401:
         isAlertFailure.value = true
-        alertMessage.value = "Unauthorized access. Please log in again."
+        alertMessage.value = 'Unauthorized access. Please log in again.'
         setTimeout(hideAlert, 3000)
         break
       case 403:
         isAlertFailure.value = true
-        alertMessage.value = "You do not have permission to add a collaborator."
+        alertMessage.value = 'You do not have permission to add a collaborator.'
         setTimeout(hideAlert, 3000)
         break
       case 404:
         isAlertFailure.value = true
-        alertMessage.value = "The user does not exists."
+        alertMessage.value = 'The user does not exists.'
         setTimeout(hideAlert, 3000)
         break
       case 409:
         isAlertFailure.value = true
         if (
           result.data.message ===
-          "The collaborator already exists for this board"
+          'The collaborator already exists for this board'
         ) {
           alertMessage.value =
-            "The user is already the collaborator or pending collaborator of this board."
+            'The user is already the collaborator or pending collaborator of this board.'
         } else if (
           result.data.message ===
-          "The collaborator email belongs to the board owner"
+          'The collaborator email belongs to the board owner'
         ) {
           alertMessage.value =
-            "Board owner cannot be collaborator of his/her own board"
+            'Board owner cannot be collaborator of his/her own board'
         } else {
           alertMessage.value =
-            "The user is already the collaborator or pending collaborator of this board."
+            'The user is already the collaborator or pending collaborator of this board.'
         }
         setTimeout(hideAlert, 3000)
         break
 
       default:
         isAlertFailure.value = true
-        alertMessage.value = "There is a problem. Please try again later."
+        alertMessage.value = 'There is a problem. Please try again later.'
         setTimeout(hideAlert, 3000)
     }
   } catch (error) {
     isAlertFailure.value = true
-    alertMessage.value = "An error occurred: " + error.message
+    alertMessage.value = 'An error occurred: ' + error.message
     setTimeout(hideAlert, 3000)
   } finally {
     waitModal.value = false
@@ -317,7 +316,7 @@ const fetchCollaborators = async () => {
     const collaborator = await getItems(baseUrlCollaborator)
     collaboratorInfo.value = collaborator.collaborators
   } catch (error) {
-    console.error("Failed to fetch collaborators:", error)
+    console.error('Failed to fetch collaborators:', error)
   }
 }
 
@@ -332,7 +331,7 @@ watch(
 const deleteConfirmationMessage = computed(() => {
   if (
     collaboratorToRemove.value &&
-    collaboratorToRemove.value.status === "PENDING"
+    collaboratorToRemove.value.status === 'PENDING'
   ) {
     return `Do you want to cancel the invitation to ${collaboratorToRemove.value.name}?`
   }
@@ -432,7 +431,7 @@ const deleteConfirmationMessage = computed(() => {
           </button>
         </div>
 
-        <div class="flex flex-col items-center mt-2 overflow-y-auto">
+        <div class="flex flex-col items-center mt-2">
           <div>
             <div
               class="bg-base-100 mt-4 md:mt-0 flex justify-center items-center"
@@ -444,7 +443,12 @@ const deleteConfirmationMessage = computed(() => {
             </div>
             <div
               v-else
-              class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 z-0"
+              :class="[
+                'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 z-0 px-4',
+                collaboratorInfo.length > 3
+                  ? 'max-h-[calc(100vh-200px)] overflow-y-auto'
+                  : ''
+              ]"
             >
               <CollaboratorCard
                 v-for="(item, index) in collaboratorInfo"
@@ -491,7 +495,7 @@ const deleteConfirmationMessage = computed(() => {
                       }"
                       class="text-xs font-medium px-2 py-1 rounded-full"
                     >
-                      {{ item.status === "PENDING" ? "PENDING" : "ACCEPTED" }}
+                      {{ item.status === 'PENDING' ? 'PENDING' : 'ACCEPTED' }}
                     </span>
                   </div>
                 </template>
@@ -503,72 +507,69 @@ const deleteConfirmationMessage = computed(() => {
                     {{ item.email }}
                   </p>
                 </template>
+
                 <template #access-right>
                   <div class="itbkk-access-right">
-                    <section class="">
-                      <div class="relative inline-block text-left">
-                        <div>
-                          <button
-                            @click="openDropdownAccess(item.id)"
-                            type="button"
-                            class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            id="menu-button"
-                            aria-expanded="true"
-                            aria-haspopup="true"
-                          >
-                            {{ item.accessRight }}
-                            <svg
-                              class="-mr-1 h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                              aria-hidden="true"
-                            >
-                              <path
-                                fill-rule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                                clip-rule="evenodd"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-
-                        <div
-                          v-if="openDropdownId === item.id"
-                          class=" absolute mt-2 left-5 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                          role="menu"
-                          aria-orientation="vertical"
-                          aria-labelledby="menu-button"
-                          tabindex="-1"
+                    <div class="relative inline-block text-left">
+                      <button
+                        @click="openDropdownAccess(item.id)"
+                        type="button"
+                        class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        id="menu-button"
+                        aria-expanded="true"
+                        aria-haspopup="true"
+                      >
+                        {{ item.accessRight }}
+                        <svg
+                          class="-mr-1 h-5 w-5 text-gray-400"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          aria-hidden="true"
                         >
-                          <div class="py-1" role="none">
-                            <p
-                              @click="
-                                () =>
-                                  updateAccessRight(
-                                    collaboratorInfo[index],
-                                    'READ'
-                                  )
-                              "
-                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
-                            >
-                              Read
-                            </p>
-                            <p
-                              @click="
-                                () =>
-                                  updateAccessRight(
-                                    collaboratorInfo[index],
-                                    'WRITE'
-                                  )
-                              "
-                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
-                            >
-                              Write
-                            </p>
-                          </div>
+                          <path
+                            fill-rule="evenodd"
+                            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+
+                      <div
+                        v-if="openDropdownId === item.id"
+                        class="absolute mt-2 left-5 w-32 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="menu-button"
+                        tabindex="-1"
+                      >
+                        <div class="py-1" role="none">
+                          <p
+                            @click="
+                              () =>
+                                updateAccessRight(
+                                  collaboratorInfo[index],
+                                  'READ'
+                                )
+                            "
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
+                          >
+                            READ
+                          </p>
+                          <p
+                            @click="
+                              () =>
+                                updateAccessRight(
+                                  collaboratorInfo[index],
+                                  'WRITE'
+                                )
+                            "
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-all"
+                          >
+                            WRITE
+                          </p>
                         </div>
                       </div>
-                    </section>
+                    </div>
                   </div>
                 </template>
                 <!-- <select
@@ -648,9 +649,9 @@ const deleteConfirmationMessage = computed(() => {
 
               <template #headerMessage>
                 {{
-                  collaboratorToRemove?.status === "PENDING"
-                    ? "Cancel Collaborator"
-                    : "Delete Collaborator"
+                  collaboratorToRemove?.status === 'PENDING'
+                    ? 'Cancel Collaborator'
+                    : 'Delete Collaborator'
                 }}
               </template>
 
@@ -669,9 +670,9 @@ const deleteConfirmationMessage = computed(() => {
                   "
                 >
                   {{
-                    collaboratorToRemove?.status === "PENDING"
-                      ? "Confirm"
-                      : "Delete"
+                    collaboratorToRemove?.status === 'PENDING'
+                      ? 'Confirm'
+                      : 'Delete'
                   }}
                 </span>
               </template>
@@ -726,8 +727,8 @@ const deleteConfirmationMessage = computed(() => {
                       <p class="text-red-500 text-sm mt-1">
                         {{
                           isOwnerEmail
-                            ? "Board owner cannot be collaborator of his/her own board"
-                            : ""
+                            ? 'Board owner cannot be collaborator of his/her own board'
+                            : ''
                         }}
                       </p>
                     </div>
@@ -761,7 +762,10 @@ const deleteConfirmationMessage = computed(() => {
                 </div>
               </div>
             </div>
+
+
           </div>
+
         </div>
       </div>
     </div>
