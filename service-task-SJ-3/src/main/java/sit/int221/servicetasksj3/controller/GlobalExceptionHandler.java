@@ -1,5 +1,6 @@
 package sit.int221.servicetasksj3.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @Value("${file.max-file-size}")
+    private int MAX_FILE_SIZE_MB;
+
     // 404 - ItemNotFoundException
     @ExceptionHandler(ItemNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleItemNotFoundException(ItemNotFoundException exception, WebRequest request) {
@@ -75,7 +79,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
         List<ErrorDetails.ValidationError> errors = List.of(
-                new ErrorDetails.ValidationError("files", "File size exceeds the maximum limit of 20MB")
+                new ErrorDetails.ValidationError("files","Maximum upload size exceeded. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
+                )
         );
         return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }

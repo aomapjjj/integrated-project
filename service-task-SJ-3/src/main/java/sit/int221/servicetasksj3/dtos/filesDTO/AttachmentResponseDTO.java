@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sit.int221.servicetasksj3.exceptions.ErrorDetails;
 
 import java.util.List;
 
@@ -13,5 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class AttachmentResponseDTO {
     private String message;
-    private List<AttachmentDTO> attachments;
+    private List<AttachmentDTO> successfulUploads;
+    List<ErrorDetails.ValidationError> errors;
 }

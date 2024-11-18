@@ -14,12 +14,14 @@ import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentDTO;
 import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskFile;
+import sit.int221.servicetasksj3.exceptions.ErrorDetails;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.FileRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,49 +88,118 @@ public class FileService {
     }
 
     // Upload attachments to a task
-    public AttachmentResponseDTO addAttachments(Integer taskId, List<MultipartFile> files) throws IOException {
+    public AttachmentResponseDTO addAttachments(Integer taskId, List<MultipartFile> files) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ItemNotFoundException("Task not found"));
 
-        ValidationException validationError = new ValidationException("Validation error");
+        List<AttachmentDTO> successfulUploads = new ArrayList<>();
+        List<ErrorDetails.ValidationError> errorList = new ArrayList<>();
 
-        if (task.getFiles().size() + files.size() > MAX_FILES) {
-            validationError.addValidationError("files", "Each task can have at most " + MAX_FILES + " files.");
-            throw validationError;
+        int remainingSlots = MAX_FILES - task.getFiles().size();
+        if (files.size() > remainingSlots) {
+            errorList.add(new ErrorDetails.ValidationError("files", "Each task can have at most " + MAX_FILES + " files."));
+            files = files.subList(0, remainingSlots);
         }
 
-        List<AttachmentDTO> attachmentDTOs = files.stream().map(file -> {
+        for (MultipartFile file : files) {
             try {
                 String fileName = file.getOriginalFilename();
                 String fileType = file.getContentType();
 
                 if (!isValidFileSize(file)) {
-                    validationError.addValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
-                    throw validationError;
+                    errorList.add(new ErrorDetails.ValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB."));
+                    continue; // skip file with invalid size
                 }
+
                 if (isDuplicateFile(task, fileName)) {
-                    validationError.addValidationError("files", "File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add it again to update the file.");
-                    throw validationError;
+                    errorList.add(new ErrorDetails.ValidationError("files", "File with the same filename cannot be added: " + fileName));
+                    continue; // skip file with duplicate name
                 }
 
                 TaskFile taskFile = new TaskFile();
                 taskFile.setTask(task);
-                taskFile.setFileName(file.getOriginalFilename());
+                taskFile.setFileName(fileName);
                 taskFile.setFileType(fileType);
                 taskFile.setFileData(file.getBytes());
                 fileRepository.save(taskFile);
                 task.addFile(taskFile);
 
-                return new AttachmentDTO(taskFile.getFileId(), taskFile.getFileName(), taskFile.getFileType(), taskFile.getFileData(), taskFile.getUploadDate(), isPreviewFileType(taskFile.getFileType()));
-//            } catch (MaxUploadSizeExceededException e) {
-//                validationError.addValidationError("files", "File size exceeds the maximum allowed size.");
-//                return null;
+                successfulUploads.add(new AttachmentDTO(
+                        taskFile.getFileId(),
+                        taskFile.getFileName(),
+                        taskFile.getFileType(),
+                        taskFile.getFileData(),
+                        taskFile.getUploadDate(),
+                        isPreviewFileType(taskFile.getFileType())
+                ));
             } catch (IOException e) {
-                throw new ValidationException("Error uploading file: " + file.getOriginalFilename());
+                errorList.add(new ErrorDetails.ValidationError("files", "Error uploading file: " + file.getOriginalFilename()));
             }
-        }).collect(Collectors.toList());
-        return new AttachmentResponseDTO("Files uploaded successfully.", attachmentDTOs);
+        }
+
+        String message = errorList.isEmpty()
+                ? "All files uploaded successfully."
+                : "Some files could not be uploaded.";
+        return new AttachmentResponseDTO(message, successfulUploads, errorList);
     }
+
+//    public AttachmentResponseDTO addAttachments(Integer taskId, List<MultipartFile> files) {
+//        Task task = taskRepository.findById(taskId)
+//                .orElseThrow(() -> new ItemNotFoundException("Task not found"));
+//
+//        ValidationException validationError = new ValidationException("Validation error");
+//        List<AttachmentDTO> successfulUploads = new ArrayList<>();
+//
+//        int remainingSlots = MAX_FILES - task.getFiles().size();
+//        if (files.size() > remainingSlots) {
+//            validationError.addValidationError("files", "Each task can have at most " + MAX_FILES + " files.");
+//            files = files.subList(0, remainingSlots);
+//        }
+//
+//        for (MultipartFile file : files) {
+//            try {
+//                String fileName = file.getOriginalFilename();
+//                String fileType = file.getContentType();
+//
+//                // ตรวจสอบขนาดไฟล์
+//                if (!isValidFileSize(file)) {
+//                    validationError.addValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
+//                    continue; // skip file with invalid size
+//                }
+//
+//                if (isDuplicateFile(task, fileName)) {
+//                    validationError.addValidationError("files", "File with the same filename cannot be added: " + fileName);
+//                    continue; // skip file with duplicate name
+//                }
+//
+//                TaskFile taskFile = new TaskFile();
+//                taskFile.setTask(task);
+//                taskFile.setFileName(fileName);
+//                taskFile.setFileType(fileType);
+//                taskFile.setFileData(file.getBytes());
+//                fileRepository.save(taskFile);
+//                task.addFile(taskFile);
+//
+//                successfulUploads.add(new AttachmentDTO(
+//                        taskFile.getFileId(),
+//                        taskFile.getFileName(),
+//                        taskFile.getFileType(),
+//                        taskFile.getFileData(),
+//                        taskFile.getUploadDate(),
+//                        isPreviewFileType(taskFile.getFileType())
+//                ));
+//            } catch (IOException e) {
+//                validationError.addValidationError("files", "Error uploading file: " + file.getOriginalFilename());
+//            }
+//        }
+//
+//        String message = validationError.getErrors().isEmpty()
+//                ? "All files uploaded successfully."
+//                : "Some files could not be uploaded.";
+//
+//        return new AttachmentResponseDTO(message, successfulUploads, validationError.getErrors());
+//    }
+
 
     // Delete an attachment
     public AttachmentDTO deleteAttachment(Integer attachmentId) {
