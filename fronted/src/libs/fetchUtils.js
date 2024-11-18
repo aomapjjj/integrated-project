@@ -400,7 +400,7 @@ async function addAttachments(boardId, taskId, files) {
   const token = getToken()
   const formData = new FormData()
   files.forEach((file) => formData.append('files', file))
-
+  
   try {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`,
@@ -414,7 +414,7 @@ async function addAttachments(boardId, taskId, files) {
     )
 
     const statusCode = response.status
-    const responseData = await response.json()
+    const responseData = await response.text()
     return { statusCode, data: responseData }
   } catch (error) {
     console.log(`Error: ${error.message}`)
