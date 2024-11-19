@@ -151,31 +151,6 @@ public class BoardController {
         return ResponseEntity.ok(updatedTaskDTO);
     }
 
-    // ----------------------- File -----------------------
-    // Get File
-    @GetMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<List<AttachmentDTO>> getAttachments(@PathVariable String boardId, @PathVariable Integer taskId) {
-        List<AttachmentDTO> attachments = fileService.getAttachments(taskId);
-        return ResponseEntity.ok(attachments);
-    }
-    // Download File
-    @GetMapping("/{boardId}/tasks/{taskId}/attachments/{filename:.+}")
-    public ResponseEntity<Resource> downloadAttachment(@PathVariable Integer taskId, @PathVariable String filename) {
-        return fileService.downloadAttachment(taskId, filename);
-    }
-    // Upload File
-    @PostMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<AttachmentResponseDTO> addAttachments(@PathVariable String boardId, @PathVariable Integer taskId, @RequestParam("files") List<MultipartFile> files) throws IOException {
-        AttachmentResponseDTO response = fileService.addAttachments(taskId, files);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    // Delete File
-    @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
-    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId) {
-        AttachmentDTO deletedAttachment = fileService.deleteAttachment(attachmentId);
-        return ResponseEntity.ok(deletedAttachment);
-    }
-
     // ----------------------- Status -----------------------
     @GetMapping("/{boardId}/statuses")
     public ResponseEntity<List<StatusDTOTwo>> getAllStatuses(@PathVariable String boardId, HttpServletRequest request) {
