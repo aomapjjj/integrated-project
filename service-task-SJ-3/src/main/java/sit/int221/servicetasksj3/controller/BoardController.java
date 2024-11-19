@@ -151,6 +151,43 @@ public class BoardController {
         return ResponseEntity.ok(updatedTaskDTO);
     }
 
+    // ----------------------- File -----------------------
+    // Get File
+    @GetMapping("/{boardId}/tasks/{taskId}/attachments")
+    public ResponseEntity<List<AttachmentDTO>> getAttachments(@PathVariable String boardId, @PathVariable Integer taskId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        List<AttachmentDTO> attachments = fileService.getAttachments(taskId);
+        return ResponseEntity.ok(attachments);
+    }
+    // Download File
+    @GetMapping("/{boardId}/tasks/{taskId}/attachments/{filename:.+}")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable String filename, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        return fileService.downloadAttachment(taskId, filename);
+    }
+    // Upload File
+    @PostMapping("/{boardId}/tasks/{taskId}/attachments")
+    public ResponseEntity<AttachmentResponseDTO> addAttachments(@PathVariable String boardId, @PathVariable Integer taskId, @RequestParam("files") List<MultipartFile> files, HttpServletRequest request) throws IOException {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        AttachmentResponseDTO response = fileService.addAttachments(taskId, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    // Delete File
+    @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
+    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
+        AttachmentDTO deletedAttachment = fileService.deleteAttachment(attachmentId);
+        return ResponseEntity.ok(deletedAttachment);
+    }
+
     // ----------------------- Status -----------------------
     @GetMapping("/{boardId}/statuses")
     public ResponseEntity<List<StatusDTOTwo>> getAllStatuses(@PathVariable String boardId, HttpServletRequest request) {
