@@ -83,6 +83,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (request.getRequestURI().startsWith("/v3/boards/")) {
                 handleRequest(request, isTokenValid, tokenError);
             } else if (!isTokenValid && !request.getRequestURI().equals("/v3/boards")) {
+                System.out.println("JWT Token: " + jwtToken);
+                System.out.println("Username from Token: " + username);
                 throw new AuthenticationException("Invalid token");
             }
             chain.doFilter(request, response);

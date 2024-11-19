@@ -10,6 +10,7 @@ import Board from '@/views/boards/Board.vue'
 import ToLoginPage from '@/views/errorpage/ToLoginPage.vue'
 import ErrorPagePermission from '@/views/errorpage/PermissionError.vue'
 import Members from '@/views/other/Members.vue'
+
 import {
   getBoardById,
   validateAccessToken,
@@ -196,7 +197,8 @@ const routes = [
     path: '/members',
     name: 'Members',
     component: Members
-  }
+  },
+ 
 ]
 
 const router = createRouter({
