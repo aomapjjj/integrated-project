@@ -14,11 +14,19 @@ public class TaskFile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer fileId;
+
+    @Column(nullable = false)
     private String fileName;
+
     private String fileType;
+
     @Lob
+    @Column(nullable = false)
     private byte[] fileData;
+
+    @Column(updatable = false, insertable = false)
     private LocalDateTime uploadDate = LocalDateTime.now();
+
     @ManyToOne
     @JoinColumn(name = "taskId", nullable = false)
     private Task task;
