@@ -138,7 +138,7 @@ const UpdateTask = async () => {
 
       if (attachmentsResponse.statusCode === 200 || attachmentsResponse.statusCode === 201) {
         console.log("Attachments uploaded successfully:", attachmentsResponse.data);
-        
+
       } else {
         console.error("Failed to upload attachments:", attachmentsResponse);
       }
@@ -223,8 +223,8 @@ const maxFiles = 10
 const maxTotalSizePerFile = 20 * 1024 * 1024
 
 const handleFileChange = (event) => {
-  const selectedFiles = Array.from(event.target.files); 
-console.log(selectedFiles);
+  const selectedFiles = Array.from(event.target.files);
+  console.log(selectedFiles);
 
   if (files.value.length + selectedFiles.length > maxFiles) {
     alert(`You can upload up to ${maxFiles} files.`);
@@ -239,8 +239,12 @@ console.log(selectedFiles);
     alert("Some files exceed the maximum size of 20 MB.");
   }
 
+
+
   files.value = [...selectedFiles, ...files.value];
+
 };
+
 
 
 watch(
@@ -251,44 +255,44 @@ watch(
   }
 )
 
-const isImage = (file) => {
-  return file.type.startsWith('image/')
-}
+// const isImage = (file) => {
+//   return file.type.startsWith('image/')
+// }
 
-const getFileIcon = (file) => {
-  if (!file || typeof file !== 'object' || !file.name) {
-    return '/image/files/default.png'
-  }
+// const getFileIcon = (file) => {
+//   if (!file || typeof file !== 'object' || !file.name) {
+//     return '/image/files/default.png'
+//   }
 
-  const extension = file.name.split('.').pop().toLowerCase()
-  if (!extension) return '/image/files/default.png'
+//   const extension = file.name.split('.').pop().toLowerCase()
+//   if (!extension) return '/image/files/default.png'
 
-  // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
-  switch (extension) {
-    case 'pdf':
-      return '/image/files/PDF.png'
-    case 'doc':
-    case 'docx':
-      return '/image/files/DOC.png'
-    case 'xls':
-    case 'xlsx':
-      return '/image/files/XLS.png'
-    case 'ppt':
-    case 'pptx':
-      return '/image/files/PPT.png'
-    case 'txt':
-      return '/image/files/TXT.png'
-    case 'png':
-    case 'jpeg':
-    case 'jpg':
-    case 'gif':
-      return file instanceof File
-        ? URL.createObjectURL(file)
-        : '/image/files/default.png'
-    default:
-      return '/image/files/default.png'
-  }
-}
+//   // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
+//   switch (extension) {
+//     case 'pdf':
+//       return '/image/files/PDF.png'
+//     case 'doc':
+//     case 'docx':
+//       return '/image/files/DOC.png'
+//     case 'xls':
+//     case 'xlsx':
+//       return '/image/files/XLS.png'
+//     case 'ppt':
+//     case 'pptx':
+//       return '/image/files/PPT.png'
+//     case 'txt':
+//       return '/image/files/TXT.png'
+//     case 'png':
+//     case 'jpeg':
+//     case 'jpg':
+//     case 'gif':
+//       return file instanceof File
+//         ? URL.createObjectURL(file)
+//         : '/image/files/default.png'
+//     default:
+//       return '/image/files/default.png'
+//   }
+// }
 
 const clearFileUrls = () => {
   files.value.forEach((file) => {
@@ -314,8 +318,24 @@ const fetchAttachments = async () => {
     const response = await getAttachments(boardId.value, props.todoId)
     if (response.statusCode === 200) {
       todo.value.attachments = response.data
+      for (let index = 0; index < todo.value.attachments.length; index++) {
+    const element = todo.value.attachments[index];
+
+    // แปลง base64 string ของ element.fileData ให้เป็น Blob
+    const byteCharacters = atob(element.fileData);
+    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: element.fileType });
+
+    // สร้าง File object โดยใช้ blob
+    const file = new File([blob], element.fileName, { type: element.fileType });
+
+    files.value.push(file);
+}
       console.log('Attachments:', todo.value.attachments)
       console.log('Attachments:', response.data)
+      console.log(typeof(todo.value.attachments))
+      
     } else {
       console.error('Failed to fetch attachments:', response)
     }
@@ -431,7 +451,7 @@ onMounted(() => {
               </p>
               <!-- Upload Section -->
               <div class="grid grid-cols-4 gap-4">
-                <div v-if="files.length < maxFiles" class="relative">
+                <div v-if="files.length <= maxFiles" class="relative">
                   <div
                     class="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-gray-50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" viewBox="0 0 24 24">
@@ -449,11 +469,11 @@ onMounted(() => {
                 <div v-for="(file, index) in files" :key="index"
                   class="flex flex-col items-start bg-gray-100 rounded-lg p-2">
                   <div class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
-                    <p v-if="isImage(file)" class="text-xs text-gray-600">
+                    <!-- <p v-if="isImage(file)" class="text-xs text-gray-600">
                       <img :src="file.url || getFileIcon(file)" alt="Preview"
                         class="object-cover w-full h-full rounded" />
-                    </p>
-                    <p v-else class="text-xs text-gray-600 truncate">
+                    </p> -->
+                    <p class="text-xs text-gray-600 truncate">
                       {{ file.name }}
                     </p>
 

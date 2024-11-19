@@ -3,6 +3,8 @@ import { getItemById, getAttachments } from "@/libs/fetchUtils";
 import { ref, watch } from "vue";
 import { toDate } from "../../libs/toDate";
 import { useRoute, useRouter } from "vue-router";
+import PreviewFile from "../../component/files/PreviewFile.vue";
+
 
 // ----------------------- Router -----------------------
 
@@ -14,6 +16,27 @@ const route = useRoute();
 const props = defineProps({
   todoId: Number,
 });
+
+const isFilePreviewOpen = ref(false);
+const previewFileData = ref({});
+
+const openPreviewFile = (file) => {
+  console.log("Opening file:", file); 
+
+  const fileURL = URL.createObjectURL(file);
+  previewFileData.value = {
+    name: file.name,
+    url: fileURL,
+    type: file.type,
+    size: file.size,
+  };
+
+  isFilePreviewOpen.value = true; 
+};
+
+const closePreviewFile = () => {
+  isFilePreviewOpen.value = false;
+};
 
 const todo = ref({
   id: "",
@@ -48,10 +71,34 @@ watch(
       const { statusCode, data } = await getAttachments(boardId.value, newValue);
       if (statusCode === 200 && Array.isArray(data)) {
         todo.value.attachments = data;
+        console.log(todo.value.attachments);
+
       } else {
         todo.value.attachments = [];
         console.error("Failed to fetch attachments");
       }
+    }
+  },
+  { immediate: true }
+);
+
+const files = ref([]);
+
+watch(
+  () => todo.value.attachments,
+  (attachments) => {
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      files.value = attachments.map((attachment) => {
+        const byteCharacters = atob(attachment.fileData);
+        const byteNumbers = new Uint8Array(
+          byteCharacters.split("").map((char) => char.charCodeAt(0))
+        );
+        const blob = new Blob([byteNumbers], { type: attachment.fileType });
+
+        return new File([blob], attachment.fileName, { type: attachment.fileType });
+      });
+    } else {
+      files.value = [];
     }
   },
   { immediate: true }
@@ -100,16 +147,28 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
             <h2 class="text-lg font-bold mb-2" style="color: #9391e4">Attachments</h2>
             <div v-if="todo.attachments?.length > 0">
-              <ul>
-                <li v-for="(attachment, index) in todo.attachments" :key="index" class="mb-2">
-                  <a :href="attachment.fileUrl" target="_blank" class="text-blue-500 underline">
-                    {{ attachment.fileName }}
-                  </a>
-                </li>
-              </ul>
+              <div v-for="(file, index) in files" :key="index"
+                class="flex flex-col items-start bg-gray-100 rounded-lg p-2" @click="openPreviewFile(file)">
+                <div class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
+                  <!-- <p v-if="isImage(file)" class="text-xs text-gray-600">
+                      <img :src="file.url || getFileIcon(file)" alt="Preview"
+                        class="object-cover w-full h-full rounded" />
+                    </p> -->
+                  <p class="text-xs text-gray-600 truncate">
+                    {{ file.name }}
+                  </p>
+                </div>
+                <p class="text-xs text-gray-600 truncate">
+                  {{ file.name }}
+                </p>
+                <p class="text-xs text-gray-600 truncate">
+                  {{ (file.size / 1024).toFixed(2) }}
+                </p>
+              </div>
             </div>
             <div v-else class="italic text-gray-500">No attachments available.</div>
           </div>
+          <PreviewFile v-if="isFilePreviewOpen" :file="previewFileData" @close="closePreviewFile" />
         </div>
 
         <div class="modal-content py-4 text-left px-10 flex-grow w-1/3 max-w-sm" style="margin-top: 65px">
