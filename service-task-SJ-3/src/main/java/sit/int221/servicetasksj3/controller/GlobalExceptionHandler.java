@@ -14,6 +14,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentDTO;
+import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.exceptions.*;
 
 import java.time.ZoneId;
@@ -79,21 +81,14 @@ public class GlobalExceptionHandler {
         List<ErrorDetails.ValidationError> errors = extractValidationErrors(exception);
         return createErrorResponse("Request body contains invalid data. Please check the 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
-    @ExceptionHandler({HttpRequestMethodNotSupportedException.class, HttpMediaTypeNotSupportedException.class, MultipartException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(Exception ex,WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(errorResponse);
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
+        List<ErrorDetails.ValidationError> errors = List.of(
+                new ErrorDetails.ValidationError("files","Some files were not uploaded due to size limits. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
+                )
+        );
+        return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
-//    @ExceptionHandler(MaxUploadSizeExceededException.class)
-//    public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
-//        List<ErrorDetails.ValidationError> errors = List.of(
-//                new ErrorDetails.ValidationError("files","Maximum upload size exceeded. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
-//                )
-//        );
-//        return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
-//    }
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException exception, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access is denied", request.getDescription(false).replace("uri=", ""));
