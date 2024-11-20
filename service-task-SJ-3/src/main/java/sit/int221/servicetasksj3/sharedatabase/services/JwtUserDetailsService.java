@@ -10,6 +10,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.Visibility;
+import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
@@ -25,7 +28,8 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Users users = userRepository.findByUsername(userName);
+        Users users = userRepository.findByEmailOrUsername(userName);
+
         if(users == null) {
             throw new UnauthorizedException(userName + " does not exist !!");
         }
@@ -42,6 +46,8 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new AuthUser(users.getUsername(), users.getPassword(), roles,
                 users.getName(), users.getOid(), users.getEmail(), users.getRole());
     }
+
+
 
     @Transactional
     public boolean authenticateUser(String username, String password) {

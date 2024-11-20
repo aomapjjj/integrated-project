@@ -91,6 +91,7 @@ const showAlert = () => {
 
 const loginMicrosoft = () => {
   authConfig.login()
+  console.log("Hello")
 }
 
 const submitForm = async () => {
@@ -257,7 +258,6 @@ const submitForm = async () => {
                     class="itbkk-username w-full ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Username"
                     maxlength="50"
-                    required
                   />
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ userInput.length }}/50
@@ -290,7 +290,6 @@ const submitForm = async () => {
                     class="itbkk-password w-full ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Password"
                     maxlength="14"
-                    required
                   />
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ passwordInput.length }}/14
@@ -359,32 +358,30 @@ const submitForm = async () => {
               >
                 Sign in
               </button>
-
-            
             </form>
-              <!-- Microsoft -->
-              <div class="flex flex-col mt-4 items-center">
-                <!-- <p class="text-gray-500">or sign up</p> -->
-                <div class="items-center justify-center">
-                  <button
-                    @click="loginMicrosoft()"
-                    class="flex w-72 py-2 justify-center rounded-md border border-gray-400"
+            <!-- Microsoft -->
+            <div class="flex flex-col mt-4 items-center">
+              <!-- <p class="text-gray-500">or sign up</p> -->
+              <div class="items-center justify-center">
+                <button
+                  @click="loginMicrosoft()"
+                  class="flex w-72 py-2 justify-center rounded-md border border-gray-400"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 21 21"
+                    width="24"
+                    height="24"
                   >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 21 21"
-                      width="24"
-                      height="24"
-                    >
-                      <path fill="#f25022" d="M1 1h9v9H1z"></path>
-                      <path fill="#00a4ef" d="M1 11h9v9H1z"></path>
-                      <path fill="#7fba00" d="M11 1h9v9h-9z"></path>
-                      <path fill="#ffb900" d="M11 11h9v9h-9z"></path>
-                    </svg>
-                    <p class="text-black ml-2">Sign in with Microsoft</p>
-                  </button>
-                </div>
+                    <path fill="#f25022" d="M1 1h9v9H1z"></path>
+                    <path fill="#00a4ef" d="M1 11h9v9H1z"></path>
+                    <path fill="#7fba00" d="M11 1h9v9h-9z"></path>
+                    <path fill="#ffb900" d="M11 11h9v9h-9z"></path>
+                  </svg>
+                  <p class="text-black ml-2">Sign in with Microsoft</p>
+                </button>
               </div>
+            </div>
           </div>
         </div>
       </div>

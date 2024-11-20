@@ -23,6 +23,7 @@ import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.services.BoardService;
 import sit.int221.servicetasksj3.services.CollaboratorService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
 
@@ -54,13 +55,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             }
-
             if (requestTokenHeader != null) {
                 if (requestTokenHeader.startsWith("Bearer ")) {
                     jwtToken = requestTokenHeader.substring(7);
                     try {
-                        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                        isTokenValid = true;
+                        if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
+                            System.out.println("Hi");
+                            MicrosoftUser msUser = jwtTokenUtil.extractMicrosoftUserFromToken(jwtToken);
+                            if (msUser != null) {
+                                System.out.println(msUser);
+                                username = msUser.getEmail();
+                                isTokenValid = true;
+                            } else {
+                                tokenError = "Invalid Microsoft Token";
+                            }
+                        } else {
+
+                            try {
+                                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                                isTokenValid = true;
+                            } catch (IllegalArgumentException e) {
+                                tokenError = e.getMessage();
+                            } catch (ExpiredJwtException e) {
+                                tokenError = e.getMessage();
+                            }
+                        }
                     } catch (IllegalArgumentException e) {
                         tokenError = e.getMessage();
                     } catch (ExpiredJwtException e) {
