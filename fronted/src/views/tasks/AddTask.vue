@@ -81,7 +81,7 @@ const handleFileChange = (event) => {
     newFiles.push(file)
   }
 
-  files.value = [...files.value, ...newFiles]
+  files.value = [...files.value, ...newFiles] 
 }
 
 watch(
