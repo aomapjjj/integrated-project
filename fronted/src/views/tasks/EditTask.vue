@@ -56,6 +56,8 @@ const todo = ref({
 
 const boardId = ref()
 
+const messageResponse = ref('')
+
 watch(
   () => route.params.id,
   (newId) => {
@@ -138,7 +140,10 @@ const UpdateTask = async () => {
 
       if (attachmentsResponse.statusCode === 200 || attachmentsResponse.statusCode === 201) {
         console.log("Attachments uploaded successfully:", attachmentsResponse.data);
-
+        const message = attachmentsResponse.data.message;
+        console.log(message);
+        
+        messageResponse.value = message
       } else {
         console.error("Failed to upload attachments:", attachmentsResponse);
       }
@@ -317,24 +322,20 @@ const fetchAttachments = async () => {
   try {
     const response = await getAttachments(boardId.value, props.todoId)
     if (response.statusCode === 200) {
-      todo.value.attachments = response.data
+      todo.value.attachments = response.data    
+      
       for (let index = 0; index < todo.value.attachments.length; index++) {
     const element = todo.value.attachments[index];
 
-    // แปลง base64 string ของ element.fileData ให้เป็น Blob
     const byteCharacters = atob(element.fileData);
     const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: element.fileType });
 
-    // สร้าง File object โดยใช้ blob
     const file = new File([blob], element.fileName, { type: element.fileType });
 
     files.value.push(file);
 }
-      console.log('Attachments:', todo.value.attachments)
-      console.log('Attachments:', response.data)
-      console.log(typeof(todo.value.attachments))
       
     } else {
       console.error('Failed to fetch attachments:', response)
@@ -446,7 +447,7 @@ onMounted(() => {
           <div v-if="files.length > 0">
             <div class="max-w-md mb-4">
               <p class="text-sm text-customRed mb-2">
-                <span>เอาไว้ใส่ message ที่แบคส่งมา ขนาดไฟล์เกิน , ชื่อซ้ำ
+                <span> {{ messageResponse }}
                 </span>
               </p>
               <!-- Upload Section -->

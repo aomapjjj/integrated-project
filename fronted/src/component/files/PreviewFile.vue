@@ -16,10 +16,10 @@ const files = ref([]);
 const route = useRoute();
 
 const props = defineProps({
-  file: Object, 
+  file: Object,
 });
 
-const emit = defineEmits(["close"]); 
+const emit = defineEmits(["close"]);
 
 const boardId = ref();
 
@@ -27,7 +27,7 @@ watch(
   () => props.file,
   (newFile) => {
     if (newFile && newFile.url) {
-      fileUrl.value = newFile.url; // ใช้ URL ที่ส่งมาจาก TaskDetail.vue
+      fileUrl.value = newFile.url; 
     }
   },
   { immediate: true }
@@ -42,7 +42,7 @@ const openModal = (file) => {
 };
 
 const closeModal = () => {
-  emit("close"); 
+  emit("close");
 };
 
 const prevPage = () => {

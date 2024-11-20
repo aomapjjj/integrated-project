@@ -374,7 +374,7 @@ async function deleteCollaborator(boardId, oid) {
   }
 }
 
-async function getAttachments(boardId, taskId) {
+async function getAttachments(boardId ,taskId) {
   const token = getToken()
   try {
     const response = await fetch(
@@ -390,13 +390,15 @@ async function getAttachments(boardId, taskId) {
     const statusCode = response.status
     const responseData = await response.json()
     return { statusCode, data: responseData }
+
+    
   } catch (error) {
     console.log(`Error: ${error.message}`)
     return { statusCode: null, error: error.message }
   }
 }
 
-async function addAttachments(boardId, taskId, files) {
+async function addAttachments(boardId ,taskId, files) {
   const token = getToken()
   const formData = new FormData()
   files.forEach((file) => formData.append("files", file))
@@ -414,7 +416,7 @@ async function addAttachments(boardId, taskId, files) {
     )
 
     const statusCode = response.status
-    const responseData = await response.text()
+    const responseData = await response.json()
     return { statusCode, data: responseData }
   } catch (error) {
     console.log(`Error: ${error.message}`)
