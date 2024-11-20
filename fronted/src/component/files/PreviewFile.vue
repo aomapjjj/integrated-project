@@ -1,24 +1,38 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
+import { getAttachments } from "@/libs/fetchUtils";
+import { useRoute } from "vue-router";
 
-// File preview data
 const fileName = ref("");
 const currentPage = ref(1);
 const totalPages = ref(1);
 const zoomLevel = ref(1);
 const fileUrl = ref("");
 
-// Modal visibility
 const isModalOpen = ref(false);
 
-// Sample files
-const files = ref([
-  { id: 1, name: "Resume.pdf", url: "path/to/resume.pdf", pages: 10 },
-  { id: 2, name: "Portfolio.pdf", url: "path/to/portfolio.pdf", pages: 5 },
-  { id: 3, name: "Report.pdf", url: "path/to/report.pdf", pages: 20 },
-]);
+const files = ref([]);
 
-// File interaction methods
+const route = useRoute();
+
+const props = defineProps({
+  file: Object,
+});
+
+const emit = defineEmits(["close"]);
+
+const boardId = ref();
+
+watch(
+  () => props.file,
+  (newFile) => {
+    if (newFile && newFile.url) {
+      fileUrl.value = newFile.url; 
+    }
+  },
+  { immediate: true }
+);
+
 const openModal = (file) => {
   fileName.value = file.name;
   fileUrl.value = file.url;
@@ -28,7 +42,7 @@ const openModal = (file) => {
 };
 
 const closeModal = () => {
-  isModalOpen.value = false;
+  emit("close");
 };
 
 const prevPage = () => {
@@ -40,7 +54,10 @@ const nextPage = () => {
 };
 
 const downloadFile = () => {
-  window.open(fileUrl.value, "_blank");
+  const a = document.createElement("a");
+  a.href = fileUrl.value;
+  a.download = fileName.value;
+  a.click();
 };
 
 const zoomIn = () => {
@@ -66,33 +83,24 @@ const updateZoom = () => {
 };
 </script>
 
+
 <template>
   <!-- File List -->
   <div class="grid grid-cols-3 gap-4 p-6">
-    <div
-      v-for="file in files"
-      :key="file.id"
-      class="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-100 cursor-pointer"
-      @click="openModal(file)"
-    >
+    <div v-for="file in files" :key="file.name"
+      class="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-100 cursor-pointer" @click="openModal(file)">
       <h3 class="text-base font-semibold">{{ file.name }}</h3>
       <p class="text-sm text-gray-500">Pages: {{ file.pages }}</p>
     </div>
   </div>
 
   <!-- Modal -->
-  <div
-    v-if="isModalOpen"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-  >
+  <div v-if="fileUrl" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg">
       <!-- Modal Header -->
       <div class="flex justify-between items-center px-6 py-4 border-b border-gray-300">
         <h3 class="text-lg font-semibold">{{ fileName }}</h3>
-        <button
-          @click="closeModal"
-          class="text-gray-500 hover:text-gray-700 focus:outline-none"
-        >
+        <button @click="closeModal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
           ✕
         </button>
       </div>
@@ -106,42 +114,24 @@ const updateZoom = () => {
       <div class="flex justify-between items-center px-6 py-4 border-t border-gray-300">
         <span class="text-sm">Page {{ currentPage }} / {{ totalPages }}</span>
         <div class="flex space-x-2">
-          <button
-            @click="prevPage"
-            :disabled="currentPage === 1"
-            class="px-2 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
+          <button @click="prevPage" :disabled="currentPage === 1"
+            class="px-2 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed">
             &lt;
           </button>
-          <button
-            @click="nextPage"
-            :disabled="currentPage === totalPages"
-            class="px-2 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
+          <button @click="nextPage" :disabled="currentPage === totalPages"
+            class="px-2 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300 disabled:cursor-not-allowed">
             &gt;
           </button>
-          <button
-            @click="zoomIn"
-            class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button @click="zoomIn" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
             +
           </button>
-          <button
-            @click="zoomOut"
-            class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button @click="zoomOut" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
             -
           </button>
-          <button
-            @click="fitToScreen"
-            class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button @click="fitToScreen" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
             Fit to screen
           </button>
-          <button
-            @click="downloadFile"
-            class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button @click="downloadFile" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
             Download
           </button>
         </div>
@@ -150,6 +140,4 @@ const updateZoom = () => {
   </div>
 </template>
 
-<style scoped>
-/* No additional styles are needed since Tailwind CSS is used */
-</style>
+<style scoped></style>

@@ -53,7 +53,10 @@ const todo = ref({
   updatedOn: '',
   attachments: []
 })
+
 const boardId = ref()
+
+const messageResponse = ref('')
 
 watch(
   () => route.params.id,
@@ -103,21 +106,21 @@ const closeModal = () => {
 }
 
 const UpdateTask = async () => {
-  console.log('Todo ID:', props.todoId)
+  console.log("Todo ID:", props.todoId);
 
   if (isLimitReached.value) {
-    return
+    return;
   }
 
   const trimmedTodo = {
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
     assignees: todo.value.assignees?.trim(),
-    status: todo.value.status
-  }
+    status: todo.value.status,
+  };
 
   try {
-    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo)
+    const edit = await editItem(baseUrlTask, props.todoId, trimmedTodo);
     myTasks.updateTask(
       edit.id,
       edit.title,
@@ -125,18 +128,36 @@ const UpdateTask = async () => {
       edit.assignees,
       edit.status,
       edit.createdOn,
-      edit.updateOn
-    )
+      edit.updatedOn
+    );
 
-    showAlertEdit.value = true
-    showAlertAfterEdit.value = true
+    if (files.value.length > 0) {
+      const attachmentsResponse = await addAttachments(
+        boardId.value,
+        edit.id,
+        files.value
+      );
+
+      if (attachmentsResponse.statusCode === 200 || attachmentsResponse.statusCode === 201) {
+        console.log("Attachments uploaded successfully:", attachmentsResponse.data);
+        const message = attachmentsResponse.data.message;
+        console.log(message);
+        
+        messageResponse.value = message
+      } else {
+        console.error("Failed to upload attachments:", attachmentsResponse);
+      }
+    }
+
+    showAlertEdit.value = true;
+    showAlertAfterEdit.value = true;
     setTimeout(() => {
-      showAlertAfterEdit.value = false
-    }, 2300)
+      showAlertAfterEdit.value = false;
+    }, 2300);
   } catch (error) {
-    console.error('Error updating task:', error)
+    console.error("Error updating task:", error);
   }
-}
+};
 
 const checkEqual = computed(() => {
   const trimmedTodo = {
@@ -202,79 +223,81 @@ const isLimitReached = computed(() => {
 })
 
 //------------------------------------ File ----------------------------
-const files = ref([])
+const files = ref([]);
 const maxFiles = 10
-const maxTotalSizePerFile = 20 * 1024 * 1024 // 20 MB
+const maxTotalSizePerFile = 20 * 1024 * 1024
 
 const handleFileChange = (event) => {
-  const selectedFiles = Array.from(event.target.files)
+  const selectedFiles = Array.from(event.target.files);
+  console.log(selectedFiles);
 
-  // ตรวจสอบจำนวนไฟล์
   if (files.value.length + selectedFiles.length > maxFiles) {
-    alert(`You can upload up to ${maxFiles} files.`)
-    return
+    alert(`You can upload up to ${maxFiles} files.`);
+    return;
   }
 
-  // ตรวจสอบขนาดไฟล์
-  const newFiles = []
-  for (const file of selectedFiles) {
-    if (file.size > maxTotalSizePerFile) {
-      alert(`File ${file.name} exceeds the maximum size of 20 MB.`)
-      continue
-    }
-    newFiles.push(file)
+  const validFiles = selectedFiles.filter(
+    (file) => file.size <= maxTotalSizePerFile
+  );
+
+  if (validFiles.length < selectedFiles.length) {
+    alert("Some files exceed the maximum size of 20 MB.");
   }
 
-  // เพิ่มไฟล์ใหม่เข้าไปใน `files`
-  files.value = [...files.value, ...newFiles]
-}
+
+
+  files.value = [...selectedFiles, ...files.value];
+
+};
+
+
 
 watch(
-  () => files.value,
+  () => files,
   (newFiles) => {
-    files.value = newFiles
+    files = newFiles
     console.log('Updated files:', newFiles)
   }
 )
 
-const isImage = (file) => {
-  return file.type.startsWith('image/')
-}
+// const isImage = (file) => {
+//   return file.type.startsWith('image/')
+// }
 
-const getFileIcon = (file) => {
-  if (!file || typeof file !== 'object' || !file.name) {
-    return '/image/files/default.png'
-  }
+// const getFileIcon = (file) => {
+//   if (!file || typeof file !== 'object' || !file.name) {
+//     return '/image/files/default.png'
+//   }
 
-  const extension = file.name.split('.').pop().toLowerCase()
-  if (!extension) return '/image/files/default.png'
+//   const extension = file.name.split('.').pop().toLowerCase()
+//   if (!extension) return '/image/files/default.png'
 
-  // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
-  switch (extension) {
-    case 'pdf':
-      return '/image/files/PDF.png'
-    case 'doc':
-    case 'docx':
-      return '/image/files/DOC.png'
-    case 'xls':
-    case 'xlsx':
-      return '/image/files/XLS.png'
-    case 'ppt':
-    case 'pptx':
-      return '/image/files/PPT.png'
-    case 'txt':
-      return '/image/files/TXT.png'
-    case 'png':
-    case 'jpeg':
-    case 'jpg':
-    case 'gif':
-      return file instanceof File
-        ? URL.createObjectURL(file)
-        : '/image/files/default.png'
-    default:
-      return '/image/files/default.png'
-  }
-}
+//   // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
+//   switch (extension) {
+//     case 'pdf':
+//       return '/image/files/PDF.png'
+//     case 'doc':
+//     case 'docx':
+//       return '/image/files/DOC.png'
+//     case 'xls':
+//     case 'xlsx':
+//       return '/image/files/XLS.png'
+//     case 'ppt':
+//     case 'pptx':
+//       return '/image/files/PPT.png'
+//     case 'txt':
+//       return '/image/files/TXT.png'
+//     case 'png':
+//     case 'jpeg':
+//     case 'jpg':
+//     case 'gif':
+//       return file instanceof File
+//         ? URL.createObjectURL(file)
+//         : '/image/files/default.png'
+//     default:
+//       return '/image/files/default.png'
+//   }
+// }
 
 const clearFileUrls = () => {
   files.value.forEach((file) => {
@@ -284,15 +307,36 @@ const clearFileUrls = () => {
   })
 }
 
-const attachments = ref([])
+const removeFile = (index) => {
+  const fileToRemove = files.value[index];
+  if (fileToRemove?.url) {
+    URL.revokeObjectURL(fileToRemove.url);
+  }
 
-// ฟังก์ชันดึงข้อมูลไฟล์แนบจาก backend
+  files.value.splice(index, 1);
+
+  console.log("Updated files:", files.value);
+};
+
 const fetchAttachments = async () => {
   try {
     const response = await getAttachments(boardId.value, props.todoId)
     if (response.statusCode === 200) {
-      files.value = response.data.attachments || [] // กำหนดไฟล์ที่ได้จาก backend
-      console.log('Attachments:', files.value)
+      todo.value.attachments = response.data    
+      
+      for (let index = 0; index < todo.value.attachments.length; index++) {
+    const element = todo.value.attachments[index];
+
+    const byteCharacters = atob(element.fileData);
+    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: element.fileType });
+
+    const file = new File([blob], element.fileName, { type: element.fileType });
+
+    files.value.push(file);
+}
+      
     } else {
       console.error('Failed to fetch attachments:', response)
     }
@@ -308,50 +352,32 @@ onMounted(() => {
 
 <template>
   <!-- Edit Button -->
-  <button
-    @click="openModal"
-    class="itbkk-button-edit btn rounded-full"
-    :disabled="disabledBtn"
-    :class="[
-      'itbkk-button-edit ml-2',
-      'btn',
-      'rounded-full',
-      { 'btn-disabled': disabledBtn }
-    ]"
-    :style="{
-      backgroundColor: disabledBtn ? '#d3d3d3' : '#fae59d',
-      color: disabledBtn ? '#a9a9a9' : 'white',
-      borderRadius: '30px',
-      position: 'static',
-      cursor: disabledBtn ? 'not-allowed' : 'pointer',
-      opacity: disabledBtn ? 0.6 : 1
-    }"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-    >
+  <button @click="openModal" class="itbkk-button-edit btn rounded-full" :disabled="disabledBtn" :class="[
+    'itbkk-button-edit ml-2',
+    'btn',
+    'rounded-full',
+    { 'btn-disabled': disabledBtn }
+  ]" :style="{
+    backgroundColor: disabledBtn ? '#d3d3d3' : '#fae59d',
+    color: disabledBtn ? '#a9a9a9' : 'white',
+    borderRadius: '30px',
+    position: 'static',
+    cursor: disabledBtn ? 'not-allowed' : 'pointer',
+    opacity: disabledBtn ? 0.6 : 1
+  }">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
       <g fill="none">
         <path
-          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-        />
-        <path
-          fill="currentColor"
-          d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"
-        />
+          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+        <path fill="currentColor"
+          d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z" />
       </g>
     </svg>
   </button>
   <!-- Modal window -->
-  <dialog
-    ref="myModal"
-    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
-  >
-    <div
-      class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
-    >
+  <dialog ref="myModal"
+    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">
@@ -360,12 +386,8 @@ onMounted(() => {
             <label class="block text-base font-medium text-[#9391e4]">
               Title <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              v-model="todo.title"
-              placeholder="Title"
-              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
+            <input type="text" v-model="todo.title" placeholder="Title"
+              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg" />
             <p class="text-sm text-gray-500 text-right">
               {{ todo.title.length }}/100
             </p>
@@ -376,15 +398,8 @@ onMounted(() => {
             <label class="block text-base font-medium text-[#9391e4]">
               Status
             </label>
-            <select
-              v-model="todo.status"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            >
-              <option
-                class="itbkk-status"
-                v-for="status in statusList"
-                :value="status.name"
-              >
+            <select v-model="todo.status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              <option class="itbkk-status" v-for="status in statusList" :value="status.name">
                 {{ status.name }}
               </option>
             </select>
@@ -396,15 +411,11 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Description <span class="text-red-500">*</span>
           </label>
-          <textarea
-            v-model="todo.description"
-            :class="{
-              'italic text-gray-500':
-                !todo.description || todo.description.trim() === ''
-            }"
-            placeholder="No Description Provided"
-            class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
-          >
+          <textarea v-model="todo.description" :class="{
+            'italic text-gray-500':
+              !todo.description || todo.description.trim() === ''
+          }" placeholder="No Description Provided"
+            class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24">
           {{ todo.description }}
           </textarea>
           <p class="text-sm text-gray-500 text-right mt-1">
@@ -417,15 +428,10 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Assignees <span class="text-red-500">*</span>
           </label>
-          <textarea
-            v-model="todo.assignees"
-            :class="{
-              'italic text-gray-500':
-                !todo.assignees || todo.assignees.trim() === ''
-            }"
-            placeholder="Unassigned"
-            class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
-          >
+          <textarea v-model="todo.assignees" :class="{
+            'italic text-gray-500':
+              !todo.assignees || todo.assignees.trim() === ''
+          }" placeholder="Unassigned" class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg">
           {{ todo.assignees }}
           </textarea>
           <p class="text-sm text-gray-500 text-right mt-1">
@@ -438,71 +444,46 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Attachments
           </label>
-          <!-- Have File -->
           <div v-if="files.length > 0">
             <div class="max-w-md mb-4">
               <p class="text-sm text-customRed mb-2">
-                <span
-                  >เอาไว้ใส่ message ที่แบคส่งมา ขนาดไฟล์เกิน , ชื่อซ้ำ
+                <span> {{ messageResponse }}
                 </span>
               </p>
               <!-- Upload Section -->
-              <!-- ปุ่มนี้จะหายด้วยถ้า file ครบ 10 -->
               <div class="grid grid-cols-4 gap-4">
-                <div
-                  v-if="files.length < maxFiles"
-                  class="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-gray-50"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 text-gray-300"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065"
-                    />
-                  </svg>
-                </div>
-                <!-- File Item -->
-                <div
-                  v-for="(file, index) in files"
-                  :key="index"
-                  class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
-                >
-                  <!-- thumbnail -->
+                <div v-if="files.length <= maxFiles" class="relative">
                   <div
-                    class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
-                  >
-                    <p v-if="isImage(file)" class="text-xs text-gray-600">
-                      <img
-                        :src="file.url || getFileIcon(file)"
-                        alt="Preview"
-                        class="object-cover w-full h-full rounded"
-                      />
-                    </p>
-                    <p v-else class="text-xs text-gray-600 truncate">
+                    class="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-gray-50">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300" viewBox="0 0 24 24">
+                      <path fill="currentColor"
+                        d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1" />
+                      <path fill="currentColor"
+                        d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065" />
+                    </svg>
+                  </div>
+                  <input id="file-upload" type="file" multiple @change="handleFileChange"
+                    class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
+                </div>
+
+
+                <div v-for="(file, index) in files" :key="index"
+                  class="flex flex-col items-start bg-gray-100 rounded-lg p-2">
+                  <div class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
+                    <!-- <p v-if="isImage(file)" class="text-xs text-gray-600">
+                      <img :src="file.url || getFileIcon(file)" alt="Preview"
+                        class="object-cover w-full h-full rounded" />
+                    </p> -->
+                    <p class="text-xs text-gray-600 truncate">
                       {{ file.name }}
                     </p>
 
-                    <!-- Delete Button -->
-                    <button
-                      @click="removeFile(index)"
-                      class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-red-400 hover:text-red-500"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m4.3 14.3a.996.996 0 0 1-1.41 0L12 13.41L9.11 16.3a.996.996 0 1 1-1.41-1.41L10.59 12L7.7 9.11A.996.996 0 1 1 9.11 7.7L12 10.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41"
-                        />
+                    <button @click="removeFile(index)"
+                      class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400 hover:text-red-500"
+                        viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                          d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m4.3 14.3a.996.996 0 0 1-1.41 0L12 13.41L9.11 16.3a.996.996 0 1 1-1.41-1.41L10.59 12L7.7 9.11A.996.996 0 1 1 9.11 7.7L12 10.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41" />
                       </svg>
                     </button>
                   </div>
@@ -521,50 +502,39 @@ onMounted(() => {
             <div>
               <div class="grid grid-cols-1 space-y-4">
                 <div class="flex items-center justify-center w-full">
-                  <label
-                    for="file-upload"
-                    class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-60 p-6 group text-center cursor-pointer transition duration-300 ease-in-out"
-                  >
-                    <div
-                      class="h-full w-full text-center flex flex-col justify-center items-center"
-                    >
-                      <div class="flex flex-auto max-h-40 w-1/3 mx-auto">
-                        <img
-                          class="has-mask object-contain"
-                          src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg"
-                          alt="upload illustration"
-                        />
+                  <!-- ใช้ for เชื่อมกับ input -->
+                  <div class="relative w-full h-60">
+                    <!-- ปุ่มอัปโหลด -->
+                    <label for="file-upload"
+                      class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-full p-6 group text-center cursor-pointer transition duration-300 ease-in-out">
+                      <div class="h-full w-full text-center flex flex-col justify-center items-center">
+                        <div class="flex flex-auto max-h-40 w-1/3 mx-auto">
+                          <img class="has-mask object-contain"
+                            src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg"
+                            alt="upload illustration" />
+                        </div>
+                        <p class="pointer-none text-gray-500">
+                          <span class="text-sm">Drag and drop</span> files here
+                          <br />
+                          or
+                          <span class="text-blue-500 underline cursor-pointer">
+                            select a file
+                          </span>
+                          from your computer
+                        </p>
                       </div>
+                    </label>
 
-                      <p class="pointer-none text-gray-500">
-                        <span class="text-sm">Drag and drop</span> files here
-                        <br />
-                        or
-                        <span
-                          class="text-blue-500 underline cursor-pointer"
-                          id="trigger-file-input"
-                        >
-                          select a file
-                        </span>
-                        from your computer
-                      </p>
-                    </div>
-
-                    <input
-                      id="file-upload"
-                      type="file"
-                      class="hidden"
-                      @change="handleFileUpload"
-                    />
-                  </label>
+                    <!-- ซ่อน input -->
+                    <input id="file-upload" type="file" multiple @change="handleFileChange"
+                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
+                  </div>
                 </div>
               </div>
 
               <p class="text-sm text-gray-300 p-2">
-                <span
-                  >Supported formats: png, jpeg, txt, rtf, pdf (up to 10
-                  files)</span
-                >
+                <span>Supported formats: png, jpeg, txt, rtf, pdf (up to 10
+                  files)</span>
               </p>
             </div>
           </div>
@@ -616,11 +586,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div
-          role="alert"
-          class="alert shadow-lg alert-error"
-          v-show="alertFailToEdit"
-          style="
+        <div role="alert" class="alert shadow-lg alert-error" v-show="alertFailToEdit" style="
             position: fixed;
             top: 20px;
             left: 50%;
@@ -628,29 +594,16 @@ onMounted(() => {
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>{{ aletMessage }}</span>
         </div>
 
-        <div
-          role="alert"
-          class="alert shadow-lg"
-          :class="{ hidden: !showAlertAfterEdit }"
-          style="
+        <div role="alert" class="alert shadow-lg" :class="{ hidden: !showAlertAfterEdit }" style="
             position: fixed;
             top: 20px;
             left: 50%;
@@ -659,20 +612,11 @@ onMounted(() => {
             width: 500px;
             color: rgb(74 222 128 / var(--tw-text-opacity));
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
             <h2 class="itbkk-message font-bold text-green-400">
@@ -683,20 +627,14 @@ onMounted(() => {
 
         <!-- Save & Close Button -->
         <div class="px-6 py-4 flex justify-end border-t border-gray-200">
-          <button
-            @click="closeModal"
-            class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
-          >
+          <button @click="closeModal"
+            class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none">
             Close
           </button>
-          <button
-            @click="UpdateTask"
-            :disabled="!isFormValid || checkEqual || isLimitReached"
-            :class="{
-              disabled: !isFormValid || checkEqual || isLimitReached
-            }"
-            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
-          >
+          <button @click="UpdateTask" :disabled="!isFormValid || checkEqual || isLimitReached" :class="{
+            disabled: !isFormValid || checkEqual || isLimitReached
+          }"
+            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50">
             Save
           </button>
         </div>
@@ -719,5 +657,15 @@ onMounted(() => {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 9999;
   animation: fadeInOut 4s infinite;
+}
+
+input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 </style>

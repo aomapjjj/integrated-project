@@ -1,8 +1,8 @@
-import router from '@/router'
+import router from "@/router"
 
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem("access_token")
 }
 
 async function getItems(url) {
@@ -21,7 +21,7 @@ async function getBoardItems(url) {
   const token = getToken()
 
   if (!token) {
-    console.log('No token provided. Exiting function.')
+    console.log("No token provided. Exiting function.")
     return
   }
 
@@ -65,7 +65,7 @@ async function getItemById(taskId, boardId) {
       console.log(`error: ${error}`)
     }
   } else {
-    console.log('Invalid boardId or taskId')
+    console.log("Invalid boardId or taskId")
   }
 }
 
@@ -77,12 +77,12 @@ async function getBoardById(boardId) {
     try {
       const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers })
       if (response.status === 404) {
-        router.push({ name: 'ErrorPage' })
+        router.push({ name: "ErrorPage" })
         return
       }
 
       if (response.status === 403) {
-        router.push({ name: 'ErrorPagePermission' })
+        router.push({ name: "ErrorPagePermission" })
         return
       }
 
@@ -94,7 +94,7 @@ async function getBoardById(boardId) {
       console.log(`error: ${error}`)
     }
   } else {
-    console.log('Invalid boardId or taskId')
+    console.log("Invalid boardId or taskId")
   }
 }
 
@@ -102,10 +102,10 @@ async function deleteItemById(url, id) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
     return response.status
   } catch (error) {
@@ -117,10 +117,10 @@ async function deleteItemAndTransfer(url, id, newid) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}/${newid}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
     return response.status
   } catch (error) {
@@ -132,12 +132,12 @@ async function addItem(url, newItem) {
   const token = getToken()
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ ...newItem })
+      body: JSON.stringify({ ...newItem }),
     })
     const addedItem = await response.json()
     return addedItem
@@ -150,12 +150,12 @@ async function editItem(url, id, editItem) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ ...editItem })
+      body: JSON.stringify({ ...editItem }),
     })
     const editedItem = await response.json()
     return editedItem
@@ -170,11 +170,11 @@ async function editLimit(baseUrlLimit, maximumTask, isLimit) {
     const response = await fetch(
       `${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
     )
 
@@ -193,12 +193,12 @@ async function addBoard(url, newBoard) {
   const token = getToken()
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(newBoard)
+      body: JSON.stringify(newBoard),
     })
 
     const data = await response.json()
@@ -214,16 +214,16 @@ async function addBoard(url, newBoard) {
 async function boardVisibility(boardId, currentVisibility) {
   const token = getToken()
 
-  const newVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
+  const newVisibility = currentVisibility === "PUBLIC" ? "PRIVATE" : "PUBLIC"
 
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ visibility: newVisibility })
+      body: JSON.stringify({ visibility: newVisibility }),
     })
 
     if (response.status === 200) {
@@ -232,7 +232,7 @@ async function boardVisibility(boardId, currentVisibility) {
       return {
         success: true,
         visibility: editedItem.visibility,
-        message: `Visibility changed to: ${editedItem.visibility}`
+        message: `Visibility changed to: ${editedItem.visibility}`,
       }
     } else if (response.status === 401) {
       resetAuthentication()
@@ -240,24 +240,24 @@ async function boardVisibility(boardId, currentVisibility) {
       return null
     } else if (response.status === 403) {
       const message =
-        'You do not have permission to change board visibility mode.'
+        "You do not have permission to change board visibility mode."
       return {
         success: false,
-        message: message
+        message: message,
       }
     } else {
-      const message = 'There is a problem. Please try again later.'
+      const message = "There is a problem. Please try again later."
       return {
         success: false,
-        message: message
+        message: message,
       }
     }
   } catch (error) {
     console.log(`Error: ${error.message}`)
-    const message = 'There is a problem, Please try again later.'
+    const message = "There is a problem, Please try again later."
     return {
       success: false,
-      message: message
+      message: message,
     }
   }
 }
@@ -287,12 +287,12 @@ async function addCollaborator(boardId, collaboratorWithEmai) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(collaboratorWithEmai)
+      body: JSON.stringify(collaboratorWithEmai),
     })
 
     const statusCode = response.status
@@ -308,15 +308,15 @@ async function editAccessRight(boardId, access, oid, status) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         accessRight: access,
-        status: status
-      })
+        status: status,
+      }),
     })
 
     if (!response.ok) {
@@ -336,15 +336,15 @@ async function editStatusCollab(boardId, status, collaboratorId, access) {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/collabs/${collaboratorId}/status`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           accessRight: access,
-          status: status
-        })
+          status: status,
+        }),
       }
     )
 
@@ -363,10 +363,10 @@ async function deleteCollaborator(boardId, oid) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
     return response.status
   } catch (error) {
@@ -374,42 +374,44 @@ async function deleteCollaborator(boardId, oid) {
   }
 }
 
-async function getAttachments(boardId, taskId) {
+async function getAttachments(boardId ,taskId) {
   const token = getToken()
   try {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       }
     )
 
     const statusCode = response.status
     const responseData = await response.json()
     return { statusCode, data: responseData }
+
+    
   } catch (error) {
     console.log(`Error: ${error.message}`)
     return { statusCode: null, error: error.message }
   }
 }
 
-async function addAttachments(boardId, taskId, files) {
+async function addAttachments(boardId ,taskId, files) {
   const token = getToken()
   const formData = new FormData()
-  files.forEach((file) => formData.append('files', file))
+  files.forEach((file) => formData.append("files", file))
 
   try {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
       }
     )
 
@@ -429,10 +431,10 @@ async function deleteAttachment(boardId, taskId, attachmentId) {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${attachmentId}`,
       {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       }
     )
 
@@ -445,15 +447,47 @@ async function deleteAttachment(boardId, taskId, attachmentId) {
   }
 }
 
+const downloadAttachment = async (boardId, taskId, filename) => {
+  const token = getToken()
+  try {
+    const response = await fetch(
+      `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${filename}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    if (response.ok) {
+      const blob = await response.blob(); // รับข้อมูลเป็น Blob
+      const fileUrl = URL.createObjectURL(blob);
+
+      // ใช้ Programmatic File Download
+      const link = new URL(fileUrl);
+      const anchor = new URL("", link.origin);
+      anchor.href = fileUrl;
+      anchor.download = fileName.value; // ตั้งชื่อไฟล์
+      anchor.dispatchEvent(new MouseEvent("click")); // กระตุ้นการดาวน์โหลด
+
+      URL.revokeObjectURL(fileUrl);
+    } else {
+      console.error(`Failed to load attachment: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
+}
+
 const validateAccessToken = async (token) => {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     }
   )
   return response
@@ -463,11 +497,11 @@ const refreshAccessToken = async (refreshToken) => {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        requestTokenHeader: `Bearer ${refreshToken}`
-      }
+        "Content-Type": "application/json",
+        requestTokenHeader: `Bearer ${refreshToken}`,
+      },
     }
   )
   return response
@@ -496,5 +530,6 @@ export {
   refreshAccessToken,
   addAttachments,
   deleteAttachment,
-  getAttachments
+  getAttachments,
+  downloadAttachment
 }
