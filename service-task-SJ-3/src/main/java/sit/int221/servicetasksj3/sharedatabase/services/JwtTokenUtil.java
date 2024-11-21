@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -117,8 +118,6 @@ public class JwtTokenUtil implements Serializable {
                     entity,
                     String.class
             );
-
-
             if (response.getStatusCode().is2xxSuccessful()) {
                 System.out.println("Token is valid. User info: " + response.getBody());
                 return true;
@@ -164,11 +163,12 @@ public class JwtTokenUtil implements Serializable {
                     Map.class
             );
 
-
             if (response.getStatusCode().is2xxSuccessful()) {
                 Map<String, Object> userInfo = response.getBody();
-                Claims claims = Jwts.claims();
-                claims.putAll(userInfo);
+                Claims claims = new DefaultClaims();
+                if (userInfo != null) {
+                    claims.putAll(userInfo);
+                }
                 return claims;
             } else {
                 System.out.println("Failed to fetch user info. Status: " + response.getStatusCode());
