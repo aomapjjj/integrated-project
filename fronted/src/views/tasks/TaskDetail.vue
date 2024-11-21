@@ -1,9 +1,9 @@
 <script setup>
-import { getItemById, getAttachments } from "@/libs/fetchUtils"
-import { ref, watch } from "vue"
-import { toDate } from "../../libs/toDate"
-import { useRoute, useRouter } from "vue-router"
-import PreviewFile from "../../component/files/PreviewFile.vue"
+import { getItemById, getAttachments } from '@/libs/fetchUtils'
+import { ref, watch } from 'vue'
+import { toDate } from '../../libs/toDate'
+import { useRoute, useRouter } from 'vue-router'
+import PreviewFile from '../../component/files/PreviewFile.vue'
 
 // ----------------------- Router -----------------------
 
@@ -16,13 +16,13 @@ const props = defineProps({
   todoId: Number,
   isOpenModal: Boolean
 })
-const emit = defineEmits(["close"])
+const emit = defineEmits(['close'])
 
 const isFilePreviewOpen = ref(false)
 const previewFileData = ref({})
 
 const openPreviewFile = (file) => {
-  console.log("Opening file:", file)
+  console.log('Opening file:', file)
 
   const fileURL = URL.createObjectURL(file)
   previewFileData.value = {
@@ -40,13 +40,13 @@ const closePreviewFile = () => {
 }
 
 const todo = ref({
-  id: "",
-  title: "",
-  description: "",
-  assignees: "",
-  status: "",
-  createdOn: "",
-  updatedOn: "",
+  id: '',
+  title: '',
+  description: '',
+  assignees: '',
+  status: '',
+  createdOn: '',
+  updatedOn: '',
   attachments: []
 })
 
@@ -66,7 +66,7 @@ watch(
     if (newValue) {
       const { item, responsed } = await getItemById(newValue, boardId.value)
       if (responsed === 403) {
-        router.push({ name: "ErrorPagePermission" })
+        router.push({ name: 'ErrorPagePermission' })
       }
       todo.value = item
       const { statusCode, data } = await getAttachments(boardId.value, newValue)
@@ -75,7 +75,7 @@ watch(
         console.log(todo.value.attachments)
       } else {
         todo.value.attachments = []
-        console.error("Failed to fetch attachments")
+        console.error('Failed to fetch attachments')
       }
     }
   },
@@ -91,7 +91,7 @@ watch(
       files.value = attachments.map((attachment) => {
         const byteCharacters = atob(attachment.fileData)
         const byteNumbers = new Uint8Array(
-          byteCharacters.split("").map((char) => char.charCodeAt(0))
+          byteCharacters.split('').map((char) => char.charCodeAt(0))
         )
         const blob = new Blob([byteNumbers], { type: attachment.fileType })
 
@@ -120,8 +120,8 @@ const closeModal = () => {
   // if (myModal.value) {
   //   myModal.value.close()
   // }
-  emit("close")
-  router.push({ name: "TaskList", params: { id: boardId.value } })
+  emit('close')
+  router.push({ name: 'TaskList', params: { id: boardId.value } })
 }
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -131,7 +131,8 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   <!-- Modal window -->
   <dialog
     v-if="isOpenModal"
-    class="itbkk-modal-task w-full h-full flex inset-0 items-center justify-center"
+    ref="myModal"
+    class="itbkk-modal-task w-full h-full flex inset-0 z-20 items-center justify-center bg-gray-500 bg-opacity-50"
   >
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
@@ -151,9 +152,6 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               maxlength="100"
               class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg"
             />
-            <p class="text-sm text-gray-500 text-right">
-              {{ todo.title.length }}/100
-            </p>
           </div>
 
           <!-- Status -->
@@ -189,7 +187,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
         <!-- Description -->
         <div class="space-y-1">
           <label class="block text-base font-medium text-[#9391e4]">
-            Description <span class="text-red-500">*</span>
+            Description
           </label>
           <textarea
             disabled
@@ -204,7 +202,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             }"
             class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
           >
-          {{ todo.description || "No Description Provided" }}
+          {{ todo.description || 'No Description Provided' }}
           </textarea>
         </div>
 
@@ -226,7 +224,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             }"
             class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
           >
-          {{ todo.assignees || "Unassigned" }}
+          {{ todo.assignees || 'Unassigned' }}
           </textarea>
         </div>
 
@@ -270,51 +268,52 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           :file="previewFileData"
           @close="closePreviewFile"
         />
-      </div>
 
-      <!-- Metadata Section -->
-      <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
-        <!-- TimeZone -->
-        <div class="text-center">
-          <span class="block font-bold text-[#9391e4]">TimeZone</span>
-          <p class="itbkk-timezone">{{ TimeZone }}</p>
+        <!-- Metadata Section -->
+        <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
+          <!-- TimeZone -->
+          <div class="text-center">
+            <span class="block font-bold text-[#9391e4]">TimeZone</span>
+            <p class="itbkk-timezone">{{ TimeZone }}</p>
+          </div>
+
+          <!-- Created On -->
+          <div class="text-center">
+            <span class="block font-bold text-[#9391e4]">Created On</span>
+            <p class="itbkk-created-on">{{ toDate(todo.createdOn) }}</p>
+          </div>
+
+          <!-- Updated On -->
+          <div class="text-center">
+            <span class="block font-bold text-[#9391e4]">Updated On</span>
+            <p class="itbkk-updated-on">{{ toDate(todo.updatedOn) }}</p>
+          </div>
         </div>
 
-        <!-- Created On -->
-        <div class="text-center">
-          <span class="block font-bold text-[#9391e4]">Created On</span>
-          <p class="itbkk-created-on">{{ toDate(todo.createdOn) }}</p>
-        </div>
-
-        <!-- Updated On -->
-        <div class="text-center">
-          <span class="block font-bold text-[#9391e4]">Updated On</span>
-          <p class="itbkk-updated-on">{{ toDate(todo.updatedOn) }}</p>
-        </div>
-      </div>
-
-      <!-- Close Button -->
-      <div
-        class="itbkk-button px-6 py-4 flex justify-end border-t border-gray-200"
-      >
-        <button
-          @click="closeModal"
-          class="itbkk-close-button px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+        <!-- Close Button -->
+        <div
+          class="itbkk-button px-6 py-4 flex justify-end border-t border-gray-200"
         >
-          Close
-        </button>
-      </div>
-
-      <!-- Close Button -->
-      <!-- <div class="itbkk-button modal-action">
-          <label for="my_modal_6" class="btn" @click="closeModal()"
-            >Close</label
+          <button
+            @click="closeModal"
+            class="itbkk-close-button text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
           >
-        </div> -->
-      <!-- </div>
-    </div> -->
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   </dialog>
 </template>
 
-<style></style>
+<style>
+.itbkk-modal-task > div {
+  margin-left: 18%;
+}
+
+@media (max-width: 768px) {
+  .itbkk-modal-task > div {
+    margin-left: 0;
+  }
+}
+</style>
