@@ -1,9 +1,9 @@
 <script setup>
-import { getItemById, getAttachments } from '@/libs/fetchUtils'
-import { ref, watch } from 'vue'
-import { toDate } from '../../libs/toDate'
-import { useRoute, useRouter } from 'vue-router'
-import PreviewFile from '../../component/files/PreviewFile.vue'
+import { getItemById, getAttachments } from "@/libs/fetchUtils"
+import { ref, watch } from "vue"
+import { toDate } from "../../libs/toDate"
+import { useRoute, useRouter } from "vue-router"
+import PreviewFile from "../../component/files/PreviewFile.vue"
 
 // ----------------------- Router -----------------------
 
@@ -14,14 +14,15 @@ const route = useRoute()
 
 const props = defineProps({
   todoId: Number,
-  isOpenModal : Boolean
+  isOpenModal: Boolean
 })
+const emit = defineEmits(["close"])
 
 const isFilePreviewOpen = ref(false)
 const previewFileData = ref({})
 
 const openPreviewFile = (file) => {
-  console.log('Opening file:', file)
+  console.log("Opening file:", file)
 
   const fileURL = URL.createObjectURL(file)
   previewFileData.value = {
@@ -39,13 +40,13 @@ const closePreviewFile = () => {
 }
 
 const todo = ref({
-  id: '',
-  title: '',
-  description: '',
-  assignees: '',
-  status: '',
-  createdOn: '',
-  updatedOn: '',
+  id: "",
+  title: "",
+  description: "",
+  assignees: "",
+  status: "",
+  createdOn: "",
+  updatedOn: "",
   attachments: []
 })
 
@@ -65,7 +66,7 @@ watch(
     if (newValue) {
       const { item, responsed } = await getItemById(newValue, boardId.value)
       if (responsed === 403) {
-        router.push({ name: 'ErrorPagePermission' })
+        router.push({ name: "ErrorPagePermission" })
       }
       todo.value = item
       const { statusCode, data } = await getAttachments(boardId.value, newValue)
@@ -74,7 +75,7 @@ watch(
         console.log(todo.value.attachments)
       } else {
         todo.value.attachments = []
-        console.error('Failed to fetch attachments')
+        console.error("Failed to fetch attachments")
       }
     }
   },
@@ -90,7 +91,7 @@ watch(
       files.value = attachments.map((attachment) => {
         const byteCharacters = atob(attachment.fileData)
         const byteNumbers = new Uint8Array(
-          byteCharacters.split('').map((char) => char.charCodeAt(0))
+          byteCharacters.split("").map((char) => char.charCodeAt(0))
         )
         const blob = new Blob([byteNumbers], { type: attachment.fileType })
 
@@ -114,13 +115,13 @@ const myModal = ref(null)
 //   }
 // }
 
-
 // ฟังก์ชันปิด modal
 const closeModal = () => {
   // if (myModal.value) {
   //   myModal.value.close()
   // }
-  router.push({ name: 'TaskList', params: { id: boardId.value } })
+  emit("close")
+  router.push({ name: "TaskList", params: { id: boardId.value } })
 }
 
 const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -128,16 +129,10 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 <template>
   <!-- Modal window -->
-  <dialog v-if="isOpenModal"
-    ref="myModal"
-    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
+  <dialog
+    v-if="isOpenModal"
+    class="itbkk-modal-task w-full h-full flex inset-0 items-center justify-center"
   >
-    <!-- <div
-    class="modal fixed w-full h-full top-0 left-0 flex items-center justify-center"
-  >
-    <div
-      class="modal-container bg-white w-full md:w-11/12 lg:w-5/6 xl:w-3/4 h-fit mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
-    > -->
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
     >
@@ -209,7 +204,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             }"
             class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
           >
-          {{ todo.description || 'No Description Provided' }}
+          {{ todo.description || "No Description Provided" }}
           </textarea>
         </div>
 
@@ -231,7 +226,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
             }"
             class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
           >
-          {{ todo.assignees || 'Unassigned' }}
+          {{ todo.assignees || "Unassigned" }}
           </textarea>
         </div>
 

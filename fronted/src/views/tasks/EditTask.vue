@@ -525,7 +525,6 @@ onMounted(() => {
                       </div>
                     </label>
 
-                    <!-- ซ่อน input -->
                     <input id="file-upload" type="file" multiple @change="handleFileChange"
                       class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
                   </div>
