@@ -142,7 +142,7 @@ const UpdateTask = async () => {
         console.log("Attachments uploaded successfully:", attachmentsResponse.data);
         const message = attachmentsResponse.data.message;
         console.log(message);
-        
+
         messageResponse.value = message
       } else {
         console.error("Failed to upload attachments:", attachmentsResponse);
@@ -244,13 +244,9 @@ const handleFileChange = (event) => {
     alert("Some files exceed the maximum size of 20 MB.");
   }
 
-
-
   files.value = [...selectedFiles, ...files.value];
 
 };
-
-
 
 watch(
   () => files,
@@ -260,83 +256,71 @@ watch(
   }
 )
 
-// const isImage = (file) => {
-//   return file.type.startsWith('image/')
-// }
+const fileContent = ref([]);
 
-// const getFileIcon = (file) => {
-//   if (!file || typeof file !== 'object' || !file.name) {
-//     return '/image/files/default.png'
-//   }
+const loadTextFileContent = (file, index) => {
+  if (file.type.startsWith("text/")) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      fileContent.value[index] = event.target.result;
+    };
+    reader.readAsText(file);
+  }
+};
 
-//   const extension = file.name.split('.').pop().toLowerCase()
-//   if (!extension) return '/image/files/default.png'
-
-//   // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
-//   switch (extension) {
-//     case 'pdf':
-//       return '/image/files/PDF.png'
-//     case 'doc':
-//     case 'docx':
-//       return '/image/files/DOC.png'
-//     case 'xls':
-//     case 'xlsx':
-//       return '/image/files/XLS.png'
-//     case 'ppt':
-//     case 'pptx':
-//       return '/image/files/PPT.png'
-//     case 'txt':
-//       return '/image/files/TXT.png'
-//     case 'png':
-//     case 'jpeg':
-//     case 'jpg':
-//     case 'gif':
-//       return file instanceof File
-//         ? URL.createObjectURL(file)
-//         : '/image/files/default.png'
-//     default:
-//       return '/image/files/default.png'
-//   }
-// }
-
-const clearFileUrls = () => {
-  files.value.forEach((file) => {
-    if (file instanceof File && file.url) {
-      URL.revokeObjectURL(file.url)
+watch(files, (newFiles) => {
+  newFiles.forEach((file, index) => {
+    if (file.type.startsWith("text/")) {
+      loadTextFileContent(file, index);
     }
-  })
-}
+  });
+});
+
+const getFilePreview = (file) => {
+  if (file.type.startsWith("image/")) {
+    return URL.createObjectURL(file);
+  } else if (file.type === "application/pdf") {
+    return URL.createObjectURL(file);
+  } else if (file.type.startsWith("text/")) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        resolve(event.target.result);
+      };
+      reader.readAsText(file);
+    });
+  }
+  return URL.createObjectURL(file);
+};
 
 const removeFile = (index) => {
   const fileToRemove = files.value[index];
-  if (fileToRemove?.url) {
+  if (fileToRemove.url) {
     URL.revokeObjectURL(fileToRemove.url);
   }
-
   files.value.splice(index, 1);
-
-  console.log("Updated files:", files.value);
+  fileContent.value.splice(index, 1);
 };
 
 const fetchAttachments = async () => {
   try {
     const response = await getAttachments(boardId.value, props.todoId)
     if (response.statusCode === 200) {
-      todo.value.attachments = response.data    
-      
+      todo.value.attachments = response.data
+
       for (let index = 0; index < todo.value.attachments.length; index++) {
-    const element = todo.value.attachments[index];
+        const element = todo.value.attachments[index];
 
-    const byteCharacters = atob(element.fileData);
-    const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: element.fileType });
+        const byteCharacters = atob(element.fileData);
+        const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: element.fileType });
 
-    const file = new File([blob], element.fileName, { type: element.fileType });
+        const file = new File([blob], element.fileName, { type: element.fileType });
 
-    files.value.push(file);
-}
-      
+        files.value.push(file);
+      }
+
     } else {
       console.error('Failed to fetch attachments:', response)
     }
@@ -469,14 +453,26 @@ onMounted(() => {
 
                 <div v-for="(file, index) in files" :key="index"
                   class="flex flex-col items-start bg-gray-100 rounded-lg p-2">
-                  <div class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
-                    <!-- <p v-if="isImage(file)" class="text-xs text-gray-600">
-                      <img :src="file.url || getFileIcon(file)" alt="Preview"
-                        class="object-cover w-full h-full rounded" />
-                    </p> -->
-                    <p class="text-xs text-gray-600 truncate">
-                      {{ file.name }}
-                    </p>
+                  <div class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
+                    <!-- รูปภาพ -->
+                    <img v-if="file.type.startsWith('image/')" :src="getFilePreview(file)" alt="Image Preview"
+                      class="object-cover w-full h-full rounded" />
+                    <!-- PDF -->
+                    <iframe v-else-if="file.type === 'application/pdf'" :src="getFilePreview(file)"
+                      class="w-full h-full rounded" frameborder="0"></iframe>
+                    <!-- ข้อความ -->
+                    <pre v-else-if="file.type.startsWith('text/')"
+                      class="w-full h-full overflow-auto text-sm bg-white rounded p-2">
+      {{ fileContent[index] }}
+    </pre>
+                    <!-- SVG แทนไฟล์ที่ไม่รองรับ -->
+                    <div v-else class="flex items-center justify-center w-full h-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-12 h-12 text-gray-400">
+                        <path
+                          d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z" />
+                      </svg>
+                    </div>
 
                     <button @click="removeFile(index)"
                       class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200">
@@ -487,7 +483,7 @@ onMounted(() => {
                       </svg>
                     </button>
                   </div>
-                  <p class="text-xs text-gray-600 truncate">
+                  <p class="text-xs text-gray-600 truncate" >
                     {{ file.name }}
                   </p>
                   <p class="text-xs text-gray-600 truncate">
@@ -539,31 +535,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-
-        <!-- <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
-          <h2 class="text-lg font-bold mb-2" style="color: #9391e4">Attachments</h2>
-          <div v-if="todo.attachments.length > 0">
-            <ul>
-              <li v-for="(attachment, index) in todo.attachments" :key="index" class="flex items-center mb-2">
-                <a :href="attachment.fileUrl" target="_blank" class="text-blue-500 underline flex-grow">
-                  {{ attachment.fileName }}
-                </a>
-                <button @click="removeAttachment(index)" class="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
-                  title="Remove">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    viewBox="0 0 16 16">
-                    <path
-                      d="M4.646 4.646a.5.5 0 011 0L8 6.707l2.354-2.061a.5.5 0 01.707.707L8.707 7.414l2.061 2.353a.5.5 0 01-.707.707L8 8.707l-2.354 2.354a.5.5 0 01-.707-.707L7.293 7.414 5.232 5.061a.5.5 0 010-.707z" />
-                  </svg>
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <div v-else class="italic text-gray-500">No attachments available</div>
-          
-        </div> -->
-        <!-- </div> -->
 
         <!-- Metadata Section -->
         <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">

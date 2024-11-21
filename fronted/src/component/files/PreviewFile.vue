@@ -13,21 +13,17 @@ const isModalOpen = ref(false);
 
 const files = ref([]);
 
-const route = useRoute();
-
 const props = defineProps({
   file: Object,
 });
 
 const emit = defineEmits(["close"]);
 
-const boardId = ref();
-
 watch(
   () => props.file,
   (newFile) => {
     if (newFile && newFile.url) {
-      fileUrl.value = newFile.url; 
+      fileUrl.value = newFile.url;
     }
   },
   { immediate: true }
@@ -51,13 +47,6 @@ const prevPage = () => {
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) currentPage.value += 1;
-};
-
-const downloadFile = () => {
-  const a = document.createElement("a");
-  a.href = fileUrl.value;
-  a.download = fileName.value;
-  a.click();
 };
 
 const zoomIn = () => {
@@ -90,7 +79,6 @@ const updateZoom = () => {
     <div v-for="file in files" :key="file.name"
       class="p-4 border border-gray-300 rounded-lg shadow hover:bg-gray-100 cursor-pointer" @click="openModal(file)">
       <h3 class="text-base font-semibold">{{ file.name }}</h3>
-      <p class="text-sm text-gray-500">Pages: {{ file.pages }}</p>
     </div>
   </div>
 
@@ -99,7 +87,7 @@ const updateZoom = () => {
     <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg">
       <!-- Modal Header -->
       <div class="flex justify-between items-center px-6 py-4 border-b border-gray-300">
-        <h3 class="text-lg font-semibold">{{ fileName }}</h3>
+        <h3 class="text-lg font-semibold">{{ file.name }}</h3>
         <button @click="closeModal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
           ✕
         </button>
@@ -131,9 +119,10 @@ const updateZoom = () => {
           <button @click="fitToScreen" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
             Fit to screen
           </button>
-          <button @click="downloadFile" class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+          <a :href="fileUrl" :download="file.name"
+            class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-center">
             Download
-          </button>
+          </a>
         </div>
       </div>
     </div>
