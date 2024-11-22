@@ -11,19 +11,21 @@ const router = useRouter()
 const route = useRoute()
 
 // ----------------------- Params -----------------------
-
+const boardId = ref()
 const props = defineProps({
   todoId: Number,
   isOpenModal: Boolean
 })
 const emit = defineEmits(['close'])
-
+const files = ref([])
 const isFilePreviewOpen = ref(false)
 const previewFileData = ref({})
 
-const openPreviewFile = (file) => {
-  console.log('Opening file:', file)
+const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
+// ----------------------- Functions -----------------------
+
+const openPreviewFile = (file) => {
   const fileURL = URL.createObjectURL(file)
   previewFileData.value = {
     name: file.name,
@@ -31,7 +33,6 @@ const openPreviewFile = (file) => {
     type: file.type,
     size: file.size
   }
-
   isFilePreviewOpen.value = true
 }
 
@@ -49,8 +50,6 @@ const todo = ref({
   updatedOn: '',
   attachments: []
 })
-
-const boardId = ref()
 
 watch(
   () => route.params.id,
@@ -82,8 +81,6 @@ watch(
   { immediate: true }
 )
 
-const files = ref([])
-
 watch(
   () => todo.value.attachments,
   (attachments) => {
@@ -106,25 +103,13 @@ watch(
   { immediate: true }
 )
 
+// ----------------------- Modal -----------------------
 const myModal = ref(null)
 
-// ฟังก์ชันเปิด modal
-// const openModal = () => {
-//   if (myModal.value) {
-//     myModal.value.showModal()
-//   }
-// }
-
-// ฟังก์ชันปิด modal
 const closeModal = () => {
-  // if (myModal.value) {
-  //   myModal.value.close()
-  // }
   emit('close')
   router.push({ name: 'TaskList', params: { id: boardId.value } })
 }
-
-const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 </script>
 
 <template>
@@ -146,6 +131,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
               Title
             </label>
             <input
+              disabled
               type="text"
               v-model="todo.title"
               placeholder="Title"
@@ -155,34 +141,17 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
           </div>
 
           <!-- Status -->
-          <!-- <div class="w-1/5 space-y-1">
+          <div class="w-1/5 space-y-1">
             <label class="block text-base font-medium text-[#9391e4]">
               Status
             </label>
-            <select
-              v-model="todo.status"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            <div
+              class="itbkk-status w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center"
             >
-              <option
-                class="itbkk-status"
-                v-for="status in statusList"
-                :value="status.name"
-              >
-                {{ status.name }}
-              </option>
-            </select>
-          </div> -->
+              {{ todo.status }}
+            </div>
+          </div>
         </div>
-
-        <!-- Status -->
-        <!-- <div class="itbkk-status mb-4 mt-2">
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-              style="color: #9391e4"
-              >Status</span
-            >
-            {{ todo.status }}
-          </div> -->
 
         <!-- Description -->
         <div class="space-y-1">
@@ -230,37 +199,50 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
         <!-- Attachments Section -->
         <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
-          <h2 class="text-lg font-bold mb-2" style="color: #9391e4">
+          <label class="block text-base font-medium text-[#9391e4]">
             Attachments
-          </h2>
+          </label>
           <div v-if="todo.attachments?.length > 0">
             <div
-              v-for="(file, index) in files"
-              :key="index"
-              class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
-              @click="openPreviewFile(file)"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"
             >
               <div
-                class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
+                v-for="(file, index) in files"
+                :key="index"
+                class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
+                @click="openPreviewFile(file)"
               >
-                <!-- <p v-if="isImage(file)" class="text-xs text-gray-600">
-                      <img :src="file.url || getFileIcon(file)" alt="Preview"
-                        class="object-cover w-full h-full rounded" />
-                    </p> -->
-                <p class="text-xs text-gray-600 truncate">
+                <div
+                  class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
+                >
+                  <!-- preview เขียนต่อจากนี้ -->
+                  <!-- code ... -->
+                </div>
+                <p
+                  class="text-xs text-gray-600 truncate w-full overflow-hidden"
+                >
                   {{ file.name }}
                 </p>
+                <p class="text-xs text-gray-600 truncate">
+                  {{ (file.size / (1024 * 1024)).toFixed(2) }} MB
+                </p>
               </div>
-              <p class="text-xs text-gray-600 truncate">
-                {{ file.name }}
-              </p>
-              <p class="text-xs text-gray-600 truncate">
-                {{ (file.size / 1024).toFixed(2) }}
-              </p>
             </div>
           </div>
-          <div v-else class="italic text-gray-500">
-            No attachments available.
+          <div v-else>
+            <ul id="gallery" class="flex flex-1 flex-wrap -m-1">
+              <li
+                id="empty"
+                class="h-full w-full text-center flex flex-col justify-center items-center"
+              >
+                <img
+                  class="mx-auto w-28"
+                  src="https://user-images.githubusercontent.com/507615/54591670-ac0a0180-4a65-11e9-846c-e55ffce0fe7b.png"
+                  alt="no data"
+                />
+                <span class="text-small text-gray-500">No files attached</span>
+              </li>
+            </ul>
           </div>
         </div>
         <PreviewFile
@@ -308,7 +290,7 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 <style>
 .itbkk-modal-task > div {
-  margin-left: 18%;
+  margin-left: 6%;
 }
 
 @media (max-width: 768px) {
