@@ -96,12 +96,12 @@ onMounted(async () => {
     }
 
     for (const task of taskStore.getTasks()) {
-    const { statusCode, data } = await getAttachments(boardId.value, task.id);
+      const { statusCode, data } = await getAttachments(boardId.value, task.id)
 
-    if (statusCode === 200) {
-      taskStore.updateAttachments(task.id, data);
+      if (statusCode === 200) {
+        taskStore.updateAttachments(task.id, data)
+      }
     }
-  }
 
     const board = await getBoardById(boardId.value)
 
@@ -140,8 +140,7 @@ onMounted(async () => {
     isLoading.value = false
   }
 
-  console.log(taskStore.getTasks());
-  
+  console.log(taskStore.getTasks())
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -174,10 +173,11 @@ const UpdateLimit = async () => {
 
 const selectTodo = (todoId) => {
   if (todoId !== 0) {
+    selectedTodoId.value = todoId
+    showDetail.value = true
+    console.log('Opening TaskDetail with ID:', todoId)
     router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
-  selectedTodoId.value = todoId
-  showDetail.value = true
 }
 
 const deleteTodo = async (todoId, index) => {
@@ -446,6 +446,7 @@ const changeVisibility = async () => {
               </div>
             </div>
           </dialog>
+          <!-- <TaskDetail :todo-id="selectedTodoId" :isOpenModal="showDetail" /> -->
 
           <!-- Limit alert -->
           <Alert :is-alert-success="alertLimit">
@@ -635,6 +636,12 @@ const changeVisibility = async () => {
             </label>
           </div>
 
+          <TaskDetail
+            :todo-id="selectedTodoId"
+            :isOpenModal="showDetail"
+            @close="showDetail = false"
+          />
+
           <Alert
             :isAlertFailure="alertEnabledFail"
             :isAlertSuccess="alertEnabledSuc"
@@ -705,7 +712,7 @@ const changeVisibility = async () => {
                         color: #fff;
                       "
                     >
-                    Attachments
+                      Attachments
                     </th>
 
                     <!-- STATUS SORT -->
@@ -800,29 +807,27 @@ const changeVisibility = async () => {
                 </thead>
                 <tbody>
                   <!-- Iterate over todoList -->
-                  <TaskDetail :todo-id="selectedTodoId" />
                   <tr
                     class="itbkk-item"
                     v-for="(item, index) in filteredTasks"
                     :key="index"
                   >
                     <td
+                      @click="selectTodo(item.id)"
                       class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
                       {{ index + 1 }}
                     </td>
                     <td
+                      @click="selectTodo(item.id)"
                       class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
                     >
-                      <label
-                        for="my_modal_6"
-                        @click="selectTodo(item.id)"
-                        style="display: block; width: 100%; height: 100%"
-                      >
+                      <label style="display: block; width: 100%; height: 100%">
                         {{ item.title }}
                       </label>
                     </td>
                     <td
+                      @click="selectTodo(item.id)"
                       class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
                       :class="{
                         italic: !item.assignees || item.assignees.length === 0
@@ -834,10 +839,17 @@ const changeVisibility = async () => {
                           : item.assignees
                       }}
                     </td>
-                    <td class="px-4 py-2 text-center md:text-left text-sm text-gray-700">
-  {{ item.attachments && Array.isArray(item.attachments) && item.attachments.length > 0 ? item.attachments.length : '-' }}
-</td>
-
+                    <td
+                      class="px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                    >
+                      {{
+                        item.attachments &&
+                        Array.isArray(item.attachments) &&
+                        item.attachments.length > 0
+                          ? item.attachments.length
+                          : '-'
+                      }}
+                    </td>
 
                     <td
                       class="itbkk-status px-4 py-2 text-center md:text-left text-sm text-gray-700"
@@ -991,8 +1003,8 @@ const changeVisibility = async () => {
                 </tbody>
               </table>
             </div>
-            <!-- DELETE COMPLETE -->
 
+            <!-- DELETE COMPLETE -->
             <div
               role="alert"
               class="alert shadow-lg"
@@ -1040,8 +1052,7 @@ const changeVisibility = async () => {
   </div>
 </div> -->
 
-  <!-- 
-  <div class="flex justify-center space-x-20 mt-3 mb-3">
+  <!-- <div class="flex justify-center space-x-20 mt-3 mb-3">
     <button class="flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1024 1024">
         <path fill="#eb4343"
@@ -1058,7 +1069,6 @@ const changeVisibility = async () => {
 </template>
 
 <style scoped>
-/* Responsive table styles */
 @media screen and (max-width: 640px) {
   thead {
     display: none;
