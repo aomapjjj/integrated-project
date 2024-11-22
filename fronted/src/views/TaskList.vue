@@ -50,6 +50,7 @@ watch(
 
 // ----------------------- List Items -----------------------
 
+const attachmentsNumber = ref()
 const todoList = ref([])
 const statusList = ref([])
 let items = []
@@ -97,10 +98,7 @@ onMounted(async () => {
 
     for (const task of taskStore.getTasks()) {
       const { statusCode, data } = await getAttachments(boardId.value, task.id)
-
-      if (statusCode === 200) {
-        taskStore.updateAttachments(task.id, data)
-      }
+      taskStore.updateAttachments(task.id, data)
     }
 
     const board = await getBoardById(boardId.value)
