@@ -81,7 +81,7 @@ const handleFileChange = (event) => {
     newFiles.push(file)
   }
 
-  files.value = [...files.value, ...newFiles] 
+  files.value = [...files.value, ...newFiles]
 }
 
 watch(
@@ -291,148 +291,89 @@ const isLimitReached = computed(() => {
   </RouterLink>
 
   <div class="itbkk-modal-task">
-    <dialog id="my_modal_1" class="modal fixed min-h-full max-h-fit flex">
+    <dialog
+      id="my_modal_1"
+      class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
+    >
       <div
-        class="modal-container bg-white xl:w-2/4 mx-auto rounded-lg shadow-lg z-50 overflow-y-auto flex"
+        class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
       >
-        <div
-          form
-          @submit.prevent="submitForm"
-          class="flex justify-between w-full h-full"
-          style="align-items: center"
-        >
-          <!-- Title -->
-          <div class="modal-content py-4 text-left px-6 flex-grow">
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-              style="color: #9391e4; margin: 15px"
-            >
-              Title<span style="color: red"> *</span>
-            </span>
-            <label
-              class="itbkk-title input input-bordered flex items-center gap-2 font-bold ml-4"
-            >
-              <input
-                type="text"
-                class="grow"
-                placeholder="Enter Your Title"
-                v-model="todo.title"
-              />
-            </label>
-            <p
-              class="text-sm text-gray-400 ml-4 mb-2 mt-2"
-              style="text-align: right"
-            >
-              {{ todo.title?.length }}/100
-            </p>
+        <div form @submit.prevent="submitForm">
+          <div class="p-6 space-y-6">
+            <!-- Title and Status -->
+            <div class="flex space-x-4">
+              <!-- Title -->
+              <div class="flex-1 space-y-1">
+                <label class="block text-base font-medium text-[#9391e4]">
+                  Title <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  v-model="todo.title"
+                  placeholder="Title"
+                  class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+                <p class="text-sm text-gray-500 text-right">
+                  {{ todo.title.length }}/100
+                </p>
+              </div>
+              <!-- Status -->
+              <div class="w-1/5 space-y-1">
+                <label class="block text-base font-medium text-[#9391e4]">
+                  Status
+                </label>
+                <select
+                  v-model="todo.status"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option
+                    class="itbkk-status"
+                    v-for="status in statusList"
+                    :value="status.name"
+                  >
+                    {{ status.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
 
             <!-- Description -->
-            <label for="description" class="form-control flex-grow ml-4">
-              <div class="label">
-                <span
-                  class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                  style="color: #9391e4"
-                  >Description</span
-                >
-              </div>
+            <div class="space-y-1">
+              <label class="block text-base font-medium text-[#9391e4]">
+                Description <span class="text-red-500">*</span>
+              </label>
               <textarea
                 id="description"
-                class="itbkk-description textarea textarea-bordered h-3/4"
+                v-model="todo.description"
                 rows="4"
                 placeholder="No Description Provided"
-                style="height: 200px"
-                v-model="todo.description"
-              ></textarea>
-            </label>
-            <p
-              class="text-sm text-gray-400 mb-2 mt-2"
-              style="text-align: right"
-            >
-              {{ todo.description?.length }}/500
-            </p>
-
-            <!-- Attachments -->
-            <!-- <div class="mb-4 mt-2">
-              <span
-                class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-                style="color: #9391e4"
-                >Attachments</span
+                class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
               >
-              <input
-                type="file"
-                multiple
-                @change="handleFileChange"
-                class="w-full max-w-xs mt-1"
-              />
-
-              <div
-                v-for="(file, index) in files"
-                :key="index"
-                class="flex items-center mt-3"
+ {{ todo.description }}</textarea
               >
-                <div
-                  v-if="
-                    isImage(file) && typeof file === 'object' && 'name' in file
-                  "
-                  class="flex items-center gap-2"
-                >
-                  <img
-                    :src="URL.createObjectURL(file)"
-                    alt="Image Thumbnail"
-                    class="w-12 h-12 object-cover rounded shadow-md"
-                  />
-                </div>
-                <div v-else class="flex items-center gap-2">
-                  <img
-                    :src="getFileIcon(file)"
-                    alt="File Icon"
-                    class="w-12 h-12 object-cover rounded shadow-md"
-                  />
-                </div>
-                <p class="font-semibold text-gray-700">{{ file.name }}</p>
-              </div>
-
-              <p class="text-sm text-gray-400 mt-1">
-                Selected {{ files?.length }}/{{ maxFiles }} files
+              <p class="text-sm text-gray-500 text-right mt-1">
+                {{ todo.description?.length }}/500
               </p>
-            </div> -->
-          </div>
-          <div class="modal-content py-4 text-left px-10 mb-2">
-            <!-- Assignees -->
-            <span
-              class="block text-lg font-bold leading-6 text-gray-900"
-              style="color: #9391e4"
-              >Assignees</span
-            >
-            <textarea
-              id="assignees"
-              class="itbkk-assignees textarea textarea-bordered w-full mt-1"
-              rows="4"
-              placeholder="Unassigned"
-              v-model="todo.assignees"
-            ></textarea>
-            <p
-              class="text-sm text-gray-400 mb-2 mt-2"
-              style="text-align: right"
-            >
-              {{ todo.assignees?.length }}/30
-            </p>
+            </div>
 
-            <!-- Status -->
-            <div class="mb-4 mt-2">
-              <span
-                class="block text-lg font-bold leading-6 text-gray-900 mb-2"
-                style="color: #9391e4"
-                >Status</span
+            <!-- Assignees -->
+            <div>
+              <label class="block text-base font-medium text-[#9391e4]">
+                Assignees <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="assignees"
+                v-model="todo.assignees"
+                rows="4"
+                placeholder="Unassigned"
+                class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
               >
-              <select
-                class="itbkk-status select select-bordered w-full max-w-xs mt-1"
-                v-model="todo.status"
+          {{ todo.assignees }}
+          </textarea
               >
-                <option v-for="status in statusList" :value="status.name">
-                  {{ status.name }}
-                </option>
-              </select>
+              <p class="text-sm text-gray-500 text-right mt-1">
+                {{ todo.assignees?.length }}/30
+              </p>
             </div>
 
             <div
@@ -458,21 +399,28 @@ const isLimitReached = computed(() => {
             </div>
 
             <!-- Cancel & Save Button -->
-            <div class="modal-action">
+            <div
+              class="modal-action px-6 py-4 flex justify-end border-t border-gray-200"
+            >
+              <button
+                class="itbkk-button-cancel text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+                @click="closeModal"
+              >
+                Cancel
+              </button>
               <form method="dialog">
                 <button
                   type="submit"
-                  class="itbkk-button-confirm btn disabled:{{ todo.title?.length === 0 || todo.title === null }}"
-                  style="background-color: #f785b1"
-                  :class="{ disabled: !isFormValid || isLimitReached }"
+                  class="itbkk-button-confirm text-sm ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
+                  :class="{
+                    'opacity-50 cursor-not-allowed':
+                      !isFormValid || isLimitReached
+                  }"
                   :disabled="!isFormValid || isLimitReached"
                 >
                   Save
                 </button>
               </form>
-              <button class="itbkk-button-cancel btn" @click="closeModal">
-                Cancel
-              </button>
             </div>
           </div>
         </div>
