@@ -162,6 +162,7 @@ const UpdateTask = async () => {
         messageResponse.value = 'Attachments uploaded successfully.'
         messageResponseType.value = 'success'
         todo.value.attachments = [...todo.value.attachments, ...files.value]
+        myTasks.updateAttachments(todo.value.id, files.value)
       } else {
         messageResponse.value = 'Unexpected error occurred. Please try again.'
         messageResponseType.value = 'error'
@@ -188,19 +189,38 @@ const UpdateTask = async () => {
 
 const checkEqual = computed(() => {
   const trimmedTodo = {
-    ...todo.value,
-    title: todo.value.title?.trim(),
-    description: todo.value.description?.trim(),
-    assignees: todo.value.assignees?.trim()
-  }
+    title: todo.value.title?.trim() || '',
+    description: todo.value.description?.trim() || '',
+    assignees: todo.value.assignees?.trim() || '',
+    status: todo.value.status || '',
+  };
   const trimmedOldValue = {
-    ...oldValue.value,
-    title: oldValue.value.title?.trim(),
-    description: oldValue.value.description?.trim(),
-    assignees: oldValue.value.assignees?.trim()
-  }
-  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue)
-})
+    title: oldValue.value.title?.trim() || '',
+    description: oldValue.value.description?.trim() || '',
+    assignees: oldValue.value.assignees?.trim() || '',
+    status: oldValue.value.status || '',
+  };
+
+  // ตรวจสอบว่า attachments เป็น array
+  const currentFiles = files.value.map((file) => file.name);
+  const oldFiles = Array.isArray(todo.value.attachments)
+    ? todo.value.attachments.map((attachment) => attachment.fileName)
+    : [];
+
+  const filesChanged =
+    currentFiles.length !== oldFiles.length ||
+    !currentFiles.every((fileName) => oldFiles.includes(fileName));
+
+  console.log("Current Files:", currentFiles);
+  console.log("Old Files:", oldFiles);
+  console.log("Files Changed:", filesChanged);
+
+  return (
+    JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue) &&
+    !filesChanged
+  );
+});
+
 
 // ----------------------- Validate -----------------------
 
@@ -213,8 +233,8 @@ const isFormValid = computed(() => {
     isValidTitle(todo.value.title) &&
     (!todo.value.description || todo.value.description.trim().length <= 500) &&
     (!todo.value.assignees || todo.value.assignees.trim().length <= 30)
-  )
-})
+  );
+});
 
 const assigneesLength = computed(() => {
   return todo.value.assignees ? todo.value.assignees.length : 0
@@ -327,6 +347,13 @@ watch(
   }
 )
 
+watch([isFormValid, checkEqual, isLimitReached], ([formValid, equalCheck, limitReached]) => {
+  console.log("isFormValid:", formValid);
+  console.log("checkEqual:", equalCheck);
+  console.log("isLimitReached:", limitReached);
+  console.log("Button disabled:", !formValid || equalCheck || limitReached);
+});
+
 const fileContent = ref([])
 
 const loadTextFileContent = (file, index) => {
@@ -371,6 +398,7 @@ const removeFile = (index) => {
   }
   files.value.splice(index, 1)
   fileContent.value.splice(index, 1)
+  myTasks.updateAttachments(todo.value.id, files.value)
 }
 
 const fetchAttachments = async () => {
@@ -700,10 +728,9 @@ const closePreview = () => {
             class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none">
             Close
           </button>
-          <button @click="UpdateTask" :disabled="!isFormValid || checkEqual || isLimitReached" :class="{
-            disabled: !isFormValid || checkEqual || isLimitReached
-          }"
-            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50">
+          <button @click="UpdateTask" :disabled="!isFormValid || checkEqual || isLimitReached"
+            :class="{ 'opacity-50 cursor-not-allowed': !isFormValid || checkEqual || isLimitReached }"
+            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none">
             Save
           </button>
         </div>
