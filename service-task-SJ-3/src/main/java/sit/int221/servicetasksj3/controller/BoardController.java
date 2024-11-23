@@ -22,6 +22,7 @@ import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
 import java.io.IOException;
@@ -49,14 +50,20 @@ public class BoardController {
     private EmailSenderService emailSenderService;
     @Autowired
     private FileService fileService;
-
+    MicrosoftUser microsoftUser = null;
 
     private String getUserId(HttpServletRequest request) {
         String userId = null;
         String jwtToken = request.getHeader("Authorization");
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            userId = jwtTokenUtil.getAllClaimsFromToken(jwtToken.substring(7)).get("oid").toString();
+            try {
+                userId = jwtTokenUtil.getAllClaimsFromToken(jwtToken.substring(7)).get("oid").toString();
+            } catch (Exception e) {
+                microsoftUser  = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken.substring(7));
+                userId = microsoftUser.getOid();
+            }
         }
+
         return userId;
     }
 
@@ -69,6 +76,7 @@ public class BoardController {
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
+        System.out.println(userId);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         BoardResponseDTO boardResponse = boardService.getBoardById(boardId);

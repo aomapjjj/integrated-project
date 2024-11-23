@@ -45,6 +45,7 @@ function toggleDropdown() {
 const clearToken = () => {
   localStorage.clear()
   localStorage.removeItem('access_token')
+  
   router.push({ name: 'Login' })
 }
 

@@ -38,12 +38,11 @@ var getAccount = async () => {
         scopes: ["user.read"],
         account: account
       }
-
       try {
         const authResult = await myMSALObj.acquireTokenSilent(tokenRequest)
         console.log("User Info from Account:", account)
-        console.log("Access Token:", authResult.accessToken)
-        localStorage.setItem("access_token", authResult.accessToken)
+        console.log("Id Token:", authResult.idToken.rawIdToken)
+        localStorage.setItem("access_token", authResult.idToken.rawIdToken)
         return {
           account: account,
           accessToken: authResult.accessToken
@@ -72,8 +71,21 @@ var logoff = () => {
   myMSALObj.logout()
 }
 
+var getIdtoken = async() => {
+  const account = myMSALObj.getAccount()
+    if (account) {
+      const tokenRequest = {
+        scopes: ["user.read"],
+        account: account
+      }
+  const authResult = await myMSALObj.acquireTokenSilent(tokenRequest)
+        return authResult.idToken.rawIdToken
+}
+}
+
 export default {
   login,
   getAccount,
-  logoff
+  logoff,
+  getIdtoken
 }

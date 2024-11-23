@@ -50,6 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             boolean isTokenValid = false;
             String tokenError = null;
+            MicrosoftUser microsoftUser = null;
 
             if (request.getRequestURI().equals("/token") || request.getRequestURI().equals("/login")) {
                 chain.doFilter(request, response);
@@ -60,17 +61,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     jwtToken = requestTokenHeader.substring(7);
                     try {
                         if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
-                            System.out.println("Hi");
-                            MicrosoftUser msUser = jwtTokenUtil.extractMicrosoftUserFromToken(jwtToken);
-                            if (msUser != null) {
-                                System.out.println(msUser);
-                                username = msUser.getEmail();
-                                isTokenValid = true;
-                            } else {
-                                tokenError = "Invalid Microsoft Token";
-                            }
+                            microsoftUser = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken);
+                            isTokenValid = true;
+                            tokenError = "Invalid Microsoft Token";
                         } else {
-
                             try {
                                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                                 isTokenValid = true;
@@ -98,12 +92,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
             }
+            if (microsoftUser != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.jwtUserDetailsService.loadUserByOid(microsoftUser.getOid());
+                if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+            }
 
             if (request.getRequestURI().startsWith("/v3/boards/")) {
                 handleRequest(request, isTokenValid, tokenError);
             } else if (!isTokenValid && !request.getRequestURI().equals("/v3/boards")) {
-                System.out.println("JWT Token: " + jwtToken);
-                System.out.println("Username from Token: " + username);
                 throw new AuthenticationException("Invalid token");
             }
             chain.doFilter(request, response);
@@ -116,6 +116,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String boardId = request.getRequestURI().split("/")[3];
         String requestMethod = request.getMethod();
         AuthUser currentUser = getCurrentUserDetails();
+        System.out.println("currentUser " + currentUser);
         boolean isBoardExist = boardService.boardExists(boardId);
 
         if (!isBoardExist) {

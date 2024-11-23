@@ -40,12 +40,17 @@ public class JwtTokenUtil implements Serializable {
 
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject); }
+
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+
         final Claims claims = getAllClaimsFromToken(token);
+
         return claimsResolver.apply(claims);
     }
     public Claims getAllClaimsFromToken(String token) {
@@ -99,97 +104,43 @@ public class JwtTokenUtil implements Serializable {
 
 
     public Boolean validateToken(String token, UserDetails userDetails) {
+        System.out.println("Utill " + userDetails);
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public Boolean isMicrosoftToken(String token) {
+
+    public Boolean isMicrosoftToken(String token) throws JsonProcessingException {
         try {
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.exchange(
-                    graphApiUrl,
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
-            if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println("Token is valid. User info: " + response.getBody());
-                return true;
-            }
-        } catch (HttpClientErrorException ex) {
-
-            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                System.out.println("Invalid token: " + ex.getMessage());
-            } else {
-                System.out.println("Unexpected error: " + ex.getMessage());
-            }
+            NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withIssuerLocation("https://login.microsoftonline.com/79845616-9df0-43e0-8842-e300feb2642a/v2.0").build();
+            Jwt jwt = nimbusJwtDecoder.decode(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException |ExpiredJwtException e) {
+            return false;
         }
-        return false;
     }
 
-
-    public MicrosoftUser extractMicrosoftUserFromToken(String token) {
+    public MicrosoftUser getDetailMicrosoftFromToken(String token) {
         Claims claims = getClaimsFromMicrosoftToken(token);
         if (claims == null) {
-            System.out.println("Claims is null");
             return null;
         }
-
         return new MicrosoftUser(
-                claims.get("id", String.class),
-                claims.get("userPrincipalName", String.class),
-                claims.get("displayName", String.class)
+                claims.get("oid", String.class),
+                claims.get("preferred_username", String.class),
+                claims.get("name", String.class)
         );
     }
 
-
     public Claims getClaimsFromMicrosoftToken(String token) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    "https://graph.microsoft.com/v1.0/me",
-                    HttpMethod.GET,
-                    entity,
-                    Map.class
-            );
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                Map<String, Object> userInfo = response.getBody();
-                Claims claims = new DefaultClaims();
-                if (userInfo != null) {
-                    claims.putAll(userInfo);
-                }
-                return claims;
-            } else {
-                System.out.println("Failed to fetch user info. Status: " + response.getStatusCode());
-            }
-        } catch (HttpClientErrorException ex) {
-            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                System.out.println("Invalid token: " + ex.getMessage());
-            } else {
-                System.out.println("Unexpected error: " + ex.getMessage());
-            }
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
+            NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withIssuerLocation("https://login.microsoftonline.com/79845616-9df0-43e0-8842-e300feb2642a/v2.0").build();
+            Jwt jwt = nimbusJwtDecoder.decode(token);
+            return new DefaultClaims(jwt.getClaims());
+        } catch (JwtException | IllegalArgumentException ex) {
+            return null;
         }
-        return null;
     }
 
 
-    // ตรวจสอบว่า token ที่ส่งมาเป็น refresh token หรือไม่
-//    public Boolean isRefreshToken(String token) {
-//        Claims claims = getAllClaimsFromToken(token);
-//        Date expiration = claims.getExpiration();
-//        return expiration.getTime() - new Date().getTime() <= JWT_REFRESH_TOKEN_VALIDITY;
-//    }
 }

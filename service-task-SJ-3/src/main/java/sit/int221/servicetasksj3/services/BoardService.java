@@ -43,6 +43,7 @@ public class BoardService {
     }
 
     public void checkOwnerAndVisibility(String boardId, String userId, String requestMethod, String collaboratorId) {
+
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
 
@@ -108,7 +109,7 @@ public class BoardService {
     public List<BoardResponseDTO> getBoardIdByOwner() {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String oid = currentUser.getOid();
-        System.out.println("Current User OID: " + oid);
+
 
         List<Board> boards = boardRepository.findAllByUserIdOrCollaboratorId(oid);
         System.out.println("Boards found: " + boards.size());
@@ -193,7 +194,6 @@ public class BoardService {
         ownerDTO.setOid(board.getOwnerId());
         ownerDTO.setName(owner.getName());
         boardResponse.setOwner(ownerDTO);
-
         return boardResponse;
     }
 

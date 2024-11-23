@@ -1,9 +1,10 @@
 package sit.int221.servicetasksj3.sharedatabase.services;
 
-
+import io.viascom.nanoid.NanoId;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,10 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sit.int221.servicetasksj3.entities.Board;
-import sit.int221.servicetasksj3.entities.Visibility;
-import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
+import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
@@ -25,11 +26,12 @@ import java.util.List;
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Users users = userRepository.findByEmailOrUsername(userName);
-
+        Users users = userRepository.findByUsername(userName);
         if(users == null) {
             throw new UnauthorizedException(userName + " does not exist !!");
         }
@@ -47,6 +49,25 @@ public class JwtUserDetailsService implements UserDetailsService {
                 users.getName(), users.getOid(), users.getEmail(), users.getRole());
     }
 
+    public AuthUser loadUserByOid(String userName) throws UsernameNotFoundException {
+        Users users = userRepository.findById(userName).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(users == null) {
+            throw new UnauthorizedException(userName + " does not exist !!");
+        }
+        List<GrantedAuthority> roles = new ArrayList<>();
+        GrantedAuthority grantedAuthority = new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return users.getRole().toString();
+            }
+        };
+        roles.add(grantedAuthority);
+
+        return new AuthUser(users.getUsername(), users.getPassword(), roles,
+                users.getName(), users.getOid(), users.getEmail(), users.getRole());
+    }
+
+
 
 
     @Transactional
@@ -60,4 +81,8 @@ public class JwtUserDetailsService implements UserDetailsService {
             return argon2.verify(users.getPassword(), passwordArray);
         }
     }
+
+
+
+
 }

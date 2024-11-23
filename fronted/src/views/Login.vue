@@ -89,9 +89,32 @@ const showAlert = () => {
   }, 2000)
 }
 
-const loginMicrosoft = () => {
+const loginMicrosoft = async() => {
   authConfig.login()
-  console.log("Hello")
+  userStore.setLoginSuccess(true)
+  if(localStorage.getItem('access_token') !== null){
+    userStore.setLoginSuccess(true)
+      const decoded = jwtDecode(localStorage.getItem('access_token'))
+      nameJWT.value = decoded.name
+      emailJWT.value = decoded.email
+
+      userInfowhileLogin.value = { ...decoded }
+
+      userStore.setUserInfo(userInfowhileLogin.value)
+
+      userStore.setEmail(emailJWT.value)
+      userStore.setToken(localStorage.getItem('access_token'))
+
+
+      const itemsBoards = await getBoardItems(baseUrlboards)
+      itemsBoards.boards.sort(
+        (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
+      ) 
+
+      boardStore.setBoards(itemsBoards.boards) 
+      boardStore.setCollabs(itemsBoards.collabs)
+      openHomePage()
+}
 }
 
 const submitForm = async () => {
@@ -131,7 +154,7 @@ const submitForm = async () => {
         (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
       ) //sort by createdOn
 
-      boardStore.setBoards(itemsBoards.boards) //set value board
+      boardStore.addNewBoards(itemsBoards.boards) //set value board
 
       boardStore.setCollabs(itemsBoards.collabs)
 
