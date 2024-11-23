@@ -13,11 +13,8 @@ import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskLimit;
 import sit.int221.servicetasksj3.entities.TaskStatus;
 import sit.int221.servicetasksj3.exceptions.*;
-import sit.int221.servicetasksj3.repositories.BoardRepository;
-import sit.int221.servicetasksj3.repositories.LimitRepository;
+import sit.int221.servicetasksj3.repositories.*;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
-import sit.int221.servicetasksj3.repositories.StatusRepository;
-import sit.int221.servicetasksj3.repositories.TaskRepository;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 
@@ -42,6 +39,8 @@ public class TaskService {
     private UserRepository userRepository;
     @Autowired
     private CollaboratorService collaboratorService;
+    @Autowired
+    private FileRepository fileRepository;
 
 
     //GET ALL TASKS V.2
@@ -207,6 +206,11 @@ public class TaskService {
     public TaskDTO removeTasks(String boardId, Integer id) {
         Task task = repository.findByBoard_IdAndId(boardId, id).orElseThrow(
                 () -> new ItemNotFoundException("NOT FOUND"));
+
+        if (task.getFiles() != null && !task.getFiles().isEmpty()) {
+            task.getFiles().forEach(file -> fileRepository.deleteById(file.getFileId()));
+        }
+
         TaskDTO deletedTaskDTO = modelMapper.map(task, TaskDTO.class);
         repository.delete(task);
         return deletedTaskDTO;
@@ -223,9 +227,6 @@ public class TaskService {
 
 
         TaskStatus status = statusRepository.findByNameAndBoardId(task.getStatus(), boardId);
-//        if (status == null) {
-//            throw new ValidationException("status does not exist");
-//        }
 
         Task task1 = modelMapper.map(task, Task.class);
         task1.setBoard(board);

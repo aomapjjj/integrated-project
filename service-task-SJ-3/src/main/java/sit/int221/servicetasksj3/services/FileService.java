@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentDTO;
 import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
@@ -16,7 +15,6 @@ import sit.int221.servicetasksj3.entities.Task;
 import sit.int221.servicetasksj3.entities.TaskFile;
 import sit.int221.servicetasksj3.exceptions.ErrorDetails;
 import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
-import sit.int221.servicetasksj3.exceptions.ValidationException;
 import sit.int221.servicetasksj3.repositories.FileRepository;
 import sit.int221.servicetasksj3.repositories.TaskRepository;
 
@@ -41,6 +39,7 @@ public class FileService {
     private boolean isValidFileSize(MultipartFile file) {
         return file.getSize() <= (long) MAX_FILE_SIZE_MB * 1024 * 1024;
     }
+
     private boolean isDuplicateFile(Task task, String fileName) {
         return task.getFiles().stream().anyMatch(existingFile -> existingFile.getFileName().equals(fileName));
     }
@@ -48,9 +47,22 @@ public class FileService {
     private static final List<String> PREVIEW_FILE_TYPES = List.of(
             "image/png",
             "image/jpeg",
+            "image/gif",
+            "image/bmp",
+            "image/svg+xml",
+            "image/webp",
             "text/plain",
+            "text/csv",
+            "application/json",
+            "application/xml",
+            "application/pdf",
             "application/rtf",
-            "application/pdf"
+            "video/mp4",
+            "video/webm",
+            "video/ogg",
+            "audio/mpeg",
+            "audio/wav",
+            "audio/ogg"
     );
 
     private boolean isPreviewFileType(String fileType) {
@@ -94,28 +106,51 @@ public class FileService {
 
         List<AttachmentDTO> successfulUploads = new ArrayList<>();
         List<ErrorDetails.ValidationError> errorList = new ArrayList<>();
+        List<String> notAddedFiles = new ArrayList<>();
 
-        int remainingSlots = MAX_FILES - task.getFiles().size();
+        int existingFileCount = task.getFiles().size();
+        int remainingSlots = MAX_FILES - existingFileCount;
+
         if (files.size() > remainingSlots) {
-            errorList.add(new ErrorDetails.ValidationError("files", "Each task can have at most " + MAX_FILES + " files."));
-            files = files.subList(0, remainingSlots);
+            errorList.add(new ErrorDetails.ValidationError(
+                    "files",
+                    "Each task can have at most " + MAX_FILES + " files."
+            ));
+            notAddedFiles.addAll(
+                    files.subList(remainingSlots, files.size()).stream()
+                            .map(MultipartFile::getOriginalFilename)
+                            .collect(Collectors.toList())
+            );
+            files = files.subList(0, remainingSlots); // limit files to remaining slots
         }
 
+        long MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
         for (MultipartFile file : files) {
+            String fileName = file.getOriginalFilename();
+            String fileType = file.getContentType();
+            long fileSize = file.getSize();
+
+            if (fileSize > MAX_FILE_SIZE_BYTES) {
+                errorList.add(new ErrorDetails.ValidationError(
+                        "files",
+                        String.format("%s exceeds max file size of %d MB (%.2f MB detected).",
+                                fileName, MAX_FILE_SIZE_MB, fileSize / (1024.0 * 1024.0))
+                ));
+                notAddedFiles.add(fileName);
+                continue; // skip file with invalid size
+            }
+
+            if (isDuplicateFile(task, fileName)) {
+                errorList.add(new ErrorDetails.ValidationError(
+                        "files",
+                        "File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add it again to update the file: " + fileName
+                ));
+                notAddedFiles.add(fileName);
+                continue; // skip file with duplicate name
+            }
+
             try {
-                String fileName = file.getOriginalFilename();
-                String fileType = file.getContentType();
-
-                if (!isValidFileSize(file)) {
-                    errorList.add(new ErrorDetails.ValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB."));
-                    continue; // skip file with invalid size
-                }
-
-                if (isDuplicateFile(task, fileName)) {
-                    errorList.add(new ErrorDetails.ValidationError("files", "File with the same filename cannot be added: " + fileName));
-                    continue; // skip file with duplicate name
-                }
-
                 TaskFile taskFile = new TaskFile();
                 taskFile.setTask(task);
                 taskFile.setFileName(fileName);
@@ -133,42 +168,66 @@ public class FileService {
                         isPreviewFileType(taskFile.getFileType())
                 ));
             } catch (IOException e) {
-                errorList.add(new ErrorDetails.ValidationError("files", "Error uploading file: " + file.getOriginalFilename()));
+                errorList.add(new ErrorDetails.ValidationError(
+                        "files",
+                        "Error uploading file: " + fileName
+                ));
+                notAddedFiles.add(fileName);
             }
         }
 
-        String message = errorList.isEmpty()
-                ? "All files uploaded successfully."
-                : "Some files could not be uploaded.";
-        return new AttachmentResponseDTO(message, successfulUploads, errorList);
+        StringBuilder message = new StringBuilder();
+        if (!errorList.isEmpty()) {
+            message.append("- Some files could not be uploaded due to the following errors:\n");
+            for (ErrorDetails.ValidationError error : errorList) {
+                message.append("  - ").append(error.getMessage()).append("\n");
+            }
+        }
+        if (!notAddedFiles.isEmpty()) {
+            message.append("The following files were not added: ").append(String.join(", ", notAddedFiles)).append(".");
+        }
+        if (errorList.isEmpty()) {
+            message.insert(0, "All files uploaded successfully.");
+        }
+
+        return new AttachmentResponseDTO(message.toString(), successfulUploads, errorList);
     }
 
 //    public AttachmentResponseDTO addAttachments(Integer taskId, List<MultipartFile> files) {
 //        Task task = taskRepository.findById(taskId)
 //                .orElseThrow(() -> new ItemNotFoundException("Task not found"));
 //
-//        ValidationException validationError = new ValidationException("Validation error");
 //        List<AttachmentDTO> successfulUploads = new ArrayList<>();
+//        List<ErrorDetails.ValidationError> errorList = new ArrayList<>();
 //
-//        int remainingSlots = MAX_FILES - task.getFiles().size();
+//        int existingFileCount = task.getFiles().size();
+//        int remainingSlots = MAX_FILES - existingFileCount;
+//
 //        if (files.size() > remainingSlots) {
-//            validationError.addValidationError("files", "Each task can have at most " + MAX_FILES + " files.");
-//            files = files.subList(0, remainingSlots);
+//            errorList.add(new ErrorDetails.ValidationError("files",
+//                    "Each task can have at most " + MAX_FILES + " files."));
+//            files = files.subList(0, remainingSlots); // limit files to remaining slots
 //        }
+//
+//        long MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 //
 //        for (MultipartFile file : files) {
 //            try {
 //                String fileName = file.getOriginalFilename();
 //                String fileType = file.getContentType();
+//                long fileSize = file.getSize();
 //
-//                // ตรวจสอบขนาดไฟล์
-//                if (!isValidFileSize(file)) {
-//                    validationError.addValidationError("files", fileName + " exceeds max file size of " + MAX_FILE_SIZE_MB + " MB.");
-//                    continue; // skip file with invalid size
+//                if (fileSize > MAX_FILE_SIZE_BYTES) {
+//                    errorList.add(new ErrorDetails.ValidationError(
+//                            "files",
+//                            String.format("%s exceeds max file size of %d MB (%.2f MB detected).",
+//                                    fileName, MAX_FILE_SIZE_MB, fileSize / (1024.0 * 1024.0))
+//                    ));
+//                    continue;
 //                }
 //
 //                if (isDuplicateFile(task, fileName)) {
-//                    validationError.addValidationError("files", "File with the same filename cannot be added: " + fileName);
+//                    errorList.add(new ErrorDetails.ValidationError("files", "File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add again to update the file: " + fileName));
 //                    continue; // skip file with duplicate name
 //                }
 //
@@ -189,17 +248,15 @@ public class FileService {
 //                        isPreviewFileType(taskFile.getFileType())
 //                ));
 //            } catch (IOException e) {
-//                validationError.addValidationError("files", "Error uploading file: " + file.getOriginalFilename());
+//                errorList.add(new ErrorDetails.ValidationError("files", "Error uploading file: " + file.getOriginalFilename()));
 //            }
 //        }
 //
-//        String message = validationError.getErrors().isEmpty()
+//        String message = errorList.isEmpty()
 //                ? "All files uploaded successfully."
 //                : "Some files could not be uploaded.";
-//
-//        return new AttachmentResponseDTO(message, successfulUploads, validationError.getErrors());
+//        return new AttachmentResponseDTO(message, successfulUploads, errorList);
 //    }
-
 
     // Delete an attachment
     public AttachmentDTO deleteAttachment(Integer attachmentId) {

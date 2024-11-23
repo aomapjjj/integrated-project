@@ -65,7 +65,7 @@ const toBoardsList = (boardId) => {
   <div
     id="sidebar"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    class="hs-overlay fixed top-0 left-0 bottom-0 z-40 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
+    class="hs-overlay fixed top-0 left-0 bottom-0 z-20 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
     role="dialog"
     tabindex="-1"
     aria-label="Sidebar"
