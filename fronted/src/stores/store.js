@@ -75,7 +75,7 @@ const useTasks = defineStore("tasks", () => {
   const updateAttachments = (id, newAttachments) => {
     const task = tasks.value.find((task) => task.id === id)
     if (task) {
-      task.attachments = [...task.attachments, ...newAttachments]
+      task.attachments = [...newAttachments]
     } else {
       console.error(`Task with ID ${id} not found.`)
     }
