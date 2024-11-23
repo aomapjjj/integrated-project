@@ -34,10 +34,7 @@ public class JwtTokenUtil implements Serializable {
     private long JWT_TOKEN_VALIDITY;
     @Value("#{${jwt.refresh-token-validity}*60*60*1000}")
     private long JWT_REFRESH_TOKEN_VALIDITY;
-    @Value("${spring.security.oauth2.client.provider.azure.issuer-uri}")
-    private String azureIssuerUri;
-    private final String graphApiUrl = "https://graph.microsoft.com/v1.0/me";
-
+    
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     public String getUsernameFromToken(String token) {
 
