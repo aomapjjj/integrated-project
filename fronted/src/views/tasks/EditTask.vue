@@ -6,12 +6,12 @@ import {
   editItem,
   getAttachments,
   addAttachments,
-  deleteAttachment
 } from '@/libs/fetchUtils'
 import { useTasks } from '../../stores/store'
 import { toDate } from '../../libs/toDate'
 import { useRoute, useRouter } from 'vue-router'
 import { useLimitStore } from '../../stores/storeLimit'
+import PreviewFile from '../../component/files/PreviewFile.vue'
 // import UploadFile from '@/component/files/UploadFile.vue'
 
 // ----------------------- Router -----------------------
@@ -108,10 +108,8 @@ const messageResponse = ref('')
 const messageResponseType = ref('')
 
 const clearMessageResponse = () => {
-  setTimeout(() => {
-    messageResponse.value = ''
-    messageResponseType.value = ''
-  }, 1000)
+  messageResponse.value = ''
+  messageResponseType.value = ''
 }
 
 // const fetchUpdatedTask = async () => {
@@ -173,8 +171,9 @@ const UpdateTask = async () => {
       messageResponse.value = 'Task updated successfully.'
       messageResponseType.value = 'success'
     }
+    clearMessageResponse()
     closeModal()
-    // clearMessageResponse()
+
     showAlertEdit.value = true
     showAlertAfterEdit.value = true
     setTimeout(() => {
@@ -262,14 +261,6 @@ const handleFileChange = (event) => {
   const errorMessages = []
   const notAddedFiles = []
 
-  // Check the total number of files
-  if (files.value.length + selectedFiles.length > maxFiles) {
-    const allowedFilesCount = maxFiles - files.value.length
-    const excessFiles = selectedFiles.slice(allowedFilesCount) // Exceed files
-    notAddedFiles.push(...excessFiles.map((file) => file.name)) // Add unadded filenames
-    selectedFiles.splice(allowedFilesCount) // Cut out excess files
-    errorMessages.push(`Each task can have at most ${maxFiles} files.`)
-  }
   // Check file size
   const validFiles = selectedFiles.filter((file) => {
     if (file.size > maxTotalSizePerFile) {
@@ -284,6 +275,16 @@ const handleFileChange = (event) => {
     }
     return true
   })
+
+  // Check the total number of files
+  if (files.value.length + selectedFiles.length > maxFiles) {
+    const allowedFilesCount = maxFiles - files.value.length
+    const excessFiles = selectedFiles.slice(allowedFilesCount) // Exceed files
+    notAddedFiles.push(...excessFiles.map((file) => file.name)) // Add unadded filenames
+    selectedFiles.splice(allowedFilesCount) // Cut out excess files
+    errorMessages.push(`Each task can have at most ${maxFiles} files.`)
+  }
+
   // Check for duplicate file names
   const uniqueFiles = validFiles.filter((file) => {
     if (existingFileNames.includes(file.name)) {
@@ -405,54 +406,59 @@ const fetchAttachments = async () => {
 onMounted(() => {
   fetchAttachments()
 })
+
+// ----------------------- File Preview -----------------------
+const previewFile = ref(null);
+const isPreviewModalOpen = ref(false);
+
+const openPreview = (file) => {
+  previewFile.value = {
+    name: file.name,
+    url: URL.createObjectURL(file),
+    type: file.type,
+    size: file.size,
+  };
+  isPreviewModalOpen.value = true;
+};
+
+const closePreview = () => {
+  if (previewFile.value?.url) {
+    URL.revokeObjectURL(previewFile.value.url);
+  }
+  previewFile.value = null;
+  isPreviewModalOpen.value = false;
+};
+
 </script>
 
 <template>
   <!-- Edit Button -->
-  <button
-    @click="openModal"
-    class="itbkk-button-edit btn rounded-full"
-    :disabled="disabledBtn"
-    :class="[
-      'itbkk-button-edit ml-2',
-      'btn',
-      'rounded-full',
-      { 'btn-disabled': disabledBtn }
-    ]"
-    :style="{
-      backgroundColor: disabledBtn ? '#d3d3d3' : '#fae59d',
-      color: disabledBtn ? '#a9a9a9' : 'white',
-      borderRadius: '30px',
-      position: 'static',
-      cursor: disabledBtn ? 'not-allowed' : 'pointer',
-      opacity: disabledBtn ? 0.6 : 1
-    }"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-    >
+  <button @click="openModal" class="itbkk-button-edit btn rounded-full" :disabled="disabledBtn" :class="[
+    'itbkk-button-edit ml-2',
+    'btn',
+    'rounded-full',
+    { 'btn-disabled': disabledBtn }
+  ]" :style="{
+    backgroundColor: disabledBtn ? '#d3d3d3' : '#fae59d',
+    color: disabledBtn ? '#a9a9a9' : 'white',
+    borderRadius: '30px',
+    position: 'static',
+    cursor: disabledBtn ? 'not-allowed' : 'pointer',
+    opacity: disabledBtn ? 0.6 : 1
+  }">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
       <g fill="none">
         <path
-          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-        />
-        <path
-          fill="currentColor"
-          d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z"
-        />
+          d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022m-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" />
+        <path fill="currentColor"
+          d="M16.035 3.015a3 3 0 0 1 4.099-.135l.144.135l.707.707a3 3 0 0 1 .135 4.098l-.135.144L9.773 19.177a1.5 1.5 0 0 1-.562.354l-.162.047l-4.454 1.028a1.001 1.001 0 0 1-1.22-1.088l.02-.113l1.027-4.455a1.5 1.5 0 0 1 .29-.598l.111-.125zm-.707 3.535l-8.99 8.99l-.636 2.758l2.758-.637l8.99-8.99l-2.122-2.12Zm3.536-2.121a1 1 0 0 0-1.32-.083l-.094.083l-.708.707l2.122 2.121l.707-.707a1 1 0 0 0 .083-1.32l-.083-.094z" />
       </g>
     </svg>
   </button>
   <!-- Modal window -->
-  <dialog
-    ref="myModal"
-    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
-  >
-    <div
-      class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
-    >
+  <dialog ref="myModal"
+    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">
@@ -461,12 +467,8 @@ onMounted(() => {
             <label class="block text-base font-medium text-[#9391e4]">
               Title <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              v-model="todo.title"
-              placeholder="Title"
-              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
+            <input type="text" v-model="todo.title" placeholder="Title"
+              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg" />
             <p class="text-sm text-gray-500 text-right">
               {{ todo.title.length }}/100
             </p>
@@ -477,15 +479,8 @@ onMounted(() => {
             <label class="block text-base font-medium text-[#9391e4]">
               Status
             </label>
-            <select
-              v-model="todo.status"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-            >
-              <option
-                class="itbkk-status"
-                v-for="status in statusList"
-                :value="status.name"
-              >
+            <select v-model="todo.status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              <option class="itbkk-status" v-for="status in statusList" :value="status.name">
                 {{ status.name }}
               </option>
             </select>
@@ -497,15 +492,11 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Description <span class="text-red-500">*</span>
           </label>
-          <textarea
-            v-model="todo.description"
-            :class="{
-              'italic text-gray-500':
-                !todo.description || todo.description.trim() === ''
-            }"
-            placeholder="No Description Provided"
-            class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
-          >
+          <textarea v-model="todo.description" :class="{
+            'italic text-gray-500':
+              !todo.description || todo.description.trim() === ''
+          }" placeholder="No Description Provided"
+            class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24">
           {{ todo.description }}
           </textarea>
           <p class="text-sm text-gray-500 text-right mt-1">
@@ -518,15 +509,10 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Assignees <span class="text-red-500">*</span>
           </label>
-          <textarea
-            v-model="todo.assignees"
-            :class="{
-              'italic text-gray-500':
-                !todo.assignees || todo.assignees.trim() === ''
-            }"
-            placeholder="Unassigned"
-            class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
-          >
+          <textarea v-model="todo.assignees" :class="{
+            'italic text-gray-500':
+              !todo.assignees || todo.assignees.trim() === ''
+          }" placeholder="Unassigned" class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg">
           {{ todo.assignees }}
           </textarea>
           <p class="text-sm text-gray-500 text-right mt-1">
@@ -541,113 +527,61 @@ onMounted(() => {
           </label>
           <div v-if="files.length > 0">
             <div>
-              <p
-                v-if="messageResponse"
-                class="whitespace-pre-wrap text-sm mb-2"
-                :class="{
-                  'text-green-500': messageResponseType === 'success',
-                  'text-red-500': messageResponseType === 'error'
-                }"
-              >
+              <p v-if="messageResponse" class="whitespace-pre-wrap text-sm mb-2" :class="{
+                'text-green-500': messageResponseType === 'success',
+                'text-red-500': messageResponseType === 'error'
+              }">
                 <span>{{ messageResponse }}</span>
               </p>
 
               <!-- Upload Section -->
-              <div
-                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-              >
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <div v-if="files.length < maxFiles" class="relative">
                   <div
-                    class="flex items-center justify-center border-2 border-dashed rounded-lg h-full cursor-pointer hover:bg-gray-100 transition ease-in-out duration-150"
-                  >
+                    class="flex items-center justify-center border-2 border-dashed rounded-lg h-full cursor-pointer hover:bg-gray-100 transition ease-in-out duration-150">
                     <!-- Add file -->
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-8 w-8 text-gray-300"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065"
-                      />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-300" viewBox="0 0 24 24">
+                      <path fill="currentColor"
+                        d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1" />
+                      <path fill="currentColor"
+                        d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065" />
                     </svg>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      multiple
-                      @change="handleFileChange"
-                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                    />
+                    <input id="file-upload" type="file" multiple @change="handleFileChange"
+                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
                   </div>
                 </div>
-                <div
-                  v-for="(file, index) in files"
-                  :key="index"
-                  class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
-                >
-                  <div
-                    class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
-                  >
+                <div v-for="(file, index) in files" :key="index"
+                  class="flex flex-col items-start bg-gray-100 rounded-lg p-2 relative" @click="openPreview(file)">
+
+                  <div class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
                     <!-- รูปภาพ -->
-                    <img
-                      v-if="file.type.startsWith('image/')"
-                      :src="getFilePreview(file)"
-                      alt="Image Preview"
-                      class="object-cover w-full h-full rounded"
-                    />
+                    <img v-if="file.type.startsWith('image/')" :src="getFilePreview(file)" alt="Image Preview"
+                      class="object-cover w-full h-full rounded" />
                     <!-- PDF -->
-                    <iframe
-                      v-else-if="file.type === 'application/pdf'"
-                      :src="getFilePreview(file)"
-                      class="w-full h-full rounded"
-                      frameborder="0"
-                    ></iframe>
+                    <iframe v-else-if="file.type === 'application/pdf'" :src="getFilePreview(file)"
+                      class="w-full h-full rounded" frameborder="0"></iframe>
                     <!-- ข้อความ -->
-                    <pre
-                      v-else-if="file.type.startsWith('text/')"
-                      class="w-full h-full overflow-auto text-sm bg-white rounded p-2"
-                      >{{ fileContent[index] }}</pre
-                    >
+                    <pre v-else-if="file.type.startsWith('text/')"
+                      class="w-full h-full overflow-auto text-sm bg-white rounded p-2">{{ fileContent[index] }}</pre>
                     <!-- SVG แทนไฟล์ที่ไม่รองรับ -->
-                    <div
-                      v-else
-                      class="flex items-center justify-center w-full h-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="w-12 h-12 text-gray-400"
-                      >
+                    <div v-else class="flex items-center justify-center w-full h-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-12 h-12 text-gray-400">
                         <path
-                          d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z"
-                        />
+                          d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z" />
                       </svg>
                     </div>
 
-                    <button
-                      @click="removeFile(index)"
-                      class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-red-400 hover:text-red-500"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m4.3 14.3a.996.996 0 0 1-1.41 0L12 13.41L9.11 16.3a.996.996 0 1 1-1.41-1.41L10.59 12L7.7 9.11A.996.996 0 1 1 9.11 7.7L12 10.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41"
-                        />
+                    <button @click="removeFile(index)"
+                      class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400 hover:text-red-500"
+                        viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                          d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10s10-4.47 10-10S17.53 2 12 2m4.3 14.3a.996.996 0 0 1-1.41 0L12 13.41L9.11 16.3a.996.996 0 1 1-1.41-1.41L10.59 12L7.7 9.11A.996.996 0 1 1 9.11 7.7L12 10.59l2.89-2.89a.996.996 0 1 1 1.41 1.41L13.41 12l2.89 2.89c.38.38.38 1.02 0 1.41" />
                       </svg>
                     </button>
                   </div>
-                  <p
-                    class="text-xs text-gray-600 truncate w-full overflow-hidden"
-                  >
+                  <p class="text-xs text-gray-600 truncate w-full overflow-hidden">
                     {{ file.name }}
                   </p>
                   <p class="text-xs text-gray-600 truncate">
@@ -656,6 +590,7 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+            <PreviewFile v-if="isPreviewModalOpen" :file="previewFile" @close="closePreview" />
           </div>
           <!-- No have File -->
           <div v-else>
@@ -665,19 +600,13 @@ onMounted(() => {
                   <!-- ใช้ for เชื่อมกับ input -->
                   <div class="relative w-full h-60">
                     <!-- ปุ่มอัปโหลด -->
-                    <label
-                      for="file-upload"
-                      class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-full p-6 group text-center cursor-pointer transition duration-300 ease-in-out"
-                    >
-                      <div
-                        class="h-full w-full text-center flex flex-col justify-center items-center"
-                      >
+                    <label for="file-upload"
+                      class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-full p-6 group text-center cursor-pointer transition duration-300 ease-in-out">
+                      <div class="h-full w-full text-center flex flex-col justify-center items-center">
                         <div class="flex flex-auto max-h-40 w-1/3 mx-auto">
-                          <img
-                            class="has-mask object-contain"
+                          <img class="has-mask object-contain"
                             src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg"
-                            alt="upload illustration"
-                          />
+                            alt="upload illustration" />
                         </div>
                         <p class="pointer-none text-gray-500">
                           <span class="text-sm">Drag and drop</span> files here
@@ -691,22 +620,15 @@ onMounted(() => {
                       </div>
                     </label>
 
-                    <input
-                      id="file-upload"
-                      type="file"
-                      multiple
-                      @change="handleFileChange"
-                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
-                    />
+                    <input id="file-upload" type="file" multiple @change="handleFileChange"
+                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer" />
                   </div>
                 </div>
               </div>
 
               <p class="text-sm text-gray-300 p-2">
-                <span
-                  >Supported formats: png, jpeg, txt, rtf, pdf (up to 10
-                  files)</span
-                >
+                <span>Supported formats: png, jpeg, txt, rtf, pdf (up to 10
+                  files)</span>
               </p>
             </div>
           </div>
@@ -733,11 +655,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div
-          role="alert"
-          class="alert shadow-lg alert-error"
-          v-show="alertFailToEdit"
-          style="
+        <div role="alert" class="alert shadow-lg alert-error" v-show="alertFailToEdit" style="
             position: fixed;
             top: 20px;
             left: 50%;
@@ -745,29 +663,16 @@ onMounted(() => {
             z-index: 9999;
             width: 500px;
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <span>{{ aletMessage }}</span>
         </div>
 
-        <div
-          role="alert"
-          class="alert shadow-lg"
-          :class="{ hidden: !showAlertAfterEdit }"
-          style="
+        <div role="alert" class="alert shadow-lg" :class="{ hidden: !showAlertAfterEdit }" style="
             position: fixed;
             top: 20px;
             left: 50%;
@@ -776,20 +681,11 @@ onMounted(() => {
             width: 500px;
             color: rgb(74 222 128 / var(--tw-text-opacity));
             animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          ">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
             <h2 class="itbkk-message font-bold text-green-400">
@@ -800,20 +696,14 @@ onMounted(() => {
 
         <!-- Save & Close Button -->
         <div class="px-6 py-4 flex justify-end border-t border-gray-200">
-          <button
-            @click="closeModal"
-            class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
-          >
+          <button @click="closeModal"
+            class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none">
             Close
           </button>
-          <button
-            @click="UpdateTask"
-            :disabled="!isFormValid || checkEqual || isLimitReached"
-            :class="{
-              disabled: !isFormValid || checkEqual || isLimitReached
-            }"
-            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
-          >
+          <button @click="UpdateTask" :disabled="!isFormValid || checkEqual || isLimitReached" :class="{
+            disabled: !isFormValid || checkEqual || isLimitReached
+          }"
+            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50">
             Save
           </button>
         </div>
