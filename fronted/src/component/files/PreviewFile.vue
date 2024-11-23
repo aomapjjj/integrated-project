@@ -1,7 +1,6 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { getAttachments } from "@/libs/fetchUtils";
-import { useRoute } from "vue-router";
+import { ref, watch } from "vue";
+
 
 const fileName = ref("");
 const currentPage = ref(1);
