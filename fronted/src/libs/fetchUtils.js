@@ -492,6 +492,33 @@ const validateAccessToken = async (token) => {
   )
   return response
 }
+const validateMicrosoftAccessToken = async (token) => {
+  try {
+    const response = await fetch('https://graph.microsoft.com/v1.0/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Token validation failed: ${response.status} ${response.statusText}`)
+    }
+    const data = await response.json()
+    return {
+      valid: true,
+      data, 
+    }
+  } catch (error) {
+    console.error('Error validating token:', error)
+    return {
+      valid: false,
+      error: error.message,
+    }
+  }
+}
+
 
 const refreshAccessToken = async (refreshToken) => {
   const response = await fetch(
@@ -531,5 +558,7 @@ export {
   addAttachments,
   deleteAttachment,
   getAttachments,
-  downloadAttachment
+  downloadAttachment,
+  validateMicrosoftAccessToken
+
 }

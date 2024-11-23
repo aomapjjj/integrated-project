@@ -31,4 +31,10 @@ public class Board {
     @Enumerated(EnumType.STRING)
     @Column(name = "visibility")
     private Visibility visibility = Visibility.PRIVATE;
+
+    public void setUsername(String username) {
+    }
+
+    public void setEmail(String email) {
+    }
 }
