@@ -182,6 +182,7 @@ const routes = [
       }
     }
   },
+
   {
     path: '/auth-required',
     name: 'ToLoginPage',
@@ -198,6 +199,11 @@ const routes = [
     name: 'Members',
     component: Members
   },
+  {
+    path: "/logout",
+    name: "Logout",
+  },
+
  
 ]
 

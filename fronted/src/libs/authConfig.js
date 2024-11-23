@@ -82,10 +82,16 @@ var getIdtoken = async() => {
         return authResult.idToken.rawIdToken
 }
 }
+var logoff = () => {
+  myMSALObj.logout({
+    postLogoutRedirectUri: "https://intproj23.sit.kmutt.ac.th/sj3/logout" 
+  })
+}
 
 export default {
   login,
   getAccount,
   logoff,
-  getIdtoken
+  getIdtoken,
+  logoff
 }
