@@ -112,48 +112,53 @@ const closeModal = () => {
 }
 
 const getFilePreview = (file) => {
-  if (file.type.startsWith("image/")) {
-    return URL.createObjectURL(file);
-  } else if (file.type === "application/pdf") {
-    return URL.createObjectURL(file);
-  } else if (file.type.startsWith("text/")) {
+  if (file.type.startsWith('image/')) {
+    return URL.createObjectURL(file)
+  } else if (file.type === 'application/pdf') {
+    return URL.createObjectURL(file)
+  } else if (file.type.startsWith('text/')) {
     return new Promise((resolve) => {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (event) => {
-        resolve(event.target.result);
-      };
-      reader.readAsText(file);
-    });
+        resolve(event.target.result)
+      }
+      reader.readAsText(file)
+    })
   }
-  return URL.createObjectURL(file);
-};
+  return URL.createObjectURL(file)
+}
 
-const fileContent = ref([]);
+const fileContent = ref([])
 
 const loadTextFileContent = (file, index) => {
-  if (file.type.startsWith("text/")) {
-    const reader = new FileReader();
+  if (file.type.startsWith('text/')) {
+    const reader = new FileReader()
     reader.onload = (event) => {
-      fileContent.value[index] = event.target.result;
-    };
-    reader.readAsText(file);
+      fileContent.value[index] = event.target.result
+    }
+    reader.readAsText(file)
   }
-};
+}
 
 watch(files, (newFiles) => {
   newFiles.forEach((file, index) => {
-    if (file.type.startsWith("text/")) {
-      loadTextFileContent(file, index);
+    if (file.type.startsWith('text/')) {
+      loadTextFileContent(file, index)
     }
-  });
-});
+  })
+})
 </script>
 
 <template>
   <!-- Modal window -->
-  <dialog v-if="isOpenModal" ref="myModal"
-    class="itbkk-modal-task w-full h-full flex inset-0 z-20 items-center justify-center bg-gray-500 bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+  <dialog
+    v-if="isOpenModal"
+    ref="myModal"
+    class="itbkk-modal-task w-full h-full flex inset-0 z-20 items-center justify-center bg-gray-500 bg-opacity-50"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
+    >
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">
@@ -162,8 +167,14 @@ watch(files, (newFiles) => {
             <label class="block text-base font-medium text-[#9391e4]">
               Title
             </label>
-            <input disabled type="text" v-model="todo.title" placeholder="Title" maxlength="100"
-              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg" />
+            <input
+              disabled
+              type="text"
+              v-model="todo.title"
+              placeholder="Title"
+              maxlength="100"
+              class="itbkk-title w-full px-4 py-2 border border-gray-300 rounded-lg"
+            />
           </div>
 
           <!-- Status -->
@@ -171,7 +182,9 @@ watch(files, (newFiles) => {
             <label class="block text-base font-medium text-[#9391e4]">
               Status
             </label>
-            <div class="itbkk-status w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center">
+            <div
+              class="itbkk-status w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 flex items-center"
+            >
               {{ todo.status }}
             </div>
           </div>
@@ -182,12 +195,19 @@ watch(files, (newFiles) => {
           <label class="block text-base font-medium text-[#9391e4]">
             Description
           </label>
-          <textarea disabled id="description" maxlength="500" rows="4" :class="{
-            'italic text-gray-500':
-              todo.description?.length === 0 ||
-              todo.description?.trim() === '' ||
-              todo.description === null
-          }" class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24">
+          <textarea
+            disabled
+            id="description"
+            maxlength="500"
+            rows="4"
+            :class="{
+              'italic text-gray-500':
+                todo.description?.length === 0 ||
+                todo.description?.trim() === '' ||
+                todo.description === null
+            }"
+            class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
+          >
           {{ todo.description || 'No Description Provided' }}
           </textarea>
         </div>
@@ -197,12 +217,19 @@ watch(files, (newFiles) => {
           <label class="block text-base font-medium text-[#9391e4]">
             Assignees
           </label>
-          <textarea disabled id="assignees" maxlength="30" rows="4" :class="{
-            'italic text-gray-500':
-              todo.assignees?.length === 0 ||
-              todo.assignees?.trim() === '' ||
-              todo.assignees === null
-          }" class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg">
+          <textarea
+            disabled
+            id="assignees"
+            maxlength="30"
+            rows="4"
+            :class="{
+              'italic text-gray-500':
+                todo.assignees?.length === 0 ||
+                todo.assignees?.trim() === '' ||
+                todo.assignees === null
+            }"
+            class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
+          >
           {{ todo.assignees || 'Unassigned' }}
           </textarea>
         </div>
@@ -213,32 +240,59 @@ watch(files, (newFiles) => {
             Attachments
           </label>
           <div v-if="todo.attachments?.length > 0">
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-              <div v-for="(file, index) in files" :key="index"
-                class="flex flex-col items-start bg-gray-100 rounded-lg p-2" @click="openPreviewFile(file)">
-                <div class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center">
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"
+            >
+              <div
+                v-for="(file, index) in files"
+                :key="index"
+                class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
+                @click="openPreviewFile(file)"
+              >
+                <div
+                  class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
+                >
                   <!-- รูปภาพ -->
-                  <img v-if="file.type.startsWith('image/')" :src="getFilePreview(file)" alt="Image Preview"
-                    class="object-cover w-full h-full rounded" />
+                  <img
+                    v-if="file.type.startsWith('image/')"
+                    :src="getFilePreview(file)"
+                    alt="Image Preview"
+                    class="object-cover w-full h-full rounded"
+                  />
                   <!-- PDF -->
-                  <iframe v-else-if="file.type === 'application/pdf'" :src="getFilePreview(file)"
-                    class="w-full h-full rounded" frameborder="0"></iframe>
+                  <iframe
+                    v-else-if="file.type === 'application/pdf'"
+                    :src="getFilePreview(file)"
+                    class="w-full h-full rounded"
+                    frameborder="0"
+                  ></iframe>
                   <!-- ข้อความ -->
-                  <pre v-else-if="file.type.startsWith('text/')"
-                    class="w-full h-full overflow-auto text-sm bg-white rounded p-2">
-      {{ fileContent[index] }}
-    </pre>
-                  <div v-else class="flex items-center justify-center w-full h-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                      class="w-12 h-12 text-gray-400">
+                  <pre
+                    v-else-if="file.type.startsWith('text/')"
+                    class="w-full h-full overflow-auto text-sm bg-white rounded p-2"
+                    >{{ fileContent[index] }}</pre
+                  >
+                  <div
+                    v-else
+                    class="flex items-center justify-center w-full h-full"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="w-12 h-12 text-gray-400"
+                    >
                       <path
-                        d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z" />
+                        d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z"
+                      />
                     </svg>
                   </div>
                   <!-- preview เขียนต่อจากนี้ -->
                   <!-- code ... -->
                 </div>
-                <p class="text-xs text-gray-600 truncate w-full overflow-hidden">
+                <p
+                  class="text-xs text-gray-600 truncate w-full overflow-hidden"
+                >
                   {{ file.name }}
                 </p>
                 <p class="text-xs text-gray-600 truncate">
@@ -249,16 +303,25 @@ watch(files, (newFiles) => {
           </div>
           <div v-else>
             <ul id="gallery" class="flex flex-1 flex-wrap -m-1">
-              <li id="empty" class="h-full w-full text-center flex flex-col justify-center items-center">
-                <img class="mx-auto w-28"
+              <li
+                id="empty"
+                class="h-full w-full text-center flex flex-col justify-center items-center"
+              >
+                <img
+                  class="mx-auto w-28"
                   src="https://user-images.githubusercontent.com/507615/54591670-ac0a0180-4a65-11e9-846c-e55ffce0fe7b.png"
-                  alt="no data" />
+                  alt="no data"
+                />
                 <span class="text-small text-gray-500">No files attached</span>
               </li>
             </ul>
           </div>
         </div>
-        <PreviewFile v-if="isFilePreviewOpen" :file="previewFileData" @close="closePreviewFile" />
+        <PreviewFile
+          v-if="isFilePreviewOpen"
+          :file="previewFileData"
+          @close="closePreviewFile"
+        />
 
         <!-- Metadata Section -->
         <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
@@ -282,9 +345,13 @@ watch(files, (newFiles) => {
         </div>
 
         <!-- Close Button -->
-        <div class="itbkk-button px-6 py-4 flex justify-end border-t border-gray-200">
-          <button @click="closeModal"
-            class="itbkk-close-button text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none">
+        <div
+          class="itbkk-button px-6 py-4 flex justify-end border-t border-gray-200"
+        >
+          <button
+            @click="closeModal"
+            class="itbkk-close-button text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+          >
             Close
           </button>
         </div>
@@ -294,12 +361,12 @@ watch(files, (newFiles) => {
 </template>
 
 <style>
-.itbkk-modal-task>div {
+.itbkk-modal-task > div {
   margin-left: 6%;
 }
 
 @media (max-width: 768px) {
-  .itbkk-modal-task>div {
+  .itbkk-modal-task > div {
     margin-left: 0;
   }
 }
