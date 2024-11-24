@@ -89,32 +89,24 @@ const showAlert = () => {
   }, 2000)
 }
 
-const loginMicrosoft = async() => {
-  authConfig.login()
-  userStore.setLoginSuccess(true)
-  if(localStorage.getItem('access_token') !== null){
-    userStore.setLoginSuccess(true)
-      const decoded = jwtDecode(localStorage.getItem('access_token'))
+const loginMicrosoft = async () => {
+  try {
+    await authConfig.login() 
+    const accountData = await authConfig.getAccount() 
+    if (accountData) {
+      const decoded = jwtDecode(localStorage.getItem("access_token"))
       nameJWT.value = decoded.name
       emailJWT.value = decoded.email
-
+      userStore.setLoginMicrosoftSuccess(true)
       userInfowhileLogin.value = { ...decoded }
-
       userStore.setUserInfo(userInfowhileLogin.value)
-
       userStore.setEmail(emailJWT.value)
-      userStore.setToken(localStorage.getItem('access_token'))
-
-
-      const itemsBoards = await getBoardItems(baseUrlboards)
-      itemsBoards.boards.sort(
-        (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
-      ) 
-
-      boardStore.setBoards(itemsBoards.boards) 
-      boardStore.setCollabs(itemsBoards.collabs)
-      openHomePage()
-}
+      userStore.setToken(localStorage.getItem("access_token"))
+      await openHomePage()
+    }
+  } catch (error) {
+    console.error("Login process failed:", error)
+  }
 }
 
 const submitForm = async () => {

@@ -4,6 +4,8 @@ import { ref, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
 import { useBoard } from '@/stores/storeBoard.js'
+import authConfig from '@/libs/authConfig.js'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -41,12 +43,18 @@ function toggleDropdown() {
   isExpanded.value = !isExpanded.value
 }
 
-// Log out
+
 const clearToken = () => {
+ if(userStore.getLoginMicrosoftSuccess() === true){
+  authConfig.logoff()
   localStorage.clear()
   localStorage.removeItem('access_token')
-  
   router.push({ name: 'Login' })
+ }else{
+  localStorage.clear()
+  localStorage.removeItem('access_token')
+  router.push({ name: 'Login' })
+ }
 }
 
 const toBoardsList = (boardId) => {
