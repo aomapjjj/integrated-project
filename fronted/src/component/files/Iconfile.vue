@@ -73,11 +73,13 @@ const fileIcon = computed(() => {
     wav: '/image/files/VideoAndAudio/text_color_wav.png',
 
     // Default Icon
-    default: '/image/files/default.png'
+    default: '/image/files/ImageFile/default.png'
   }
 
   return icons[fileExtension.value] || icons.default
 })
+console.log(fileIcon.value)
+
 // const getOnlineViewerUrl = computed(() => {
 //   if (fileExtension.value === 'docx' || fileExtension.value === 'xlsx') {
 //     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
