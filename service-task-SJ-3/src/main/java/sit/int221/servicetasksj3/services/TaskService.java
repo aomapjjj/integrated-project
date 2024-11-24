@@ -116,16 +116,12 @@ public class TaskService {
         task1.setBoard(board);
         TaskStatus status;
 
-
-
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean isWriteAccess = collaboratorService.hasWriteAccess(boardId, currentUser.getOid());
-
 
         if (!isWriteAccess && !board.getOwnerId().equals(currentUser.getOid())) {
             throw new UnauthorizedException("You are not the owner of this board");
         }
-
 
         try {
             status = statusRepository.findById(Integer.parseInt(task.getStatus())).orElseThrow(
