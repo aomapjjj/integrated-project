@@ -4,6 +4,7 @@ import { ref, watch } from 'vue'
 import { toDate } from '../../libs/toDate'
 import { useRoute, useRouter } from 'vue-router'
 import PreviewFile from '../../component/files/PreviewFile.vue'
+import Iconfile from '@/component/files/Iconfile.vue'
 
 // ----------------------- Router -----------------------
 
@@ -235,7 +236,7 @@ watch(files, (newFiles) => {
         </div>
 
         <!-- Attachments Section -->
-        <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
+        <div class="attachments-section">
           <label class="block text-base font-medium text-[#9391e4]">
             Attachments
           </label>
@@ -246,56 +247,31 @@ watch(files, (newFiles) => {
               <div
                 v-for="(file, index) in files"
                 :key="index"
-                class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
-                @click="openPreviewFile(file)"
+                class="flex flex-col items-start bg-gray-100 hover:bg-gray-200 rounded-lg p-2"
               >
                 <div
                   class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
                 >
-                  <!-- รูปภาพ -->
-                  <img
-                    v-if="file.type.startsWith('image/')"
-                    :src="getFilePreview(file)"
-                    alt="Image Preview"
-                    class="object-cover w-full h-full rounded"
-                  />
-                  <!-- PDF -->
-                  <iframe
-                    v-else-if="file.type === 'application/pdf'"
-                    :src="getFilePreview(file)"
-                    class="w-full h-full rounded"
-                    frameborder="0"
-                  ></iframe>
-                  <!-- ข้อความ -->
-                  <pre
-                    v-else-if="file.type.startsWith('text/')"
-                    class="w-full h-full overflow-auto text-sm bg-white rounded p-2"
-                    >{{ fileContent[index] }}</pre
-                  >
                   <div
-                    v-else
-                    class="flex items-center justify-center w-full h-full"
+                    class="w-full h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="w-12 h-12 text-gray-400"
-                    >
-                      <path
-                        d="M13.5 2.75v5.25a.75.75 0 0 0 .75.75h5.25M13.5 2.75l6.72 6.72c.15.15.28.31.39.5H14.25A1.75 1.75 0 0 1 12.5 8.25V2.75h1ZM3.75 4.5h6v1.5h-6v-1.5Zm6 2.25h-6v1.5h6v-1.5ZM3.75 9h6v1.5h-6V9Zm0 2.25h6v1.5h-6v-1.5ZM3.75 13.5h6v1.5h-6v-1.5Zm0 2.25h6v1.5h-6v-1.5ZM3.75 18h6v1.5h-6v-1.5Z"
-                      />
-                    </svg>
+                    <Iconfile
+                      :file="file"
+                      :fileContent="fileContent[index]"
+                      @click="openPreviewFile(file)"
+                    />
                   </div>
-                  <!-- preview เขียนต่อจากนี้ -->
-                  <!-- code ... -->
                 </div>
                 <p
+                  @click="openPreviewFile(file)"
                   class="text-xs text-gray-600 truncate w-full overflow-hidden"
                 >
                   {{ file.name }}
                 </p>
-                <p class="text-xs text-gray-600 truncate">
+                <p
+                  @click="openPreviewFile(file)"
+                  class="text-xs text-gray-600 truncate"
+                >
                   {{ (file.size / (1024 * 1024)).toFixed(2) }} MB
                 </p>
               </div>

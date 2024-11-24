@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
   file: {
@@ -16,12 +16,21 @@ const fileExtension = computed(() => {
   if (!props.file.name) return 'default'
   return props.file.name.split('.').pop().toLowerCase()
 })
+
 const getFilePreview = (file) => {
-  if (file.type.startsWith('image/')) {
+  if (
+    props.file.type.startsWith('image/') ||
+    fileExtension.value === 'png' ||
+    fileExtension.value === 'jpg' ||
+    fileExtension.value === 'jpeg'
+  ) {
     return URL.createObjectURL(file)
   } else if (file.type === 'application/pdf') {
     return URL.createObjectURL(file)
-  } else if (file.type.startsWith('text/')) {
+  } else if (
+    file.type.startsWith('text/') ||
+    file.type.startsWith('application/rtf')
+  ) {
     return new Promise((resolve) => {
       const reader = new FileReader()
       reader.onload = (event) => {
@@ -69,6 +78,14 @@ const fileIcon = computed(() => {
 
   return icons[fileExtension.value] || icons.default
 })
+// const getOnlineViewerUrl = computed(() => {
+//   if (fileExtension.value === 'docx' || fileExtension.value === 'xlsx') {
+//     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
+//       props.file.url || ''
+//     )}`
+//   }
+//   return null
+// })
 </script>
 
 <template>
@@ -87,15 +104,22 @@ const fileIcon = computed(() => {
       class="w-full h-20 rounded"
       frameborder="0"
     ></iframe>
+    <!-- Online Viewer for .docx and .xlsx -->
+    <!-- <iframe
+      v-else-if="getOnlineViewerUrl"
+      :src="getOnlineViewerUrl"
+      class="w-full h-60 rounded"
+      frameborder="0"
+    ></iframe> -->
     <!-- Text Preview -->
     <pre
       v-else-if="file.type.startsWith('text/')"
-      class="w-full h-full overflow-auto text-sm bg-white rounded p-2"
-      >{{ fileContent[index] }}</pre
+      class="w-36 h-20 overflow-auto text-sm bg-white rounded p-2"
+      >{{ fileContent }}</pre
     >
     <!-- Default or Unsupported File Icon -->
     <div v-else class="flex items-center justify-center w-full h-full">
-      <img :src="fileIcon" alt="File Icon" class="w-12 h-12" />
+      <img :src="fileIcon" alt="File Icon" class="w-12 h-12 object-contain" />
     </div>
   </div>
 </template>

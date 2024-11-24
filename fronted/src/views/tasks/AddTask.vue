@@ -340,7 +340,7 @@ const isLimitReached = computed(() => {
             <!-- Description -->
             <div class="space-y-1">
               <label class="block text-base font-medium text-[#9391e4]">
-                Description <span class="text-red-500">*</span>
+                Description
               </label>
               <textarea
                 id="description"
@@ -359,7 +359,7 @@ const isLimitReached = computed(() => {
             <!-- Assignees -->
             <div>
               <label class="block text-base font-medium text-[#9391e4]">
-                Assignees <span class="text-red-500">*</span>
+                Assignees 
               </label>
               <textarea
                 id="assignees"
