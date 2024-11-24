@@ -43,7 +43,7 @@ public class CollaboratorService {
                 .map(c -> {
                     String name = c.getCollaboratorName();
                     if (c.getStatus() == CollabStatus.PENDING) {
-                        name += " (Pending Invite)";
+                        name += " (/ Invite)";
                     }
                     return new CollaboratorDTO(
                             c.getCollaboratorId(),
