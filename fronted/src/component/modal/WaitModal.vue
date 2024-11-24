@@ -5,7 +5,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div v-if="isLoading" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+  <div v-if="isLoading" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50 ">
     <div class="itbkk-modal-alert modal-box w-1/3 p-6 text-center flex flex-col items-center justify-center space-y-4">
       <h3 class="font-bold text-lg customPurple">
         Please hold on, we're almost ready...
