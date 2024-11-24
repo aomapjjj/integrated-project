@@ -8,8 +8,10 @@ const useUsers = defineStore("users", () => {
   const email = ref("")
   const userInfo = ref()
   const LoginSuccess = ref(false)
+  const LoginMicrosoftSuccess = ref(false)
   const refreshToken = ref(""); 
   const boardId = ref("");
+
 
   const setToken = (newToken) => {
     token.value = newToken;
@@ -26,6 +28,13 @@ const useUsers = defineStore("users", () => {
 
   const getLoginSuccess = () => {
     return LoginSuccess.value 
+  }
+  const setLoginMicrosoftSuccess = (statusLogin) => {
+    LoginMicrosoftSuccess.value = statusLogin
+  };
+
+  const getLoginMicrosoftSuccess = () => {
+    return LoginMicrosoftSuccess.value 
   }
 
   const setRefreshToken = (newRefreshToken) => {
@@ -117,7 +126,9 @@ const getUserInfo = () => {
     setEmail,
     getEmail,
     setUserInfo,
-    getUserInfo
+    getUserInfo,
+    setLoginMicrosoftSuccess,
+    getLoginMicrosoftSuccess
   }
 });
 
