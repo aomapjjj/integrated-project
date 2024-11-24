@@ -1,5 +1,5 @@
 <script setup>
-import { getItems, addItem, addAttachments } from '../../libs/fetchUtils.js'
+import { getItems, addItem } from '../../libs/fetchUtils.js'
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTasks } from '../../stores/store.js'
@@ -64,25 +64,7 @@ onMounted(async () => {
   statusList.value = itemsStatus
 })
 
-const handleFileChange = (event) => {
-  const selectedFiles = Array.from(event.target.files)
 
-  if (files.value.length + selectedFiles.length > maxFiles) {
-    alert(`You can upload up to ${maxFiles} files.`)
-    return
-  }
-
-  const newFiles = []
-  for (const file of selectedFiles) {
-    if (file.size > maxTotalSizePerFile) {
-      alert(`File ${file.name} exceeds the maximum size of 20 MB.`)
-      continue
-    }
-    newFiles.push(file)
-  }
-
-  files.value = [...files.value, ...newFiles]
-}
 
 watch(
   () => files.value,
@@ -92,52 +74,6 @@ watch(
   }
 )
 
-const isImage = (file) => {
-  return file.type.startsWith('image/')
-}
-
-const getFileIcon = (file) => {
-  if (!file || typeof file !== 'object' || !file.name) {
-    return '/image/files/default.png'
-  }
-
-  const extension = file.name.split('.').pop().toLowerCase()
-  if (!extension) return '/image/files/default.png'
-
-  // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
-  switch (extension) {
-    case 'pdf':
-      return '/image/files/PDF.png'
-    case 'doc':
-    case 'docx':
-      return '/image/files/DOC.png'
-    case 'xls':
-    case 'xlsx':
-      return '/image/files/XLS.png'
-    case 'ppt':
-    case 'pptx':
-      return '/image/files/PPT.png'
-    case 'txt':
-      return '/image/files/TXT.png'
-    case 'png':
-    case 'jpeg':
-    case 'jpg':
-    case 'gif':
-      return file instanceof File
-        ? URL.createObjectURL(file)
-        : '/image/files/default.png'
-    default:
-      return '/image/files/default.png'
-  }
-}
-
-const clearFileUrls = () => {
-  files.value.forEach((file) => {
-    if (file instanceof File && file.url) {
-      URL.revokeObjectURL(file.url)
-    }
-  })
-}
 
 const submitForm = async () => {
   const trimmedTitle = todo.value.title?.trim()
@@ -153,35 +89,6 @@ const submitForm = async () => {
       status: todo.value.status
     })
 
-    // อัปโหลดไฟล์แนบ
-    let attachments = []
-    const attachmentsResponse = await addAttachments(
-      boardId.value,
-      itemAdd.id,
-      files.value
-    )
-
-    if (
-      attachmentsResponse.statusCode === 200 ||
-      attachmentsResponse.statusCode === 201
-    ) {
-      console.log('File added successfully:', attachmentsResponse.data)
-
-      if (
-        attachmentsResponse.data &&
-        Array.isArray(attachmentsResponse.data.attachments)
-      ) {
-        attachments = attachmentsResponse.data.attachments
-      } else {
-        console.error(
-          'attachmentsResponse.data.attachments is not an array:',
-          attachmentsResponse.data
-        )
-      }
-    } else {
-      console.error('Failed to add file:', attachmentsResponse)
-    }
-
     taskStore.addTask(
       itemAdd.id,
       itemAdd.title,
@@ -190,7 +97,6 @@ const submitForm = async () => {
       itemAdd.status,
       itemAdd.createdOn,
       itemAdd.updateOn,
-      attachments
     )
 
     console.log(taskStore.getTasks())
