@@ -45,14 +45,14 @@ const getFilePreview = (file) => {
 const fileIcon = computed(() => {
   const icons = {
     // Document Files
-    pdf: '/files/Document/text_color_pdf.png',
-    doc: '/files/Document/text_color_doc.png',
-    docx: '/files/Document/text_color_doc.png',
-    xls: '/files/Document/text_color_xls.png',
-    xlsx: '/files/Document/text_color_xls.png',
-    txt: '/files/Document/text_color_txt.png',
-    csv: '/files/Document/text_color_csv.png',
-    ppt: '/files/Document/text_color_ppt.png',
+    pdf: '/files/DocumentFile/text_color_pdf.png',
+    doc: '/files/DocumentFile/text_color_doc.png',
+    docx: '/files/DocumentFile/text_color_doc.png',
+    xls: '/files/DocumentFile/text_color_xls.png',
+    xlsx: '/files/DocumentFile/text_color_xls.png',
+    txt: '/files/DocumentFile/text_color_txt.png',
+    csv: '/files/DocumentFile/text_color_csv.png',
+    ppt: '/files/DocumentFile/text_color_ppt.png',
 
     // Image Files
     png: '/files/ImageFile/text_color_png.png',
