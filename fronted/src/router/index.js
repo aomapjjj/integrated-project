@@ -244,6 +244,11 @@ const checkAuthorization = async (next, accessToken, refreshToken) => {
 router.beforeEach(async (to, from, next) => {
   const accessToken = getToken()
   const refreshToken = getRefreshToken()
+  if (to.name === "Logout") {
+    localStorage.clear();
+    localStorage.removeItem('access_token')
+    next({ name: "Login" });
+  }
 
   if (to.name === 'board' && to.params.id) {
     const boardId = to.params.id
