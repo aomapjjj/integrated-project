@@ -1,8 +1,7 @@
-import { defineStore, acceptHMRUpdate } from 'pinia'
-import { ref } from 'vue'
+import { defineStore, acceptHMRUpdate } from "pinia"
+import { ref } from "vue"
 
-const useTasks = defineStore('tasks', () => {
-  
+const useTasks = defineStore("tasks", () => {
   const tasks = ref([])
 
   const getTasks = () => {
@@ -12,20 +11,29 @@ const useTasks = defineStore('tasks', () => {
   // actions
   const addTasks = (newTasks) => {
     newTasks?.forEach((newTask) =>
-      addTask(  
+      addTask(
         newTask.id,
-        newTask.title, 
-        newTask.description, 
+        newTask.title,
+        newTask.description,
         newTask.assignees,
         newTask.status,
         newTask.createdOn,
         newTask.updateOn,
-        newTask.attachments 
+        newTask.attachments
       )
     )
   }
 
-  const addTask = (id, title, description, assignees, status, createdOn, updateOn, attachments = []) => {
+  const addTask = (
+    id,
+    title,
+    description,
+    assignees,
+    status,
+    createdOn,
+    updateOn,
+    attachments = []
+  ) => {
     tasks.value.push({
       id: id,
       title: title,
@@ -34,35 +42,44 @@ const useTasks = defineStore('tasks', () => {
       status: status,
       createdOn: createdOn,
       updateOn: updateOn,
-      attachments: attachments 
+      attachments: attachments,
     })
   }
 
-  const updateTask = (id, title, description, assignees, status, createdOn, updateOn, attachments) => {
+  const updateTask = (
+    id,
+    title,
+    description,
+    assignees,
+    status,
+    createdOn,
+    updateOn,
+    attachments
+  ) => {
     tasks.value = tasks.value.map((task) => {
       return task.id === id
-        ? { ...task, 
+        ? {
+            ...task,
             title: title,
             description: description,
             assignees: assignees,
             status: status,
             createdOn: createdOn,
             updateOn: updateOn,
-            attachments: attachments || task.attachments 
+            attachments: attachments || task.attachments,
           }
         : task
     })
   }
 
   const updateAttachments = (id, newAttachments) => {
-    const task = tasks.value.find((task) => task.id === id);
+    const task = tasks.value.find((task) => task.id === id)
     if (task) {
-      task.attachments = [...task.attachments, ...newAttachments];
+      task.attachments = [...newAttachments]
     } else {
-      console.error(`Task with ID ${id} not found.`);
+      console.error(`Task with ID ${id} not found.`)
     }
-  };
-  
+  }
 
   const removeTask = (removeId) => {
     tasks.value.splice(
@@ -76,7 +93,7 @@ const useTasks = defineStore('tasks', () => {
     addTasks,
     addTask,
     updateTask,
-    updateAttachments, 
+    updateAttachments,
     removeTask,
   }
 })

@@ -23,6 +23,7 @@ import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.services.BoardService;
 import sit.int221.servicetasksj3.services.CollaboratorService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
 
@@ -49,18 +50,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             boolean isTokenValid = false;
             String tokenError = null;
+            MicrosoftUser microsoftUser = null;
 
             if (request.getRequestURI().equals("/token") || request.getRequestURI().equals("/login")) {
                 chain.doFilter(request, response);
                 return;
             }
-
             if (requestTokenHeader != null) {
                 if (requestTokenHeader.startsWith("Bearer ")) {
                     jwtToken = requestTokenHeader.substring(7);
                     try {
-                        username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                        isTokenValid = true;
+                        if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
+                            microsoftUser = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken);
+                            isTokenValid = true;
+                            tokenError = "Invalid Microsoft Token";
+                        } else {
+                            try {
+                                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                                isTokenValid = true;
+                            } catch (IllegalArgumentException e) {
+                                tokenError = e.getMessage();
+                            } catch (ExpiredJwtException e) {
+                                tokenError = e.getMessage();
+                            }
+                        }
                     } catch (IllegalArgumentException e) {
                         tokenError = e.getMessage();
                     } catch (ExpiredJwtException e) {
@@ -74,6 +87,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
                 if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
+            }
+            if (microsoftUser != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.jwtUserDetailsService.loadUserByOid(microsoftUser.getOid());
+                if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
@@ -95,6 +116,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String boardId = request.getRequestURI().split("/")[3];
         String requestMethod = request.getMethod();
         AuthUser currentUser = getCurrentUserDetails();
+        System.out.println("currentUser " + currentUser);
         boolean isBoardExist = boardService.boardExists(boardId);
 
         if (!isBoardExist) {

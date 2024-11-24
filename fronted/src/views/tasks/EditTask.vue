@@ -5,13 +5,14 @@ import {
   getItemById,
   editItem,
   getAttachments,
-  addAttachments,
-  deleteAttachment
+  addAttachments
 } from '@/libs/fetchUtils'
 import { useTasks } from '../../stores/store'
 import { toDate } from '../../libs/toDate'
 import { useRoute, useRouter } from 'vue-router'
 import { useLimitStore } from '../../stores/storeLimit'
+import PreviewFile from '../../component/files/PreviewFile.vue'
+import Iconfile from '@/component/files/Iconfile.vue'
 // import UploadFile from '@/component/files/UploadFile.vue'
 
 // ----------------------- Router -----------------------
@@ -53,8 +54,8 @@ const todo = ref({
   updatedOn: '',
   attachments: []
 })
-const boardId = ref()
 
+const boardId = ref()
 watch(
   () => route.params.id,
   (newId) => {
@@ -102,9 +103,24 @@ const closeModal = () => {
   router.push({ name: 'TaskList', params: { id: boardId.value } })
 }
 
-const UpdateTask = async () => {
-  console.log('Todo ID:', props.todoId)
+// ----------------------- messageResponse -----------------------
 
+const messageResponse = ref('')
+const messageResponseType = ref('')
+
+const clearMessageResponse = () => {
+  messageResponse.value = ''
+  messageResponseType.value = ''
+}
+
+// const fetchUpdatedTask = async () => {
+//   const response = await getItemById(props.todoId, boardId.value)
+//   if (response && response.responsed === 200) {
+//     todo.value = response.item
+//   }
+// }
+
+const UpdateTask = async () => {
   if (isLimitReached.value) {
     return
   }
@@ -125,8 +141,40 @@ const UpdateTask = async () => {
       edit.assignees,
       edit.status,
       edit.createdOn,
-      edit.updateOn
+      edit.updatedOn
     )
+
+    if (files.value.length > 0) {
+      const attachmentsResponse = await addAttachments(
+        boardId.value,
+        edit.id,
+        files.value
+      )
+
+      if (attachmentsResponse.statusCode === 400) {
+        messageResponse.value = attachmentsResponse.data.errors
+          .map((error) => error.message)
+          .join('\n')
+        messageResponseType.value = 'error'
+      } else if (
+        attachmentsResponse.statusCode === 200 ||
+        attachmentsResponse.statusCode === 201
+      ) {
+        messageResponse.value = 'Attachments uploaded successfully.'
+        messageResponseType.value = 'success'
+        todo.value.attachments = [...todo.value.attachments, ...files.value]
+        myTasks.updateAttachments(todo.value.id, files.value)
+      } else {
+        messageResponse.value = 'Unexpected error occurred. Please try again.'
+        messageResponseType.value = 'error'
+        // await fetchUpdatedTask()
+      }
+    } else {
+      messageResponse.value = 'Task updated successfully.'
+      messageResponseType.value = 'success'
+    }
+    clearMessageResponse()
+    closeModal()
 
     showAlertEdit.value = true
     showAlertAfterEdit.value = true
@@ -135,23 +183,43 @@ const UpdateTask = async () => {
     }, 2300)
   } catch (error) {
     console.error('Error updating task:', error)
+    messageResponse.value = 'Unexpected error occurred.'
+    messageResponseType.value = 'error'
   }
 }
 
 const checkEqual = computed(() => {
   const trimmedTodo = {
-    ...todo.value,
-    title: todo.value.title?.trim(),
-    description: todo.value.description?.trim(),
-    assignees: todo.value.assignees?.trim()
+    title: todo.value.title?.trim() || '',
+    description: todo.value.description?.trim() || '',
+    assignees: todo.value.assignees?.trim() || '',
+    status: todo.value.status || ''
   }
   const trimmedOldValue = {
-    ...oldValue.value,
-    title: oldValue.value.title?.trim(),
-    description: oldValue.value.description?.trim(),
-    assignees: oldValue.value.assignees?.trim()
+    title: oldValue.value.title?.trim() || '',
+    description: oldValue.value.description?.trim() || '',
+    assignees: oldValue.value.assignees?.trim() || '',
+    status: oldValue.value.status || ''
   }
-  return JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue)
+
+  // ตรวจสอบว่า attachments เป็น array
+  const currentFiles = files.value.map((file) => file.name)
+  const oldFiles = Array.isArray(todo.value.attachments)
+    ? todo.value.attachments.map((attachment) => attachment.fileName)
+    : []
+
+  const filesChanged =
+    currentFiles.length !== oldFiles.length ||
+    !currentFiles.every((fileName) => oldFiles.includes(fileName))
+
+  console.log('Current Files:', currentFiles)
+  console.log('Old Files:', oldFiles)
+  console.log('Files Changed:', filesChanged)
+
+  return (
+    JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue) &&
+    !filesChanged
+  )
 })
 
 // ----------------------- Validate -----------------------
@@ -204,95 +272,172 @@ const isLimitReached = computed(() => {
 //------------------------------------ File ----------------------------
 const files = ref([])
 const maxFiles = 10
-const maxTotalSizePerFile = 20 * 1024 * 1024 // 20 MB
+const maxTotalSizePerFile = 20 * 1024 * 1024
 
 const handleFileChange = (event) => {
   const selectedFiles = Array.from(event.target.files)
 
-  // ตรวจสอบจำนวนไฟล์
-  if (files.value.length + selectedFiles.length > maxFiles) {
-    alert(`You can upload up to ${maxFiles} files.`)
-    return
-  }
+  const existingFileNames = files.value.map((file) => file.name)
+  const errorMessages = []
+  const notAddedFiles = []
+  const validFiles = []
 
-  // ตรวจสอบขนาดไฟล์
-  const newFiles = []
-  for (const file of selectedFiles) {
-    if (file.size > maxTotalSizePerFile) {
-      alert(`File ${file.name} exceeds the maximum size of 20 MB.`)
-      continue
+  selectedFiles.forEach((file) => {
+    // Check if the total file count exceeds the maximum limit
+    if (files.value.length + validFiles.length >= maxFiles) {
+      notAddedFiles.push(file.name)
+      if (
+        !errorMessages.includes(`Each task can have at most ${maxFiles} files.`)
+      ) {
+        errorMessages.push(`Each task can have at most ${maxFiles} files.`)
+      }
+      return
     }
-    newFiles.push(file)
-  }
+    // Check if the file size exceeds the limit
+    if (file.size > maxTotalSizePerFile) {
+      notAddedFiles.push(file.name)
+      if (
+        !errorMessages.includes(
+          `Each file cannot be larger than ${(
+            maxTotalSizePerFile /
+            (1024 * 1024)
+          ).toFixed(2)} MB.`
+        )
+      ) {
+        errorMessages.push(
+          `Each file cannot be larger than ${(
+            maxTotalSizePerFile /
+            (1024 * 1024)
+          ).toFixed(2)} MB.`
+        )
+      }
+      return
+    }
+    if (existingFileNames.includes(file.name)) {
+      notAddedFiles.push(file.name)
+      if (
+        !errorMessages.includes(
+          `File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add again to update the file.`
+        )
+      ) {
+        errorMessages.push(
+          `File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add again to update the file.`
+        )
+      }
+      return
+    }
+    validFiles.push(file)
+  })
 
-  // เพิ่มไฟล์ใหม่เข้าไปใน `files`
-  files.value = [...files.value, ...newFiles]
+  files.value = [...files.value, ...validFiles]
+
+  // Error Messages
+  if (notAddedFiles.length > 0) {
+    const formattedErrors = errorMessages
+      .filter((msg, index, self) => self.indexOf(msg) === index)
+      .map((msg, index) => ` ${index + 1}. ${msg}`)
+      .join('\n')
+
+    const formattedFiles = notAddedFiles
+      .map((fileName) => `- ${fileName}`)
+      .join('\n')
+
+    messageResponse.value =
+      `⚠️ Oops! Some issues occurred while uploading files:\n${formattedErrors}\n\n 📂 Files not added:\n${formattedFiles}`.trim()
+    messageResponseType.value = 'error'
+  } else {
+    messageResponse.value = `✅ Files added successfully!\n`.trim()
+    messageResponseType.value = 'success'
+  }
 }
 
 watch(
-  () => files.value,
+  () => files,
   (newFiles) => {
-    files.value = newFiles
+    files = newFiles
     console.log('Updated files:', newFiles)
   }
 )
 
-const isImage = (file) => {
-  return file.type.startsWith('image/')
-}
-
-const getFileIcon = (file) => {
-  if (!file || typeof file !== 'object' || !file.name) {
-    return '/image/files/default.png'
+watch(
+  [isFormValid, checkEqual, isLimitReached],
+  ([formValid, equalCheck, limitReached]) => {
+    console.log('isFormValid:', formValid)
+    console.log('checkEqual:', equalCheck)
+    console.log('isLimitReached:', limitReached)
+    console.log('Button disabled:', !formValid || equalCheck || limitReached)
   }
+)
 
-  const extension = file.name.split('.').pop().toLowerCase()
-  if (!extension) return '/image/files/default.png'
+const fileContent = ref([])
 
-  // ตรวจสอบนามสกุลของไฟล์เพื่อเลือกไอคอนที่เหมาะสม
-  switch (extension) {
-    case 'pdf':
-      return '/image/files/PDF.png'
-    case 'doc':
-    case 'docx':
-      return '/image/files/DOC.png'
-    case 'xls':
-    case 'xlsx':
-      return '/image/files/XLS.png'
-    case 'ppt':
-    case 'pptx':
-      return '/image/files/PPT.png'
-    case 'txt':
-      return '/image/files/TXT.png'
-    case 'png':
-    case 'jpeg':
-    case 'jpg':
-    case 'gif':
-      return file instanceof File
-        ? URL.createObjectURL(file)
-        : '/image/files/default.png'
-    default:
-      return '/image/files/default.png'
+const loadTextFileContent = (file, index) => {
+  if (file.type.startsWith('text/')) {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      fileContent.value[index] = event.target.result
+    }
+    reader.readAsText(file)
   }
 }
 
-const clearFileUrls = () => {
-  files.value.forEach((file) => {
-    if (file instanceof File && file.url) {
-      URL.revokeObjectURL(file.url)
+watch(files, (newFiles) => {
+  newFiles.forEach((file, index) => {
+    if (file.type.startsWith('text/')) {
+      loadTextFileContent(file, index)
     }
   })
+})
+
+const getFilePreview = (file) => {
+  if (file.type.startsWith('image/')) {
+    return URL.createObjectURL(file)
+  } else if (file.type === 'application/pdf') {
+    return URL.createObjectURL(file)
+  } else if (file.type.startsWith('text/')) {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        resolve(event.target.result)
+      }
+      reader.readAsText(file)
+    })
+  }
+  return URL.createObjectURL(file)
 }
 
-const attachments = ref([])
+const removeFile = (index) => {
+  const fileToRemove = files.value[index]
+  if (fileToRemove.url) {
+    URL.revokeObjectURL(fileToRemove.url)
+  }
+  files.value.splice(index, 1)
+  fileContent.value.splice(index, 1)
+  myTasks.updateAttachments(todo.value.id, files.value)
+}
 
-// ฟังก์ชันดึงข้อมูลไฟล์แนบจาก backend
 const fetchAttachments = async () => {
   try {
     const response = await getAttachments(boardId.value, props.todoId)
     if (response.statusCode === 200) {
-      files.value = response.data.attachments || [] // กำหนดไฟล์ที่ได้จาก backend
-      console.log('Attachments:', files.value)
+      todo.value.attachments = response.data
+
+      for (let index = 0; index < todo.value.attachments.length; index++) {
+        const element = todo.value.attachments[index]
+
+        const byteCharacters = atob(element.fileData)
+        const byteNumbers = new Array(byteCharacters.length)
+          .fill(0)
+          .map((_, i) => byteCharacters.charCodeAt(i))
+        const byteArray = new Uint8Array(byteNumbers)
+        const blob = new Blob([byteArray], { type: element.fileType })
+
+        const file = new File([blob], element.fileName, {
+          type: element.fileType
+        })
+
+        files.value.push(file)
+      }
     } else {
       console.error('Failed to fetch attachments:', response)
     }
@@ -304,6 +449,28 @@ const fetchAttachments = async () => {
 onMounted(() => {
   fetchAttachments()
 })
+
+// ----------------------- File Preview -----------------------
+const previewFile = ref(null)
+const isPreviewModalOpen = ref(false)
+
+const openPreview = (file) => {
+  previewFile.value = {
+    name: file.name,
+    url: URL.createObjectURL(file),
+    type: file.type,
+    size: file.size
+  }
+  isPreviewModalOpen.value = true
+}
+
+const closePreview = () => {
+  if (previewFile.value?.url) {
+    URL.revokeObjectURL(previewFile.value.url)
+  }
+  previewFile.value = null
+  isPreviewModalOpen.value = false
+}
 </script>
 
 <template>
@@ -438,58 +605,70 @@ onMounted(() => {
           <label class="block text-base font-medium text-[#9391e4]">
             Attachments
           </label>
-          <!-- Have File -->
           <div v-if="files.length > 0">
-            <div class="max-w-md mb-4">
-              <p class="text-sm text-customRed mb-2">
-                <span
-                  >เอาไว้ใส่ message ที่แบคส่งมา ขนาดไฟล์เกิน , ชื่อซ้ำ
-                </span>
+            <div>
+              <p
+                v-if="messageResponse"
+                class="whitespace-pre-wrap text-sm mb-2"
+                :class="{
+                  'text-green-500': messageResponseType === 'success',
+                  'text-red-500': messageResponseType === 'error'
+                }"
+              >
+                <span>{{ messageResponse }}</span>
               </p>
+
               <!-- Upload Section -->
-              <!-- ปุ่มนี้จะหายด้วยถ้า file ครบ 10 -->
-              <div class="grid grid-cols-4 gap-4">
-                <div
-                  v-if="files.length < maxFiles"
-                  class="flex items-center justify-center border-2 border-dashed rounded-lg p-6 cursor-pointer hover:bg-gray-50"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 text-gray-300"
-                    viewBox="0 0 24 24"
+              <div
+                class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+              >
+                <div v-if="files.length < maxFiles" class="relative">
+                  <div
+                    class="flex items-center justify-center border-2 border-dashed rounded-lg h-full cursor-pointer hover:bg-gray-100 transition ease-in-out duration-150"
                   >
-                    <path
-                      fill="currentColor"
-                      d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1"
+                    <!-- Add file -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-8 w-8 text-gray-300"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M15 12.5h-2.5V15a.5.5 0 0 1-1 0v-2.5H9a.5.5 0 0 1 0-1h2.5V9a.5.5 0 0 1 1 0v2.5H15a.5.5 0 0 1 0 1"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065"
+                      />
+                    </svg>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      multiple
+                      @change="handleFileChange"
+                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <path
-                      fill="currentColor"
-                      d="M12 21.932A9.934 9.934 0 1 1 21.932 12A9.944 9.944 0 0 1 12 21.932m0-18.867A8.934 8.934 0 1 0 20.932 12A8.944 8.944 0 0 0 12 3.065"
-                    />
-                  </svg>
+                  </div>
                 </div>
-                <!-- File Item -->
                 <div
                   v-for="(file, index) in files"
                   :key="index"
-                  class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
+                  class="flex flex-col items-start bg-gray-100 hover:bg-gray-200 rounded-lg p-2 relative"
                 >
-                  <!-- thumbnail -->
                   <div
-                    class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
+                    class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
                   >
-                    <p v-if="isImage(file)" class="text-xs text-gray-600">
-                      <img
-                        :src="file.url || getFileIcon(file)"
-                        alt="Preview"
-                        class="object-cover w-full h-full rounded"
+                    <!-- File Icon or Preview -->
+                    <div
+                      class="w-full h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center"
+                    >
+                      <Iconfile
+                        :file="file"
+                        :fileContent="fileContent[index]"
+                        @click="openPreview(file)"
                       />
-                    </p>
-                    <p v-else class="text-xs text-gray-600 truncate">
-                      {{ file.name }}
-                    </p>
+                    </div>
 
-                    <!-- Delete Button -->
                     <button
                       @click="removeFile(index)"
                       class="absolute top-1 right-1 flex items-center justify-center w-5 h-5 rounded-full bg-red-100 hover:bg-red-200"
@@ -506,57 +685,69 @@ onMounted(() => {
                       </svg>
                     </button>
                   </div>
-                  <p class="text-xs text-gray-600 truncate">
+                  <p
+                    @click="openPreview(file)"
+                    class="text-xs text-gray-600 truncate w-full overflow-hidden"
+                  >
                     {{ file.name }}
                   </p>
-                  <p class="text-xs text-gray-600 truncate">
-                    {{ (file.size / 1024).toFixed(2) }}
+                  <p
+                    @click="openPreview(file)"
+                    class="text-xs text-gray-600 truncate"
+                  >
+                    {{ (file.size / (1024 * 1024)).toFixed(2) }} MB
                   </p>
                 </div>
               </div>
             </div>
+            <PreviewFile
+              v-if="isPreviewModalOpen"
+              :file="previewFile"
+              @close="closePreview"
+            />
           </div>
           <!-- No have File -->
           <div v-else>
             <div>
               <div class="grid grid-cols-1 space-y-4">
                 <div class="flex items-center justify-center w-full">
-                  <label
-                    for="file-upload"
-                    class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-60 p-6 group text-center cursor-pointer transition duration-300 ease-in-out"
-                  >
-                    <div
-                      class="h-full w-full text-center flex flex-col justify-center items-center"
+                  <!-- ใช้ for เชื่อมกับ input -->
+                  <div class="relative w-full h-60">
+                    <!-- ปุ่มอัปโหลด -->
+                    <label
+                      for="file-upload"
+                      class="flex flex-col items-center rounded-lg border-2 border-dashed w-full h-full p-6 group text-center cursor-pointer transition duration-300 ease-in-out"
                     >
-                      <div class="flex flex-auto max-h-40 w-1/3 mx-auto">
-                        <img
-                          class="has-mask object-contain"
-                          src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg"
-                          alt="upload illustration"
-                        />
+                      <div
+                        class="h-full w-full text-center flex flex-col justify-center items-center"
+                      >
+                        <div class="flex flex-auto max-h-40 w-1/3 mx-auto">
+                          <img
+                            class="has-mask object-contain"
+                            src="https://img.freepik.com/free-vector/image-upload-concept-landing-page_52683-27130.jpg?size=338&ext=jpg"
+                            alt="upload illustration"
+                          />
+                        </div>
+                        <p class="pointer-none text-gray-500">
+                          <span class="text-sm">Drag and drop</span> files here
+                          <br />
+                          or
+                          <span class="text-blue-500 underline cursor-pointer">
+                            select a file
+                          </span>
+                          from your computer
+                        </p>
                       </div>
-
-                      <p class="pointer-none text-gray-500">
-                        <span class="text-sm">Drag and drop</span> files here
-                        <br />
-                        or
-                        <span
-                          class="text-blue-500 underline cursor-pointer"
-                          id="trigger-file-input"
-                        >
-                          select a file
-                        </span>
-                        from your computer
-                      </p>
-                    </div>
+                    </label>
 
                     <input
                       id="file-upload"
                       type="file"
-                      class="hidden"
-                      @change="handleFileUpload"
+                      multiple
+                      @change="handleFileChange"
+                      class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                  </label>
+                  </div>
                 </div>
               </div>
 
@@ -569,31 +760,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-
-        <!-- <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
-          <h2 class="text-lg font-bold mb-2" style="color: #9391e4">Attachments</h2>
-          <div v-if="todo.attachments.length > 0">
-            <ul>
-              <li v-for="(attachment, index) in todo.attachments" :key="index" class="flex items-center mb-2">
-                <a :href="attachment.fileUrl" target="_blank" class="text-blue-500 underline flex-grow">
-                  {{ attachment.fileName }}
-                </a>
-                <button @click="removeAttachment(index)" class="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
-                  title="Remove">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    viewBox="0 0 16 16">
-                    <path
-                      d="M4.646 4.646a.5.5 0 011 0L8 6.707l2.354-2.061a.5.5 0 01.707.707L8.707 7.414l2.061 2.353a.5.5 0 01-.707.707L8 8.707l-2.354 2.354a.5.5 0 01-.707-.707L7.293 7.414 5.232 5.061a.5.5 0 010-.707z" />
-                  </svg>
-                </button>
-              </li>
-            </ul>
-          </div>
-
-          <div v-else class="italic text-gray-500">No attachments available</div>
-          
-        </div> -->
-        <!-- </div> -->
 
         <!-- Metadata Section -->
         <div class="grid grid-cols-3 gap-4 text-sm text-gray-600">
@@ -681,21 +847,22 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Save & Close Button -->
+        <!-- Save & Cancel Button -->
         <div class="px-6 py-4 flex justify-end border-t border-gray-200">
           <button
             @click="closeModal"
             class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
           >
-            Close
+            Cancel
           </button>
           <button
             @click="UpdateTask"
             :disabled="!isFormValid || checkEqual || isLimitReached"
             :class="{
-              disabled: !isFormValid || checkEqual || isLimitReached
+              'opacity-50 cursor-not-allowed':
+                !isFormValid || checkEqual || isLimitReached
             }"
-            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
+            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none"
           >
             Save
           </button>

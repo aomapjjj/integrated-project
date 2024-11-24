@@ -22,6 +22,7 @@ import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
 import java.io.IOException;
@@ -49,14 +50,20 @@ public class BoardController {
     private EmailSenderService emailSenderService;
     @Autowired
     private FileService fileService;
-
+    MicrosoftUser microsoftUser = null;
 
     private String getUserId(HttpServletRequest request) {
         String userId = null;
         String jwtToken = request.getHeader("Authorization");
         if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
-            userId = jwtTokenUtil.getAllClaimsFromToken(jwtToken.substring(7)).get("oid").toString();
+            try {
+                userId = jwtTokenUtil.getAllClaimsFromToken(jwtToken.substring(7)).get("oid").toString();
+            } catch (Exception e) {
+                microsoftUser  = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken.substring(7));
+                userId = microsoftUser.getOid();
+            }
         }
+
         return userId;
     }
 
@@ -69,6 +76,7 @@ public class BoardController {
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponseDTO> getBoardById(@PathVariable String boardId, HttpServletRequest request) {
         String userId = getUserId(request);
+        System.out.println(userId);
         String collaboratorId = getUserId(request);
         boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         BoardResponseDTO boardResponse = boardService.getBoardById(boardId);
@@ -154,24 +162,36 @@ public class BoardController {
     // ----------------------- File -----------------------
     // Get File
     @GetMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<List<AttachmentDTO>> getAttachments(@PathVariable String boardId, @PathVariable Integer taskId) {
+    public ResponseEntity<List<AttachmentDTO>> getAttachments(@PathVariable String boardId, @PathVariable Integer taskId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         List<AttachmentDTO> attachments = fileService.getAttachments(taskId);
         return ResponseEntity.ok(attachments);
     }
     // Download File
     @GetMapping("/{boardId}/tasks/{taskId}/attachments/{filename:.+}")
-    public ResponseEntity<Resource> downloadAttachment(@PathVariable Integer taskId, @PathVariable String filename) {
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable String filename, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         return fileService.downloadAttachment(taskId, filename);
     }
     // Upload File
     @PostMapping("/{boardId}/tasks/{taskId}/attachments")
-    public ResponseEntity<AttachmentResponseDTO> addAttachments(@PathVariable String boardId, @PathVariable Integer taskId, @RequestParam("files") List<MultipartFile> files) throws IOException {
+    public ResponseEntity<AttachmentResponseDTO> addAttachments(@PathVariable String boardId, @PathVariable Integer taskId, @RequestParam("files") List<MultipartFile> files, HttpServletRequest request) throws IOException {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         AttachmentResponseDTO response = fileService.addAttachments(taskId, files);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // Delete File
     @DeleteMapping("/{boardId}/tasks/{taskId}/attachments/{attachmentId}")
-    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId) {
+    public ResponseEntity<AttachmentDTO> deleteAttachment(@PathVariable String boardId, @PathVariable Integer taskId, @PathVariable Integer attachmentId, HttpServletRequest request) {
+        String userId = getUserId(request);
+        String collaboratorId = getUserId(request);
+        boardService.checkOwnerAndVisibility(boardId, userId, request.getMethod(), collaboratorId);
         AttachmentDTO deletedAttachment = fileService.deleteAttachment(attachmentId);
         return ResponseEntity.ok(deletedAttachment);
     }

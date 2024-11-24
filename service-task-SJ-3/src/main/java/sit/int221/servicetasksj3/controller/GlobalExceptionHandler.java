@@ -6,11 +6,18 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.method.ParameterValidationResult;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentDTO;
+import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.exceptions.*;
 
 import java.time.ZoneId;
@@ -70,6 +77,15 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.badRequest().body(errorDetails);
     }
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorDetails> handleHandlerMethodValidationException (HandlerMethodValidationException exception, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.BAD_REQUEST.value(), "Validation error. Check 'errors' field for details.", request.getDescription(false));
+        for (ParameterValidationResult param : exception.getAllValidationResults()) {
+            errorDetails.addValidationError(param.getMethodParameter().getParameterName(), param.getResolvableErrors().get(0).getDefaultMessage());
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+    }
     // 400 - HttpMessageNotReadableException: Bad Request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorDetails> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
@@ -79,7 +95,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
         List<ErrorDetails.ValidationError> errors = List.of(
-                new ErrorDetails.ValidationError("files","Maximum upload size exceeded. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
+                new ErrorDetails.ValidationError("files","Some files were not uploaded due to size limits. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
                 )
         );
         return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);

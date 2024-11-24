@@ -23,8 +23,6 @@ import java.util.List;
 public class TaskController {
     @Autowired
     private TaskService service;
-    @Autowired
-    private ModelMapper modelMapper;
 
     //GET ALL TASKS V.2
     @GetMapping("")

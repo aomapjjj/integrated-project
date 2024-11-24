@@ -4,6 +4,8 @@ import { ref, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
 import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
 import { useBoard } from '@/stores/storeBoard.js'
+import authConfig from '@/libs/authConfig.js'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -41,11 +43,18 @@ function toggleDropdown() {
   isExpanded.value = !isExpanded.value
 }
 
-// Log out
+
 const clearToken = () => {
+ if(userStore.getLoginMicrosoftSuccess() === true){
+  authConfig.logoff()
   localStorage.clear()
   localStorage.removeItem('access_token')
   router.push({ name: 'Login' })
+ }else{
+  localStorage.clear()
+  localStorage.removeItem('access_token')
+  router.push({ name: 'Login' })
+ }
 }
 
 const toBoardsList = (boardId) => {
@@ -64,7 +73,7 @@ const toBoardsList = (boardId) => {
   <div
     id="sidebar"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    class="hs-overlay fixed top-0 left-0 bottom-0 z-40 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
+    class="hs-overlay fixed top-0 left-0 bottom-0 z-20 w-64 bg-white border-e border-gray-200 pt-7 overflow-y-auto transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:relative lg:flex lg:flex-col lg:h-screen"
     role="dialog"
     tabindex="-1"
     aria-label="Sidebar"
@@ -243,16 +252,16 @@ const toBoardsList = (boardId) => {
     </nav>
     <!-- Footer with User Info -->
     <div
-      class="mt-auto p-4 fixed bottom-0 left-0 w-full lg:relative lg:mt-auto"
+      class="mt-auto p-2 fixed bottom-0 left-0 w-full lg:relative lg:mt-auto"
     >
       <div
-        class="flex items-center justify-between border border-gray-100 p-3 rounded-full shadow-lg max-w-xs mx-auto"
+        class="flex items-center justify-between border border-gray-100 p-2 rounded-full shadow-sm max-w-xs mx-auto"
       >
         <div class="flex items-center gap-2">
           <!-- User Icon -->
           <div class="avatar placeholder relative group">
             <div
-              class="bg-neutral text-neutral-content w-10 h-10 rounded-full group-hover:bg-gray-200 relative"
+              class="bg-neutral text-neutral-content w-10 h-10 overflow-hidden rounded-full group-hover:bg-gray-200 relative"
             >
               <!-- Add profile -->
               <span
@@ -310,20 +319,18 @@ const toBoardsList = (boardId) => {
         <div class="mt-3">
           <button class="itbkk-sign-out group" @click="clearToken()">
             <svg
-              class="size-5"
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              class="size-5"
+              viewBox="0 0 512 512"
             >
               <path
                 fill="none"
                 stroke="#eb4343"
+                class="group-hover:stroke-red-600"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M15 17.625c-.074 1.852-1.617 3.424-3.684 3.374c-.481-.012-1.076-.18-2.265-.515c-2.861-.807-5.345-2.164-5.941-5.203C3 14.724 3 14.095 3 12.837v-1.674c0-1.257 0-1.886.11-2.445c.596-3.038 3.08-4.395 5.941-5.202c1.19-.335 1.784-.503 2.265-.515c2.067-.05 3.61 1.522 3.684 3.374M21 12H10m11 0c0-.7-1.994-2.008-2.5-2.5M21 12c0 .7-1.994 2.008-2.5 2.5"
-                class="group-hover:stroke-red-400"
+                stroke-width="32"
+                d="M304 336v40a40 40 0 0 1-40 40H104a40 40 0 0 1-40-40V136a40 40 0 0 1 40-40h152c22.09 0 48 17.91 48 40v40m64 160l80-80l-80-80m-192 80h256"
               />
             </svg>
           </button>

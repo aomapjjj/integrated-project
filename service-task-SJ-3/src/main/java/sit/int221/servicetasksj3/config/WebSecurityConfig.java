@@ -27,19 +27,16 @@ public class WebSecurityConfig {
     private JwtAuthFilter jwtAuthFilter;
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
-//    @Autowired
-//    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.disable()).authorizeRequests(
                         authorize -> authorize.requestMatchers("/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/v3/boards/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/token").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/v3/boards/**").permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults());
-//                .exceptionHandling(handling -> handling.authenticationEntryPoint(customAuthenticationEntryPoint));
         return httpSecurity.build();
     }
 

@@ -386,7 +386,6 @@ async function getAttachments(boardId, taskId) {
         }
       }
     )
-
     const statusCode = response.status
     const responseData = await response.json()
     return { statusCode, data: responseData }
@@ -397,7 +396,14 @@ async function getAttachments(boardId, taskId) {
 }
 
 async function addAttachments(boardId, taskId, files) {
+  if (!boardId || !taskId) {
+    throw new Error('Board ID or Task ID is missing')
+  }
+
   const token = getToken()
+  if (!token) {
+    throw new Error('Authentication failed')
+  }
   const formData = new FormData()
   files.forEach((file) => formData.append('files', file))
 
@@ -445,6 +451,38 @@ async function deleteAttachment(boardId, taskId, attachmentId) {
   }
 }
 
+const downloadAttachment = async (boardId, taskId, filename) => {
+  const token = getToken()
+  try {
+    const response = await fetch(
+      `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${filename}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+    if (response.ok) {
+      const blob = await response.blob() // รับข้อมูลเป็น Blob
+      const fileUrl = URL.createObjectURL(blob)
+
+      // ใช้ Programmatic File Download
+      const link = new URL(fileUrl)
+      const anchor = new URL('', link.origin)
+      anchor.href = fileUrl
+      anchor.download = fileName.value // ตั้งชื่อไฟล์
+      anchor.dispatchEvent(new MouseEvent('click')) // กระตุ้นการดาวน์โหลด
+
+      URL.revokeObjectURL(fileUrl)
+    } else {
+      console.error(`Failed to load attachment: ${response.statusText}`)
+    }
+  } catch (error) {
+    console.error('Error downloading file:', error)
+  }
+}
+
 const validateAccessToken = async (token) => {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
@@ -458,6 +496,33 @@ const validateAccessToken = async (token) => {
   )
   return response
 }
+const validateMicrosoftAccessToken = async (token) => {
+  try {
+    const response = await fetch('https://graph.microsoft.com/v1.0/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Token validation failed: ${response.status} ${response.statusText}`)
+    }
+    const data = await response.json()
+    return {
+      valid: true,
+      data, 
+    }
+  } catch (error) {
+    console.error('Error validating token:', error)
+    return {
+      valid: false,
+      error: error.message,
+    }
+  }
+}
+
 
 const refreshAccessToken = async (refreshToken) => {
   const response = await fetch(
@@ -496,5 +561,8 @@ export {
   refreshAccessToken,
   addAttachments,
   deleteAttachment,
-  getAttachments
+  getAttachments,
+  downloadAttachment,
+  validateMicrosoftAccessToken
+
 }
