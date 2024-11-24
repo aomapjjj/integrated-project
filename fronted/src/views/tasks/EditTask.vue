@@ -13,7 +13,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLimitStore } from '../../stores/storeLimit'
 import PreviewFile from '../../component/files/PreviewFile.vue'
 import Iconfile from '@/component/files/Iconfile.vue'
-// import UploadFile from '@/component/files/UploadFile.vue'
+import WaitModal from '@/component/modal/WaitModal.vue'
 
 // ----------------------- Router -----------------------
 
@@ -41,6 +41,8 @@ const props = defineProps({
   todoId: Number,
   disabledBtn: Boolean
 })
+
+const waitModal = ref(false)
 
 // ----------------------- Params -----------------------
 
@@ -124,7 +126,7 @@ const UpdateTask = async () => {
   if (isLimitReached.value) {
     return
   }
-
+  waitModal.value = true
   const trimmedTodo = {
     title: todo.value.title?.trim(),
     description: todo.value.description?.trim(),
@@ -185,6 +187,9 @@ const UpdateTask = async () => {
     console.error('Error updating task:', error)
     messageResponse.value = 'Unexpected error occurred.'
     messageResponseType.value = 'error'
+  } finally {
+    waitModal.value = false
+    // isLoading.value = false
   }
 }
 
@@ -511,14 +516,28 @@ const closePreview = () => {
       </g>
     </svg>
   </button>
+
   <!-- Modal window -->
   <dialog
     ref="myModal"
-    class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
+    class="itbkk-modal-task modal w-full h-full flex inset-0 z-30 items-center justify-center"
   >
+
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
     >
+      
+    <WaitModal :is-loading="waitModal">
+      <template #default>
+        <p class="text-gray-700">
+          We're working on uploading your file. <br />
+          This won't take long!
+        </p>
+        <p class="text-sm text-gray-500">
+          Thank you for your patience while we process your file.
+        </p>
+      </template>
+    </WaitModal>
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">
@@ -572,8 +591,9 @@ const closePreview = () => {
             placeholder="No Description Provided"
             class="itbkk-description w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg h-24"
           >
-          {{ todo.description }}
-          </textarea>
+        {{ todo.description }}
+      </textarea
+          >
           <p class="text-sm text-gray-500 text-right mt-1">
             {{ descriptionLength }}/500
           </p>
@@ -593,8 +613,9 @@ const closePreview = () => {
             placeholder="Unassigned"
             class="itbkk-assignees w-full px-4 py-2 border border-gray-300 rounded-lg"
           >
-          {{ todo.assignees }}
-          </textarea>
+        {{ todo.assignees }}
+      </textarea
+          >
           <p class="text-sm text-gray-500 text-right mt-1">
             {{ assigneesLength }}/30
           </p>
