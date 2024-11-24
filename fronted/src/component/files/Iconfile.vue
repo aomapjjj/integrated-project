@@ -12,6 +12,14 @@ const props = defineProps({
   }
 })
 
+const basePath = {
+  document: '/image/files/DocumentFile/',
+  image: '/image/files/ImageFile/',
+  videoAudio: '/image/files/VideoAndAudio/',
+  fileAndCode: '/image/files/FileAndCode/',
+  default: '/image/files/ImageFile/default.png'
+}
+
 const fileExtension = computed(() => {
   if (!props.file.name) return 'default'
   return props.file.name.split('.').pop().toLowerCase()
@@ -45,39 +53,51 @@ const getFilePreview = (file) => {
 const fileIcon = computed(() => {
   const icons = {
     // Document Files
-    pdf: '/image/files/DocumentFile/text_color_pdf.png',
-    doc: '/image/files/DocumentFile/text_color_doc.png',
-    docx: '/image/files/DocumentFile/text_color_doc.png',
-    xls: '/image/files/DocumentFile/text_color_xls.png',
-    xlsx: '/image/files/DocumentFile/text_color_xls.png',
-    txt: '/image/files/DocumentFile/text_color_txt.png',
-    csv: '/image/files/DocumentFile/text_color_csv.png',
-    ppt: '/image/files/DocumentFile/text_color_ppt.png',
+    pdf: `${basePath.document}text_color_pdf.png`,
+    doc: `${basePath.document}text_color_doc.png`,
+    docx: `${basePath.document}text_color_doc.png`,
+    xls: `${basePath.document}text_color_xls.png`,
+    xlsx: `${basePath.document}text_color_xls.png`,
+    txt: `${basePath.document}text_color_txt.png`,
+    csv: `${basePath.document}text_color_csv.png`,
+    ppt: `${basePath.document}text_color_ppt.png`,
 
     // Image Files
-    png: '/image/files/ImageFile/text_color_png.png',
-    jpg: '/image/files/ImageFile/text_color_jpg.png',
-    jpeg: '/image/files/ImageFile/text_color_jpeg.png',
-    gif: '/image/files/ImageFile/text_color_gif.png',
-    ico: '/image/files/ImageFile/text_color_ico.png',
-    svg: '/image/files/ImageFile/text_color_svg.png',
-    tiff: '/image/files/ImageFile/text_color_tiff.png',
-    webp: '/image/files/ImageFile/text_color_webp.png',
+    png: `${basePath.image}text_color_png.png`,
+    jpg: `${basePath.image}text_color_jpg.png`,
+    jpeg: `${basePath.image}text_color_jpeg.png`,
+    gif: `${basePath.image}text_color_gif.png`,
+    ico: `${basePath.image}text_color_ico.png`,
+    svg: `${basePath.image}text_color_svg.png`,
+    tiff: `${basePath.image}text_color_tiff.png`,
+    webp: `${basePath.image}text_color_webp.png`,
 
     // Video and Audio Files
-    avi: '/image/files/VideoAndAudio/text_color_avi.png',
-    mov: '/image/files/VideoAndAudio/text_color_mov.png',
-    mp3: '/image/files/VideoAndAudio/text_color_mp3.png',
-    mp4: '/image/files/VideoAndAudio/text_color_mp4.png',
-    mpg: '/image/files/VideoAndAudio/text_color_mpg.png',
-    wav: '/image/files/VideoAndAudio/text_color_wav.png',
+    avi: `${basePath.videoAudio}text_color_avi.png`,
+    mov: `${basePath.videoAudio}text_color_mov.png`,
+    mp3: `${basePath.videoAudio}text_color_mp3.png`,
+    mp4: `${basePath.videoAudio}text_color_mp4.png`,
+    mpg: `${basePath.videoAudio}text_color_mpg.png`,
+    wav: `${basePath.videoAudio}text_color_wav.png`,
+
+    // File and Code Files
+    css: `${basePath.fileAndCode}text_color_css.png`,
+    dmg: `${basePath.fileAndCode}text_color_dmg.png`,
+    exe: `${basePath.fileAndCode}text_color_exe.png`,
+    html: `${basePath.fileAndCode}text_color_html.png`,
+    java: `${basePath.fileAndCode}text_color_java.png`,
+    js: `${basePath.fileAndCode}text_color_js.png`,
+    json: `${basePath.fileAndCode}text_color_json.png`,
+    rar: `${basePath.fileAndCode}text_color_rar.png`,
+    zip: `${basePath.fileAndCode}text_color_zip.png`,
 
     // Default Icon
-    default: '/image/files/ImageFile/default.png'
+    default: basePath.default
   }
 
   return icons[fileExtension.value] || icons.default
 })
+
 console.log(fileIcon.value)
 
 // const getOnlineViewerUrl = computed(() => {
