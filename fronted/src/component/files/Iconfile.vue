@@ -45,35 +45,35 @@ const getFilePreview = (file) => {
 const fileIcon = computed(() => {
   const icons = {
     // Document Files
-    pdf: '/files/DocumentFile/text_color_pdf.png',
-    doc: '/files/DocumentFile/text_color_doc.png',
-    docx: '/files/DocumentFile/text_color_doc.png',
-    xls: '/files/DocumentFile/text_color_xls.png',
-    xlsx: '/files/DocumentFile/text_color_xls.png',
-    txt: '/files/DocumentFile/text_color_txt.png',
-    csv: '/files/DocumentFile/text_color_csv.png',
-    ppt: '/files/DocumentFile/text_color_ppt.png',
+    pdf: '/image/files/DocumentFile/text_color_pdf.png',
+    doc: '/image/files/DocumentFile/text_color_doc.png',
+    docx: '/image/files/DocumentFile/text_color_doc.png',
+    xls: '/image/files/DocumentFile/text_color_xls.png',
+    xlsx: '/image/files/DocumentFile/text_color_xls.png',
+    txt: '/image/files/DocumentFile/text_color_txt.png',
+    csv: '/image/files/DocumentFile/text_color_csv.png',
+    ppt: '/image/files/DocumentFile/text_color_ppt.png',
 
     // Image Files
-    png: '/files/ImageFile/text_color_png.png',
-    jpg: '/files/ImageFile/text_color_jpg.png',
-    jpeg: '/files/ImageFile/text_color_jpeg.png',
-    gif: '/files/ImageFile/text_color_gif.png',
-    ico: '/files/ImageFile/text_color_ico.png',
-    svg: '/files/ImageFile/text_color_svg.png',
-    tiff: '/files/ImageFile/text_color_tiff.png',
-    webp: '/files/ImageFile/text_color_webp.png',
+    png: '/image/files/ImageFile/text_color_png.png',
+    jpg: '/image/files/ImageFile/text_color_jpg.png',
+    jpeg: '/image/files/ImageFile/text_color_jpeg.png',
+    gif: '/image/files/ImageFile/text_color_gif.png',
+    ico: '/image/files/ImageFile/text_color_ico.png',
+    svg: '/image/files/ImageFile/text_color_svg.png',
+    tiff: '/image/files/ImageFile/text_color_tiff.png',
+    webp: '/image/files/ImageFile/text_color_webp.png',
 
     // Video and Audio Files
-    avi: '/files/VideoAndAudio/text_color_avi.png',
-    mov: '/files/VideoAndAudio/text_color_mov.png',
-    mp3: '/files/VideoAndAudio/text_color_mp3.png',
-    mp4: '/files/VideoAndAudio/text_color_mp4.png',
-    mpg: '/files/VideoAndAudio/text_color_mpg.png',
-    wav: '/files/VideoAndAudio/text_color_wav.png',
+    avi: '/image/files/VideoAndAudio/text_color_avi.png',
+    mov: '/image/files/VideoAndAudio/text_color_mov.png',
+    mp3: '/image/files/VideoAndAudio/text_color_mp3.png',
+    mp4: '/image/files/VideoAndAudio/text_color_mp4.png',
+    mpg: '/image/files/VideoAndAudio/text_color_mpg.png',
+    wav: '/image/files/VideoAndAudio/text_color_wav.png',
 
     // Default Icon
-    default: '/files/default.png'
+    default: '/image/files/default.png'
   }
 
   return icons[fileExtension.value] || icons.default
