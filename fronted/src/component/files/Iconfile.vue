@@ -17,7 +17,6 @@ const basePath = {
   image: '/image/files/ImageFile/',
   videoAudio: '/image/files/VideoAndAudio/',
   fileAndCode: '/image/files/FileAndCode/',
-  default: '/image/default.png'
 }
 
 const fileExtension = computed(() => {
@@ -168,7 +167,7 @@ console.log(fileIcon.value)
     >
     <!-- Default or Unsupported File Icon -->
     <div v-else class="flex items-center justify-center w-full h-full">
-      <img :src="fileIcon" alt="File Icon" class="w-12 h-12 object-contain" />
+      <img src="/image/default.png" alt="File Icon" class="w-12 h-12 object-contain" />
     </div>
   </div>
 </template>
