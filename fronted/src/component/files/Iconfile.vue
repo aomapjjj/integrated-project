@@ -17,7 +17,7 @@ const basePath = {
   image: '/image/files/ImageFile/',
   videoAudio: '/image/files/VideoAndAudio/',
   fileAndCode: '/image/files/FileAndCode/',
-  default: '/image/files/ImageFile/default.png'
+  default: '/image/default.png'
 }
 
 const fileExtension = computed(() => {
@@ -51,52 +51,79 @@ const getFilePreview = (file) => {
 }
 
 const fileIcon = computed(() => {
-  const icons = {
+  switch (fileExtension.value) {
     // Document Files
-    pdf: `${basePath.document}text_color_pdf.png`,
-    doc: `${basePath.document}text_color_doc.png`,
-    docx: `${basePath.document}text_color_doc.png`,
-    xls: `${basePath.document}text_color_xls.png`,
-    xlsx: `${basePath.document}text_color_xls.png`,
-    txt: `${basePath.document}text_color_txt.png`,
-    csv: `${basePath.document}text_color_csv.png`,
-    ppt: `${basePath.document}text_color_ppt.png`,
+    case 'pdf':
+      return `${basePath.document}text_color_pdf.png`;
+    case 'doc':
+    case 'docx':
+      return `${basePath.document}text_color_doc.png`;
+    case 'xls':
+    case 'xlsx':
+      return `${basePath.document}text_color_xls.png`;
+    case 'txt':
+      return `${basePath.document}text_color_txt.png`;
+    case 'csv':
+      return `${basePath.document}text_color_csv.png`;
+    case 'ppt':
+      return `${basePath.document}text_color_ppt.png`;
 
     // Image Files
-    png: `${basePath.image}text_color_png.png`,
-    jpg: `${basePath.image}text_color_jpg.png`,
-    jpeg: `${basePath.image}text_color_jpeg.png`,
-    gif: `${basePath.image}text_color_gif.png`,
-    ico: `${basePath.image}text_color_ico.png`,
-    svg: `${basePath.image}text_color_svg.png`,
-    tiff: `${basePath.image}text_color_tiff.png`,
-    webp: `${basePath.image}text_color_webp.png`,
+    case 'png':
+      return `${basePath.image}text_color_png.png`;
+    case 'jpg':
+      return `${basePath.image}text_color_jpg.png`;
+    case 'jpeg':
+      return `${basePath.image}text_color_jpeg.png`;
+    case 'gif':
+      return `${basePath.image}text_color_gif.png`;
+    case 'ico':
+      return `${basePath.image}text_color_ico.png`;
+    case 'svg':
+      return `${basePath.image}text_color_svg.png`;
+    case 'tiff':
+      return `${basePath.image}text_color_tiff.png`;
+    case 'webp':
+      return `${basePath.image}text_color_webp.png`;
 
     // Video and Audio Files
-    avi: `${basePath.videoAudio}text_color_avi.png`,
-    mov: `${basePath.videoAudio}text_color_mov.png`,
-    mp3: `${basePath.videoAudio}text_color_mp3.png`,
-    mp4: `${basePath.videoAudio}text_color_mp4.png`,
-    mpg: `${basePath.videoAudio}text_color_mpg.png`,
-    wav: `${basePath.videoAudio}text_color_wav.png`,
+    case 'avi':
+      return `${basePath.videoAudio}text_color_avi.png`;
+    case 'mov':
+      return `${basePath.videoAudio}text_color_mov.png`;
+    case 'mp3':
+      return `${basePath.videoAudio}text_color_mp3.png`;
+    case 'mp4':
+      return `${basePath.videoAudio}text_color_mp4.png`;
+    case 'mpg':
+      return `${basePath.videoAudio}text_color_mpg.png`;
+    case 'wav':
+      return `${basePath.videoAudio}text_color_wav.png`;
 
     // File and Code Files
-    css: `${basePath.fileAndCode}text_color_css.png`,
-    dmg: `${basePath.fileAndCode}text_color_dmg.png`,
-    exe: `${basePath.fileAndCode}text_color_exe.png`,
-    html: `${basePath.fileAndCode}text_color_html.png`,
-    java: `${basePath.fileAndCode}text_color_java.png`,
-    js: `${basePath.fileAndCode}text_color_js.png`,
-    json: `${basePath.fileAndCode}text_color_json.png`,
-    rar: `${basePath.fileAndCode}text_color_rar.png`,
-    zip: `${basePath.fileAndCode}text_color_zip.png`,
+    case 'css':
+      return `${basePath.fileAndCode}text_color_css.png`;
+    case 'dmg':
+      return `${basePath.fileAndCode}text_color_dmg.png`;
+    case 'exe':
+      return `${basePath.fileAndCode}text_color_exe.png`;
+    case 'html':
+      return `${basePath.fileAndCode}text_color_html.png`;
+    case 'java':
+      return `${basePath.fileAndCode}text_color_java.png`;
+    case 'js':
+      return `${basePath.fileAndCode}text_color_js.png`;
+    case 'json':
+      return `${basePath.fileAndCode}text_color_json.png`;
+    case 'rar':
+      return `${basePath.fileAndCode}text_color_rar.png`;
+    case 'zip':
+      return `${basePath.fileAndCode}text_color_zip.png`;
 
-    // Default Icon
-    default: basePath.default
+    default:
+      return basePath.default;
   }
-
-  return icons[fileExtension.value] || icons.default
-})
+});
 
 console.log(fileIcon.value)
 
