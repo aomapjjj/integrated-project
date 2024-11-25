@@ -292,7 +292,7 @@ const deleteStatus = async (statusId) => {
       console.error(`Failed to delete item with ID ${statusId}`)
     }
 
-    if (status === 401) {
+    if (status === 400) {
       statusList.value = statusList.value.filter(
         (status) => status.id !== statusId
       )

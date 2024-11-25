@@ -288,8 +288,9 @@ const closeLimit = () => {
   my_modal_limit.close()
 }
 
-const handleToggleClick = () => {
+const handleToggleClick = (event) => {
   if (disabledButtonWhileOpenPublic.value) {
+    event.preventDefault()
     return
   }
   tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
@@ -611,12 +612,10 @@ const changeVisibility = async () => {
               </span>
               <div class="tooltip-arrow bg-white"></div>
             </div>
-            <div
-              class="absolute pl-12 w-1/12 h-11 z-10 bg-transparent"
-              @click="handleToggleClick"
-            ></div>
+
             <label class="relative inline-flex cursor-pointer items-center">
               <input
+                @click.prevent="handleToggleClick"
                 type="checkbox"
                 :checked="visibility == 'PRIVATE'"
                 class="itbkk-board-visibility peer sr-only"
@@ -652,6 +651,7 @@ const changeVisibility = async () => {
             :tempVisibility="tempVisibility"
             @confirm="confirmChangeVisibility"
             @cancel="cancelChange"
+            class="z-10"
           >
             <template #headerName>Board visibility changed!</template>
             <template #messageName>
