@@ -309,7 +309,7 @@ const isLimitReached = computed(() => {
               class="modal-action px-6 py-4 flex justify-end border-t border-gray-200"
             >
               <button
-                class="itbkk-button-cancel text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+                class="itbkk-button-cancel btn text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
                 @click="closeModal"
               >
                 Cancel
@@ -317,7 +317,7 @@ const isLimitReached = computed(() => {
               <form method="dialog">
                 <button
                   type="submit"
-                  class="itbkk-button-confirm text-sm ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
+                  class="itbkk-button-confirm text-sm ml-3 btn px-5 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none disabled:opacity-50"
                   :class="{
                     'opacity-50 cursor-not-allowed':
                       !isFormValid || isLimitReached

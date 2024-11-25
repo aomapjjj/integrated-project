@@ -198,84 +198,75 @@ const openModalCreate = () => {
         </BoardCard>
 
         <!------------------------- Modal ------------------------->
-        <div
+        <!-- <div
           v-if="openModalName"
           class="itbkk-modal-new fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10 lg:left-32"
         >
           <div
-            class="max-h-full w-full max-w-md overflow-y-auto sm:rounded-2xl bg-white"
+            class="max-h-full w-full max-w-md overflow-y-auto rounded-xl bg-white"
+          > -->
+        <div
+          v-if="openModalName"
+          class="itbkk-modal-new fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+        >
+          <div
+            class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 px-6 py-4 flex flex-col gap-4 transform scale-95 transition-all duration-300 ease-in-out"
           >
-            <div class="w-full">
-              <div class="m-8 my-20 max-w-[400px] mx-auto">
-                <div class="mb-8">
-                  <span
+            <div>
+              <div class="m-6 my-12 max-w-[400px] mx-auto">
+                <div class="text-center mb-4">
+                  <h2 class="text-2xl font-bold customPurple">Add New Board</h2>
+                  <p class="text-gray-500 text-sm mt-1">
+                    Make your board special < 3
+                  </p>
+                </div>
+                <!-- <div class="text-center mb-4"> -->
+                <!-- <span
                     class="block text-2xl font-bold leading-6 mb-1 customPurple text-center"
                     >New Board</span
+                  > -->
+                <div class="mb-6">
+                  <label
+                    for="boardName"
+                    class="block text-base font-bold mb-2 px-2"
                   >
-                  <div class="modal-content py-4 text-left px-6 flex-grow">
-                    <div class="label">
-                      <span
-                        class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
-                        >Title<span style="color: red"> *</span>
-                      </span>
-                      <!-- <p
-              class="text-sm text-gray-400 mb-2 mt-2"
-              style="text-align: right"
-            >
-              {{ status.name?.length }}/120
-            </p> -->
-                    </div>
-
-                    <label
-                      class="input input-bordered flex items-center gap-2 font-bold ml-4"
-                    >
-                      <input
-                        type="text"
-                        class="itbkk-board-name grow"
-                        placeholder="Board Name"
-                        v-model="userBoard.name"
-                        maxlength="120"
-                      />
-                    </label>
-                    <!-- <p class="text-sm text-gray-400 mb-2 mt-2" style="text-align: right">
-              {{ status.name?.length }}/50
-            </p> -->
+                    Board Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="boardName"
+                    type="text"
+                    placeholder="Board name"
+                    v-model="userBoard.name"
+                    maxlength="120"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-full text-gray-700 focus:ring-2 focus:ring-customPurple focus:outline-none transition duration-200"
+                  />
+                  <div class="flex justify-end items-center mx-2 mt-1">
+                    <!-- <p class="text-sm text-red-500">MessageError</p> -->
+                    <p class="text-sm text-gray-500">
+                      {{ userBoard.name.length }}/120
+                    </p>
                   </div>
                 </div>
-                <!-- <div class="space-y-4">
-                  <button
-                    class="itbkk-button-ok p-3 bg-black rounded-full text-white w-full font-semibold"
-                  >
-                    Save
-                  </button>
-
-                  <button
-                    @click="openModalName = false"
-                    class="itbkk-button-cancel p-3 bg-white border rounded-full w-full font-semibold"
-                  >
-                    Cancel
-                  </button>
-                </div> -->
-                <!-- Buttons -->
-                <div class="flex justify-center">
+                <!-- </div> -->
+                <div class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200">
+                  <router-link to="/board">
+                    <button
+                      @click="cancelAction"
+                      class="itbkk-button-cancel py-3 px-6 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </router-link>
                   <form method="dialog">
                     <button
                       type="submit"
-                      class="itbkk-button-ok btn flex-3 mr-5 bg-customPink"
+                      class="itbkk-button-ok btn py-3 px-7 rounded-full bg-customPink text-white hover:bg-[#fa619c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       @click="submitForm()"
                       :disabled="!isValidName"
                     >
                       Save
                     </button>
                   </form>
-                  <router-link to="/board">
-                    <button
-                      @click="cancelAction"
-                      class="itbkk-button-cancel btn"
-                    >
-                      Cancel
-                    </button>
-                  </router-link>
                 </div>
               </div>
             </div>
