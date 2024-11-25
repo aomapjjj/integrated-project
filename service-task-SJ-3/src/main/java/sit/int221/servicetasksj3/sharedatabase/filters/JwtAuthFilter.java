@@ -62,6 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     try {
                         if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
                             microsoftUser = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken);
+                            System.out.println(microsoftUser);
                             isTokenValid = true;
                             tokenError = "Invalid Microsoft Token";
                         } else {
@@ -93,7 +94,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
             if (microsoftUser != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.jwtUserDetailsService.loadUserByOid(microsoftUser.getOid());
+                UserDetails userDetails = this.jwtUserDetailsService.getUserDetailsMS(microsoftUser);
+                System.out.println("userDetails" + userDetails);
                 if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -11,16 +11,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import sit.int221.servicetasksj3.entities.Board;
+import sit.int221.servicetasksj3.entities.MicrosoftDetail;
+import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
+import sit.int221.servicetasksj3.repositories.MicrosoftDetailRepository;
+import sit.int221.servicetasksj3.services.BoardService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.sharedatabase.entities.Role;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -28,6 +37,13 @@ public class JwtUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private BoardService boardService;
+    @Autowired
+    private MicrosoftDetailRepository microsoftDetailRepository;
+
+
+
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -50,23 +66,53 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     public AuthUser loadUserByOid(String userName) throws UsernameNotFoundException {
-        Users users = userRepository.findById(userName).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        if(users == null) {
-            throw new UnauthorizedException(userName + " does not exist !!");
+        Users users = userRepository.findById(userName).orElse(null);
+
+        if (users != null) {
+            List<GrantedAuthority> roles = new ArrayList<>();
+            GrantedAuthority grantedAuthority = new GrantedAuthority() {
+                @Override
+                public String getAuthority() {
+                    return users.getRole().toString();
+                }
+            };
+            roles.add(grantedAuthority);
+
+            return new AuthUser(
+                    users.getUsername(),
+                    users.getPassword(),
+                    roles,
+                    users.getName(),
+                    users.getOid(),
+                    users.getEmail(),
+                    users.getRole()
+            );
+        } else {
+            return null;
         }
-        List<GrantedAuthority> roles = new ArrayList<>();
-        GrantedAuthority grantedAuthority = new GrantedAuthority() {
-            @Override
-            public String getAuthority() {
-                return users.getRole().toString();
-            }
-        };
-        roles.add(grantedAuthority);
-
-        return new AuthUser(users.getUsername(), users.getPassword(), roles,
-                users.getName(), users.getOid(), users.getEmail(), users.getRole());
     }
+    public AuthUser getUserDetailsMS(MicrosoftUser microsoftUser) {
+        AuthUser userItbkk_Shared = loadUserByOid(microsoftUser.getOid());
+        MicrosoftDetail microsoftDetail = microsoftDetailRepository.findById(microsoftUser.getOid())
+                .orElse(new MicrosoftDetail());
 
+        microsoftDetail.setOid(microsoftUser.getOid());
+        microsoftDetail.setEmail(microsoftUser.getEmail());
+        microsoftDetail.setDisplayName(microsoftUser.getDisplayName());
+        microsoftDetail.setLastLogin(LocalDateTime.now());
+
+        microsoftDetailRepository.save(microsoftDetail);
+
+        return userItbkk_Shared != null ? userItbkk_Shared : new AuthUser(
+                microsoftUser.getDisplayName(),
+                microsoftUser.getDisplayName(),
+                new ArrayList<>(),
+                microsoftUser.getDisplayName(),
+                microsoftUser.getOid(),
+                microsoftUser.getEmail(),
+                Role.STUDENT
+        );
+    }
 
 
 

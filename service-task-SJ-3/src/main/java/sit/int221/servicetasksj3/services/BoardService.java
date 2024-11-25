@@ -33,8 +33,10 @@ public class BoardService {
     private CollaboratorRepository collaboratorRepository;
     @Autowired
     private CollaboratorService collaboratorService;
+    @Autowired
+    private MicrosoftDetailRepository microsoftDetailRepository;
 
-    private String generateUniqueBoardId() {
+    public String generateUniqueBoardId() {
         String boardId;
         do {
             boardId = NanoId.generate(10);
@@ -110,18 +112,26 @@ public class BoardService {
         AuthUser currentUser = (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String oid = currentUser.getOid();
 
-
         List<Board> boards = boardRepository.findAllByUserIdOrCollaboratorId(oid);
         System.out.println("Boards found: " + boards.size());
 
         return boards.stream().map(board -> {
             BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
-
             BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
             ownerDTO.setOid(board.getOwnerId());
-            ownerDTO.setName(userRepository.findById(board.getOwnerId()).orElseThrow(() -> new ItemNotFoundException("User not found with ID: " + board.getOwnerId())).getName());
-            boardResponse.setOwner(ownerDTO);
+            ownerDTO.setName(
+                    userRepository.findById(board.getOwnerId())
+                            .map(Users::getName)
+                            .orElseGet(() ->
+                                    microsoftDetailRepository.findById(board.getOwnerId())
+                                            .map(MicrosoftDetail::getDisplayName)
+                                            .orElseThrow(() -> new ItemNotFoundException(
+                                                    "User not found with ID: " + board.getOwnerId()
+                                            ))
+                            )
+            );
 
+            boardResponse.setOwner(ownerDTO);
             return boardResponse;
         }).collect(Collectors.toList());
     }
@@ -186,13 +196,20 @@ public class BoardService {
     public BoardResponseDTO getBoardById(String id) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + id));
-        Users owner = userRepository.findById(board.getOwnerId())
-                .orElseThrow(() -> new ItemNotFoundException("Owner not found with ID: " + board.getOwnerId()));
+
 
         BoardResponseDTO boardResponse = modelMapper.map(board, BoardResponseDTO.class);
         BoardResponseDTO.OwnerDTO ownerDTO = new BoardResponseDTO.OwnerDTO();
         ownerDTO.setOid(board.getOwnerId());
-        ownerDTO.setName(owner.getName());
+        ownerDTO.setName(userRepository.findById(board.getOwnerId())
+                .map(Users::getName)
+                .orElseGet(() ->
+                        microsoftDetailRepository.findById(board.getOwnerId())
+                                .map(MicrosoftDetail::getDisplayName)
+                                .orElseThrow(() -> new ItemNotFoundException(
+                                        "Owner not found with ID: " + board.getOwnerId()
+                                ))
+                ));
         boardResponse.setOwner(ownerDTO);
         return boardResponse;
     }

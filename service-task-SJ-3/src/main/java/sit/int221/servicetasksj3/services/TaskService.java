@@ -8,10 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.TaskNewDTO;
-import sit.int221.servicetasksj3.entities.Board;
-import sit.int221.servicetasksj3.entities.Task;
-import sit.int221.servicetasksj3.entities.TaskLimit;
-import sit.int221.servicetasksj3.entities.TaskStatus;
+import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.exceptions.*;
 import sit.int221.servicetasksj3.repositories.*;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
@@ -41,6 +38,10 @@ public class TaskService {
     private CollaboratorService collaboratorService;
     @Autowired
     private FileRepository fileRepository;
+
+    @Autowired
+    MicrosoftDetailRepository microsoftDetailRepository;
+
 
 
     //GET ALL TASKS V.2
@@ -75,10 +76,17 @@ public class TaskService {
         Sort sort = Sort.by(Sort.Order.asc(sortBy != null ? sortBy : "id"));
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-        Users owner = userRepository.findById(board.getOwnerId())
-                .orElseThrow(() -> new ItemNotFoundException("Owner not found with ID: " + board.getOwnerId()));
 
-        String oid = owner.getOid();
+        String oid = userRepository.findById(board.getOwnerId())
+                .map(Users::getOid) // หากเจอใน userRepository ให้ดึง oid
+                .orElseGet(() ->
+                        microsoftDetailRepository.findById(board.getOwnerId())
+                                .map(MicrosoftDetail::getOid) // หากเจอใน microsoftDetailRepository ให้ดึง oid
+                                .orElseThrow(() -> new ItemNotFoundException(
+                                        "Owner not found with ID: " + board.getOwnerId()
+                                ))
+                );
+
         try {
             List<Task> tasks;
             if (filterStatuses != null && filterStatuses.length > 0) {

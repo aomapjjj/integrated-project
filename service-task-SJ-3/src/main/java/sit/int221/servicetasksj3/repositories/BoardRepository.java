@@ -21,4 +21,5 @@ public interface BoardRepository extends JpaRepository<Board, String> {
             "WHERE b.ownerId = :userId OR c.collaboratorId = :userId")
     List<Board> findAllByUserIdOrCollaboratorId(@Param("userId") String userId);
 
+    Optional<Board> findFirstByOwnerId(String oid);
 }
