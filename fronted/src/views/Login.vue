@@ -1,10 +1,11 @@
 <script setup>
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from "jwt-decode"
 import { useRoute, useRouter } from "vue-router"
-import { ref, computed } from 'vue'
-import { useUsers } from '../stores/storeUser'
-import { useBoard } from '@/stores/storeBoard'
-import { getItems, getBoardItems } from '../libs/fetchUtils.js'
+import { ref, computed } from "vue"
+import { useUsers } from "../stores/storeUser"
+import { useBoard } from "@/stores/storeBoard"
+import { getItems, getBoardItems } from "../libs/fetchUtils.js"
+import authConfig from "@/libs/authConfig"
 
 // ----------------------- Router -----------------------
 
@@ -26,14 +27,13 @@ const boardStore = useBoard()
 
 // ----------------------- Params -----------------------
 
-const nameJWT = ref('')
-const emailJWT = ref('')
+const nameJWT = ref("")
+const emailJWT = ref("")
 const userInfowhileLogin = ref()
-const userInput = ref('')
-const passwordInput = ref('')
+const userInput = ref("")
+const passwordInput = ref("")
 const boardId = ref()
 const referringId = computed(() => route.query.refId)
-
 
 // ----------------------- BaseUrl -----------------------
 
@@ -67,18 +67,18 @@ const isFormValid = computed(() => {
 const openHomePage = async () => {
   try {
     userStore.setUser(nameJWT.value)
-   
+
     const itemsBoards = await getItems(baseUrlboards)
     const boardIds = itemsBoards.boards.map((board) => board.id)
     boardId.value = boardIds
-   if (referringId.value) {
-      router.push({ name: 'Invitations', params: { id: referringId.value } })
+    if (referringId.value) {
+      router.push({ name: "Invitations", params: { id: referringId.value } })
     } else {
-      router.push({ name: 'TaskList', params: { id: boardId.value[0] } })
+      router.push({ name: "TaskList", params: { id: boardId.value[0] } })
     }
     userStore.setBoard(boardId.value)
   } catch (error) {
-    router.push({ name: 'Board' })
+    router.push({ name: "Board" })
   }
 }
 
@@ -89,12 +89,32 @@ const showAlert = () => {
   }, 2000)
 }
 
+const loginMicrosoft = async () => {
+  try {
+    await authConfig.login() 
+    const accountData = await authConfig.getAccount() 
+    if (accountData) {
+      const decoded = jwtDecode(localStorage.getItem("access_token"))
+      nameJWT.value = decoded.name
+      emailJWT.value = decoded.email
+      userStore.setLoginMicrosoftSuccess(true)
+      userInfowhileLogin.value = { ...decoded }
+      userStore.setUserInfo(userInfowhileLogin.value)
+      userStore.setEmail(emailJWT.value)
+      userStore.setToken(localStorage.getItem("access_token"))
+      await openHomePage()
+    }
+  } catch (error) {
+    console.error("Login process failed:", error)
+  }
+}
+
 const submitForm = async () => {
   try {
     const response = await fetch(baseUrlUsers, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         userName: userInput.value,
@@ -113,24 +133,22 @@ const submitForm = async () => {
       userInfowhileLogin.value = { ...decoded }
 
       userStore.setUserInfo(userInfowhileLogin.value)
-     
+
       userStore.setEmail(emailJWT.value)
       userStore.setRefreshToken(data.refresh_token)
       userStore.setToken(data.access_token)
 
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      localStorage.setItem("access_token", data.access_token)
+      localStorage.setItem("refresh_token", data.refresh_token)
 
       const itemsBoards = await getBoardItems(baseUrlboards)
       itemsBoards.boards.sort(
         (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
       ) //sort by createdOn
 
-
-      boardStore.setBoards(itemsBoards.boards) //set value board
+      boardStore.addNewBoards(itemsBoards.boards) //set value board
 
       boardStore.setCollabs(itemsBoards.collabs)
-    
 
       openHomePage()
     } else if (response.status === 401) {
@@ -255,7 +273,6 @@ const submitForm = async () => {
                     class="itbkk-username w-full ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Username"
                     maxlength="50"
-                    required
                   />
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ userInput.length }}/50
@@ -288,7 +305,6 @@ const submitForm = async () => {
                     class="itbkk-password w-full ml-3 px-6 py-2 border border-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-customPink"
                     placeholder="Password"
                     maxlength="14"
-                    required
                   />
                   <p class="text-xs text-gray-400 ml-auto mr-2 mt-1">
                     {{ passwordInput.length }}/14
@@ -357,30 +373,30 @@ const submitForm = async () => {
               >
                 Sign in
               </button>
-
-              <!-- Microsoft -->
-              <div class="flex flex-col mt-4 items-center">
-                <!-- <p class="text-gray-500">or sign up</p> -->
-                <div class="items-center justify-center">
-                  <button
-                    class="flex w-72 py-2 justify-center rounded-md border border-gray-400"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 21 21"
-                      width="24"
-                      height="24"
-                    >
-                      <path fill="#f25022" d="M1 1h9v9H1z"></path>
-                      <path fill="#00a4ef" d="M1 11h9v9H1z"></path>
-                      <path fill="#7fba00" d="M11 1h9v9h-9z"></path>
-                      <path fill="#ffb900" d="M11 11h9v9h-9z"></path>
-                    </svg>
-                    <p class="text-black ml-2">Sign in with Microsoft</p>
-                  </button>
-                </div>
-              </div>
             </form>
+            <!-- Microsoft -->
+            <div class="flex flex-col mt-4 items-center">
+              <!-- <p class="text-gray-500">or sign up</p> -->
+              <div class="items-center justify-center">
+                <button
+                  @click="loginMicrosoft()"
+                  class="flex w-72 py-2 justify-center rounded-md border border-gray-400"
+                >
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 21 21"
+                    width="24"
+                    height="24"
+                  >
+                    <path fill="#f25022" d="M1 1h9v9H1z"></path>
+                    <path fill="#00a4ef" d="M1 11h9v9H1z"></path>
+                    <path fill="#7fba00" d="M11 1h9v9h-9z"></path>
+                    <path fill="#ffb900" d="M11 11h9v9h-9z"></path>
+                  </svg>
+                  <p class="text-black ml-2">Sign in with Microsoft</p>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

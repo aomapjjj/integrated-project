@@ -11,9 +11,11 @@
     "cypress:run": "cypress run"
   },
   "dependencies": {
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@pinia/nuxt": "^0.5.1",
     "axios": "^1.6.8",
     "jwt-decode": "^4.0.0",
+    "msal": "^1.4.18",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.2"

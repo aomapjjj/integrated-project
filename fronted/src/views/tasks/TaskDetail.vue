@@ -4,6 +4,7 @@ import { ref, watch } from 'vue'
 import { toDate } from '../../libs/toDate'
 import { useRoute, useRouter } from 'vue-router'
 import PreviewFile from '../../component/files/PreviewFile.vue'
+import Iconfile from '@/component/files/Iconfile.vue'
 
 // ----------------------- Router -----------------------
 
@@ -110,6 +111,43 @@ const closeModal = () => {
   emit('close')
   router.push({ name: 'TaskList', params: { id: boardId.value } })
 }
+
+const getFilePreview = (file) => {
+  if (file.type.startsWith('image/')) {
+    return URL.createObjectURL(file)
+  } else if (file.type === 'application/pdf') {
+    return URL.createObjectURL(file)
+  } else if (file.type.startsWith('text/')) {
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        resolve(event.target.result)
+      }
+      reader.readAsText(file)
+    })
+  }
+  return URL.createObjectURL(file)
+}
+
+const fileContent = ref([])
+
+const loadTextFileContent = (file, index) => {
+  if (file.type.startsWith('text/')) {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      fileContent.value[index] = event.target.result
+    }
+    reader.readAsText(file)
+  }
+}
+
+watch(files, (newFiles) => {
+  newFiles.forEach((file, index) => {
+    if (file.type.startsWith('text/')) {
+      loadTextFileContent(file, index)
+    }
+  })
+})
 </script>
 
 <template>
@@ -198,7 +236,7 @@ const closeModal = () => {
         </div>
 
         <!-- Attachments Section -->
-        <div class="attachments-section border-t border-gray-300 pt-4 mt-6">
+        <div class="attachments-section">
           <label class="block text-base font-medium text-[#9391e4]">
             Attachments
           </label>
@@ -209,21 +247,31 @@ const closeModal = () => {
               <div
                 v-for="(file, index) in files"
                 :key="index"
-                class="flex flex-col items-start bg-gray-100 rounded-lg p-2"
-                @click="openPreviewFile(file)"
+                class="flex flex-col items-start bg-gray-100 hover:bg-gray-200 rounded-lg p-2"
               >
                 <div
-                  class="w-full h-14 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
+                  class="w-full h-20 bg-gray-300 rounded mb-1 relative flex items-center justify-center"
                 >
-                  <!-- preview เขียนต่อจากนี้ -->
-                  <!-- code ... -->
+                  <div
+                    class="w-full h-20 bg-gray-100 rounded overflow-hidden flex items-center justify-center"
+                  >
+                    <Iconfile
+                      :file="file"
+                      :fileContent="fileContent[index]"
+                      @click="openPreviewFile(file)"
+                    />
+                  </div>
                 </div>
                 <p
+                  @click="openPreviewFile(file)"
                   class="text-xs text-gray-600 truncate w-full overflow-hidden"
                 >
                   {{ file.name }}
                 </p>
-                <p class="text-xs text-gray-600 truncate">
+                <p
+                  @click="openPreviewFile(file)"
+                  class="text-xs text-gray-600 truncate"
+                >
                   {{ (file.size / (1024 * 1024)).toFixed(2) }} MB
                 </p>
               </div>

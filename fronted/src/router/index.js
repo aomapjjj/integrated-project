@@ -10,6 +10,7 @@ import Board from '@/views/boards/Board.vue'
 import ToLoginPage from '@/views/errorpage/ToLoginPage.vue'
 import ErrorPagePermission from '@/views/errorpage/PermissionError.vue'
 import Members from '@/views/other/Members.vue'
+
 import {
   getBoardById,
   validateAccessToken,
@@ -181,6 +182,7 @@ const routes = [
       }
     }
   },
+
   {
     path: '/auth-required',
     name: 'ToLoginPage',
@@ -196,7 +198,13 @@ const routes = [
     path: '/members',
     name: 'Members',
     component: Members
-  }
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+  },
+
+ 
 ]
 
 const router = createRouter({
@@ -236,6 +244,11 @@ const checkAuthorization = async (next, accessToken, refreshToken) => {
 router.beforeEach(async (to, from, next) => {
   const accessToken = getToken()
   const refreshToken = getRefreshToken()
+  if (to.name === "Logout") {
+    localStorage.clear();
+    localStorage.removeItem('access_token')
+    next({ name: "Login" });
+  }
 
   if (to.name === 'board' && to.params.id) {
     const boardId = to.params.id

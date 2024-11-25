@@ -50,6 +50,7 @@ watch(
 
 // ----------------------- List Items -----------------------
 
+const attachmentsNumber = ref()
 const todoList = ref([])
 const statusList = ref([])
 let items = []
@@ -97,10 +98,7 @@ onMounted(async () => {
 
     for (const task of taskStore.getTasks()) {
       const { statusCode, data } = await getAttachments(boardId.value, task.id)
-
-      if (statusCode === 200) {
-        taskStore.updateAttachments(task.id, data)
-      }
+      taskStore.updateAttachments(task.id, data)
     }
 
     const board = await getBoardById(boardId.value)
@@ -820,7 +818,7 @@ const changeVisibility = async () => {
                     </td>
                     <td
                       @click="selectTodo(item.id)"
-                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                      class="itbkk-title px-4 py-2 text-center md:text-left text-sm text-gray-700 truncate"
                     >
                       <label style="display: block; width: 100%; height: 100%">
                         {{ item.title }}
@@ -828,7 +826,7 @@ const changeVisibility = async () => {
                     </td>
                     <td
                       @click="selectTodo(item.id)"
-                      class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700"
+                      class="itbkk-assignees px-4 py-2 text-center md:text-left text-sm text-gray-700 truncate"
                       :class="{
                         italic: !item.assignees || item.assignees.length === 0
                       }"

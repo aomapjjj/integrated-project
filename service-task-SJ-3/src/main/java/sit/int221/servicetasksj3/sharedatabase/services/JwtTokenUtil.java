@@ -1,14 +1,26 @@
 package sit.int221.servicetasksj3.sharedatabase.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
+import io.jsonwebtoken.impl.DefaultClaims;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,17 +32,22 @@ public class JwtTokenUtil implements Serializable {
     private String SECRET_KEY;
     @Value("#{${jwt.max-token-interval-minutes}*60*1000}")
     private long JWT_TOKEN_VALIDITY;
-
     @Value("#{${jwt.refresh-token-validity}*60*60*1000}")
     private long JWT_REFRESH_TOKEN_VALIDITY;
+    
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     public String getUsernameFromToken(String token) {
-        return getClaimFromToken(token, Claims::getSubject); }
+
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+
         final Claims claims = getAllClaimsFromToken(token);
+
         return claimsResolver.apply(claims);
     }
     public Claims getAllClaimsFromToken(String token) {
@@ -82,15 +99,45 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-    // ตรวจสอบความถูกต้องของ token
+
     public Boolean validateToken(String token, UserDetails userDetails) {
+        System.out.println("Utill " + userDetails);
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-    // ตรวจสอบว่า token ที่ส่งมาเป็น refresh token หรือไม่
-//    public Boolean isRefreshToken(String token) {
-//        Claims claims = getAllClaimsFromToken(token);
-//        Date expiration = claims.getExpiration();
-//        return expiration.getTime() - new Date().getTime() <= JWT_REFRESH_TOKEN_VALIDITY;
-//    }
+
+
+    public Boolean isMicrosoftToken(String token) throws JsonProcessingException {
+        try {
+            NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withIssuerLocation("https://login.microsoftonline.com/79845616-9df0-43e0-8842-e300feb2642a/v2.0").build();
+            Jwt jwt = nimbusJwtDecoder.decode(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException |ExpiredJwtException e) {
+            return false;
+        }
+    }
+
+    public MicrosoftUser getDetailMicrosoftFromToken(String token) {
+        Claims claims = getClaimsFromMicrosoftToken(token);
+        if (claims == null) {
+            return null;
+        }
+        return new MicrosoftUser(
+                claims.get("oid", String.class),
+                claims.get("preferred_username", String.class),
+                claims.get("name", String.class)
+        );
+    }
+
+    public Claims getClaimsFromMicrosoftToken(String token) {
+        try {
+            NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withIssuerLocation("https://login.microsoftonline.com/79845616-9df0-43e0-8842-e300feb2642a/v2.0").build();
+            Jwt jwt = nimbusJwtDecoder.decode(token);
+            return new DefaultClaims(jwt.getClaims());
+        } catch (JwtException | IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+
 }

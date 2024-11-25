@@ -48,15 +48,20 @@ public class AuthenticationController {
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken); }
-            catch (IllegalArgumentException e) {
-                throw new UnauthorizedException("Unable to get JWT Token"); }
-            catch (ExpiredJwtException e) {
-                throw new UnauthorizedException("JWT Token has expired");
+                claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
+            } catch (IllegalArgumentException e) {
+
+                try {
+                    claims = jwtTokenUtil.getClaimsFromMicrosoftToken(jwtToken);
+                } catch (Exception ex) {
+
+                    throw new UnauthorizedException("Unable to parse JWT Token with both standard and Microsoft methods.");
+                }
             }
-        } else {
+            return ResponseEntity.ok(claims);
+
+        }else {
             throw new UnauthorizedException("JWT Token does not begin with Bearer String");
         }
-        return ResponseEntity.ok(claims);
     }
 }
