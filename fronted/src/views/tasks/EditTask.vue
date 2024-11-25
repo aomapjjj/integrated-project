@@ -872,7 +872,7 @@ const closePreview = () => {
         <div class="px-6 py-4 flex justify-end border-t border-gray-200">
           <button
             @click="closeModal"
-            class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+            class="px-4 py-2 btn text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
           >
             Cancel
           </button>
@@ -883,7 +883,7 @@ const closePreview = () => {
               'opacity-50 cursor-not-allowed':
                 !isFormValid || checkEqual || isLimitReached
             }"
-            class="ml-3 px-4 py-2 text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none"
+            class="ml-3 px-5 py-2 btn text-white bg-[#f785b1] rounded-lg hover:bg-[#fa619c] focus:outline-none"
           >
             Save
           </button>
