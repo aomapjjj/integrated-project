@@ -17,7 +17,7 @@ Our team consists of three people. Although everyone is a **full-stack developer
 |---------------|-------------------------|------------------|-----------------|
 | 65130500007   | Jakathorn Sorvises      | Front-end, Back-end  | 33%            |
 | 65130500050   | Panipak Jongsirivanich  | Front-end, Back-end, DevOps  | 33%            |
-| 65130500056   | Pearmai Wannasiri       | Back-end, UX/UI Designer| 33%            |
+| 65130500056   | Pearmai Wannasiri       | Front-end, Back-end, UX/UI Designer | 33%            |
 
 ## Access Information
 
