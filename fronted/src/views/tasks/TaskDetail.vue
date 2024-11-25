@@ -326,7 +326,7 @@ watch(files, (newFiles) => {
         >
           <button
             @click="closeModal"
-            class="itbkk-close-button text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
+            class="itbkk-close-button btn text-sm px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none"
           >
             Close
           </button>
