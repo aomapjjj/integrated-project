@@ -122,6 +122,7 @@ public class JwtTokenUtil implements Serializable {
         if (claims == null) {
             return null;
         }
+
         return new MicrosoftUser(
                 claims.get("oid", String.class),
                 claims.get("preferred_username", String.class),
@@ -138,6 +139,7 @@ public class JwtTokenUtil implements Serializable {
             return null;
         }
     }
+
 
 
 }

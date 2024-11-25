@@ -5,7 +5,7 @@ const msalConfig = {
     clientId: "cb9ba20f-6252-4318-a518-77ecef12ee8b",
     authority:
       "https://login.microsoftonline.com/79845616-9df0-43e0-8842-e300feb2642a",
-    redirectUri: "https://intproj23.sit.kmutt.ac.th/sj3/login"
+    redirectUri: "http://localhost:5173/login"
   },
   cache: {
     cacheLocation: "localStorage",
@@ -14,7 +14,7 @@ const msalConfig = {
 }
 
 const requestObj = {
-  scopes: ["openid", "email", "profile", "user.read"]
+  scopes: ["openid", "email", "profile", "user.read" , "User.ReadBasic.All" ]
 }
 
 const myMSALObj = new UserAgentApplication(msalConfig)
