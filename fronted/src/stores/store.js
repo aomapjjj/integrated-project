@@ -88,6 +88,11 @@ const useTasks = defineStore("tasks", () => {
     )
   }
 
+  const getAttachmentsByTaskId = (taskId) => {
+    const task = tasks.value.find((task) => task.id === taskId)
+    return task?.attachments || []
+  }
+
   return {
     getTasks,
     addTasks,
@@ -95,6 +100,7 @@ const useTasks = defineStore("tasks", () => {
     updateTask,
     updateAttachments,
     removeTask,
+    getAttachmentsByTaskId
   }
 })
 
