@@ -95,7 +95,8 @@ const TimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 // ----------------------- Modal -----------------------
 const myModal = ref(null)
 
-const openModal = () => {
+const openModal = async () => {
+  
   router.push({ name: 'TaskEdit', params: { taskid: props.todoId } })
   myModal.value.showModal()
 }
@@ -418,7 +419,7 @@ const removeFile = (index) => {
   }
   files.value.splice(index, 1)
   fileContent.value.splice(index, 1)
-  myTasks.updateAttachments(todo.value.id, files.value)
+  // myTasks.updateAttachments(todo.value.id, files.value)
 }
 
 const fetchAttachments = async () => {
@@ -522,22 +523,20 @@ const closePreview = () => {
     ref="myModal"
     class="itbkk-modal-task modal w-full h-full flex inset-0 z-30 items-center justify-center"
   >
-
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
     >
-      
-    <WaitModal :is-loading="waitModal">
-      <template #default>
-        <p class="text-gray-700">
-          We're working on uploading your file. <br />
-          This won't take long!
-        </p>
-        <p class="text-sm text-gray-500">
-          Thank you for your patience while we process your file.
-        </p>
-      </template>
-    </WaitModal>
+      <WaitModal :is-loading="waitModal">
+        <template #default>
+          <p class="text-gray-700">
+            We're working on uploading your file. <br />
+            This won't take long!
+          </p>
+          <p class="text-sm text-gray-500">
+            Thank you for your patience while we process your file.
+          </p>
+        </template>
+      </WaitModal>
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">
