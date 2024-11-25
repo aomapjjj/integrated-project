@@ -221,6 +221,13 @@ public class StatusService {
             throw new ValidationException("Cannot delete 'Done'");
         }
 
+        // ตรวจสอบว่า Status มี Task ใช้งานอยู่หรือไม่
+        List<Task> tasksUsingStatus = taskRepository.findByStatus(status);
+        if (!tasksUsingStatus.isEmpty()) {
+            validationError.addValidationError("tasks", "cannot delete status because there are tasks using it. Please transfer tasks to another status first.");
+            throw validationError;
+        }
+
         try {
             repository.delete(status);
             return status;
