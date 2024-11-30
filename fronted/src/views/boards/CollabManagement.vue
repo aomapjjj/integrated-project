@@ -277,7 +277,8 @@ const submitFormSendEmail = async () => {
         boardName: boardNames,
         accessRight,
         boardUrl
-      }
+      },
+      access_token : localStorage.getItem("accesstokenToMS")
     }
 
     const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO)

@@ -93,6 +93,8 @@ const loginMicrosoft = async () => {
   try {
     await authConfig.login() 
     const accountData = await authConfig.getAccount() 
+    console.log(accountData.accessToken)
+    localStorage.setItem("accesstokenToMS", accountData.accessToken)
     if (accountData) {
       const decoded = jwtDecode(localStorage.getItem("access_token"))
       nameJWT.value = decoded.name

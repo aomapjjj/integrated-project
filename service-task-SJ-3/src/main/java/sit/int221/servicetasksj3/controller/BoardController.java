@@ -301,7 +301,8 @@ public class BoardController {
                 boardId,
                 collaboratorRequest.getEmail(),
                 collaboratorRequest.getAccessRight().name(),
-                String.valueOf(collaboratorRequest.getStatus())
+                String.valueOf(collaboratorRequest.getStatus()),
+                request.getAccess_token()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);

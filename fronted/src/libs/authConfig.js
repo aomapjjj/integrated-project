@@ -14,7 +14,7 @@ const msalConfig = {
 }
 
 const requestObj = {
-  scopes: ["openid", "email", "profile", "user.read" , "User.ReadBasic.All" ]
+  scopes: ["openid", "email", "profile", "user.read", "User.ReadBasic.All", "offline_access" ]
 }
 
 const myMSALObj = new UserAgentApplication(msalConfig)
@@ -37,7 +37,7 @@ const getAccount = async () => {
     const account = myMSALObj.getAccount()
     if (account) {
       const tokenRequest = {
-        scopes: ["user.read"],
+        scopes: ["openid", "email", "profile", "user.read", "User.ReadBasic.All", "offline_access" ],
         account: account
       }
       try {
