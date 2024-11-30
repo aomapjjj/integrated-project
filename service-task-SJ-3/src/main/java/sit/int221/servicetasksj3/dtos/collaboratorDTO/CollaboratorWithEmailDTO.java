@@ -12,4 +12,6 @@ public class CollaboratorWithEmailDTO {
     private CollaboratorDTO collaborator;
     @NotNull
     private EmailRequestDTO email;
+
+    private String access_token;
 }

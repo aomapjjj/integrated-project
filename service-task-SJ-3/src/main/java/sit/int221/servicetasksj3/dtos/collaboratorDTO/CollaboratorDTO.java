@@ -14,6 +14,7 @@ public class CollaboratorDTO {
     private String id;
     private String name;
     private String email;
+
     @NotNull
     private AccessRight accessRight;
     private Timestamp addedOn;

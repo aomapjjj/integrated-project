@@ -6,6 +6,7 @@ import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.exceptions.*;
 import sit.int221.servicetasksj3.repositories.*;
+import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
@@ -20,6 +21,8 @@ public class CollaboratorService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository usersRepository;
+    @Autowired
+    private MicrosoftDetailService microsoftDetailService;
 
     public boolean isPending(String boardId, String userId) {
         return collaboratorRepository.existsByBoardIdAndCollaboratorIdAndStatus(boardId, userId, CollabStatus.PENDING);
@@ -74,37 +77,74 @@ public class CollaboratorService {
         );
     }
 
-    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight, String status) {
+    public CollaboratorDTO addCollaboratorToBoard(String boardId, String collaboratorEmail, String accessRight, String status , String token) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
-        Users user = usersRepository.findByEmail(collaboratorEmail)
-                .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
-
-        if (user.getOid().equals(board.getOwnerId())) {
-            throw new ConflictException("The collaborator email belongs to the board owner");
-        }
-
-        Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
-
-        if (existingCollaborator != null) {
-            if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
-                throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
-            } else {
-                throw new ConflictException("The collaborator already exists for this board");
-            }
-        }
-
         Collaborator collaborator = new Collaborator();
-        collaborator.setCollaboratorId(user.getOid());
-        collaborator.setCollaboratorName(user.getName());
-        collaborator.setBoardId(boardId);
-        collaborator.setOwnerId(board.getOwnerId());
-        collaborator.setCollaboratorEmail(collaboratorEmail);
-        collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
-        collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
-        collaborator.setStatus(CollabStatus.valueOf(status));
-        collaboratorRepository.save(collaborator);
+
+
+        MicrosoftUser microsoftUser = microsoftDetailService.getMicrosoftByEmail(collaboratorEmail , token);
+
+
+        if(microsoftUser != null ){
+
+                if (microsoftUser.getOid().equals(board.getOwnerId())) {
+                    throw new ConflictException("The collaborator email belongs to the board owner");
+                }
+
+                Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
+
+                if (existingCollaborator != null) {
+                    if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
+                        throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
+                    } else {
+                        throw new ConflictException("The collaborator already exists for this board");
+                    }
+                }
+
+                collaborator.setCollaboratorId(microsoftUser.getOid());
+                collaborator.setCollaboratorName(microsoftUser.getDisplayName());
+                collaborator.setBoardId(boardId);
+                collaborator.setOwnerId(board.getOwnerId());
+                collaborator.setCollaboratorEmail(collaboratorEmail);
+                collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
+                collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
+                collaborator.setStatus(CollabStatus.valueOf(status));
+                collaboratorRepository.save(collaborator);
+        }
+
+        else {
+            Users user = usersRepository.findByEmail(collaboratorEmail)
+                    .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
+
+            if (user.getOid().equals(board.getOwnerId())) {
+                throw new ConflictException("The collaborator email belongs to the board owner");
+            }
+
+            Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
+
+            if (existingCollaborator != null) {
+                if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
+                    throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
+                } else {
+                    throw new ConflictException("The collaborator already exists for this board");
+                }
+            }
+
+
+            collaborator.setCollaboratorId(user.getOid());
+            collaborator.setCollaboratorName(user.getName());
+            collaborator.setBoardId(boardId);
+            collaborator.setOwnerId(board.getOwnerId());
+            collaborator.setCollaboratorEmail(collaboratorEmail);
+            collaborator.setAccessLevel(AccessRight.valueOf(accessRight));
+            collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
+            collaborator.setStatus(CollabStatus.valueOf(status));
+            collaboratorRepository.save(collaborator);
+
+        }
+
+
 
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
