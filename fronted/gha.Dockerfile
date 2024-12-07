@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS build
+FROM node:18-bullseye AS build
 WORKDIR code
 COPY . .
 RUN npm install
