@@ -25,6 +25,7 @@ const useBoard = defineStore('board', () => {
   }
 
   const addNewBoard = (newBoard) => {
+     console.log("นี่คือ" , newBoard)
     if (!boards.value.some(board => board.id === newBoard.id)) {
       boards.value.push({ ...newBoard });
       saveBoardsToLocalStorage();
