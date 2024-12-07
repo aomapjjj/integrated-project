@@ -92,7 +92,6 @@ const loginMicrosoft = async () => {
   try {
     await authConfig.login() 
     const accountData = await authConfig.getAccount() 
-
     localStorage.setItem("accesstokenToMS", accountData.accessToken)
     if (accountData) {
       const decoded = jwtDecode(localStorage.getItem("access_token"))
@@ -103,6 +102,13 @@ const loginMicrosoft = async () => {
       userStore.setUserInfo(userInfowhileLogin.value)
       userStore.setEmail(emailJWT.value)
       userStore.setToken(localStorage.getItem("access_token"))
+      const itemsBoards = await getBoardItems(baseUrlboards)
+      itemsBoards.boards.sort(
+        (a, b) => new Date(a.createdOn) - new Date(b.createdOn)
+      ) 
+      boardStore.addNewBoards(itemsBoards.boards)
+
+      boardStore.setCollabs(itemsBoards.collabs)
       await openHomePage()
     }
   } catch (error) {
