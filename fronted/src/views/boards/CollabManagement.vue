@@ -275,7 +275,7 @@ const submitFormSendEmail = async () => {
       email: {
         inviterName,
         boardName: boardNames,
-        accessRight,
+        accessRight, 
         boardUrl
       },
       access_token : localStorage.getItem("accesstokenToMS")

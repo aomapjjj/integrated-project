@@ -10,7 +10,7 @@ import authConfig from "@/libs/authConfig"
 // ----------------------- Router -----------------------
 
 const router = useRouter()
-const route = useRoute()
+const route = useRoute() 
 
 // ----------------------- Alerts -----------------------
 

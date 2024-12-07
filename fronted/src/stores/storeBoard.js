@@ -32,7 +32,7 @@ const useBoard = defineStore('board', () => {
       console.log(newBoard.id)
       console.log(`Board with id ${newBoard.id} already exists.`);
     }
-  }
+  } 
   
   const addNewBoards = (newBoards) => {
     newBoards.forEach((newBoard) => {
