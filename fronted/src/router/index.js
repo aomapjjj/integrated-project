@@ -235,8 +235,12 @@ const checkAuthorization = async (next, accessToken, refreshToken) => {
     if (validateResponse.status === 401 && refreshToken) {
       return await handleTokenRefresh(refreshToken, next)
     }
+
   } catch (error) {
     console.error('Error validating token:', error)
+    next({ name: 'Login' })
+    localStorage.clear()
+    localStorage.removeItem('access_token')
   }
   return false
 }

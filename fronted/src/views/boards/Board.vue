@@ -1,13 +1,13 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
-import { useUsers } from '@/stores/storeUser'
-import { addBoard, getBoardItems } from '../../libs/fetchUtils.js'
-import SideBar from '@/component/bar/SideBar.vue'
-import Navbar from '@/component/bar/Navbar.vue'
-import BoardCard from '@/component/card/BoardCard.vue'
-import LodingPage from '@/component/ui/LodingPage.vue'
-import { useBoard } from '@/stores/storeBoard.js'
+import { useRouter } from "vue-router"
+import { ref, computed, onMounted } from "vue"
+import { useUsers } from "@/stores/storeUser"
+import { addBoard, getBoardItems } from "../../libs/fetchUtils.js"
+import SideBar from "@/component/bar/SideBar.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+import BoardCard from "@/component/card/BoardCard.vue"
+import LodingPage from "@/component/ui/LodingPage.vue"
+import { useBoard } from "@/stores/storeBoard.js"
 
 // ----------------------- Router -----------------------
 
@@ -29,7 +29,7 @@ const boardStore = useBoard()
 // ----------------------- Params -----------------------
 
 const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + ' personal board' })
+const userBoard = ref({ name: userName + " personal board" })
 const isLoading = ref(true)
 
 // ----------------------- BaseUrl -----------------------
@@ -37,7 +37,7 @@ const isLoading = ref(true)
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
 function getToken() {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem("access_token")
 }
 
 onMounted(async () => {
@@ -56,12 +56,12 @@ onMounted(async () => {
     )
 
     if (response.status === 404) {
-      router.push({ name: 'ErrorPage' })
+      router.push({ name: "ErrorPage" })
     } else if (response.status === 401) {
-      router.push({ name: 'Login' })
+      router.push({ name: "Login" })
     }
   } catch (error) {
-    console.error('Error loading boards:', error)
+    console.error("Error loading boards:", error)
   } finally {
     isLoading.value = false
   }
@@ -69,7 +69,7 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: 'TaskList', params: { id: boardId } })
+    router.push({ name: "TaskList", params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -85,16 +85,17 @@ const isValidName = computed(() => {
 
 const submitForm = async () => {
   const result = await addBoard(baseUrlBoard, userBoard.value)
-
-  boardStore.addNewBoard(result.data)
+  if (result.data) {
+    boardStore.addNewBoard(result.data)
+  }
 
   const items = await getBoardItems(baseUrlBoard)
   items.boards.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn)) //sort by createdOn
   boardStore.setBoards(items.boards)
 
   if (result.status === 401) {
-    localStorage.removeItem('access_token')
-    router.push({ name: 'Login' })
+    localStorage.removeItem("access_token")
+    router.push({ name: "Login" })
   } else {
     toBoardsList(result.data.id)
     clearForm()
@@ -102,7 +103,7 @@ const submitForm = async () => {
 }
 
 const clearForm = () => {
-  userBoard.value.name = ''
+  userBoard.value.name = ""
 }
 
 const cancelAction = () => {
@@ -112,7 +113,7 @@ const cancelAction = () => {
 
 const openModalCreate = () => {
   openModalName.value = !openModalName.value
-  router.push({ name: 'BoardAdd' })
+  router.push({ name: "BoardAdd" })
 }
 </script>
 
@@ -248,7 +249,9 @@ const openModalCreate = () => {
                   </div>
                 </div>
                 <!-- </div> -->
-                <div class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200">
+                <div
+                  class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200"
+                >
                   <router-link to="/board">
                     <button
                       @click="cancelAction"
