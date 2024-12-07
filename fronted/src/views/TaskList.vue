@@ -40,17 +40,19 @@ const userName = userStore.getUser().username
 const token = localStorage.getItem('access_token')
 const boardName = ref('')
 const isLoading = ref(true)
+
 watch(
   () => route.params.id,
-  (newId) => {
+  async (newId) => {
     boardId.value = newId
+    taskStore.clearTasks()
   },
   { immediate: true }
 )
 
+
 // ----------------------- List Items -----------------------
 
-const attachmentsNumber = ref()
 const todoList = ref([])
 const statusList = ref([])
 let items = []
