@@ -91,7 +91,6 @@ const getUserInfo = () => {
   if (storedUser) {
     userInfo.value = JSON.parse(storedUser);
   }
-  console.log("User Info:", userInfo.value);
   return userInfo.value;
 };
 

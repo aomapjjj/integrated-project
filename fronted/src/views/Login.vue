@@ -67,7 +67,6 @@ const isFormValid = computed(() => {
 const openHomePage = async () => {
   try {
     userStore.setUser(nameJWT.value)
-
     const itemsBoards = await getItems(baseUrlboards)
     const boardIds = itemsBoards.boards.map((board) => board.id)
     boardId.value = boardIds
@@ -125,8 +124,10 @@ const submitForm = async () => {
     })
 
     if (response.status === 200) {
+      localStorage.removeItem('boards')
+      localStorage.removeItem('collabs')
+      localStorage.removeItem('email')
       const data = await response.json()
-
       userStore.setLoginSuccess(true)
       const decoded = jwtDecode(data.access_token)
       nameJWT.value = decoded.name

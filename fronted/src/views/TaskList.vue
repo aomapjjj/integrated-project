@@ -93,6 +93,7 @@ onMounted(async () => {
 
     if (taskStore.getTasks().length === 0) {
       const items = await getItems(baseUrlTask)
+      console.log(items)
       taskStore.addTasks(items)
     }
 
