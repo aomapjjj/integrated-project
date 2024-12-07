@@ -86,7 +86,7 @@ watch(
       const { statusCode, data } = await getAttachments(boardId.value, newValue)
       if (statusCode === 200 && Array.isArray(data)) {
         todo.value.attachments = data
-        console.log(todo.value.attachments)
+    
       } else {
         todo.value.attachments = []
         console.error('Failed to fetch attachments')

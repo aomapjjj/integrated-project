@@ -40,17 +40,19 @@ const userName = userStore.getUser().username
 const token = localStorage.getItem('access_token')
 const boardName = ref('')
 const isLoading = ref(true)
+
 watch(
   () => route.params.id,
-  (newId) => {
+  async (newId) => {
     boardId.value = newId
+    taskStore.clearTasks()
   },
   { immediate: true }
 )
 
+
 // ----------------------- List Items -----------------------
 
-const attachmentsNumber = ref()
 const todoList = ref([])
 const statusList = ref([])
 let items = []
@@ -93,7 +95,6 @@ onMounted(async () => {
 
     if (taskStore.getTasks().length === 0) {
       const items = await getItems(baseUrlTask)
-      console.log(items)
       taskStore.addTasks(items)
     }
 
@@ -139,7 +140,7 @@ onMounted(async () => {
     isLoading.value = false
   }
 
-  console.log(taskStore.getTasks())
+ 
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -174,7 +175,7 @@ const selectTodo = (todoId) => {
   if (todoId !== 0) {
     selectedTodoId.value = todoId
     showDetail.value = true
-    console.log('Opening TaskDetail with ID:', todoId)
+  
     router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
 }

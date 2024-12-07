@@ -46,32 +46,12 @@ const useTasks = defineStore("tasks", () => {
     })
   }
 
-  const updateTask = (
-    id,
-    title,
-    description,
-    assignees,
-    status,
-    createdOn,
-    updateOn,
-    attachments
-  ) => {
-    tasks.value = tasks.value.map((task) => {
-      return task.id === id
-        ? {
-            ...task,
-            title: title,
-            description: description,
-            assignees: assignees,
-            status: status,
-            createdOn: createdOn,
-            updateOn: updateOn,
-            attachments: attachments || task.attachments,
-          }
-        : task
-    })
+  const updateTask = (id, updates) => {
+    tasks.value = tasks.value.map((task) =>
+      task.id === id ? { ...task, ...updates } : task
+    )
   }
-
+  
   const updateAttachments = (id, newAttachments) => {
     const task = tasks.value.find((task) => task.id === id)
     if (task) {
@@ -82,16 +62,25 @@ const useTasks = defineStore("tasks", () => {
   }
 
   const removeTask = (removeId) => {
-    tasks.value.splice(
-      tasks.value.findIndex((Task) => Task.id === removeId),
-      1
-    )
+    const index = tasks.value.findIndex((task) => task.id === removeId)
+    if (index !== -1) {
+      tasks.value.splice(index, 1)
+    } else {
+      console.error(`Task with ID ${removeId} not found.`)
+    }
   }
+  
 
   const getAttachmentsByTaskId = (taskId) => {
     const task = tasks.value.find((task) => task.id === taskId)
     return task?.attachments || []
   }
+
+
+const clearTasks = () => {
+  tasks.value = []
+}
+
 
   return {
     getTasks,
@@ -100,7 +89,8 @@ const useTasks = defineStore("tasks", () => {
     updateTask,
     updateAttachments,
     removeTask,
-    getAttachmentsByTaskId
+    getAttachmentsByTaskId,
+    clearTasks
   }
 })
 

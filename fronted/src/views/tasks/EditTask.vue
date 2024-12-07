@@ -218,10 +218,6 @@ const checkEqual = computed(() => {
     currentFiles.length !== oldFiles.length ||
     !currentFiles.every((fileName) => oldFiles.includes(fileName))
 
-  console.log('Current Files:', currentFiles)
-  console.log('Old Files:', oldFiles)
-  console.log('Files Changed:', filesChanged)
-
   return (
     JSON.stringify(trimmedTodo) === JSON.stringify(trimmedOldValue) &&
     !filesChanged
@@ -361,17 +357,14 @@ watch(
   () => files,
   (newFiles) => {
     files = newFiles
-    console.log('Updated files:', newFiles)
+   
   }
 )
 
 watch(
   [isFormValid, checkEqual, isLimitReached],
   ([formValid, equalCheck, limitReached]) => {
-    console.log('isFormValid:', formValid)
-    console.log('checkEqual:', equalCheck)
-    console.log('isLimitReached:', limitReached)
-    console.log('Button disabled:', !formValid || equalCheck || limitReached)
+   
   }
 )
 

@@ -161,7 +161,6 @@ const updateAccessRight = (item, access) => {
     openModalAcess.value = true
     pendingItem.value = { ...item }
     pendingItem.value.accessRight = access
-    console.log(pendingItem.value.accessRight)
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -172,7 +171,6 @@ const confirmChange = async () => {
   try {
     confirmAcessChange.value = true
     openModalAcess.value = false
-    console.log(pendingItem.value.accessRight)
     if (pendingItem.value && confirmAcessChange.value === true) {
       const result = await editAccessRight(
         boardId.value,
