@@ -95,7 +95,6 @@ onMounted(async () => {
 
     if (taskStore.getTasks().length === 0) {
       const items = await getItems(baseUrlTask)
-      console.log(items)
       taskStore.addTasks(items)
     }
 
@@ -141,7 +140,7 @@ onMounted(async () => {
     isLoading.value = false
   }
 
-  console.log(taskStore.getTasks())
+ 
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -176,7 +175,7 @@ const selectTodo = (todoId) => {
   if (todoId !== 0) {
     selectedTodoId.value = todoId
     showDetail.value = true
-    console.log('Opening TaskDetail with ID:', todoId)
+  
     router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
 }

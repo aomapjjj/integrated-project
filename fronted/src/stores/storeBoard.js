@@ -25,12 +25,11 @@ const useBoard = defineStore('board', () => {
   }
 
   const addNewBoard = (newBoard) => {
-     console.log("นี่คือ" , newBoard)
+  
     if (!boards.value.some(board => board.id === newBoard.id)) {
       boards.value.push({ ...newBoard });
       saveBoardsToLocalStorage();
     } else {
-      console.log(newBoard.id)
       console.log(`Board with id ${newBoard.id} already exists.`);
     }
   } 
@@ -44,11 +43,9 @@ const useBoard = defineStore('board', () => {
 
   const removeBoard = (deleteBoardID) => {
     if(deleteBoardID){
-      boards.value = boards.value.filter(
-        (board) => board.id !== deleteBoardID
-      )
+      boards.value = boards.value.filter((board) => String(board.id) !== String(deleteBoardID));
     }
-    saveBoardsToLocalStorage()
+    saveBoardsToLocalStorage();
   }
 
   const resetBoard = () => {

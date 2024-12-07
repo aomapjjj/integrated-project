@@ -111,7 +111,6 @@ const declineCollaborator = async (collaborator) => {
     const status = await deleteCollaborator(boardId.value, collaborator.id)
     if (status === 200) {
       router.push({ name: 'Board' })
-      console.log('Collaborator deleted successfully')
       collaboratorInfo.value = collaboratorInfo.value.filter(
         (c) => c.id !== collaborator.id
       )

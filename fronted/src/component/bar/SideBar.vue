@@ -62,7 +62,6 @@ const toBoardsList = (boardId) => {
     router.push({ name: 'TaskList', params: { id: boardId } }).then(() => {
       router.go()
     })
-    console.log(boardId)
     userStore.setBoard(boardId)
   }
 }

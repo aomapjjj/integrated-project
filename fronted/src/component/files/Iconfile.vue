@@ -124,7 +124,6 @@ const fileIcon = computed(() => {
   }
 });
 
-console.log(fileIcon.value)
 
 // const getOnlineViewerUrl = computed(() => {
 //   if (fileExtension.value === 'docx' || fileExtension.value === 'xlsx') {

@@ -112,7 +112,7 @@ onMounted(async () => {
     const statusId = route.params.id
 
     const board = await getBoardById(boardId.value)
-    console.log('Board data', board.item.owner.name)
+   
 
     if (board && board.item && board.item.name) {
       boardName.value = board.item.name
