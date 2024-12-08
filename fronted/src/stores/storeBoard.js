@@ -6,7 +6,6 @@ const useBoard = defineStore('board', () => {
   const boards = ref([])
   const collabs = ref([])
 
-
   const setChangeColor = (color) => {
     colorBoard.value = color
     localStorage.setItem('colorBoard', JSON.stringify(colorBoard.value))
@@ -25,15 +24,14 @@ const useBoard = defineStore('board', () => {
   }
 
   const addNewBoard = (newBoard) => {
-  
-    if (!boards.value.some(board => board.id === newBoard.id)) {
-      boards.value.push({ ...newBoard });
-      saveBoardsToLocalStorage();
+    if (!boards.value.some((board) => board.id === newBoard.id)) {
+      boards.value.push({ ...newBoard })
+      saveBoardsToLocalStorage()
     } else {
-      console.log(`Board with id ${newBoard.id} already exists.`);
+      console.log(`Board with id ${newBoard.id} already exists.`)
     }
-  } 
-  
+  }
+
   const addNewBoards = (newBoards) => {
     newBoards.forEach((newBoard) => {
       addNewBoard(newBoard)
@@ -42,10 +40,12 @@ const useBoard = defineStore('board', () => {
   }
 
   const removeBoard = (deleteBoardID) => {
-    if(deleteBoardID){
-      boards.value = boards.value.filter((board) => String(board.id) !== String(deleteBoardID));
+    if (deleteBoardID) {
+      boards.value = boards.value.filter(
+        (board) => String(board.id) !== String(deleteBoardID)
+      )
     }
-    saveBoardsToLocalStorage();
+    saveBoardsToLocalStorage()
   }
 
   const resetBoard = () => {
@@ -58,25 +58,23 @@ const useBoard = defineStore('board', () => {
     return storedBoards ? JSON.parse(storedBoards) : []
   }
 
-
   const setBoards = (newBoards) => {
     boards.value = newBoards
-    localStorage.setItem('boards', JSON.stringify(boards.value)) 
+    localStorage.setItem('boards', JSON.stringify(boards.value))
   }
 
   //--------------------------------- Collabs -------------------------
 
   const setCollabs = (newCollabs) => {
     collabs.value = newCollabs
-    localStorage.setItem('collabs', JSON.stringify(collabs.value)) 
-  }  
-  
-  
+    localStorage.setItem('collabs', JSON.stringify(collabs.value))
+  }
+
   const getCollabs = () => {
     const storedCollabs = localStorage.getItem('collabs')
     return storedCollabs ? JSON.parse(storedCollabs) : []
   }
-  
+
   const saveCollabsToLocalStorage = () => {
     localStorage.setItem('collabs', JSON.stringify(boards.value))
   }
@@ -108,8 +106,6 @@ const useBoard = defineStore('board', () => {
     saveCollabsToLocalStorage()
   }
 
-
-
   return {
     setChangeColor,
     getChangeColor,
@@ -126,7 +122,6 @@ const useBoard = defineStore('board', () => {
     editCollab,
     removeCollabs,
     resetCollabs
-
   }
 })
 

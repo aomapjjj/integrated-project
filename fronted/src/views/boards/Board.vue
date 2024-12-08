@@ -1,13 +1,13 @@
 <script setup>
-import { useRouter } from "vue-router"
-import { ref, computed, onMounted } from "vue"
-import { useUsers } from "@/stores/storeUser"
-import { addBoard, getBoardItems } from "../../libs/fetchUtils.js"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import BoardCard from "@/component/card/BoardCard.vue"
-import LodingPage from "@/component/ui/LodingPage.vue"
-import { useBoard } from "@/stores/storeBoard.js"
+import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useUsers } from '@/stores/storeUser'
+import { addBoard, getBoardItems } from '../../libs/fetchUtils.js'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import BoardCard from '@/component/card/BoardCard.vue'
+import LodingPage from '@/component/ui/LodingPage.vue'
+import { useBoard } from '@/stores/storeBoard.js'
 
 // ----------------------- Router -----------------------
 
@@ -29,7 +29,7 @@ const boardStore = useBoard()
 // ----------------------- Params -----------------------
 
 const userName = userStore.getUser().username
-const userBoard = ref({ name: userName + " personal board" })
+const userBoard = ref({ name: userName + ' personal board' })
 const isLoading = ref(true)
 
 // ----------------------- BaseUrl -----------------------
@@ -37,7 +37,7 @@ const isLoading = ref(true)
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return localStorage.getItem('access_token')
 }
 
 onMounted(async () => {
@@ -56,12 +56,12 @@ onMounted(async () => {
     )
 
     if (response.status === 404) {
-      router.push({ name: "ErrorPage" })
+      router.push({ name: 'ErrorPage' })
     } else if (response.status === 401) {
-      router.push({ name: "Login" })
+      router.push({ name: 'Login' })
     }
   } catch (error) {
-    console.error("Error loading boards:", error)
+    console.error('Error loading boards:', error)
   } finally {
     isLoading.value = false
   }
@@ -69,7 +69,7 @@ onMounted(async () => {
 
 const toBoardsList = (boardId) => {
   if (boardId !== null) {
-    router.push({ name: "TaskList", params: { id: boardId } })
+    router.push({ name: 'TaskList', params: { id: boardId } })
     userStore.setBoard(boardId)
   }
 }
@@ -94,8 +94,8 @@ const submitForm = async () => {
   boardStore.setBoards(items.boards)
 
   if (result.status === 401) {
-    localStorage.removeItem("access_token")
-    router.push({ name: "Login" })
+    localStorage.removeItem('access_token')
+    router.push({ name: 'Login' })
   } else {
     toBoardsList(result.data.id)
     clearForm()
@@ -103,7 +103,7 @@ const submitForm = async () => {
 }
 
 const clearForm = () => {
-  userBoard.value.name = ""
+  userBoard.value.name = ''
 }
 
 const cancelAction = () => {
@@ -113,7 +113,7 @@ const cancelAction = () => {
 
 const openModalCreate = () => {
   openModalName.value = !openModalName.value
-  router.push({ name: "BoardAdd" })
+  router.push({ name: 'BoardAdd' })
 }
 </script>
 
@@ -199,13 +199,6 @@ const openModalCreate = () => {
         </BoardCard>
 
         <!------------------------- Modal ------------------------->
-        <!-- <div
-          v-if="openModalName"
-          class="itbkk-modal-new fixed top-0 left-0 right-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10 lg:left-32"
-        >
-          <div
-            class="max-h-full w-full max-w-md overflow-y-auto rounded-xl bg-white"
-          > -->
         <div
           v-if="openModalName"
           class="itbkk-modal-new fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
@@ -221,11 +214,6 @@ const openModalCreate = () => {
                     Make your board special < 3
                   </p>
                 </div>
-                <!-- <div class="text-center mb-4"> -->
-                <!-- <span
-                    class="block text-2xl font-bold leading-6 mb-1 customPurple text-center"
-                    >New Board</span
-                  > -->
                 <div class="mb-6">
                   <label
                     for="boardName"

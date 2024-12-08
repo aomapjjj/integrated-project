@@ -6,7 +6,8 @@ import {
   deleteItemById,
   editLimit,
   getBoardById,
-  getAttachments
+  getAttachments,
+  getBoardItems
 } from '../libs/fetchUtils.js'
 import TaskDetail from './tasks/TaskDetail.vue'
 import AddTask from './tasks/AddTask.vue'
@@ -15,6 +16,7 @@ import { boardVisibility } from '../libs/fetchUtils.js'
 import { useLimitStore } from '../stores/storeLimit.js'
 import { useUsers } from '@/stores/storeUser'
 import { useTasks } from '../stores/store.js'
+import { useBoard } from "@/stores/storeBoard.js"
 import { useRoute, useRouter } from 'vue-router'
 import SideBar from '../component/bar/SideBar.vue'
 import Modal from '../component/modal/Modal.vue'
@@ -49,7 +51,6 @@ watch(
   },
   { immediate: true }
 )
-
 
 // ----------------------- List Items -----------------------
 
@@ -139,8 +140,6 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
-
- 
 })
 
 // ----------------------- Edit Limit -----------------------
@@ -175,7 +174,7 @@ const selectTodo = (todoId) => {
   if (todoId !== 0) {
     selectedTodoId.value = todoId
     showDetail.value = true
-  
+
     router.push({ name: 'TaskDetail', params: { taskid: todoId } })
   }
 }
@@ -324,7 +323,8 @@ const changeVisibility = async () => {
     boardId.value,
     visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
   )
-
+const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+const boardStore = useBoard()
   if (updatedBoard && updatedBoard.success) {
     alertEnabledSuc.value = true
     setTimeout(() => {
@@ -332,6 +332,9 @@ const changeVisibility = async () => {
     }, 3000)
     visibility.value = updatedBoard.visibility
     messageAlert.value = `Visibility updated to: ${updatedBoard.visibility} `
+    const items = await getBoardItems(baseUrlBoard)
+    items.boards.sort((a, b) => new Date(a.createdOn) - new Date(b.createdOn)) //sort by createdOn
+    boardStore.setBoards(items.boards)
   } else {
     messageAlert.value = updatedBoard.message
     alertEnabledFail.value = true

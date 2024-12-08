@@ -9,7 +9,7 @@ import Login from '@/views/Login.vue'
 import Board from '@/views/boards/Board.vue'
 import ToLoginPage from '@/views/errorpage/ToLoginPage.vue'
 import ErrorPagePermission from '@/views/errorpage/PermissionError.vue'
-import Members from '@/views/other/Members.vue'
+import Tutorials from '@/component/ui/Tutorials.vue'
 
 import {
   getBoardById,
@@ -195,16 +195,14 @@ const routes = [
     }
   },
   {
-    path: '/members',
-    name: 'Members',
-    component: Members
+    path: '/logout',
+    name: 'Logout'
   },
   {
-    path: "/logout",
-    name: "Logout",
-  },
-
- 
+    path: '/tutorials',
+    name: 'Tutorials',
+    component: Tutorials
+  }
 ]
 
 const router = createRouter({
@@ -235,7 +233,6 @@ const checkAuthorization = async (next, accessToken, refreshToken) => {
     if (validateResponse.status === 401 && refreshToken) {
       return await handleTokenRefresh(refreshToken, next)
     }
-
   } catch (error) {
     console.error('Error validating token:', error)
     next({ name: 'Login' })
@@ -248,10 +245,10 @@ const checkAuthorization = async (next, accessToken, refreshToken) => {
 router.beforeEach(async (to, from, next) => {
   const accessToken = getToken()
   const refreshToken = getRefreshToken()
-  if (to.name === "Logout") {
-    localStorage.clear();
+  if (to.name === 'Logout') {
+    localStorage.clear()
     localStorage.removeItem('access_token')
-    next({ name: "Login" });
+    next({ name: 'Login' })
   }
 
   if (to.name === 'board' && to.params.id) {
