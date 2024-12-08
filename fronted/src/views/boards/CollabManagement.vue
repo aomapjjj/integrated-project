@@ -14,7 +14,8 @@ import Navbar from '@/component/bar/Navbar.vue'
 import Alert from '@/component/alert/Alert.vue'
 import ModalAcess from '@/component/modal/Modal.vue'
 import ConfirmModal from '@/component/modal/ConfirmModal.vue'
-import WaitModal from '@/component/modal/WaitModal.vue'
+// import WaitModal from '@/component/modal/WaitModal.vue'
+import CatLoading from '@/component/modal/CatLoading.vue'
 import SuccessModal from '@/component/alert/SuccessModal.vue'
 import CollaboratorCard from '@/component/card/CollaboratorCard.vue'
 
@@ -90,14 +91,10 @@ const cancelChange = () => {
 
 onMounted(async () => {
   userStore.setToken(token)
-
   const collaborator = await getItems(baseUrlCollaborator)
   collaboratorInfo.value = collaborator.collaborators
-
   const Board = await getBoardById(boardId.value)
-
   boardOwnerName.value = Board.item.owner.name
-
   if (Board && Board.item && Board.item.name) {
     boardName.value = Board.item.name
   }
@@ -161,6 +158,7 @@ const updateAccessRight = (item, access) => {
     openModalAcess.value = true
     pendingItem.value = { ...item }
     pendingItem.value.accessRight = access
+    console.log(pendingItem.value.accessRight)
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -171,6 +169,7 @@ const confirmChange = async () => {
   try {
     confirmAcessChange.value = true
     openModalAcess.value = false
+    console.log(pendingItem.value.accessRight)
     if (pendingItem.value && confirmAcessChange.value === true) {
       const result = await editAccessRight(
         boardId.value,
@@ -257,7 +256,9 @@ const submitFormSendEmail = async () => {
   const inviterName = boardOwnerName.value
   const boardNames = boardName.value
   const boardUrl = baseUrlBoardId
+  console.log('Before:', waitModal.value)
   waitModal.value = true
+  console.log('After:', waitModal.value)
   if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
     console.error('One or more required fields are missing.')
     return
@@ -273,10 +274,10 @@ const submitFormSendEmail = async () => {
       email: {
         inviterName,
         boardName: boardNames,
-        accessRight, 
+        accessRight,
         boardUrl
       },
-      access_token : localStorage.getItem("accesstokenToMS")
+      access_token: localStorage.getItem('accesstokenToMS')
     }
 
     const result = await addCollaborator(boardIdValue, collaboratorWithEmailDTO)
@@ -371,7 +372,7 @@ const deleteConfirmationMessage = computed(() => {
 
 <template>
   <div>
-    <WaitModal :is-loading="waitModal" />
+    <CatLoading :is-loading="waitModal" />
   </div>
 
   <div class="fixed top-0 right-0 mt-4 mr-4 z-20">
