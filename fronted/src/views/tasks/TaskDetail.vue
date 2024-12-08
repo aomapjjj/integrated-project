@@ -33,6 +33,7 @@ const files = computed(() => {
     return new File([blob], attachment.fileName, { type: attachment.fileType })
   })
 })
+
 const isFilePreviewOpen = ref(false)
 const previewFileData = ref({})
 
