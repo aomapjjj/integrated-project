@@ -46,12 +46,32 @@ const useTasks = defineStore("tasks", () => {
     })
   }
 
-  const updateTask = (id, updates) => {
-    tasks.value = tasks.value.map((task) =>
-      task.id === id ? { ...task, ...updates } : task
-    )
+  const updateTask = (
+    id,
+    title,
+    description,
+    assignees,
+    status,
+    createdOn,
+    updateOn,
+    attachments
+  ) => {
+    tasks.value = tasks.value.map((task) => {
+      return task.id === id
+        ? {
+            ...task,
+            title: title,
+            description: description,
+            assignees: assignees,
+            status: status,
+            createdOn: createdOn,
+            updateOn: updateOn,
+            attachments: attachments || task.attachments,
+          }
+        : task
+    })
   }
-  
+
   const updateAttachments = (id, newAttachments) => {
     const task = tasks.value.find((task) => task.id === id)
     if (task) {
@@ -69,18 +89,15 @@ const useTasks = defineStore("tasks", () => {
       console.error(`Task with ID ${removeId} not found.`)
     }
   }
-  
 
   const getAttachmentsByTaskId = (taskId) => {
     const task = tasks.value.find((task) => task.id === taskId)
     return task?.attachments || []
   }
 
-
-const clearTasks = () => {
-  tasks.value = []
-}
-
+  const clearTasks = () => {
+    tasks.value = []
+  }
 
   return {
     getTasks,
@@ -90,7 +107,7 @@ const clearTasks = () => {
     updateAttachments,
     removeTask,
     getAttachmentsByTaskId,
-    clearTasks
+    clearTasks,
   }
 })
 
