@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -8,21 +8,22 @@ import {
   getBoardById,
   getAttachments,
   getBoardItems
-} from '../libs/fetchUtils.js'
-import TaskDetail from './tasks/TaskDetail.vue'
-import AddTask from './tasks/AddTask.vue'
-import EditTask from './tasks/EditTask.vue'
-import { boardVisibility } from '../libs/fetchUtils.js'
-import { useLimitStore } from '../stores/storeLimit.js'
-import { useUsers } from '@/stores/storeUser'
-import { useTasks } from '../stores/store.js'
+} from "../libs/fetchUtils.js"
+import TaskDetail from "./tasks/TaskDetail.vue"
+import AddTask from "./tasks/AddTask.vue"
+import EditTask from "./tasks/EditTask.vue"
+import { boardVisibility } from "../libs/fetchUtils.js"
+import { useLimitStore } from "../stores/storeLimit.js"
+import { useUsers } from "@/stores/storeUser"
+import { useTasks } from "../stores/store.js"
 import { useBoard } from "@/stores/storeBoard.js"
-import { useRoute, useRouter } from 'vue-router'
-import SideBar from '../component/bar/SideBar.vue'
-import Modal from '../component/modal/Modal.vue'
-import Alert from '@/component/alert/Alert.vue'
-import Navbar from '@/component/bar/Navbar.vue'
-import LodingPage from '@/component/ui/LodingPage.vue'
+import { useRoute, useRouter } from "vue-router"
+import SideBar from "../component/bar/SideBar.vue"
+import Modal from "../component/modal/Modal.vue"
+import Alert from "@/component/alert/Alert.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+import LodingPage from "@/component/ui/LodingPage.vue"
+import ConfirmModal from "@/component/modal/ConfirmModal.vue"
 
 // ----------------------- Router -----------------------
 
@@ -39,8 +40,8 @@ const userStore = useUsers()
 
 const boardId = ref()
 const userName = userStore.getUser().username
-const token = localStorage.getItem('access_token')
-const boardName = ref('')
+const token = localStorage.getItem("access_token")
+const boardName = ref("")
 const isLoading = ref(true)
 
 watch(
@@ -70,7 +71,7 @@ const deleteComplete = ref(false)
 const alertLimit = ref(false)
 const alertEnabledFail = ref(false)
 const alertEnabledSuc = ref(false)
-const messageLimit = ref('')
+const messageLimit = ref("")
 const messageAlert = ref()
 
 // ----------------------- Enable & Disable -----------------------
@@ -78,8 +79,9 @@ const messageAlert = ref()
 const showDetail = ref(false)
 const disabledButtonWhileOpenPublic = ref(false)
 const isModalVisible = ref(false)
-const visibility = ref('')
-const tempVisibility = ref('')
+const visibility = ref("")
+const tempVisibility = ref("")
+const openModalDelete = ref(false)
 
 // ----------------------- BaseUrl -----------------------
 
@@ -111,7 +113,7 @@ onMounted(async () => {
     } else if (
       board.item.owner.name !== userName &&
       !board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === 'WRITE'
+        (collab) => collab.name === userName && collab.accessRight === "WRITE"
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
@@ -132,11 +134,11 @@ onMounted(async () => {
     if (taskId !== undefined) {
       const response = await getItemById(taskId)
       if (response && (response.status === 404 || response.status === 400)) {
-        router.push('/error')
+        router.push("/error")
       }
     }
   } catch (error) {
-    console.error('Error loading data:', error)
+    console.error("Error loading data:", error)
   } finally {
     isLoading.value = false
   }
@@ -158,10 +160,10 @@ const UpdateLimit = async () => {
 
   if (alertLimit.value) {
     messageLimit.value =
-      'The Kanban board now limits ' + limitStore.getLimit().maximumTask
+      "The Kanban board now limits " + limitStore.getLimit().maximumTask
   } else {
     alertLimit.value = true
-    messageLimit.value = 'The Kanban board has disabled the task limit in each '
+    messageLimit.value = "The Kanban board has disabled the task limit in each "
   }
   setTimeout(() => {
     alertLimit.value = false
@@ -175,7 +177,7 @@ const selectTodo = (todoId) => {
     selectedTodoId.value = todoId
     showDetail.value = true
 
-    router.push({ name: 'TaskDetail', params: { taskid: todoId } })
+    router.push({ name: "TaskDetail", params: { taskid: todoId } })
   }
 }
 
@@ -195,8 +197,7 @@ const deleteTodo = async (todoId, index) => {
 const openModalToDelete = (itemId, index) => {
   selectedItemIdToDelete.value = itemId
   indexDelete.value = index
-  const modal = document.getElementById('my_modal_delete')
-  modal.showModal()
+  openModalDelete.value = true
 }
 
 const confirmDelete = () => {
@@ -206,42 +207,43 @@ const confirmDelete = () => {
   setTimeout(() => {
     deleteComplete.value = false
   }, 2300)
+  openModalDelete.value = false
 }
 
 // ----------------------- filterAndLogTitleById -----------------------
 
 const filterAndLogTitleById = (id) => {
-  const item = items.find((item) => item.id === id)
+  const item = filteredTasks.value.find((item) => item.id === id)
   if (item) {
     return item.title
   } else {
-    return ''
+    return ""
   }
 }
 
 // ----------------------- STATUS SORT -----------------------
-const showIcon = ref('default')
-const statusSortOrder = ref('default')
+const showIcon = ref("default")
+const statusSortOrder = ref("default")
 
 const toggleIcon = () => {
-  if (showIcon.value === 'default') {
-    showIcon.value = 'asc'
-    statusSortOrder.value = 'asc'
-  } else if (showIcon.value === 'asc') {
-    showIcon.value = 'desc'
-    statusSortOrder.value = 'desc'
+  if (showIcon.value === "default") {
+    showIcon.value = "asc"
+    statusSortOrder.value = "asc"
+  } else if (showIcon.value === "asc") {
+    showIcon.value = "desc"
+    statusSortOrder.value = "desc"
   } else {
-    showIcon.value = 'default'
-    statusSortOrder.value = 'default'
+    showIcon.value = "default"
+    statusSortOrder.value = "default"
   }
   sortByStatus()
 }
 
 const sortByStatus = () => {
   const currentSortOrder = statusSortOrder.value
-  if (currentSortOrder === 'asc') {
+  if (currentSortOrder === "asc") {
     taskStore.getTasks().sort((a, b) => a.status.localeCompare(b.status))
-  } else if (currentSortOrder === 'desc') {
+  } else if (currentSortOrder === "desc") {
     taskStore.getTasks().sort((a, b) => b.status.localeCompare(a.status))
   } else {
     taskStore.getTasks().sort((a, b) => a.id - b.id)
@@ -271,16 +273,16 @@ const removeStatus = (status) => {
 // ----------------------- Filter -----------------------
 
 const openNewStatus = () => {
-  router.push({ name: 'StatusesList' })
+  router.push({ name: "StatusesList" })
 }
 
 const openCollaborator = () => {
-  router.push({ name: 'Collab' })
+  router.push({ name: "Collab" })
 }
 
 const clearToken = () => {
-  router.push({ name: 'Login' })
-  localStorage.removeItem('access_token')
+  router.push({ name: "Login" })
+  localStorage.removeItem("access_token")
 }
 
 // ----------------------- Limit ---------------------------
@@ -294,7 +296,7 @@ const handleToggleClick = (event) => {
     event.preventDefault()
     return
   }
-  tempVisibility.value = visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
+  tempVisibility.value = visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
   isModalVisible.value = true
 }
 
@@ -310,7 +312,7 @@ const cancelChange = () => {
 
 if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
   alertEnabledSuc.value = true
-  messageAlert.value = 'Welcome, You have logged in successfully'
+  messageAlert.value = "Welcome, You have logged in successfully"
 
   setTimeout(() => {
     alertEnabledSuc.value = false
@@ -321,10 +323,10 @@ if (userStore.getLoginSuccess() && !alertEnabledSuc.value) {
 const changeVisibility = async () => {
   const updatedBoard = await boardVisibility(
     boardId.value,
-    visibility.value === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
+    visibility.value === "PUBLIC" ? "PRIVATE" : "PUBLIC"
   )
-const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
-const boardStore = useBoard()
+  const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
+  const boardStore = useBoard()
   if (updatedBoard && updatedBoard.success) {
     alertEnabledSuc.value = true
     setTimeout(() => {
@@ -455,6 +457,10 @@ const boardStore = useBoard()
           <!-- Limit alert -->
           <Alert :is-alert-success="alertLimit">
             {{ messageLimit }}
+          </Alert>
+          <!-- DELETE COMPLETE -->
+          <Alert :is-alert-success="deleteComplete">
+            The task has been deleted
           </Alert>
 
           <!-- FILTER -->
@@ -651,22 +657,55 @@ const boardStore = useBoard()
             {{ messageAlert }}
           </Alert>
 
-          <Modal
-            :isOpen="isModalVisible"
-            :tempVisibility="tempVisibility"
+          <ConfirmModal
+            :openModal="isModalVisible"
             @confirm="confirmChangeVisibility"
             @cancel="cancelChange"
-            class="z-10"
           >
-            <template #headerName>Board visibility changed!</template>
-            <template #messageName>
-              {{
-                tempVisibility === 'PUBLIC'
-                  ? 'In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public ? '
-                  : 'In private, only board owner can access / control board. Do you want to change the visibility toPrivate ? '
-              }}</template
-            >
-          </Modal>
+            <template #svg>
+              <div
+                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10"
+              >
+                <svg
+                  class="h-6 w-6 text-yellow-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                  data-slot="icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                  />
+                </svg>
+              </div>
+            </template>
+            <template #headerMessage> Board visibility changed! </template>
+            <template #message>
+              <p class="text-sm text-gray-500">
+                {{
+                tempVisibility === "PUBLIC"
+                  ? "In public, any one can view the board, task list and task detail of tasks in the board. Do you want to change the visibility to Public "
+                  : "In private, only board owner can access / control board. Do you want to change the visibility to Private ? "
+              }}
+              </p>
+            </template>
+            <template #confirmBtn>
+              <span
+                class="inline-flex w-full justify-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-300 sm:ml-3 sm:w-auto"
+                >Confirm</span
+              >
+            </template>
+            <template #cancelBtn>
+              <span
+                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                >Cancel</span
+              >
+            </template>
+          </ConfirmModal>
 
           <div class="overflow-x-auto max-h-96 w-full mx-auto px-2">
             <div class="w-full mx-auto max-w-screen-lg">
@@ -838,7 +877,7 @@ const boardStore = useBoard()
                     >
                       {{
                         !item.assignees || item.assignees.length === 0
-                          ? 'Unassigned'
+                          ? "Unassigned"
                           : item.assignees
                       }}
                     </td>
@@ -850,7 +889,7 @@ const boardStore = useBoard()
                         Array.isArray(item.attachments) &&
                         item.attachments.length > 0
                           ? item.attachments.length
-                          : '-'
+                          : "-"
                       }}
                     </td>
 
@@ -958,38 +997,54 @@ const boardStore = useBoard()
                             </button>
                           </div>
                         </div>
-
-                        <dialog id="my_modal_delete" class="modal">
-                          <div class="modal-box" style="max-width: 500px">
-                            <h3 class="font-bold text-lg">Delete a Task</h3>
-                            <p
-                              class="itbkk-message py-4 font-medium"
-                              style="word-wrap: break-word"
+                        <ConfirmModal
+                          :openModal="openModalDelete"
+                          @confirm="confirmDelete()"
+                          @cancel="openModalDelete = false"
+                        >
+                          <template #svg>
+                            <div
+                              class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
                             >
+                              <svg
+                                class="h-6 w-6 text-red-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="1.5"
+                                stroke="currentColor"
+                                aria-hidden="true"
+                                data-slot="icon"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                                />
+                              </svg>
+                            </div>
+                          </template>
+                          <template #headerMessage> Delete Board </template>
+                          <template #message>
+                            <p class="text-sm text-gray-500">
                               Do you want to delete the task number
                               {{ selectedItemIdToDelete }} - "{{
                                 filterAndLogTitleById(selectedItemIdToDelete)
                               }}"?
                             </p>
-                            <form method="dialog">
-                              <div class="modal-action">
-                                <button
-                                  class="itbkk-button-cancel btn"
-                                  style="color: #eb4343"
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  class="itbkk-button-confirm btn bg-green-400"
-                                  style="color: #fff"
-                                  @click="confirmDelete()"
-                                >
-                                  Confirm
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        </dialog>
+                          </template>
+                          <template #confirmBtn>
+                            <span
+                              class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+                              >Delete</span
+                            >
+                          </template>
+                          <template #cancelBtn>
+                            <span
+                              class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                              >Cancel</span
+                            >
+                          </template>
+                        </ConfirmModal>
 
                         <!-- DELETE -->
                       </td>
@@ -1006,69 +1061,11 @@ const boardStore = useBoard()
                 </tbody>
               </table>
             </div>
-
-            <!-- DELETE COMPLETE -->
-            <div
-              role="alert"
-              class="alert shadow-lg"
-              v-show="deleteComplete"
-              style="
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 9999;
-                width: 500px;
-                color: rgb(74 222 128 / var(--tw-text-opacity));
-                animation: fadeInOut 1.5s infinite;
-              "
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div>
-                <h2 class="itbkk-message font-bold text-green-400">
-                  The task has been deleted
-                </h2>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <div class="flex justify-center space-x-20 mt-3 mb-3">
-  <div class="mt-2 bg-teal-500 text-sm text-white rounded-lg p-4" role="alert" tabindex="-1" aria-labelledby="hs-solid-color-success-label">
-    <span id="hs-solid-color-success-label" class="font-bold">Success</span> 
-    {{ updateLimitText() }}
-  </div>
-</div> -->
-
-  <!-- <div class="flex justify-center space-x-20 mt-3 mb-3">
-    <button class="flex items-center bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1024 1024">
-        <path fill="#eb4343"
-          d="M512 244c176.18 0 319 142.82 319 319v233a32 32 0 0 1-32 32H225a32 32 0 0 1-32-32V563c0-176.18 142.82-319 319-319M484 68h56a8 8 0 0 1 8 8v96a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8V76a8 8 0 0 1 8-8M177.25 191.66a8 8 0 0 1 11.32 0l67.88 67.88a8 8 0 0 1 0 11.31l-39.6 39.6a8 8 0 0 1-11.31 0l-67.88-67.88a8 8 0 0 1 0-11.31l39.6-39.6zm669.6 0l39.6 39.6a8 8 0 0 1 0 11.3l-67.88 67.9a8 8 0 0 1-11.32 0l-39.6-39.6a8 8 0 0 1 0-11.32l67.89-67.88a8 8 0 0 1 11.31 0M192 892h640a32 32 0 0 1 32 32v24a8 8 0 0 1-8 8H168a8 8 0 0 1-8-8v-24a32 32 0 0 1 32-32m148-317v253h64V575z" />
-      </svg>
-      {{ updateLimitText() }}
-    </button>
-  </div> -->
-  <!-- <footer class="footer footer-center p-5 text-primary-content">
-    <aside class="flex items-center space-x-20">
-      <p style="color: #f785b1">Thank you for choosing Kradan Kanban!</p>
-    </aside>
-  </footer> -->
 </template>
 
 <style scoped>

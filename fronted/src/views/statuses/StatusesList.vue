@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from "vue"
 import {
   getItemById,
   getItems,
@@ -9,16 +9,17 @@ import {
   deleteItemAndTransfer,
   getBoardById,
   getResponseItems
-} from '@/libs/fetchUtils.js'
-import { useStatuses } from '@/stores/storeStatus'
-import { useRoute, useRouter } from 'vue-router'
-import { useLimitStore } from '@/stores/storeLimit'
-import { useTasks } from '@/stores/store'
-import { useUsers } from '@/stores/storeUser'
-import SideBar from '@/component/bar/SideBar.vue'
-import Navbar from '@/component/bar/Navbar.vue'
-import LodingPage from '@/component/ui/LodingPage.vue'
-
+} from "@/libs/fetchUtils.js"
+import { useStatuses } from "@/stores/storeStatus"
+import { useRoute, useRouter } from "vue-router"
+import { useLimitStore } from "@/stores/storeLimit"
+import { useTasks } from "@/stores/store"
+import { useUsers } from "@/stores/storeUser"
+import SideBar from "@/component/bar/SideBar.vue"
+import Navbar from "@/component/bar/Navbar.vue"
+import LodingPage from "@/component/ui/LodingPage.vue"
+import Alert from "@/component/alert/Alert.vue"
+import ConfirmModal from "@/component/modal/ConfirmModal.vue"
 // ----------------------- Router -----------------------
 
 const route = useRoute()
@@ -34,7 +35,7 @@ const taskStore = useTasks()
 // ----------------------- Params -----------------------
 
 const selectedStatusId = ref(0)
-const boardName = ref('')
+const boardName = ref("")
 const boardId = ref()
 const isLoading = ref(true)
 
@@ -45,7 +46,7 @@ watch(
   },
   { immediate: true }
 )
-const token = localStorage.getItem('access_token')
+const token = localStorage.getItem("access_token")
 
 const userName = userStore.getUser().username
 
@@ -53,25 +54,25 @@ const userName = userStore.getUser().username
 
 const statusList = ref([])
 const status = ref({
-  id: '',
-  name: '',
-  description: '',
-  createdOn: '',
-  updatedOn: ''
+  id: "",
+  name: "",
+  description: "",
+  createdOn: "",
+  updatedOn: ""
 })
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status'
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
 })
 
 // ----------------------- Alerts -----------------------
 
 const notFound = ref(false)
-const errorAdd = ref('')
-const errorEdit = ref('')
+const errorAdd = ref("")
+const errorEdit = ref("")
 
 const notAdd = ref(false)
 const notEdit = ref(false)
@@ -85,12 +86,13 @@ const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
 const limitAlert = ref(false)
-const errorLimit = ref('')
+const errorLimit = ref("")
 const errorTrans = ref(false)
 
 // ----------------------- Enable & Disable -----------------------
 
 const disabledButtonWhileOpenPublic = ref(false)
+const openModalDelete = ref(false)
 
 // ----------------------- BaseUrl -----------------------
 
@@ -112,7 +114,6 @@ onMounted(async () => {
     const statusId = route.params.id
 
     const board = await getBoardById(boardId.value)
-   
 
     if (board && board.item && board.item.name) {
       boardName.value = board.item.name
@@ -122,7 +123,7 @@ onMounted(async () => {
     } else if (
       board.item.owner.name !== userName &&
       !board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === 'WRITE'
+        (collab) => collab.name === userName && collab.accessRight === "WRITE"
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
@@ -130,11 +131,15 @@ onMounted(async () => {
       disabledButtonWhileOpenPublic.value = false
     }
   } catch (error) {
-    console.error('Error loading data:', error)
+    console.error("Error loading data:", error)
   } finally {
     isLoading.value = false
   }
 })
+
+const toBoardList = () => {
+  router.go(-1)
+}
 
 // ----------------------- Add -----------------------
 
@@ -150,7 +155,7 @@ const submitForm = async () => {
       notAdd.value = false
     }, 1800)
     notAdd.value = true
-    return (errorAdd.value = 'Status name already exists')
+    return (errorAdd.value = "Status name already exists")
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -163,17 +168,18 @@ const submitForm = async () => {
   setTimeout(() => {
     showAlertAfterAdd.value = false
   }, 2300)
+  closeModalAdd()
   clearForm()
 }
 
 const clearForm = () => {
-  status.value.name = ''
-  status.value.description = ''
+  status.value.name = ""
+  status.value.description = ""
 }
 
 const closeModalAdd = () => {
   clearForm()
-  const modal = document.getElementById('my_modal_4')
+  const modal = document.getElementById("my_modal_4")
   modal.close()
   router.go(-1)
 }
@@ -200,7 +206,7 @@ const UpdateStatus = async () => {
       notEdit.value = false
     }, 1800)
     notEdit.value = true
-    return (errorEdit.value = 'Status name already exists')
+    return (errorEdit.value = "Status name already exists")
   }
 
   myStatuses.updateStatus(
@@ -229,13 +235,13 @@ const openModalToEdit = (statusId) => {
   const statusToEdit = statusList.value.find((item) => item.id === statusId)
   status.value = { ...statusToEdit }
   originalStatus.value = { ...statusToEdit }
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.showModal()
-  router.push({ name: 'EditStatus', params: { statusid: statusId } })
+  router.push({ name: "EditStatus", params: { statusid: statusId } })
 }
 
 const closeModalEdit = () => {
-  const modal = document.getElementById('my_modal_edit')
+  const modal = document.getElementById("my_modal_edit")
   modal.close()
   router.go(-1)
   clearForm()
@@ -270,7 +276,7 @@ const getNameById = (id) => {
 }
 
 const openAdd = () => {
-  router.push({ name: 'AddStatus' })
+  router.push({ name: "AddStatus" })
 }
 
 const selectedItemIdToDelete = ref(0)
@@ -305,28 +311,22 @@ const deleteStatus = async (statusId) => {
 
 const openModalToDelete = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_delete')
-  modal3?.showModal()
-}
-
-const closeModal = () => {
-  const modal3 = document.getElementById('my_modal_delete')
-  modal3?.close()
+  openModalDelete.value = true
 }
 
 const confirmDelete = () => {
   deleteStatus(selectedItemIdToDelete.value)
-  closeModal()
+  openModalDelete.value = false
 }
 
 const openModalToDeleteTrans = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.showModal()
 }
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById('my_modal_deleteTrans')
+  const modal3 = document.getElementById("my_modal_deleteTrans")
   modal3?.close()
 }
 const confirmDeleteTrans = (statusId) => {
@@ -369,7 +369,7 @@ const deleteandtrans = async (statusId, newID) => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === 'No Status' || status === 'Done') {
+  if (status === "No Status" || status === "Done") {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -399,6 +399,8 @@ const isFormValid = computed(() => {
     isValidDescription(status.value.description)
   )
 })
+
+
 </script>
 
 <template>
@@ -421,7 +423,7 @@ const isFormValid = computed(() => {
           <div class="text-sm breadcrumbs">
             <ul>
               <li>
-                <a @click="$router.go(-1)">
+                <a @click="toBoardList()">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 256 256"
@@ -503,70 +505,41 @@ const isFormValid = computed(() => {
             <div class="min-w-full">
               <!-- HOME -->
 
+              <!-- Add Alert -->
+              <Alert :isAlertSuccess="showAlertAfterAdd">
+                The Status has been successfully added
+              </Alert>
+
+              <Alert :isAlertFailure="notAdd">
+                {{ errorAdd }}
+              </Alert>
+
               <!-- Edit Alert Success -->
-              <div
-                role="alert"
-                class="alert shadow-lg"
-                :class="{ hidden: !showAlertAfterEdit }"
-                style="
-                  position: fixed;
-                  top: 20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 9999;
-                  width: 500px;
-                  animation: fadeInOut 1.5s infinite;
-                  color: rgb(74 222 128 / var(--tw-text-opacity));
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <h2 class="itbkk-message font-bold text-green-400">
-                  The Status has been successfully edited
-                </h2>
-              </div>
-              <!-- Edit Alert -->
-              <div
-                role="alert"
-                class="alert shadow-lg alert-error"
-                v-show="notEdit"
-                style="
-                  position: fixed;
-                  top: 20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 9999;
-                  width: 500px;
-                  color: rgb(74 222 128 / var(--tw-text-opacity));
-                  animation: fadeInOut 1.5s infinite;
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{{ errorEdit }}</span>
-              </div>
+
+              <Alert :isAlertSuccess="showAlertAfterEdit">
+                The Status has been successfully edited
+              </Alert>
+
+              <Alert :isAlertFailure="notEdit">
+                {{ errorEdit }}
+              </Alert>
+
+              <!-- Delete Alert -->
+              <Alert :isAlertSuccess="showAlertAfterDelete">
+                The Status has been deleted
+              </Alert>
+              <Alert :isAlertFailure="errorTrans">
+                "Cannot transfer to status since it will exceed the limit.
+                Please choose another status to transfer to."
+              </Alert>
+              <Alert :isAlertFailure="notFound">
+                Error! Status not found
+              </Alert>
+
+              <!-- LimitAlert -->
+              <Alert :isAlertFailure="limitAlert">
+                {{ errorLimit }}
+              </Alert>
 
               <!-- TABLE -->
               <table
@@ -665,7 +638,7 @@ const isFormValid = computed(() => {
                       >
                         {{
                           !item.description || item.description.length === 0
-                            ? 'No description is provided'
+                            ? "No description is provided"
                             : item.description
                         }}
                       </label>
@@ -865,68 +838,53 @@ const isFormValid = computed(() => {
                           </g>
                         </svg>
                       </button>
-                      <dialog id="my_modal_delete" class="modal">
-                        <div class="modal-box" style="max-width: 500px">
-                          <h3 class="font-bold text-lg">Delete a Task</h3>
-                          <p
-                            class="itbkk-message py-4 font-medium"
-                            style="word-wrap: break-word"
+                      <ConfirmModal
+                        :openModal="openModalDelete"
+                        @confirm="confirmDelete()"
+                        @cancel="openModalDelete = false"
+                      >
+                        <template #svg>
+                          <div
+                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
                           >
+                            <svg
+                              class="h-6 w-6 text-red-600"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              aria-hidden="true"
+                              data-slot="icon"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                              />
+                            </svg>
+                          </div>
+                        </template>
+                        <template #headerMessage> Delete Board </template>
+                        <template #message>
+                          <p class="text-sm text-gray-500">
                             Do you want to delete
                             {{ getNameById(selectedItemIdToDelete) }} ?
                           </p>
-                          <div class="modal-action">
-                            <button
-                              class="itbkk-button-cancel btn"
-                              @click="closeModal"
-                              style="color: #eb4343"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              class="itbkk-button-confirm btn bg-green-400"
-                              style="color: #fff"
-                              @click="confirmDelete"
-                            >
-                              Confirm
-                            </button>
-                          </div>
-                        </div>
-                      </dialog>
-                      <div
-                        role="alert"
-                        class="alert shadow-lg"
-                        :class="{ hidden: !showAlertAfterDelete }"
-                        style="
-                          position: fixed;
-                          top: 20px;
-                          left: 50%;
-                          transform: translateX(-50%);
-                          z-index: 9999;
-                          width: 500px;
-                          color: rgb(74 222 128 / var(--tw-text-opacity));
-                          animation: fadeInOut 1.5s infinite;
-                        "
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="stroke-current shrink-0 h-6 w-6"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <div>
-                          <h2 class="itbkk-message font-bold text-green-400">
-                            The Status has been deleted
-                          </h2>
-                        </div>
-                      </div>
+                        </template>
+                        <template #confirmBtn>
+                          <span
+                            class="inline-flex w-full justify-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-300 sm:ml-3 sm:w-auto"
+                            >Delete</span
+                          >
+                        </template>
+                        <template #cancelBtn>
+                          <span
+                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                            >Cancel</span
+                          >
+                        </template>
+                      </ConfirmModal>
+                     
 
                       <!-- Delete And Trans -->
                       <dialog id="my_modal_deleteTrans" class="modal">
@@ -983,36 +941,6 @@ const isFormValid = computed(() => {
                               </button>
                             </div>
                           </div>
-                          <!-- LimitAlert -->
-                          <div
-                            role="alert"
-                            class="alert shadow-lg alert-error"
-                            v-show="limitAlert"
-                            style="
-                              position: fixed;
-                              top: 20px;
-                              left: 50%;
-                              transform: translateX(-50%);
-                              z-index: 9999;
-                              width: 500px;
-                              animation: fadeInOut 1.5s infinite;
-                            "
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="stroke-current shrink-0 h-6 w-6"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            <span>{{ errorLimit }}</span>
-                          </div>
                         </div>
                       </dialog>
                     </td>
@@ -1024,70 +952,6 @@ const isFormValid = computed(() => {
         </div>
 
         <div class="min-h-full max-h-fit">
-          <div
-            role="alert"
-            class="alert alert-error"
-            v-show="errorTrans"
-            style="
-              position: fixed;
-              top: 20px;
-              left: 50%;
-              transform: translateX(-50%);
-              z-index: 9999;
-              width: 500px;
-              animation: fadeInOut 1.5s infinite;
-            "
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>
-              "Cannot transfer to status since it will exceed the limit. Please
-              choose another status to transfer to."
-            </span>
-          </div>
-
-          <!-- Alert Status not found -->
-          <div
-            role="alert"
-            class="alert alert-error"
-            v-show="notFound"
-            style="
-              position: fixed;
-              top: 20px;
-              left: 50%;
-              transform: translateX(-50%);
-              z-index: 9999;
-              width: 500px;
-              animation: fadeInOut 1.5s infinite;
-            "
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>Error! Status not found</span>
-          </div>
-
           <div class="flex items-center">
             <div class="hidden md:block">
               <div class="flex space-x-1.5"></div>
@@ -1159,6 +1023,13 @@ const isFormValid = computed(() => {
 
                 <!-- Buttons -->
                 <div class="flex justify-end">
+                  <button
+                    class="itbkk-button-cancel btn"
+                    style="margin: 10px"
+                    @click="closeModalAdd()"
+                  >
+                    Cancel
+                  </button>
                   <form form @submit.prevent="submitForm" method="dialog">
                     <button
                       type="submit"
@@ -1169,83 +1040,10 @@ const isFormValid = computed(() => {
                       Save
                     </button>
                   </form>
-                  <button
-                    class="itbkk-button-cancel btn"
-                    style="margin: 10px"
-                    @click="closeModalAdd()"
-                  >
-                    Cancel
-                  </button>
                 </div>
-              </div>
-
-              <!-- Add Error Alert -->
-              <div
-                role="alert"
-                class="alert shadow-lg alert-error"
-                v-show="notAdd"
-                style="
-                  position: fixed;
-                  top: 20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 9999;
-                  width: 500px;
-                  animation: fadeInOut 1.5s infinite;
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>{{ errorAdd }}</span>
-              </div>
-
-              <!-- Add Success Alert -->
-              <div
-                role="alert"
-                class="alert shadow-lg"
-                :class="{ hidden: !showAlertAfterAdd }"
-                style="
-                  position: fixed;
-                  top: 20px;
-                  left: 50%;
-                  transform: translateX(-50%);
-                  z-index: 9999;
-                  width: 500px;
-                  animation: fadeInOut 1.5s infinite;
-                  color: rgb(74 222 128 / var(--tw-text-opacity));
-                "
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="stroke-current shrink-0 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <h2 class="itbkk-message font-bold text-green-400">
-                  The Status has been successfully added
-                </h2>
               </div>
             </div>
           </dialog>
-          
         </div>
       </div>
     </div>

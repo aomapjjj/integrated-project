@@ -1,8 +1,8 @@
-import router from '@/router'
+import router from "@/router"
 
 const baseUrlBoards = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
 function getToken() {
-  return localStorage.getItem('access_token')
+  return localStorage.getItem("access_token")
 }
 
 async function getItems(url) {
@@ -21,7 +21,7 @@ async function getBoardItems(url) {
   const token = getToken()
 
   if (!token) {
-    console.log('No token provided. Exiting function.')
+    console.log("No token provided. Exiting function.")
     return
   }
 
@@ -65,7 +65,7 @@ async function getItemById(taskId, boardId) {
       console.log(`error: ${error}`)
     }
   } else {
-    console.log('Invalid boardId or taskId')
+    console.log("Invalid boardId or taskId")
   }
 }
 
@@ -77,12 +77,12 @@ async function getBoardById(boardId) {
     try {
       const response = await fetch(`${baseUrlBoards}/${boardId}`, { headers })
       if (response.status === 404) {
-        router.push({ name: 'ErrorPage' })
+        router.push({ name: "ErrorPage" })
         return
       }
 
       if (response.status === 403) {
-        router.push({ name: 'ErrorPagePermission' })
+        router.push({ name: "ErrorPagePermission" })
         return
       }
 
@@ -94,7 +94,7 @@ async function getBoardById(boardId) {
       console.log(`error: ${error}`)
     }
   } else {
-    console.log('Invalid boardId or taskId')
+    console.log("Invalid boardId or taskId")
   }
 }
 
@@ -102,7 +102,7 @@ async function deleteItemById(url, id) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -117,7 +117,7 @@ async function deleteItemAndTransfer(url, id, newid) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}/${newid}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -132,9 +132,9 @@ async function addItem(url, newItem) {
   const token = getToken()
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ ...newItem })
@@ -150,9 +150,9 @@ async function editItem(url, id, editItem) {
   const token = getToken()
   try {
     const response = await fetch(`${url}/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ ...editItem })
@@ -170,9 +170,9 @@ async function editLimit(baseUrlLimit, maximumTask, isLimit) {
     const response = await fetch(
       `${baseUrlLimit}?maximumTask=${maximumTask}&isLimit=${isLimit}`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         }
       }
@@ -193,9 +193,9 @@ async function addBoard(url, newBoard) {
   const token = getToken()
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(newBoard)
@@ -214,13 +214,13 @@ async function addBoard(url, newBoard) {
 async function boardVisibility(boardId, currentVisibility) {
   const token = getToken()
 
-  const newVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC'
+  const newVisibility = currentVisibility === "PUBLIC" ? "PRIVATE" : "PUBLIC"
 
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({ visibility: newVisibility })
@@ -240,13 +240,13 @@ async function boardVisibility(boardId, currentVisibility) {
       return null
     } else if (response.status === 403) {
       const message =
-        'You do not have permission to change board visibility mode.'
+        "You do not have permission to change board visibility mode."
       return {
         success: false,
         message: message
       }
     } else {
-      const message = 'There is a problem. Please try again later.'
+      const message = "There is a problem. Please try again later."
       return {
         success: false,
         message: message
@@ -254,7 +254,7 @@ async function boardVisibility(boardId, currentVisibility) {
     }
   } catch (error) {
     console.log(`Error: ${error.message}`)
-    const message = 'There is a problem, Please try again later.'
+    const message = "There is a problem, Please try again later."
     return {
       success: false,
       message: message
@@ -287,9 +287,9 @@ async function addCollaborator(boardId, collaboratorWithEmai) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(collaboratorWithEmai)
@@ -308,9 +308,9 @@ async function editAccessRight(boardId, access, oid, status) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify({
@@ -336,9 +336,9 @@ async function editStatusCollab(boardId, status, collaboratorId, access) {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/collabs/${collaboratorId}/status`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
@@ -363,7 +363,7 @@ async function deleteCollaborator(boardId, oid) {
   const token = getToken()
   try {
     const response = await fetch(`${baseUrlBoards}/${boardId}/collabs/${oid}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -380,7 +380,7 @@ async function getAttachments(boardId, taskId) {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -397,21 +397,21 @@ async function getAttachments(boardId, taskId) {
 
 async function addAttachments(boardId, taskId, files) {
   if (!boardId || !taskId) {
-    throw new Error('Board ID or Task ID is missing')
+    throw new Error("Board ID or Task ID is missing")
   }
 
   const token = getToken()
   if (!token) {
-    throw new Error('Authentication failed')
+    throw new Error("Authentication failed")
   }
   const formData = new FormData()
-  files.forEach((file) => formData.append('files', file))
+  files.forEach((file) => formData.append("files", file))
 
   try {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -435,7 +435,7 @@ async function deleteAttachment(boardId, taskId, attachmentId) {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${attachmentId}`,
       {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -457,7 +457,7 @@ const downloadAttachment = async (boardId, taskId, filename) => {
     const response = await fetch(
       `${baseUrlBoards}/${boardId}/tasks/${taskId}/attachments/${filename}`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -469,17 +469,17 @@ const downloadAttachment = async (boardId, taskId, filename) => {
 
       // ใช้ Programmatic File Download
       const link = new URL(fileUrl)
-      const anchor = new URL('', link.origin)
+      const anchor = new URL("", link.origin)
       anchor.href = fileUrl
       anchor.download = fileName.value // ตั้งชื่อไฟล์
-      anchor.dispatchEvent(new MouseEvent('click')) // กระตุ้นการดาวน์โหลด
+      anchor.dispatchEvent(new MouseEvent("click")) // กระตุ้นการดาวน์โหลด
 
       URL.revokeObjectURL(fileUrl)
     } else {
       console.error(`Failed to load attachment: ${response.statusText}`)
     }
   } catch (error) {
-    console.error('Error downloading file:', error)
+    console.error("Error downloading file:", error)
   }
 }
 
@@ -487,9 +487,9 @@ const validateAccessToken = async (token) => {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/validate-token`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       }
     }
@@ -498,44 +498,50 @@ const validateAccessToken = async (token) => {
 }
 const validateMicrosoftAccessToken = async (token) => {
   try {
-    const response = await fetch('https://graph.microsoft.com/v1.0/me', {
-      method: 'GET',
+    const response = await fetch("https://graph.microsoft.com/v1.0/me", {
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
     })
 
     if (!response.ok) {
-      throw new Error(`Token validation failed: ${response.status} ${response.statusText}`)
+      throw new Error(
+        `Token validation failed: ${response.status} ${response.statusText}`
+      )
     }
     const data = await response.json()
     return {
       valid: true,
-      data, 
+      data
     }
   } catch (error) {
-    console.error('Error validating token:', error)
+    console.error("Error validating token:", error)
     return {
       valid: false,
-      error: error.message,
+      error: error.message
     }
   }
 }
 
-
 const refreshAccessToken = async (refreshToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        requestTokenHeader: `Bearer ${refreshToken}`
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          requestTokenHeader: `Bearer ${refreshToken}`
+        }
       }
-    }
-  )
-  return response
+    )
+    return response
+  } catch (error) {
+    console.error("Error validating token:", error)
+    router.push({ name: "Login" })
+  }
 }
 
 export {
@@ -564,5 +570,4 @@ export {
   getAttachments,
   downloadAttachment,
   validateMicrosoftAccessToken
-
 }
