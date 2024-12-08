@@ -53,6 +53,13 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => taskStore.getTasks(), 
+  (newTasks) => {
+    todoList.value = newTasks; 
+  }
+);
+
 // ----------------------- List Items -----------------------
 
 const todoList = ref([])
