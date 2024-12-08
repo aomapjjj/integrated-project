@@ -6,7 +6,8 @@ import { useBoard } from '../../stores/storeBoard'
 import {
   deleteItemById,
   getBoardItems,
-  deleteCollaborator
+  deleteCollaborator,
+  editBoard
 } from '../../libs/fetchUtils.js'
 import Alert from '../alert/Alert.vue'
 import ConfirmModal from '../modal/ConfirmModal.vue'
@@ -49,9 +50,10 @@ const boardsOwner = ref()
 const oidCollaboratorToRemove = ref()
 const boardIdCollabs = ref()
 const boardsCollab = ref()
-
+const boardName = ref('')
 boardsOwner.value = boardStore.getBoards()
 boardsCollab.value = boardStore.getCollabs()
+const boardIdtoEdit = ref()
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -60,7 +62,7 @@ const showConfirmModal = ref(false)
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
 const alertMessage = ref('')
-
+const openModalName = ref(false)
 // ----------------------- BaseUrl -----------------------
 
 const baseUrlBoard = `${import.meta.env.VITE_BASE_URL_MAIN}/boards`
@@ -155,9 +157,16 @@ const toBoardsInvitations = (board) => {
 const deletBoard = async (boardId) => {
   const deletBoard = await deleteItemById(baseUrlBoard, boardId)
   if (deletBoard === 200) {
+    isAlertSuccess.value = true
+    alertMessage.value = "The Board has been deleted"
+    setTimeout(hideAlert, 3000)
     removeBoard(boardId)
     openModalToDelete.value = false
     boardsOwner.value = boardStore.getBoards()
+  }else{
+    isAlertFailure.value = true
+     alertMessage.value = "Can't Delete The Board"
+     setTimeout(hideAlert, 3000)
   }
 }
 
@@ -214,12 +223,42 @@ const getCollaboratorAccessRight = (collaborators, name) => {
   }
   return false
 }
+
+
+
+const openModalEdit = (boardid , boardname) => {
+  openModalName.value = true
+  boardIdtoEdit.value = boardid
+  boardName.value = boardname
+}
+
+const updateBoardName = async () => {
+  const result = await editBoard(baseUrlBoard, boardIdtoEdit.value , boardName.value);
+  if (result.data) {
+    boardStore.updateBoard(result.data); 
+    boardsOwner.value = boardStore.getBoards()
+     isAlertSuccess.value = true
+    alertMessage.value = "The Board has been edited"
+    setTimeout(hideAlert, 3000)
+  }
+  if (result.status === 401) {
+    router.push({ name: 'Login' });
+    isAlertFailure.value = true
+     alertMessage.value = "Can't Edit The Board"
+     setTimeout(hideAlert, 3000)
+  } else {
+    openModalName.value = false
+  }
+};
+
+
 </script>
 
 <template>
   <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
     {{ alertMessage }}
   </Alert>
+
   <div
     class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
   >
@@ -286,7 +325,7 @@ const getCollaboratorAccessRight = (collaborators, name) => {
               ></span>
             </template>
             <template #Btn>
-              <button class="btn rounded-full customBgYellow">
+              <button class="btn rounded-full customBgYellow" @click="openModalEdit(item.id , item.name)">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
@@ -527,9 +566,75 @@ const getCollaboratorAccessRight = (collaborators, name) => {
       </div>
     </div>
 
-    <div v-else-if="!boardsCollab || boardsCollab.length === 0">
+      <!------------------------- Modal ------------------------->
+      <div
+          v-if="openModalName"
+          class="itbkk-modal-new fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+        >
+          <div
+            class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 px-6 py-4 flex flex-col gap-4 transform scale-95 transition-all duration-300 ease-in-out"
+          >
+            <div>
+              <div class="m-6 my-12 max-w-[400px] mx-auto">
+                <div class="text-center mb-4">
+                  <h2 class="text-2xl font-bold customPurple">Edit Board Name</h2>
+                  <p class="text-gray-500 text-sm mt-1">
+                    Make your board special < 3
+                  </p>
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="boardName"
+                    class="block text-base font-bold mb-2 px-2"
+                  >
+                    Board Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="boardName"
+                    type="text"
+                    placeholder="Board name"
+                    v-model="boardName"
+                    maxlength="120"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-full text-gray-700 focus:ring-2 focus:ring-customPurple focus:outline-none transition duration-200"
+                  />
+                  <div class="flex justify-end items-center mx-2 mt-1">
+                    <!-- <p class="text-sm text-red-500">MessageError</p> -->
+                    <p class="text-sm text-gray-500">
+                      {{ boardName.length }}/120
+                    </p>
+                  </div>
+                </div>
+                <!-- </div> -->
+                <div
+                  class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200"
+                >
+                  <router-link to="/board">
+                    <button
+                      @click="openModalName = false"
+                      class="itbkk-button-cancel py-3 px-6 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </router-link>
+                  <form method="dialog">
+                    <button
+                      type="submit"
+                      class="itbkk-button-ok btn py-3 px-7 rounded-full bg-customPink text-white hover:bg-[#fa619c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      @click="updateBoardName()"
+                    >
+                      Save
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+    <!-- <div v-else-if="!boardsCollab || boardsCollab.length === 0">
       <EmptyBoard />
-    </div>
+    </div> -->
   </div>
 
   <ConfirmModal
