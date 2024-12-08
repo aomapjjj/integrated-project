@@ -196,7 +196,8 @@ const routes = [
   },
   {
     path: '/logout',
-    name: 'Logout'
+    name: 'Logout',
+    redirect: { name: 'Login' },
   },
   {
     path: '/tutorials',
