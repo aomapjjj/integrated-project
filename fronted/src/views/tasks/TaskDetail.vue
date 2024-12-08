@@ -22,17 +22,7 @@ const props = defineProps({
 const tasksStore = useTasks()
 const emit = defineEmits(['close'])
 
-const files = computed(() => {
-  const attachments = tasksStore.getAttachmentsByTaskId(props.todoId)
-  return attachments.map((attachment) => {
-    const byteCharacters = atob(attachment.fileData)
-    const byteNumbers = new Uint8Array(
-      byteCharacters.split('').map((char) => char.charCodeAt(0))
-    )
-    const blob = new Blob([byteNumbers], { type: attachment.fileType })
-    return new File([blob], attachment.fileName, { type: attachment.fileType })
-  })
-})
+const files = ref([])
 
 const isFilePreviewOpen = ref(false)
 const previewFileData = ref({})
