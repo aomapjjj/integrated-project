@@ -38,6 +38,18 @@ const useBoard = defineStore("board", () => {
     })
     saveBoardsToLocalStorage()
   }
+  const updateBoard = (updatedBoard) => {
+    boards.value = getBoards()
+    const index = boards.value.findIndex((board) => String(board.id) === String(updatedBoard.id));
+    if (index !== -1) {
+      boards.value.splice(index, 1, { ...boards.value[index], ...updatedBoard }); 
+      console.log(`Board with id ${updatedBoard.id} has been updated.`);
+      saveBoardsToLocalStorage(); 
+    } else {
+      console.log(`Board with id ${updatedBoard.id} not found.`);
+    }
+  }
+  
 
   const removeBoard = (deleteBoardID) => {
     console.log(deleteBoardID)
@@ -135,7 +147,8 @@ const useBoard = defineStore("board", () => {
     addNewCollabs,
     editCollab,
     removeCollabs,
-    resetCollabs
+    resetCollabs,
+    updateBoard
   }
 })
 

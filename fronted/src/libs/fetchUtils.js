@@ -210,6 +210,26 @@ async function addBoard(url, newBoard) {
     return { status: 401, data: null }
   }
 }
+async function editBoard(url, boardId, updatedBoard) {
+  const token = getToken(); 
+  try {
+    const response = await fetch(`${url}/${boardId}`, {
+      method: "PUT", 
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedBoard), 
+    });
+
+    const data = await response.json();
+    return { status: response.status, data };
+  } catch (error) {
+    console.log(`error: ${error}`);
+    return { status: 500, data: null };
+  }
+}
+
 
 async function boardVisibility(boardId, currentVisibility) {
   const token = getToken()
@@ -569,5 +589,6 @@ export {
   deleteAttachment,
   getAttachments,
   downloadAttachment,
-  validateMicrosoftAccessToken
+  validateMicrosoftAccessToken,
+  editBoard
 }

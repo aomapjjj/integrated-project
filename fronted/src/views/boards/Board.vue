@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 import { useUsers } from '@/stores/storeUser'
-import { addBoard, getBoardItems } from '../../libs/fetchUtils.js'
+import { addBoard, getBoardItems , editBoard} from '../../libs/fetchUtils.js'
 import SideBar from '@/component/bar/SideBar.vue'
 import Navbar from '@/component/bar/Navbar.vue'
 import BoardCard from '@/component/card/BoardCard.vue'
@@ -101,6 +101,9 @@ const submitForm = async () => {
     clearForm()
   }
 }
+
+
+
 
 const clearForm = () => {
   userBoard.value.name = ''
@@ -263,6 +266,10 @@ const openModalCreate = () => {
             </div>
           </div>
         </div>
+
+
+
+        
       </div>
     </div>
   </div>
