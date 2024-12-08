@@ -157,9 +157,16 @@ const toBoardsInvitations = (board) => {
 const deletBoard = async (boardId) => {
   const deletBoard = await deleteItemById(baseUrlBoard, boardId)
   if (deletBoard === 200) {
+    isAlertSuccess.value = true
+    alertMessage.value = "The Board has been deleted"
+    setTimeout(hideAlert, 3000)
     removeBoard(boardId)
     openModalToDelete.value = false
     boardsOwner.value = boardStore.getBoards()
+  }else{
+    isAlertFailure.value = true
+     alertMessage.value = "Can't Delete The Board"
+     setTimeout(hideAlert, 3000)
   }
 }
 
@@ -230,9 +237,15 @@ const updateBoardName = async () => {
   if (result.data) {
     boardStore.updateBoard(result.data); 
     boardsOwner.value = boardStore.getBoards()
+     isAlertSuccess.value = true
+    alertMessage.value = "The Board has been edited"
+    setTimeout(hideAlert, 3000)
   }
   if (result.status === 401) {
     router.push({ name: 'Login' });
+    isAlertFailure.value = true
+     alertMessage.value = "Can't Edit The Board"
+     setTimeout(hideAlert, 3000)
   } else {
     openModalName.value = false
   }
@@ -245,6 +258,7 @@ const updateBoardName = async () => {
   <Alert :isAlertFailure="isAlertFailure" :isAlertSuccess="isAlertSuccess">
     {{ alertMessage }}
   </Alert>
+
   <div
     class="p-4 overflow-y-auto h-screen max-h-screen md:h-[80vh] lg:h-[75vh] xl:h-[70vh]"
   >
@@ -618,9 +632,9 @@ const updateBoardName = async () => {
         </div>
 
 
-    <div v-else-if="!boardsCollab || boardsCollab.length === 0">
+    <!-- <div v-else-if="!boardsCollab || boardsCollab.length === 0">
       <EmptyBoard />
-    </div>
+    </div> -->
   </div>
 
   <ConfirmModal
