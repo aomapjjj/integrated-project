@@ -1,10 +1,10 @@
 <script setup>
-import { getItems, addItem } from "../../libs/fetchUtils.js"
-import { ref, onMounted, computed, watch } from "vue"
-import { useRouter, useRoute } from "vue-router"
-import { useTasks } from "../../stores/store.js"
-import { useLimitStore } from "../../stores/storeLimit.js"
-import Alert from "@/component/alert/Alert.vue"
+import { getItems, addItem } from '../../libs/fetchUtils.js'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useTasks } from '../../stores/store.js'
+import { useLimitStore } from '../../stores/storeLimit.js'
+import Alert from '@/component/alert/Alert.vue'
 
 // ----------------------- Router -----------------------
 
@@ -16,7 +16,7 @@ const route = useRoute()
 const alertAdd = ref(false)
 const statusList = ref([])
 const alertLimitAdd = ref(false)
-const errorMessageLimit = ref("")
+const errorMessageLimit = ref('')
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -43,10 +43,10 @@ watch(
 )
 
 const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
+  title: '',
+  description: '',
+  assignees: '',
+  status: 'No Status'
 })
 
 // ----------------------- BaseUrl -----------------------
@@ -69,7 +69,7 @@ watch(
   () => files.value,
   (newFiles) => {
     files.value = newFiles
-    console.log("Updated files:", newFiles)
+    console.log('Updated files:', newFiles)
   }
 )
 
@@ -105,7 +105,7 @@ const submitForm = async () => {
     }, 2300)
     closeModal()
   } catch (error) {
-    console.error("Error adding task:", error)
+    console.error('Error adding task:', error)
   }
 }
 
@@ -116,10 +116,10 @@ const closeModal = () => {
 }
 
 const clearForm = () => {
-  todo.value.title = ""
-  todo.value.description = ""
-  todo.value.assignees = ""
-  todo.value.status = "No Status"
+  todo.value.title = ''
+  todo.value.description = ''
+  todo.value.assignees = ''
+  todo.value.status = 'No Status'
   files.value = []
 }
 
@@ -141,7 +141,7 @@ const isFormValid = computed(() => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === "No Status" || status === "Done") {
+  if (status === 'No Status' || status === 'Done') {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -283,7 +283,6 @@ const isLimitReached = computed(() => {
               </p>
             </div>
 
-     
             <!-- Cancel & Save Button -->
             <div
               class="modal-action px-6 py-4 flex justify-end border-t border-gray-200"
@@ -366,7 +365,6 @@ const isLimitReached = computed(() => {
               <span class="text-red-500">Error! Tasks cannot be added</span>
               <span>{{ errorMessageLimit }}</span>
             </div> -->
-
       </div>
     </dialog>
   </div>

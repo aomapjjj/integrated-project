@@ -1,350 +1,48 @@
 <script setup>
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+
 const props = defineProps({
   isLoading: Boolean
 })
 </script>
 
 <template>
-  <!-- <div
+  <div
     v-if="isLoading"
-    class="fixed inset-0 bg-[#e6dcdb] bg-opacity-50 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-white bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50"
   >
-    <div class="loading-cat">
-      <div class="body"></div>
-      <div class="head">
-        <div class="face"></div>
-      </div>
-      <div class="foot">
-        <div class="tummy-end"></div>
-        <div class="bottom"></div>
-        <div class="legs left"></div>
-        <div class="legs right"></div>
-      </div>
-      <div class="hands left"></div>
-      <div class="hands right"></div>
-    </div>
-  </div> -->
-  <div v-if="isLoading" class="border border-blue-300 shadow rounded-md p-4 max-w-sm w-full mx-auto">
-  <div class="animate-pulse flex space-x-4">
-    <div class="rounded-full bg-slate-200 h-10 w-10"></div>
-    <div class="flex-1 space-y-6 py-1">
-      <div class="h-2 bg-slate-200 rounded"></div>
-      <div class="space-y-3">
-        <div class="grid grid-cols-3 gap-4">
-          <div class="h-2 bg-slate-200 rounded col-span-2"></div>
-          <div class="h-2 bg-slate-200 rounded col-span-1"></div>
-        </div>
-        <div class="h-2 bg-slate-200 rounded"></div>
-      </div>
+    <div
+      class="flex flex-col items-center space-y-4 p-8"
+    >
+      <DotLottieVue
+        style="height: 300px; width: 300px"
+        autoplay
+        loop
+        src="https://lottie.host/f6798d97-5e54-472e-80f9-6c074a732376/h0aswDGwkE.lottie"
+      />
+      <slot>
+      <h3 class="font-bold text-lg text-customPurple">
+        Saving your task... Almost there!
+      </h3>
+      <p class="text-sm text-gray-600">
+        Please wait while we save your changes.
+      </p>
+      </slot>
     </div>
   </div>
-</div>
 </template>
 
-<style>
-.loading-cat {
-  position: relative;
-  display: inline-block;
-  width: 480px;
-  height: 360px;
-  animation: 2.74s linear infinite loading-cat;
-}
-.loading-cat .head,
-.loading-cat .foot,
-.loading-cat .body {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: auto;
-  border-radius: 50%;
-  width: 240px;
-  height: 240px;
-}
-.loading-cat .body {
-  background-image: radial-gradient(
-    transparent 0%,
-    transparent 35%,
-    #383c4b 35%,
-    #383c4b 39%,
-    #eda65d 39%,
-    #eda65d 46%,
-    #f2c089 46%,
-    #f2c089 60%,
-    #eda65d 60%,
-    #eda65d 67%,
-    #383c4b 67%,
-    #383c4b 100%
-  );
-}
-.loading-cat .head:before,
-.loading-cat .foot:before {
-  background-image: radial-gradient(
-    transparent 0%,
-    transparent 35%,
-    #383c4b 35%,
-    #383c4b 39%,
-    #eda65d 39%,
-    #eda65d 67%,
-    #383c4b 67%,
-    #383c4b 100%
-  );
-}
-.loading-cat .head:before {
-  content: '';
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  border-radius: 50%;
-  clip-path: polygon(100% 20%, 50% 50%, 70% -10%);
-  -webkit-clip-path: polygon(100% 20%, 50% 50%, 70% -10%);
-}
-.loading-cat .head:after {
-  content: '';
-  width: 66px;
-  height: 40px;
-  position: absolute;
-  top: 13px;
-  right: 63px;
-  background-image: linear-gradient(#e6dcdb 65%, transparent 65%),
-    radial-gradient(#e6dcdb 51%, #383c4b 55%, #383c4b 68%, transparent 70%);
-  transform: rotate(-66deg);
-}
-.loading-cat .head .face {
-  width: 80px;
-  height: 60px;
-  left: 145px;
-  top: 29px;
-  position: absolute;
-  transform: rotate(-47deg);
-  background: radial-gradient(circle, #f2c089 0%, #f2c089 23%, transparent 23%) -3px
-      17px no-repeat,
-    radial-gradient(circle, #383c4b 0%, #383c4b 6%, transparent 6%) 12px -12px no-repeat,
-    radial-gradient(circle, #383c4b 0%, #383c4b 6%, transparent 6%) -12px -12px
-      no-repeat,
-    radial-gradient(#eda65d 0%, #eda65d 15%, transparent 15%) 0 -11px no-repeat,
-    radial-gradient(
-        circle,
-        transparent 5%,
-        #383c4b 5%,
-        #383c4b 10%,
-        transparent 10%
-      ) -3px -5px no-repeat,
-    radial-gradient(
-        circle,
-        transparent 5%,
-        #383c4b 5%,
-        #383c4b 10%,
-        transparent 10%
-      )
-      3px -5px no-repeat,
-    radial-gradient(circle, #eda65d 45%, transparent 45%) 0 -3px,
-    linear-gradient(
-      transparent 35%,
-      #383c4b 35%,
-      #383c4b 41%,
-      transparent 41%,
-      transparent 44%,
-      #383c4b 44%,
-      #383c4b 50%,
-      transparent 50%,
-      transparent 53%,
-      #383c4b 53%,
-      #383c4b 59%,
-      transparent 59%
-    );
-}
-.loading-cat .foot:before,
-.loading-cat .foot:after {
-  content: '';
-  width: 100%;
-  height: 100%;
-  position: absolute;
-}
-.loading-cat .foot:before {
-  border-radius: 50%;
-  clip-path: polygon(50% 50%, 0% 50%, 0% 25%);
-  -webkit-clip-path: polygon(50% 50%, 0% 50%, 0% 25%);
-}
-.loading-cat .foot .tummy-end {
-  width: 24px;
-  height: 24px;
-  position: absolute;
-  border-radius: 50%;
-  background-color: #f2c089;
-  left: 19px;
-  top: 105px;
-}
-.loading-cat .foot .bottom {
-  width: 48px;
-  height: 15px;
-  position: absolute;
-  top: 78px;
-  left: 12px;
-  border: 0 solid #383c4b;
-  border-top-width: 6.5px;
-  border-radius: 50%;
-  transform: rotate(21deg);
-  background: #eda65d;
-}
-.loading-cat .hands,
-.loading-cat .legs,
-.loading-cat .foot:after {
-  width: 10px;
-  height: 25px;
-  position: absolute;
-  border: 6.5px solid #383c4b;
-  background-color: #eda65d;
-}
-.loading-cat .hands {
-  border-top: 0;
-  border-radius: 0 0 13px 13px;
-}
-.loading-cat .hands.left {
-  top: 144px;
-  right: 161px;
-  transform: rotate(-20deg);
-}
-.loading-cat .hands.right {
-  top: 123px;
-  right: 128px;
-  transform: rotate(-25deg);
-}
-.loading-cat .legs {
-  border-bottom: 0;
-  border-radius: 13px 13px 0 0;
-}
-.loading-cat .legs.left {
-  top: 65px;
-  left: 49px;
-  transform: rotate(25deg);
-}
-.loading-cat .legs.right {
-  top: 53px;
-  left: 12px;
-  transform: rotate(22deg);
-}
-.loading-cat .foot:after {
-  width: 8px;
-  height: 40px;
-  top: 42px;
-  left: 36px;
-  z-index: -1;
-  transform: rotate(25deg);
-  background-color: #c6823b;
-  border-bottom: 0;
-  border-radius: 12px 12px 0 0;
-}
-@keyframes body {
-  0% {
-    clip-path: polygon(50% 50%, 0% 50%, 0% 100%, 100% 100%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 0% 50%, 0% 100%, 100% 100%, 100% 20%);
+<style scoped>
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  10% {
-    clip-path: polygon(50% 50%, 30% 120%, 50% 100%, 100% 100%, 100% 20%);
-    -webkit-clip-path: polygon(
-      50% 50%,
-      30% 120%,
-      50% 100%,
-      100% 100%,
-      100% 20%
-    );
-  }
-  20% {
-    clip-path: polygon(50% 50%, 100% 90%, 120% 90%, 100% 100%, 100% 20%);
-    -webkit-clip-path: polygon(
-      50% 50%,
-      100% 90%,
-      120% 90%,
-      100% 100%,
-      100% 20%
-    );
-  }
-  40% {
-    clip-path: polygon(50% 50%, 100% 45%, 120% 45%, 120% 50%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 100% 45%, 120% 45%, 120% 50%, 100% 20%);
-  }
-  50% {
-    clip-path: polygon(50% 50%, 100% 45%, 120% 45%, 120% 50%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 100% 45%, 120% 45%, 120% 50%, 100% 20%);
-  }
-  65% {
-    clip-path: polygon(50% 50%, 100% 65%, 120% 65%, 120% 50%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 100% 65%, 120% 65%, 120% 50%, 100% 20%);
-  }
-  80% {
-    clip-path: polygon(50% 50%, 75% 130%, 120% 65%, 120% 50%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 75% 130%, 120% 65%, 120% 50%, 100% 20%);
-  }
-  90% {
-    clip-path: polygon(50% 50%, -20% 110%, 50% 120%, 100% 100%, 100% 20%);
-    -webkit-clip-path: polygon(
-      50% 50%,
-      -20% 110%,
-      50% 120%,
-      100% 100%,
-      100% 20%
-    );
-  }
-  100% {
-    clip-path: polygon(50% 50%, 0% 50%, 0% 100%, 100% 100%, 100% 20%);
-    -webkit-clip-path: polygon(50% 50%, 0% 50%, 0% 100%, 100% 100%, 100% 20%);
+  to {
+    opacity: 1;
   }
 }
-@keyframes loading-cat {
-  0% {
-    transform: rotate(0deg);
-  }
-  10% {
-    transform: rotate(-80deg);
-  }
-  20% {
-    transform: rotate(-180deg);
-  }
-  40% {
-    transform: rotate(-245deg);
-  }
-  50% {
-    transform: rotate(-250deg);
-  }
-  68% {
-    transform: rotate(-300deg);
-  }
-  90% {
-    transform: rotate(-560deg);
-  }
-  100% {
-    transform: rotate(-720deg);
-  }
-}
-@keyframes foot {
-  0% {
-    transform: rotate(-10deg);
-  }
-  10% {
-    transform: rotate(-100deg);
-  }
-  20% {
-    transform: rotate(-145deg);
-  }
-  35% {
-    transform: rotate(-190deg);
-  }
-  50% {
-    transform: rotate(-195deg);
-  }
-  70% {
-    transform: rotate(-165deg);
-  }
-  100% {
-    transform: rotate(-10deg);
-  }
-}
-.loading-cat .body {
-  animation: 2.74s linear infinite body;
-}
-.loading-cat .foot {
-  animation: 2.74s linear infinite foot;
+
+.fixed {
+  animation: fadeIn 0.3s ease-in-out;
 }
 </style>

@@ -11,6 +11,7 @@
     "cypress:run": "cypress run"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-vue": "^0.5.3",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@pinia/nuxt": "^0.5.1",
     "axios": "^1.6.8",
