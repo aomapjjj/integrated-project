@@ -372,7 +372,16 @@ const deleteConfirmationMessage = computed(() => {
 
 <template>
   <div>
-    <CatLoading :is-loading="waitModal" />
+    <CatLoading :is-loading="waitModal">
+      <template #default>
+        <h3 class="font-bold text-lg text-customPurple">
+          Sending your invitation email now.
+        </h3>
+        <p class="text-sm text-gray-700">
+          Please hold on while we send your email invitation.
+        </p>
+      </template>
+    </CatLoading>
   </div>
 
   <div class="fixed top-0 right-0 mt-4 mr-4 z-20">
@@ -732,7 +741,7 @@ const deleteConfirmationMessage = computed(() => {
             <!-- Modal AddCollab -->
             <div
               v-if="openModalAddCollab"
-              class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+              class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
             >
               <div
                 class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 px-6 py-6 flex flex-col gap-4 transform scale-95 transition-all duration-300 ease-in-out"
