@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted, watch, ref, onUnmounted } from 'vue'
 
 const props = defineProps({
   isAlertFailure: Boolean,
@@ -8,7 +7,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div v-if="isAlertFailure" class="space-y-5 fixed bottom-5 right-5">
+  <div v-if="isAlertFailure" class="space-y-5 fixed bottom-5 right-5 z-50">
     <div
       class="bg-red-50 border-s-4 border-red-500 p-4 dark:bg-red-800/30"
       role="alert"

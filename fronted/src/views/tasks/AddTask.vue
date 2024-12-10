@@ -1,9 +1,10 @@
 <script setup>
-import { getItems, addItem } from '../../libs/fetchUtils.js'
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useTasks } from '../../stores/store.js'
-import { useLimitStore } from '../../stores/storeLimit.js'
+import { getItems, addItem } from "../../libs/fetchUtils.js"
+import { ref, onMounted, computed, watch } from "vue"
+import { useRouter, useRoute } from "vue-router"
+import { useTasks } from "../../stores/store.js"
+import { useLimitStore } from "../../stores/storeLimit.js"
+import Alert from "@/component/alert/Alert.vue"
 
 // ----------------------- Router -----------------------
 
@@ -15,7 +16,7 @@ const route = useRoute()
 const alertAdd = ref(false)
 const statusList = ref([])
 const alertLimitAdd = ref(false)
-const errorMessageLimit = ref('')
+const errorMessageLimit = ref("")
 
 // ----------------------- Enable & Disable -----------------------
 
@@ -42,10 +43,10 @@ watch(
 )
 
 const todo = ref({
-  title: '',
-  description: '',
-  assignees: '',
-  status: 'No Status'
+  title: "",
+  description: "",
+  assignees: "",
+  status: "No Status"
 })
 
 // ----------------------- BaseUrl -----------------------
@@ -64,16 +65,13 @@ onMounted(async () => {
   statusList.value = itemsStatus
 })
 
-
-
 watch(
   () => files.value,
   (newFiles) => {
     files.value = newFiles
-    console.log('Updated files:', newFiles)
+    console.log("Updated files:", newFiles)
   }
 )
-
 
 const submitForm = async () => {
   const trimmedTitle = todo.value.title?.trim()
@@ -96,7 +94,7 @@ const submitForm = async () => {
       itemAdd.assignees,
       itemAdd.status,
       itemAdd.createdOn,
-      itemAdd.updateOn,
+      itemAdd.updateOn
     )
 
     console.log(taskStore.getTasks())
@@ -107,7 +105,7 @@ const submitForm = async () => {
     }, 2300)
     closeModal()
   } catch (error) {
-    console.error('Error adding task:', error)
+    console.error("Error adding task:", error)
   }
 }
 
@@ -118,10 +116,10 @@ const closeModal = () => {
 }
 
 const clearForm = () => {
-  todo.value.title = ''
-  todo.value.description = ''
-  todo.value.assignees = ''
-  todo.value.status = 'No Status'
+  todo.value.title = ""
+  todo.value.description = ""
+  todo.value.assignees = ""
+  todo.value.status = "No Status"
   files.value = []
 }
 
@@ -143,10 +141,9 @@ const isFormValid = computed(() => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === 'No Status' || status === 'Done') {
+  if (status === "No Status" || status === "Done") {
     return false
   }
-
   if (limitStore.getLimit().isLimit) {
     const tasksInStatus = taskStore
       .getTasks()
@@ -195,11 +192,15 @@ const isLimitReached = computed(() => {
       Add new task
     </button>
   </RouterLink>
+  <Alert :isAlertSuccess="alertAdd">
+    The task has been successfully added
+  </Alert>
+  <Alert :isAlertFailure="alertLimitAdd"> {{ errorMessageLimit }} </Alert>
 
   <div class="itbkk-modal-task">
     <dialog
       id="my_modal_1"
-      class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-50 items-center justify-center"
+      class="itbkk-modal-task modal fixed w-full h-full flex inset-0 z-30 items-center justify-center"
     >
       <div
         class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
@@ -265,7 +266,7 @@ const isLimitReached = computed(() => {
             <!-- Assignees -->
             <div>
               <label class="block text-base font-medium text-[#9391e4]">
-                Assignees 
+                Assignees
               </label>
               <textarea
                 id="assignees"
@@ -282,28 +283,7 @@ const isLimitReached = computed(() => {
               </p>
             </div>
 
-            <div
-              role="alert"
-              v-show="alertLimitAdd"
-              class="flex flex-col fixed-alert alert"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span class="text-red-500">Error! Tasks cannot be added</span>
-              <span>{{ errorMessageLimit }}</span>
-            </div>
-
+     
             <!-- Cancel & Save Button -->
             <div
               class="modal-action px-6 py-4 flex justify-end border-t border-gray-200"
@@ -332,7 +312,8 @@ const isLimitReached = computed(() => {
         </div>
 
         <!-- ALERT -->
-        <div
+
+        <!-- <div
           role="alert"
           class="alert shadow-lg"
           :class="{ hidden: !alertAdd }"
@@ -363,7 +344,29 @@ const isLimitReached = computed(() => {
           <span class="font-bold text-green-400"
             >The task has been successfully added</span
           >
-        </div>
+        </div> -->
+        <!-- <div
+              role="alert"
+              v-show="alertLimitAdd"
+              class="flex flex-col fixed-alert alert"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span class="text-red-500">Error! Tasks cannot be added</span>
+              <span>{{ errorMessageLimit }}</span>
+            </div> -->
+
       </div>
     </dialog>
   </div>

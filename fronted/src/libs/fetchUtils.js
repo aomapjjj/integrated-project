@@ -175,6 +175,7 @@ async function editLimit(baseUrlLimit, maximumTask, isLimit) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+
       }
     )
 
@@ -197,6 +198,7 @@ async function addBoard(url, newBoard) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+
       },
       body: JSON.stringify(newBoard),
     })
@@ -210,6 +212,26 @@ async function addBoard(url, newBoard) {
     return { status: 401, data: null }
   }
 }
+async function editBoard(url, boardId, updatedBoard) {
+  const token = getToken(); 
+  try {
+    const response = await fetch(`${url}/${boardId}`, {
+      method: "PUT", 
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedBoard), 
+    });
+
+    const data = await response.json();
+    return { status: response.status, data };
+  } catch (error) {
+    console.log(`error: ${error}`);
+    return { status: 500, data: null };
+  }
+}
+
 
 async function boardVisibility(boardId, currentVisibility) {
   const token = getToken()
@@ -312,6 +334,7 @@ async function editAccessRight(boardId, access, oid, status) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+
       },
       body: JSON.stringify({
         accessRight: access,
@@ -492,6 +515,7 @@ const validateAccessToken = async (token) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
+
     }
   )
   return response
@@ -515,28 +539,36 @@ const validateMicrosoftAccessToken = async (token) => {
     return {
       valid: true,
       data,
+
     }
   } catch (error) {
     console.error("Error validating token:", error)
     return {
       valid: false,
-      error: error.message,
+      error: error.message
     }
   }
 }
 
 const refreshAccessToken = async (refreshToken) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        requestTokenHeader: `Bearer ${refreshToken}`,
-      },
-    }
-  )
-  return response
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_BASE_URL_MAIN_LOGIN}/token`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          requestTokenHeader: `Bearer ${refreshToken}`
+        }
+      }
+    )
+    return response
+  } catch (error) {
+    console.error("Error validating token:", error)
+    router.push({ name: "Login" })
+  }
+
 }
 
 export {
@@ -565,4 +597,6 @@ export {
   getAttachments,
   downloadAttachment,
   validateMicrosoftAccessToken,
+  editBoard
+
 }

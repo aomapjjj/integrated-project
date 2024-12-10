@@ -4,9 +4,15 @@ import { useRouter } from 'vue-router'
 
 
 const router = useRouter()
+const token = localStorage.getItem("access_token")
 
 const goBackHome = () => {
-  router.go(-1)
+  if(token){
+    router.go(-1)
+  }else{
+    router.push({ name: "Login" })
+  }
+  
 }
 </script>
 
