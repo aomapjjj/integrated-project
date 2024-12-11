@@ -157,7 +157,6 @@ const updateAccessRight = (item, access) => {
     openModalAcess.value = true
     pendingItem.value = { ...item }
     pendingItem.value.accessRight = access
-    console.log(pendingItem.value.accessRight)
   } catch (error) {
     console.error('Failed to open modal:', error)
   }
@@ -168,7 +167,6 @@ const confirmChange = async () => {
   try {
     confirmAcessChange.value = true
     openModalAcess.value = false
-    console.log(pendingItem.value.accessRight)
     if (pendingItem.value && confirmAcessChange.value === true) {
       const result = await editAccessRight(
         boardId.value,
@@ -255,9 +253,7 @@ const submitFormSendEmail = async () => {
   const inviterName = boardOwnerName.value
   const boardNames = boardName.value
   const boardUrl = baseUrlBoardId
-  console.log('Before:', waitModal.value)
   waitModal.value = true
-  console.log('After:', waitModal.value)
   if (!email || !accessRight || !inviterName || !boardNames || !boardUrl) {
     console.error('One or more required fields are missing.')
     return
@@ -611,14 +607,7 @@ const deleteConfirmationMessage = computed(() => {
                     </div>
                   </div>
                 </template>
-                <!-- <select
-                      v-model="item.accessRight"
-                      @change="updateAccessRight(item)"
-                      class="border border-gray-300 rounded-full text-gray-900 h-10 pl-5 pr-10 bg-white hover:border-gray-400 focus:outline-none appearance-none"
-                    >
-                      <option value="READ">Read</option>
-                      <option value="WRITE">Write</option>
-                    </select> -->
+                
                 <template #btn>
                   <button
                     :disabled="disabledButtonWhileOpenPublic"

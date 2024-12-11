@@ -1,14 +1,12 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import {
-  getItemById,
   getItems,
   addItem,
   editItem,
   deleteItemById,
   deleteItemAndTransfer,
   getBoardById,
-  getResponseItems
 } from '@/libs/fetchUtils.js'
 import { useStatuses } from '@/stores/storeStatus'
 import { useRoute, useRouter } from 'vue-router'

@@ -203,7 +203,7 @@ const checkEqual = computed(() => {
     status: oldValue.value.status || ''
   }
 
-  // ตรวจสอบว่า attachments เป็น array
+  
   const currentFiles = files.value.map((file) => file.name)
   const oldFiles = Array.isArray(todo.value.attachments)
     ? todo.value.attachments.map((attachment) => attachment.fileName)
@@ -503,70 +503,7 @@ const closePreview = () => {
   <Alert :isAlertSuccess="showAlertAfterEdit">
     The task has been successfully edited
   </Alert>
-  <!-- <div
-          role="alert"
-          class="alert shadow-lg alert-error"
-          v-show="alertFailToEdit"
-          style="
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            width: 500px;
-            animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{{ aletMessage }}</span>
-        </div>
-
-        <div
-          role="alert"
-          class="alert shadow-lg"
-          :class="{ hidden: !showAlertAfterEdit }"
-          style="
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            width: 500px;
-            color: rgb(74 222 128 / var(--tw-text-opacity));
-            animation: fadeInOut 1.5s infinite;
-          "
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div>
-            <h2 class="itbkk-message font-bold text-green-400">
-              The task has been successfully edited
-            </h2>
-          </div>
-        </div> -->
+ 
   <!-- Modal window -->
   <dialog
     ref="myModal"

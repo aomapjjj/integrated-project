@@ -204,8 +204,7 @@ async function addBoard(url, newBoard) {
     })
 
     const data = await response.json()
-    // Return both status code and data
-    console.log(data)
+  
     return { status: response.status, data }
   } catch (error) {
     console.log(`error: ${error}`)
@@ -250,7 +249,6 @@ async function boardVisibility(boardId, currentVisibility) {
 
     if (response.status === 200) {
       const editedItem = await response.json()
-      console.log(`Visibility changed to: ${editedItem.visibility}`)
       return {
         success: true,
         visibility: editedItem.visibility,

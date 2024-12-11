@@ -2,7 +2,7 @@
 import { useRouter, useRoute, RouterLink } from 'vue-router'
 import { ref, onMounted, computed } from 'vue'
 import { useUsers } from '@/stores/storeUser'
-import { getItems, getBoardItems } from '../../libs/fetchUtils.js'
+import { getBoardItems } from '../../libs/fetchUtils.js'
 import { useBoard } from '@/stores/storeBoard.js'
 import authConfig from '@/libs/authConfig.js'
 

@@ -102,9 +102,6 @@ const submitForm = async () => {
   }
 }
 
-
-
-
 const clearForm = () => {
   userBoard.value.name = ''
 }

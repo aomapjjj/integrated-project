@@ -125,14 +125,7 @@ const fileIcon = computed(() => {
 });
 
 
-// const getOnlineViewerUrl = computed(() => {
-//   if (fileExtension.value === 'docx' || fileExtension.value === 'xlsx') {
-//     return `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
-//       props.file.url || ''
-//     )}`
-//   }
-//   return null
-// })
+
 </script>
 
 <template>

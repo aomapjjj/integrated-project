@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const referringId = computed(() => route.query.refId)
-const isSignedIn = ref(false) // แทนที่ด้วยฟังก์ชันตรวจสอบสถานะการเข้าสู่ระบบจริง
+const isSignedIn = ref(false) 
 
 const toLogin = () => {
   router.push({ name: 'Login', query: { refId: referringId.value } })

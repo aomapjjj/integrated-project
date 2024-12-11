@@ -1,5 +1,5 @@
 <script setup>
-// const emit = defineEmits(['cancel','comfirm'])
+
 </script>
 
 <template>

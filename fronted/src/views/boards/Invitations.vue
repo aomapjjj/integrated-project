@@ -3,7 +3,6 @@ import { ref, onMounted, watch, computed } from 'vue'
 import {
   getBoardById,
   getItems,
-  addCollaborator,
   editStatusCollab,
   deleteCollaborator
 } from './../../libs/fetchUtils.js'
@@ -37,9 +36,7 @@ watch(
 )
 
 const token = localStorage.getItem('access_token')
-const collaboratorEmail = ref('')
-const collaboratorAccess = ref('READ')
-const oidCollaboratorToRemove = ref(null)
+
 const userName = userStore.getUser().username
 const userEmail = userStore.getEmail()
 
@@ -50,15 +47,14 @@ const collaboratorInfo = ref([])
 // ----------------------- Enable & Disable -----------------------
 
 const disabledButtonWhileOpenPublic = ref(false)
-const openModalAddCollab = ref(false)
-const showConfirmModal = ref(false)
+
 
 // ----------------------- Alerts -----------------------
 
 const isAlertFailure = ref(false)
 const isAlertSuccess = ref(false)
 const alertMessage = ref('')
-const collabnotfoundMessage = ref(false)
+
 
 // ----------------------- BaseUrl -----------------------
 
