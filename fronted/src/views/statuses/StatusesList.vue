@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from 'vue'
 import {
   getItemById,
   getItems,
@@ -9,17 +9,17 @@ import {
   deleteItemAndTransfer,
   getBoardById,
   getResponseItems
-} from "@/libs/fetchUtils.js"
-import { useStatuses } from "@/stores/storeStatus"
-import { useRoute, useRouter } from "vue-router"
-import { useLimitStore } from "@/stores/storeLimit"
-import { useTasks } from "@/stores/store"
-import { useUsers } from "@/stores/storeUser"
-import SideBar from "@/component/bar/SideBar.vue"
-import Navbar from "@/component/bar/Navbar.vue"
-import LodingPage from "@/component/ui/LodingPage.vue"
-import Alert from "@/component/alert/Alert.vue"
-import ConfirmModal from "@/component/modal/ConfirmModal.vue"
+} from '@/libs/fetchUtils.js'
+import { useStatuses } from '@/stores/storeStatus'
+import { useRoute, useRouter } from 'vue-router'
+import { useLimitStore } from '@/stores/storeLimit'
+import { useTasks } from '@/stores/store'
+import { useUsers } from '@/stores/storeUser'
+import SideBar from '@/component/bar/SideBar.vue'
+import Navbar from '@/component/bar/Navbar.vue'
+import LodingPage from '@/component/others/LodingPage.vue'
+import Alert from '@/component/alert/Alert.vue'
+import ConfirmModal from '@/component/modal/ConfirmModal.vue'
 // ----------------------- Router -----------------------
 
 const route = useRoute()
@@ -35,7 +35,7 @@ const taskStore = useTasks()
 // ----------------------- Params -----------------------
 
 const selectedStatusId = ref(0)
-const boardName = ref("")
+const boardName = ref('')
 const boardId = ref()
 const isLoading = ref(true)
 
@@ -46,33 +46,34 @@ watch(
   },
   { immediate: true }
 )
-const token = localStorage.getItem("access_token")
+const token = localStorage.getItem('access_token')
 
 const userName = userStore.getUser().username
 
 // ----------------------- List Items -----------------------
 
 const statusList = ref([])
+
 const status = ref({
-  id: "",
-  name: "",
-  description: "",
-  createdOn: "",
-  updatedOn: ""
+  id: '',
+  name: '',
+  description: '',
+  createdOn: '',
+  updatedOn: ''
 })
 
 const todo = ref({
-  title: "",
-  description: "",
-  assignees: "",
-  status: "No Status"
+  title: '',
+  description: '',
+  assignees: '',
+  status: 'No Status'
 })
 
 // ----------------------- Alerts -----------------------
 
 const notFound = ref(false)
-const errorAdd = ref("")
-const errorEdit = ref("")
+const errorAdd = ref('')
+const errorEdit = ref('')
 
 const notAdd = ref(false)
 const notEdit = ref(false)
@@ -86,13 +87,14 @@ const showAlertDelete = ref(false)
 const showAlertAfterDelete = ref(false)
 
 const limitAlert = ref(false)
-const errorLimit = ref("")
+const errorLimit = ref('')
 const errorTrans = ref(false)
 
 // ----------------------- Enable & Disable -----------------------
 
 const disabledButtonWhileOpenPublic = ref(false)
 const openModalDelete = ref(false)
+const openModalDeleteAndTrans = ref(false)
 
 // ----------------------- BaseUrl -----------------------
 
@@ -111,7 +113,6 @@ onMounted(async () => {
     }
 
     statusList.value = myStatuses.getStatuses()
-    const statusId = route.params.id
 
     const board = await getBoardById(boardId.value)
 
@@ -123,7 +124,7 @@ onMounted(async () => {
     } else if (
       board.item.owner.name !== userName &&
       !board.item.collaborators.some(
-        (collab) => collab.name === userName && collab.accessRight === "WRITE"
+        (collab) => collab.name === userName && collab.accessRight === 'WRITE'
       )
     ) {
       disabledButtonWhileOpenPublic.value = true
@@ -131,7 +132,7 @@ onMounted(async () => {
       disabledButtonWhileOpenPublic.value = false
     }
   } catch (error) {
-    console.error("Error loading data:", error)
+    console.error('Error loading data:', error)
   } finally {
     isLoading.value = false
   }
@@ -142,6 +143,38 @@ const toBoardList = () => {
 }
 
 // ----------------------- Add -----------------------
+const showEditModal = ref(false)
+const showAddModal = ref(false)
+
+const openAddModal = () => {
+  showAddModal.value = true
+}
+
+const closeSharedModal = () => {
+  clearForm()
+  showAddModal.value = false
+  showEditModal.value = false
+}
+
+const updateSharedStatus = async () => {
+  if (!isFormValid.value) return
+  await UpdateStatus()
+  closeSharedModal()
+}
+
+const openEditModal = (statusId) => {
+  const statusToEdit = statusList.value.find((item) => item.id === statusId)
+  if (statusToEdit) {
+    status.value = { ...statusToEdit }
+    originalStatus.value = { ...statusToEdit }
+    showEditModal.value = true
+  }
+}
+
+const closeAddModal = () => {
+  clearForm()
+  showAddModal.value = false
+}
 
 const submitForm = async () => {
   const statusName = status.value.name.trim()
@@ -155,7 +188,7 @@ const submitForm = async () => {
       notAdd.value = false
     }, 1800)
     notAdd.value = true
-    return (errorAdd.value = "Status name already exists")
+    return (errorAdd.value = 'Status name already exists')
   }
   myStatuses.addStatus(
     itemAdd.id,
@@ -168,20 +201,13 @@ const submitForm = async () => {
   setTimeout(() => {
     showAlertAfterAdd.value = false
   }, 2300)
-  closeModalAdd()
+  closeAddModal()
   clearForm()
 }
 
 const clearForm = () => {
-  status.value.name = ""
-  status.value.description = ""
-}
-
-const closeModalAdd = () => {
-  clearForm()
-  const modal = document.getElementById("my_modal_4")
-  modal.close()
-  router.go(-1)
+  status.value.name = ''
+  status.value.description = ''
 }
 
 const selectStatus = (statusId) => {
@@ -206,7 +232,7 @@ const UpdateStatus = async () => {
       notEdit.value = false
     }, 1800)
     notEdit.value = true
-    return (errorEdit.value = "Status name already exists")
+    return (errorEdit.value = 'Status name already exists')
   }
 
   myStatuses.updateStatus(
@@ -231,31 +257,6 @@ const UpdateStatus = async () => {
   router.go(-1)
 }
 
-const openModalToEdit = (statusId) => {
-  const statusToEdit = statusList.value.find((item) => item.id === statusId)
-  status.value = { ...statusToEdit }
-  originalStatus.value = { ...statusToEdit }
-  const modal = document.getElementById("my_modal_edit")
-  modal.showModal()
-  router.push({ name: "EditStatus", params: { statusid: statusId } })
-}
-
-const closeModalEdit = () => {
-  const modal = document.getElementById("my_modal_edit")
-  modal.close()
-  router.go(-1)
-  clearForm()
-}
-
-const isEdited = computed(() => {
-  return (
-    (status.value.name !== originalStatus.value.name ||
-      status.value.description !== originalStatus.value.description) &&
-    (status.value.name.trim().length > 0 ||
-      status.value.description.trim().length > 0)
-  )
-})
-
 const statusExists = (name, id) => {
   return statusList.value.some(
     (status) =>
@@ -273,10 +274,6 @@ const getNameById = (id) => {
   } else {
     return null
   }
-}
-
-const openAdd = () => {
-  router.push({ name: "AddStatus" })
 }
 
 const selectedItemIdToDelete = ref(0)
@@ -321,21 +318,25 @@ const confirmDelete = () => {
 
 const openModalToDeleteTrans = (statusId) => {
   selectedItemIdToDelete.value = statusId
-  const modal3 = document.getElementById("my_modal_deleteTrans")
-  modal3?.showModal()
+  // const modal3 = document.getElementById('my_modal_deleteTrans')
+  // modal3?.showModal()
+  openModalDeleteAndTrans.value = true
 }
 
 const closeModalTrans = () => {
-  const modal3 = document.getElementById("my_modal_deleteTrans")
-  modal3?.close()
+  // const modal3 = document.getElementById('my_modal_deleteTrans')
+  // modal3?.close()
+  openModalDeleteAndTrans.value = false
 }
+
 const confirmDeleteTrans = (statusId) => {
   if (isLimitReached.value) {
     console.error(error.value)
     return
   }
   deleteandtrans(selectedItemIdToDelete.value, statusId)
-  closeModalTrans()
+  openModalDeleteAndTrans.value = false
+  // closeModalTrans()
 }
 
 const deleteandtrans = async (statusId, newID) => {
@@ -369,7 +370,7 @@ const deleteandtrans = async (statusId, newID) => {
 
 const isLimitReached = computed(() => {
   const status = todo.value.status
-  if (status === "No Status" || status === "Done") {
+  if (status === 'No Status' || status === 'Done') {
     return false
   }
   if (limitStore.getLimit().isLimit) {
@@ -399,8 +400,6 @@ const isFormValid = computed(() => {
     isValidDescription(status.value.description)
   )
 })
-
-
 </script>
 
 <template>
@@ -460,24 +459,17 @@ const isFormValid = computed(() => {
 
           <button
             :disabled="disabledButtonWhileOpenPublic"
-            :class="[
-              'itbkk-button-add',
-              'btn',
-              { 'btn-disabled': disabledButtonWhileOpenPublic }
-            ]"
+            class="itbkk-button-add btn ml-4"
             :style="{
               backgroundColor: disabledButtonWhileOpenPublic
                 ? '#d3d3d3'
                 : '#F785B1',
               color: disabledButtonWhileOpenPublic ? '#a9a9a9' : 'white',
               borderRadius: '30px',
-              position: 'static',
               cursor: disabledButtonWhileOpenPublic ? 'not-allowed' : 'pointer',
               opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
             }"
-            onclick="my_modal_4.showModal() "
-            @click="openAdd()"
-            class="itbkk-button-add btn ml-4"
+            @click="openAddModal"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -492,6 +484,92 @@ const isFormValid = computed(() => {
             </svg>
             Add new status
           </button>
+          <div
+            v-if="showAddModal || showEditModal"
+            class="itbkk-modal-status fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+          >
+            <div
+              class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 px-6 py-4 flex flex-col gap-4 transform scale-95 transition-all duration-300 ease-in-out"
+            >
+              <div class="m-6 my-12">
+                <div class="text-center mb-4">
+                  <h2 class="text-2xl font-bold customPurple">
+                    {{ showAddModal ? 'Add New Status' : 'Edit Status' }}
+                  </h2>
+                  <p class="text-gray-500 text-sm mt-1">
+                    Make your status special < 3
+                  </p>
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="statusName"
+                    class="block text-base font-bold mb-2 px-2"
+                  >
+                    Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="statusName"
+                    type="text"
+                    placeholder="Status Name"
+                    v-model="status.name"
+                    class="itbkk-status-name w-full px-4 py-3 border border-gray-300 rounded-full text-gray-700 focus:ring-2 focus:ring-customPurple focus:outline-none transition duration-200"
+                  />
+                  <div class="flex justify-end items-center mx-2 mt-1">
+                    <p class="text-sm text-gray-500">
+                      {{ status.name?.length }}/50
+                    </p>
+                  </div>
+
+                  <label
+                    for="description"
+                    class="block text-base font-bold mb-2 px-2"
+                  >
+                    Description <span class="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    placeholder="No Description Provided"
+                    rows="4"
+                    v-model="status.description"
+                    class="itbkk-status-description w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:ring-2 focus:ring-customPurple focus:outline-none transition duration-200"
+                  ></textarea>
+                  <div class="flex justify-end items-center mx-2 mt-1">
+                    <p class="text-sm text-gray-500">
+                      {{ status.description?.length }}/200
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200"
+                >
+                  <button
+                    @click="closeSharedModal"
+                    class="itbkk-button-cancel py-3 px-6 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    v-if="showAddModal"
+                    @click="submitForm"
+                    :disabled="!isFormValid"
+                    class="itbkk-button-ok btn py-3 px-7 rounded-full bg-customPink text-white hover:bg-[#fa619c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Save
+                  </button>
+                  <button
+                    v-else
+                    @click="updateSharedStatus"
+                    :disabled="!isFormValid"
+                    class="itbkk-button-ok btn py-3 px-7 rounded-full bg-customPink text-white hover:bg-[#fa619c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex items-center">
@@ -638,7 +716,7 @@ const isFormValid = computed(() => {
                       >
                         {{
                           !item.description || item.description.length === 0
-                            ? "No description is provided"
+                            ? 'No description is provided'
                             : item.description
                         }}
                       </label>
@@ -671,7 +749,7 @@ const isFormValid = computed(() => {
                             : 'pointer',
                           opacity: disabledButtonWhileOpenPublic ? 0.6 : 1
                         }"
-                        @click="openModalToEdit(item.id)"
+                        @click="openEditModal(item.id)"
                         v-if="item.name !== 'No Status' && item.name !== 'Done'"
                       >
                         <svg
@@ -691,106 +769,6 @@ const isFormValid = computed(() => {
                           </g>
                         </svg>
                       </button>
-
-                      <dialog id="my_modal_edit" class="modal">
-                        <div
-                          class="modal-box w-full md:w-11/12 max-w-5xl mx-auto"
-                          :key="index"
-                        >
-                          <span
-                            class="block text-2xl font-bold leading-6 text-gray-900 mb-1"
-                            style="margin: 15px"
-                          ></span>
-
-                          <!-- Modal content -->
-                          <div
-                            class="modal-action flex flex-col justify-between"
-                          >
-                            <div
-                              class="modal-content py-4 text-left px-6 flex-grow flex flex-col"
-                            >
-                              <div class="label">
-                                <span
-                                  class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
-                                  >Name
-                                </span>
-                              </div>
-
-                              <label
-                                class="input input-bordered flex items-center gap-2 font-bold ml-4"
-                              >
-                                <input
-                                  type="text"
-                                  class="itbkk-status-name grow"
-                                  placeholder="Enter Your Status Name"
-                                  maxlength="100"
-                                  v-model="status.name"
-                                />
-                              </label>
-                              <p
-                                class="text-sm text-gray-400 mb-2 mt-2"
-                                style="text-align: right"
-                              >
-                                {{ status.name?.length }}/50
-                              </p>
-
-                              <!-- Description -->
-
-                              <label
-                                for="description"
-                                class="itbkk-status-description form-control flex-grow ml-4"
-                              >
-                                <div class="label">
-                                  <span
-                                    class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                                    >Description</span
-                                  >
-                                </div>
-
-                                <textarea
-                                  id="description"
-                                  class="textarea textarea-bordered flex-grow w-full"
-                                  maxlength="500"
-                                  rows="4"
-                                  placeholder="No Description Provided"
-                                  v-model="status.description"
-                                >
-
-                            No description is provided
-                          </textarea
-                                >
-                              </label>
-                              <p
-                                class="text-sm text-gray-400 mb-2 mt-2"
-                                style="text-align: right"
-                              >
-                                {{ status.description?.length }}/200
-                              </p>
-                            </div>
-
-                            <!-- Buttons -->
-                            <div class="flex justify-end">
-                              <form method="dialog">
-                                <button
-                                  @click="UpdateStatus"
-                                  type="submit"
-                                  class="itbkk-button-confirm btn mr-2"
-                                  :class="{ disabled: !isEdited }"
-                                  :disabled="!isFormValid || !isEdited"
-                                >
-                                  Save
-                                </button>
-                              </form>
-                              <button
-                                class="itbkk-button-cancel btn"
-                                @click="closeModalEdit()"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </dialog>
 
                       <!-- Delete Modal -->
 
@@ -884,65 +862,70 @@ const isFormValid = computed(() => {
                           >
                         </template>
                       </ConfirmModal>
-                     
 
                       <!-- Delete And Trans -->
-                      <dialog id="my_modal_deleteTrans" class="modal">
-                        <div class="modal-box" style="max-width: 500px">
-                          <h3
-                            class="itbkk-message font-bold text-lg"
-                            style="color: #9391e4"
-                          >
-                            Transfer a Status
-                          </h3>
-                          <p
-                            class="py-4 font-medium"
-                            style="word-wrap: break-word"
-                          >
-                            There is some task associated with the ...
-                          </p>
+                      <div
+                        v-if="openModalDeleteAndTrans"
+                        class="itbkk-modal-new fixed inset-0 z-20 flex items-center justify-center bg-black bg-opacity-10 "
+                      >
+                        <div
+                          class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4 px-6 py-4 flex flex-col gap-4 transform scale-95 transition-all duration-300 ease-in-out"
+                        >
+                          <div>
+                            <div class="m-6 my-12">
+                              <div class="text-center mb-4">
+                                <h2 class="text-2xl font-bold customPurple">
+                                  Transfer a Status
+                                </h2>
 
-                          <div
-                            class="itbkk-status mb-4 mt-2 w-full flex flex-col items-center"
-                          >
-                            <span
-                              class="block text-lg font-bold leading-6 text-gray-900 mb-2 text-center"
-                              >Transfer a task to</span
-                            >
-                            <select
-                              v-model="status.id"
-                              class="select select-bordered w-full max-w-xs mt-1"
-                              style="text-align: center"
-                            >
-                              <option
-                                v-for="status in statusList"
-                                :value="status.id"
-                              >
-                                {{ status.name }}
-                              </option>
-                            </select>
+                                <p class="text-gray-500 text-sm mt-1">
+                                  There is some task associated with this
+                                  status. <br />
+                                  Please choose another status to transfer the
+                                  tasks.
+                                </p>
 
-                            <div
-                              class="flex justify-center w-full max-w-xs mt-4 space-x-5"
-                            >
-                              <button
-                                class="itbkk-button-cancel btn"
-                                @click="closeModalTrans"
-                                style="color: #eb4343"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                class="itbkk-button-confirm btn bg-green-400"
-                                style="color: #fff"
-                                @click="confirmDeleteTrans(status.id)"
-                              >
-                                Confirm
-                              </button>
+                                <div
+                                  class="itbkk-status flex flex-col space-y-4"
+                                >
+                                  <label
+                                    class="block text-lg font-bold leading-6 text-gray-900 mt-2 text-left"
+                                  >
+                                    Transfer task to:
+                                  </label>
+                                  <select
+                                    v-model="status.id"
+                                    class="border border-gray-300 rounded-lg px-4 py-2"
+                                  >
+                                    <option
+                                      v-for="status in statusList"
+                                      :key="status.id"
+                                      :value="status.id"
+                                    >
+                                      {{ status.name }}
+                                    </option>
+                                  </select>
+                                </div>
+
+                                <div class="flex justify-end space-x-4 mt-6">
+                                  <button
+                                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                    @click="closeModalTrans"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    class="inline-flex w-full justify-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-300 sm:ml-3 sm:w-auto"
+                                    @click="confirmDeleteTrans(status.id)"
+                                  >
+                                    Confirm
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </dialog>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -957,93 +940,6 @@ const isFormValid = computed(() => {
               <div class="flex space-x-1.5"></div>
             </div>
           </div>
-        </div>
-
-        <div>
-          <!-- Add new status -->
-          <dialog id="my_modal_4" class="itbkk-modal-status modal">
-            <div class="modal-box w-full md:w-11/12 max-w-5xl mx-auto">
-              <span
-                class="block text-2xl font-bold leading-6 mb-1"
-                style="margin: 15px; color: #9391e4; text-align: center"
-                >Add Status</span
-              >
-
-              <!-- Modal content -->
-              <div class="modal-action flex flex-col justify-between">
-                <!-- Name -->
-                <div class="modal-content py-4 text-left px-6 flex-grow">
-                  <div class="label">
-                    <span
-                      class="block text-lg font-bold leading-6 text-gray-900 mb-1 ml-4"
-                      >Name
-                    </span>
-                  </div>
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 font-bold ml-4"
-                  >
-                    <input
-                      type="text"
-                      class="itbkk-status-name grow"
-                      placeholder="Enter Your Status Name"
-                      v-model="status.name"
-                    />
-                  </label>
-                  <p
-                    class="text-sm text-gray-400 mb-2 mt-2"
-                    style="text-align: right"
-                  >
-                    {{ status.name?.length }}/50
-                  </p>
-                  <!-- Description -->
-                  <label for="description" class="form-control flex-grow ml-4">
-                    <div class="label">
-                      <span
-                        class="block text-lg font-bold leading-6 text-gray-900 mb-1"
-                        >Description
-                      </span>
-                    </div>
-
-                    <textarea
-                      id="description"
-                      class="itbkk-status-description textarea textarea-bordered flex-grow w-full"
-                      rows="4"
-                      placeholder="No Description Provided"
-                      v-model="status.description"
-                    ></textarea>
-                  </label>
-                  <p
-                    class="text-sm text-gray-400 mb-2 mt-2"
-                    style="text-align: right"
-                  >
-                    {{ status.description?.length }}/200
-                  </p>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex justify-end">
-                  <button
-                    class="itbkk-button-cancel btn"
-                    style="margin: 10px"
-                    @click="closeModalAdd()"
-                  >
-                    Cancel
-                  </button>
-                  <form form @submit.prevent="submitForm" method="dialog">
-                    <button
-                      type="submit"
-                      class="itbkk-button-confirm btn mr-2"
-                      style="flex: 3; margin: 10px; background-color: #f785b1"
-                      :disabled="!isFormValid"
-                    >
-                      Save
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </dialog>
         </div>
       </div>
     </div>

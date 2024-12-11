@@ -13,8 +13,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useLimitStore } from '../../stores/storeLimit'
 import PreviewFile from '../../component/files/PreviewFile.vue'
 import Iconfile from '@/component/files/Iconfile.vue'
-import CatLoading from '@/component/modal/CatLoading.vue'
-// import WaitModal from '@/component/modal/WaitModal.vue'
+import CatLoading from '@/component/others/CatLoading.vue'
 import Alert from '@/component/alert/Alert.vue'
 
 // ----------------------- Router -----------------------
@@ -576,7 +575,7 @@ const closePreview = () => {
     <div
       class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto"
     >
-    <CatLoading :is-loading="waitModal"/>
+      <CatLoading :is-loading="waitModal" />
       <div class="p-6 space-y-6">
         <!-- Title and Status -->
         <div class="flex space-x-4">

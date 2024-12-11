@@ -14,9 +14,8 @@ import Navbar from '@/component/bar/Navbar.vue'
 import Alert from '@/component/alert/Alert.vue'
 import ModalAcess from '@/component/modal/Modal.vue'
 import ConfirmModal from '@/component/modal/ConfirmModal.vue'
-// import WaitModal from '@/component/modal/WaitModal.vue'
-import CatLoading from '@/component/modal/CatLoading.vue'
-import SuccessModal from '@/component/alert/SuccessModal.vue'
+import CatLoading from '@/component/others/CatLoading.vue'
+import SuccessModal from '@/component/alert/SuccessAlert.vue'
 import CollaboratorCard from '@/component/card/CollaboratorCard.vue'
 
 // ----------------------- Router -----------------------

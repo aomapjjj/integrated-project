@@ -9,8 +9,7 @@ import Login from '@/views/Login.vue'
 import Board from '@/views/boards/Board.vue'
 import ToLoginPage from '@/views/errorpage/ToLoginPage.vue'
 import ErrorPagePermission from '@/views/errorpage/PermissionError.vue'
-import Tutorials from '@/component/ui/Tutorials.vue'
-
+import Tutorials from '@/component/others/Tutorials.vue'
 import {
   getBoardById,
   validateAccessToken,

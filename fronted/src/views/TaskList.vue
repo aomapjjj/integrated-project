@@ -22,7 +22,7 @@ import SideBar from "../component/bar/SideBar.vue"
 import Modal from "../component/modal/Modal.vue"
 import Alert from "@/component/alert/Alert.vue"
 import Navbar from "@/component/bar/Navbar.vue"
-import LodingPage from "@/component/ui/LodingPage.vue"
+import LodingPage from "@/component/others/LodingPage.vue"
 import ConfirmModal from "@/component/modal/ConfirmModal.vue"
 
 // ----------------------- Router -----------------------

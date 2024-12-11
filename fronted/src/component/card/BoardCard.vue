@@ -11,7 +11,7 @@ import {
 } from '../../libs/fetchUtils.js'
 import Alert from '../alert/Alert.vue'
 import ConfirmModal from '../modal/ConfirmModal.vue'
-import EmptyBoard from './EmptyBoard.vue'
+import EmptyBoard from '../board/EmptyBoard.vue'
 import PersonalAndCollabBoard from '../board/PersonalAndCollabBoard.vue'
 
 // ----------------------- Router -----------------------
