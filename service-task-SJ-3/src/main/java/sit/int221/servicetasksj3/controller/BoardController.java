@@ -22,7 +22,7 @@ import sit.int221.servicetasksj3.dtos.filesDTO.AttachmentResponseDTO;
 import sit.int221.servicetasksj3.dtos.tasksDTO.*;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.services.*;
-import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.dtos.tasksDTO.MicrosoftDetailDTO;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class BoardController {
     private EmailSenderService emailSenderService;
     @Autowired
     private FileService fileService;
-    MicrosoftUser microsoftUser = null;
+    MicrosoftDetailDTO microsoftUser = null;
 
     private String getUserId(HttpServletRequest request) {
         String userId = null;
