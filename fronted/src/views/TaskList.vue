@@ -1030,7 +1030,7 @@ const changeVisibility = async () => {
                               </svg>
                             </div>
                           </template>
-                          <template #headerMessage> Delete Board </template>
+                          <template #headerMessage> Delete Task </template>
                           <template #message>
                             <p class="text-sm text-gray-500">
                               Do you want to delete the task number

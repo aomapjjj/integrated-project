@@ -842,10 +842,10 @@ const isFormValid = computed(() => {
                             </svg>
                           </div>
                         </template>
-                        <template #headerMessage> Delete Board </template>
+                        <template #headerMessage> Delete Status </template>
                         <template #message>
                           <p class="text-sm text-gray-500">
-                            Do you want to delete
+                            Do you want to delete the status
                             {{ getNameById(selectedItemIdToDelete) }} ?
                           </p>
                         </template>
