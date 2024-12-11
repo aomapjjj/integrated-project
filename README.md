@@ -1,4 +1,4 @@
-# IT Bangmod Kradan Kanbun (SJ-3)
+# IT Bangmod Kradan Kanban (SJ-3)
 
 This project is a continuation of ([IT Bangmod Kradan Kanbun](https://intproj23.sit.kmutt.ac.th/sj3/login)). It is part of the **Integrated Project INT222** subject. And focuses on the collaboration of three main components: **Database**, **Front-end**, and **Back-end**. The following frameworks and tools were chosen:
 
