@@ -1,14 +1,12 @@
-package sit.int221.servicetasksj3.sharedatabase.entities;
+package sit.int221.servicetasksj3.dtos.tasksDTO;
 
 import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MicrosoftUser {
+public class MicrosoftDetailDTO {
     private String oid;
     private String email;
     private String displayName;
-
-
 }

@@ -156,7 +156,7 @@ const steps = [
                       <li
                         v-for="(step, index) in steps"
                         :key="index"
-                        class="relative bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 p-4 mb-2 rounded-xl shadow-md transform transition-all hover:scale-105"
+                        class="relative bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 p-4 mb-2 rounded-lg shadow-md transform transition-all hover:scale-105"
                       >
                         <div
                           class="absolute -top-3 -left-3 w-8 h-8 flex items-center justify-center rounded-full bg-customBlue shadow-sm"

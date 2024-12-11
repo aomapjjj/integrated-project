@@ -1,27 +1,21 @@
 package sit.int221.servicetasksj3.sharedatabase.services;
 
-import io.viascom.nanoid.NanoId;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import sit.int221.servicetasksj3.entities.Board;
 import sit.int221.servicetasksj3.entities.MicrosoftDetail;
-import sit.int221.servicetasksj3.exceptions.ItemNotFoundException;
 import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.repositories.BoardRepository;
 import sit.int221.servicetasksj3.repositories.MicrosoftDetailRepository;
 import sit.int221.servicetasksj3.services.BoardService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
-import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.dtos.tasksDTO.MicrosoftDetailDTO;
 import sit.int221.servicetasksj3.sharedatabase.entities.Role;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
@@ -29,7 +23,6 @@ import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -91,7 +84,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             return null;
         }
     }
-    public AuthUser getUserDetailsMS(MicrosoftUser microsoftUser) {
+    public AuthUser getUserDetailsMS(MicrosoftDetailDTO microsoftUser) {
         AuthUser userItbkk_Shared = loadUserByOid(microsoftUser.getOid());
         MicrosoftDetail microsoftDetail = microsoftDetailRepository.findById(microsoftUser.getOid())
                 .orElse(new MicrosoftDetail());

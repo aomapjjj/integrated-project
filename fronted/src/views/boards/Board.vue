@@ -6,7 +6,7 @@ import { addBoard, getBoardItems , editBoard} from '../../libs/fetchUtils.js'
 import SideBar from '@/component/bar/SideBar.vue'
 import Navbar from '@/component/bar/Navbar.vue'
 import BoardCard from '@/component/card/BoardCard.vue'
-import LodingPage from '@/component/ui/LodingPage.vue'
+import LodingPage from '@/component/others/LodingPage.vue'
 import { useBoard } from '@/stores/storeBoard.js'
 
 // ----------------------- Router -----------------------
@@ -227,19 +227,17 @@ const openModalCreate = () => {
                   <input
                     id="boardName"
                     type="text"
-                    placeholder="Board name"
+                    placeholder="Board Name"
                     v-model="userBoard.name"
                     maxlength="120"
                     class="w-full px-4 py-3 border border-gray-300 rounded-full text-gray-700 focus:ring-2 focus:ring-customPurple focus:outline-none transition duration-200"
                   />
                   <div class="flex justify-end items-center mx-2 mt-1">
-                    <!-- <p class="text-sm text-red-500">MessageError</p> -->
                     <p class="text-sm text-gray-500">
                       {{ userBoard.name.length }}/120
                     </p>
                   </div>
                 </div>
-                <!-- </div> -->
                 <div
                   class="flex justify-center gap-4 px-4 py-4 border-t border-gray-200"
                 >
@@ -265,11 +263,7 @@ const openModalCreate = () => {
               </div>
             </div>
           </div>
-        </div>
-
-
-
-        
+        </div>        
       </div>
     </div>
   </div>
