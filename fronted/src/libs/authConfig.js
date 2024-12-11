@@ -23,14 +23,12 @@ const myMSALObj = new UserAgentApplication(msalConfig)
 const login = async () => {
   try {
     const authResult = await myMSALObj.loginPopup(requestObj)
-    console.log("User Info:", authResult.account)
     return authResult.account
   } catch (error) {
     console.error("Login Error:", error)
     throw error
   }
 }
-
 
 const getAccount = async () => {
   try {
@@ -42,7 +40,6 @@ const getAccount = async () => {
       }
       try {
         const authResult = await myMSALObj.acquireTokenSilent(tokenRequest)
-        console.log("Access Token:", authResult.accessToken)
         localStorage.setItem("access_token", authResult.idToken.rawIdToken)
         return {
           account: account,

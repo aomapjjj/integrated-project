@@ -23,7 +23,7 @@ import sit.int221.servicetasksj3.exceptions.UnauthorizedException;
 import sit.int221.servicetasksj3.services.BoardService;
 import sit.int221.servicetasksj3.services.CollaboratorService;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
-import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.dtos.tasksDTO.MicrosoftDetailDTO;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtTokenUtil;
 import sit.int221.servicetasksj3.sharedatabase.services.JwtUserDetailsService;
 
@@ -50,7 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             boolean isTokenValid = false;
             String tokenError = null;
-            MicrosoftUser microsoftUser = null;
+            MicrosoftDetailDTO microsoftUser = null;
 
             if (request.getRequestURI().equals("/token") || request.getRequestURI().equals("/login")) {
                 chain.doFilter(request, response);
@@ -62,7 +62,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     try {
                         if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
                             microsoftUser = jwtTokenUtil.getDetailMicrosoftFromToken(jwtToken);
-                            System.out.println(microsoftUser);
                             isTokenValid = true;
                             tokenError = "Invalid Microsoft Token";
                         } else {
@@ -95,7 +94,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
             if (microsoftUser != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.jwtUserDetailsService.getUserDetailsMS(microsoftUser);
-                System.out.println("userDetails" + userDetails);
                 if (jwtTokenUtil.isMicrosoftToken(jwtToken)) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -118,7 +116,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String boardId = request.getRequestURI().split("/")[3];
         String requestMethod = request.getMethod();
         AuthUser currentUser = getCurrentUserDetails();
-        System.out.println("currentUser " + currentUser);
         boolean isBoardExist = boardService.boardExists(boardId);
 
         if (!isBoardExist) {
@@ -151,10 +148,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     return;
                 } else {
                     throw new ForbiddenException(
-                            "Pending collaborators are only allowed to access GET methods on board with ID: " + boardId
+                        "Pending collaborators are only allowed to access GET methods on board with ID: " + boardId
                     );
                 }
-
             }
 
             if (isCollaborator) {
