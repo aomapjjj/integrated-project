@@ -6,7 +6,7 @@ import { addBoard, getBoardItems , editBoard} from '../../libs/fetchUtils.js'
 import SideBar from '@/component/bar/SideBar.vue'
 import Navbar from '@/component/bar/Navbar.vue'
 import BoardCard from '@/component/card/BoardCard.vue'
-import LodingPage from '@/component/ui/LodingPage.vue'
+import LodingPage from '@/component/others/LodingPage.vue'
 import { useBoard } from '@/stores/storeBoard.js'
 
 // ----------------------- Router -----------------------
