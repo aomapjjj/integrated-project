@@ -6,21 +6,16 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import sit.int221.servicetasksj3.sharedatabase.entities.AuthUser;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.dtos.tasksDTO.MicrosoftDetailDTO;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,17 +32,13 @@ public class JwtTokenUtil implements Serializable {
     
     SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     public String getUsernameFromToken(String token) {
-
         return getClaimFromToken(token, Claims::getSubject);
     }
-
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-
         final Claims claims = getAllClaimsFromToken(token);
-
         return claimsResolver.apply(claims);
     }
     public Claims getAllClaimsFromToken(String token) {
@@ -99,13 +90,10 @@ public class JwtTokenUtil implements Serializable {
                 .compact();
     }
 
-
     public Boolean validateToken(String token, UserDetails userDetails) {
-        System.out.println("Utill " + userDetails);
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-
 
     public Boolean isMicrosoftToken(String token) throws JsonProcessingException {
         try {
@@ -117,13 +105,12 @@ public class JwtTokenUtil implements Serializable {
         }
     }
 
-    public MicrosoftUser getDetailMicrosoftFromToken(String token) {
+    public MicrosoftDetailDTO getDetailMicrosoftFromToken(String token) {
         Claims claims = getClaimsFromMicrosoftToken(token);
         if (claims == null) {
             return null;
         }
-
-        return new MicrosoftUser(
+        return new MicrosoftDetailDTO(
                 claims.get("oid", String.class),
                 claims.get("preferred_username", String.class),
                 claims.get("name", String.class)
@@ -139,7 +126,5 @@ public class JwtTokenUtil implements Serializable {
             return null;
         }
     }
-
-
 
 }

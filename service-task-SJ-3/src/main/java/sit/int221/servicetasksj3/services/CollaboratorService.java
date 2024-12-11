@@ -6,7 +6,7 @@ import sit.int221.servicetasksj3.dtos.collaboratorDTO.CollaboratorDTO;
 import sit.int221.servicetasksj3.entities.*;
 import sit.int221.servicetasksj3.exceptions.*;
 import sit.int221.servicetasksj3.repositories.*;
-import sit.int221.servicetasksj3.sharedatabase.entities.MicrosoftUser;
+import sit.int221.servicetasksj3.dtos.tasksDTO.MicrosoftDetailDTO;
 import sit.int221.servicetasksj3.sharedatabase.entities.Users;
 import sit.int221.servicetasksj3.sharedatabase.repositories.UserRepository;
 
@@ -81,19 +81,12 @@ public class CollaboratorService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
         Collaborator collaborator = new Collaborator();
-
-
-        MicrosoftUser microsoftUser = microsoftDetailService.getMicrosoftByEmail(collaboratorEmail , token);
-
-
+        MicrosoftDetailDTO microsoftUser = microsoftDetailService.getMicrosoftByEmail(collaboratorEmail , token);
         if(microsoftUser != null ){
-
                 if (microsoftUser.getOid().equals(board.getOwnerId())) {
                     throw new ConflictException("The collaborator email belongs to the board owner");
                 }
-
                 Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
-
                 if (existingCollaborator != null) {
                     if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
                         throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
@@ -101,7 +94,6 @@ public class CollaboratorService {
                         throw new ConflictException("The collaborator already exists for this board");
                     }
                 }
-
                 collaborator.setCollaboratorId(microsoftUser.getOid());
                 collaborator.setCollaboratorName(microsoftUser.getDisplayName());
                 collaborator.setBoardId(boardId);
@@ -112,17 +104,13 @@ public class CollaboratorService {
                 collaborator.setStatus(CollabStatus.valueOf(status));
                 collaboratorRepository.save(collaborator);
         }
-
         else {
             Users user = usersRepository.findByEmail(collaboratorEmail)
                     .orElseThrow(() -> new ItemNotFoundException("User not found with email: " + collaboratorEmail));
-
             if (user.getOid().equals(board.getOwnerId())) {
                 throw new ConflictException("The collaborator email belongs to the board owner");
             }
-
             Collaborator existingCollaborator = collaboratorRepository.findByBoardIdAndCollaboratorEmail(boardId, collaboratorEmail).orElse(null);
-
             if (existingCollaborator != null) {
                 if (existingCollaborator.getStatus() == CollabStatus.PENDING) {
                     throw new ConflictException("The user is already a collaborator or pending collaborator of this board");
@@ -130,8 +118,6 @@ public class CollaboratorService {
                     throw new ConflictException("The collaborator already exists for this board");
                 }
             }
-
-
             collaborator.setCollaboratorId(user.getOid());
             collaborator.setCollaboratorName(user.getName());
             collaborator.setBoardId(boardId);
@@ -141,11 +127,7 @@ public class CollaboratorService {
             collaborator.setAddedOn(new Timestamp(System.currentTimeMillis()));
             collaborator.setStatus(CollabStatus.valueOf(status));
             collaboratorRepository.save(collaborator);
-
         }
-
-
-
         return new CollaboratorDTO(
                 collaborator.getCollaboratorId(),
                 collaborator.getCollaboratorName(),
@@ -159,19 +141,16 @@ public class CollaboratorService {
     public Collaborator updateCollaboratorAccessRight(String boardId, String collaboratorId, String newAccessRight) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
-
         AccessRight accessRight;
         try {
             accessRight = AccessRight.valueOf(newAccessRight.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid access right. Only READ and WRITE are allowed.");
         }
-
         collaborator.setAccessLevel(accessRight);
         return collaboratorRepository.save(collaborator);
     }
@@ -179,19 +158,16 @@ public class CollaboratorService {
     public Collaborator updateCollaboratorStatus(String boardId, String collaboratorId, String newStatus) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
-
         CollabStatus collabStatus;
         try {
             collabStatus = CollabStatus.valueOf(newStatus.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid access right. Only READ and WRITE are allowed.");
         }
-
         collaborator.setStatus(collabStatus);
         return collaboratorRepository.save(collaborator);
     }
@@ -199,12 +175,10 @@ public class CollaboratorService {
     public Collaborator removeCollaborator(String boardId, String collaboratorId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new ItemNotFoundException("Board not found with ID: " + boardId));
-
         Collaborator collaborator = collaboratorRepository.findByBoardIdAndCollaboratorId(boardId, collaboratorId);
         if (collaborator == null) {
             throw new ItemNotFoundException("Collaborator not found");
         }
-
         collaboratorRepository.delete(collaborator);
         return collaborator;
     }
