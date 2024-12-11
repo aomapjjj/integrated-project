@@ -179,10 +179,7 @@ const closeAddModal = () => {
 const submitForm = async () => {
   const statusName = status.value.name.trim()
   const statusDescription = status.value.description.trim()
-  const itemAdd = await addItem(baseUrlStatus, {
-    name: statusName,
-    description: statusDescription
-  })
+
   if (statusExists(statusName)) {
     setTimeout(() => {
       notAdd.value = false
@@ -190,6 +187,12 @@ const submitForm = async () => {
     notAdd.value = true
     return (errorAdd.value = 'Status name already exists')
   }
+
+  const itemAdd = await addItem(baseUrlStatus, {
+    name: statusName,
+    description: statusDescription
+  })
+
   myStatuses.addStatus(
     itemAdd.id,
     itemAdd.name,
@@ -197,6 +200,9 @@ const submitForm = async () => {
     itemAdd.createdOn,
     itemAdd.updateOn
   )
+
+  statusList.value = [...myStatuses.getStatuses()]
+
   showAlertAfterAdd.value = true
   setTimeout(() => {
     showAlertAfterAdd.value = false
@@ -254,7 +260,7 @@ const UpdateStatus = async () => {
   setTimeout(() => {
     showAlertAfterEdit.value = false
   }, 2300)
-  router.go(-1)
+  
 }
 
 const statusExists = (name, id) => {
