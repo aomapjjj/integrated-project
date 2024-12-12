@@ -27,3 +27,10 @@ You can access the project by visiting ([IT Bangmod Kradan Kanbun](https://intpr
 |---------------|-------------|
 | itbkk.olarn   | ip23/OLA    |
 | itbbk.somsuan | ip23/SOM    |
+
+## ([Diagram](https://www.canva.com/design/DAGY91V8Iv0/THEBpnxwX8I1qnuSJkTPyw/edit?utm_content=DAGY91V8Iv0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton))
+<img width="660" alt="Screenshot 2567-12-12 at 15 02 33" src="https://github.com/user-attachments/assets/d89cf262-6825-4d9f-b119-8f3672e07fda" />
+<img width="882" alt="Screenshot 2567-12-12 at 15 02 44" src="https://github.com/user-attachments/assets/97ddfb0e-3c47-47e4-b96f-c9bdc7fd51cf" />
+<img width="918" alt="Screenshot 2567-12-12 at 15 03 22" src="https://github.com/user-attachments/assets/6d19fae0-db32-425a-b85a-e7ac124ae209" />
+<img width="1099" alt="Screenshot 2567-12-12 at 15 03 10" src="https://github.com/user-attachments/assets/3eacd018-7f4f-40a9-af09-05c1eaf2fc5c" />
+
