@@ -36,6 +36,10 @@ public class FileService {
     @Autowired
     private TaskRepository taskRepository;
 
+    private boolean isValidFileSize(MultipartFile file) {
+        return file.getSize() <= (long) MAX_FILE_SIZE_MB * 1024 * 1024;
+    }
+
     private boolean isDuplicateFile(Task task, String fileName) {
         return task.getFiles().stream().anyMatch(existingFile -> existingFile.getFileName().equals(fileName));
     }
@@ -102,6 +106,7 @@ public class FileService {
 
         List<AttachmentDTO> successfulUploads = new ArrayList<>();
         List<ErrorDetails.ValidationError> errorList = new ArrayList<>();
+        List<String> notAddedFiles = new ArrayList<>();
 
         int existingFileCount = task.getFiles().size();
         int remainingSlots = MAX_FILES - existingFileCount;
@@ -111,6 +116,11 @@ public class FileService {
                     "files",
                     "Each task can have at most " + MAX_FILES + " files."
             ));
+            notAddedFiles.addAll(
+                    files.subList(remainingSlots, files.size()).stream()
+                            .map(MultipartFile::getOriginalFilename)
+                            .collect(Collectors.toList())
+            );
             files = files.subList(0, remainingSlots); // limit files to remaining slots
         }
 
@@ -127,6 +137,7 @@ public class FileService {
                         String.format("%s exceeds max file size of %d MB (%.2f MB detected).",
                                 fileName, MAX_FILE_SIZE_MB, fileSize / (1024.0 * 1024.0))
                 ));
+                notAddedFiles.add(fileName);
                 continue; // skip file with invalid size
             }
 
@@ -135,6 +146,7 @@ public class FileService {
                         "files",
                         "File with the same filename cannot be added or updated to the attachments. Please delete the attachment and add it again to update the file: " + fileName
                 ));
+                notAddedFiles.add(fileName);
                 continue; // skip file with duplicate name
             }
 
@@ -160,6 +172,7 @@ public class FileService {
                         "files",
                         "Error uploading file: " + fileName
                 ));
+                notAddedFiles.add(fileName);
             }
         }
 
@@ -169,6 +182,9 @@ public class FileService {
             for (ErrorDetails.ValidationError error : errorList) {
                 message.append("  - ").append(error.getMessage()).append("\n");
             }
+        }
+        if (!notAddedFiles.isEmpty()) {
+            message.append("The following files were not added: ").append(String.join(", ", notAddedFiles)).append(".");
         }
         if (errorList.isEmpty()) {
             message.insert(0, "All files uploaded successfully.");
@@ -195,4 +211,3 @@ public class FileService {
         return deletedAttachmentDTO;
     }
 }
-
