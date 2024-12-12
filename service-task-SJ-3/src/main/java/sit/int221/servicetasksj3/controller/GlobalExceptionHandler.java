@@ -93,12 +93,15 @@ public class GlobalExceptionHandler {
         return createErrorResponse("Request body contains invalid data. Please check the 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
     }
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorDetails> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
-        List<ErrorDetails.ValidationError> errors = List.of(
-                new ErrorDetails.ValidationError("files","Some files were not uploaded due to size limits. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
-                )
+    public ResponseEntity<AttachmentResponseDTO> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception, WebRequest request) {
+        AttachmentResponseDTO responseDTO = new AttachmentResponseDTO(
+            "Some files were too large and could not be uploaded.", List.of(),
+                List.of(new ErrorDetails.ValidationError(
+                    "files",
+                    "Some files were not uploaded due to size limits. Ensure file size does not exceed " + MAX_FILE_SIZE_MB + " MB."
+            ))
         );
-        return createErrorResponse("Validation error. Check 'errors' field for details.", HttpStatus.BAD_REQUEST, request, errors);
+        return ResponseEntity.ok(responseDTO);
     }
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(org.springframework.security.access.AccessDeniedException exception, WebRequest request) {
