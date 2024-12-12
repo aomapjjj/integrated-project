@@ -29,8 +29,7 @@ const checkAccessRight = async (boardId, requiredAccess) => {
   const board = await getBoardById(boardId)
 
   const currentUser = getCurrentUser()
-  // if (!currentUser) return { error: "Login" }
-
+ 
   const currentUsername = currentUser?.username
   const { owner, collaborators, visibility } = board.item
 
